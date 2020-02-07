@@ -10,3 +10,6 @@ htmlcov/
 settings.py
 logs/
 time/
+
+# VS Code config
+.vscode
