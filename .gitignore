@@ -1,0 +1,12 @@
+# Caches
+__pycache__/
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# Specific instance details
+settings.py
+logs/
+time/
