@@ -1,11 +1,12 @@
 import pytest
 
-from tests.mocks import mock_events
+from tests.mocks.events import nominate
+from tests.mocks.events.faulty import beatmapset_events
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.time_parser import from_ISO_8601_to_datetime
 
 def test_parse():
-    generator = beatmapset_event_parser.parse(mock_events.first_faulty_second_correct_beatmapsets_soup)
+    generator = beatmapset_event_parser.parse(beatmapset_events.soup)
 
     generated_events = []
     for event in generator:
@@ -16,7 +17,7 @@ def test_parse():
 
 @pytest.fixture(scope="module")
 def beatmapset_event():
-    return beatmapset_event_parser.parse_event(mock_events.nominate_tag)
+    return beatmapset_event_parser.parse_event(nominate.tag)
 
 def test_event_attr(beatmapset_event):
     assert beatmapset_event.time == from_ISO_8601_to_datetime("2019-12-05T12:39:39+00:00")

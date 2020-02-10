@@ -1,16 +1,17 @@
 import pytest
 from datetime import datetime
 
-from tests.mocks import mock_events
+from tests.mocks.events import issue_resolve, nominate, problem
+from tests.mocks.events.faulty import no_events
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.discussion_event_parser import discussion_event_parser
 from parsers.time_parser import from_ISO_8601_to_datetime
 
 def test_parse_event_type():
     tests = [
-        [beatmapset_event_parser.parse_event_type(mock_events.issue_resolve_tag), "issue-resolve"],
-        [beatmapset_event_parser.parse_event_type(mock_events.nominate_tag), "nominate"],
-        [discussion_event_parser.parse_event_type(mock_events.discussion_tag), "problem"]
+        [beatmapset_event_parser.parse_event_type(issue_resolve.tag), "issue-resolve"],
+        [beatmapset_event_parser.parse_event_type(nominate.tag), "nominate"],
+        [discussion_event_parser.parse_event_type(problem.tag), "problem"]
     ]
 
     for actual, expected in tests:
@@ -18,7 +19,7 @@ def test_parse_event_type():
 
 def test_parse_event_type_faulty():
     faulty_values = [
-        mock_events.faulty_tag,
+        no_events.tag,
         None
     ]
 
@@ -32,9 +33,9 @@ def test_parse_event_type_faulty():
 
 def test_parse_event_time():
     tests = [
-        [beatmapset_event_parser.parse_event_time(mock_events.issue_resolve_tag), from_ISO_8601_to_datetime("2019-12-05T10:26:54+00:00")],
-        [beatmapset_event_parser.parse_event_time(mock_events.nominate_tag), from_ISO_8601_to_datetime("2019-12-05T12:39:39+00:00")],
-        [discussion_event_parser.parse_event_time(mock_events.discussion_tag), from_ISO_8601_to_datetime("2019-12-05T16:50:10+00:00")]
+        [beatmapset_event_parser.parse_event_time(issue_resolve.tag), from_ISO_8601_to_datetime("2019-12-05T10:26:54+00:00")],
+        [beatmapset_event_parser.parse_event_time(nominate.tag), from_ISO_8601_to_datetime("2019-12-05T12:39:39+00:00")],
+        [discussion_event_parser.parse_event_time(problem.tag), from_ISO_8601_to_datetime("2019-12-05T16:50:10+00:00")]
     ]
 
     for actual, expected in tests:
@@ -42,7 +43,7 @@ def test_parse_event_time():
 
 def test_parse_event_time_faulty():
     faulty_values = [
-        mock_events.faulty_tag,
+        no_events.tag,
         None
     ]
 
@@ -56,9 +57,9 @@ def test_parse_event_time_faulty():
 
 def test_parse_event_link():
     tests = [
-        [beatmapset_event_parser.parse_event_link(mock_events.issue_resolve_tag), "https://osu.ppy.sh/beatmapsets/1011055/discussion#/1294675"],
-        [beatmapset_event_parser.parse_event_link(mock_events.nominate_tag), "https://osu.ppy.sh/beatmapsets/1013400/discussion"],
-        [discussion_event_parser.parse_event_link(mock_events.discussion_tag), "https://osu.ppy.sh/beatmapsets/1074596/discussion#/1295203"]
+        [beatmapset_event_parser.parse_event_link(issue_resolve.tag), "https://osu.ppy.sh/beatmapsets/1011055/discussion#/1294675"],
+        [beatmapset_event_parser.parse_event_link(nominate.tag), "https://osu.ppy.sh/beatmapsets/1013400/discussion"],
+        [discussion_event_parser.parse_event_link(problem.tag), "https://osu.ppy.sh/beatmapsets/1074596/discussion#/1295203"]
     ]
 
     for actual, expected in tests:
@@ -66,7 +67,7 @@ def test_parse_event_link():
 
 def test_parse_event_link_faulty():
     faulty_values = [
-        mock_events.faulty_tag,
+        no_events.tag,
         None
     ]
 
@@ -80,9 +81,9 @@ def test_parse_event_link_faulty():
 
 def test_parse_author_id():
     tests = [
-        [beatmapset_event_parser.parse_event_author_id(mock_events.issue_resolve_tag), None],
-        [beatmapset_event_parser.parse_event_author_id(mock_events.nominate_tag), "1653229"],
-        [discussion_event_parser.parse_event_author_id(mock_events.discussion_tag), "197805"]
+        [beatmapset_event_parser.parse_event_author_id(issue_resolve.tag), None],
+        [beatmapset_event_parser.parse_event_author_id(nominate.tag), "1653229"],
+        [discussion_event_parser.parse_event_author_id(problem.tag), "197805"]
     ]
 
     for actual, expected in tests:
@@ -90,7 +91,7 @@ def test_parse_author_id():
 
 def test_parse_event_author_id_faulty():
     faulty_values = [
-        mock_events.faulty_tag,
+        no_events.tag,
         None
     ]
 
@@ -103,9 +104,9 @@ def test_parse_event_author_id_faulty():
 
 def test_parse_author_name():
     tests = [
-        [beatmapset_event_parser.parse_event_author_name(mock_events.issue_resolve_tag), None],
-        [beatmapset_event_parser.parse_event_author_name(mock_events.nominate_tag), "_Stan"],
-        [discussion_event_parser.parse_event_author_name(mock_events.discussion_tag), "Niva"]
+        [beatmapset_event_parser.parse_event_author_name(issue_resolve.tag), None],
+        [beatmapset_event_parser.parse_event_author_name(nominate.tag), "_Stan"],
+        [discussion_event_parser.parse_event_author_name(problem.tag), "Niva"]
     ]
 
     for actual, expected in tests:
@@ -113,7 +114,7 @@ def test_parse_author_name():
 
 def test_parse_event_author_name_faulty():
     faulty_values = [
-        mock_events.faulty_tag,
+        no_events.tag,
         None
     ]
 
