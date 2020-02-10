@@ -20,7 +20,6 @@ def test_parse_event_type():
 def test_parse_event_type_faulty():
     faulty_values = [
         no_events.tag,
-        deleted_beatmap.tag,
         None
     ]
 
@@ -45,7 +44,6 @@ def test_parse_event_time():
 def test_parse_event_time_faulty():
     faulty_values = [
         no_events.tag,
-        deleted_beatmap.tag,
         None
     ]
 
