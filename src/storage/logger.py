@@ -30,3 +30,8 @@ def write(_obj, end: str="\n", postfix: str="") -> None:
     message = str(_obj)
     with open(f"{PATH_PREFIX}log{postfix}-{time_str}.txt", "a", encoding="utf-8") as _file:
         _file.write(message + end)
+
+def log_err(err: Exception) -> None:
+    """Takes the given exception as a string and appends it to both the current log and log-err files."""
+    log(err)
+    write(err, postfix="-err")
