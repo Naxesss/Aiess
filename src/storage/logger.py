@@ -11,10 +11,6 @@ def init(_time_str):
 
 def log(_obj="", end="\n") -> None:
     """Takes the given object as a string, prints it, and appends it to the current log file."""
-    global time_str
-    if not time_str:
-        return  # Tests do not initalize the time string.
-
     message = str(_obj)
     try:
         print(message, end=end)
@@ -22,5 +18,15 @@ def log(_obj="", end="\n") -> None:
         # Occurs when the message includes character codes which the python terminal doesn't recognize.
         print(f"OSError: {error}")
     
-    with open(f"{PATH_PREFIX}log-{time_str}.txt", "a", encoding="utf-8") as _file:
+    write(_obj, end)
+
+def write(_obj, end: str="\n", postfix: str="") -> None:
+    """Takes the given object as a string and appends it to the current log file,
+    with a given postfix, if specified."""
+    global time_str
+    if not time_str:
+        return  # Tests do not initalize the time string.
+
+    message = str(_obj)
+    with open(f"{PATH_PREFIX}log{postfix}-{time_str}.txt", "a", encoding="utf-8") as _file:
         _file.write(message + end)
