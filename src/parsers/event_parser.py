@@ -45,7 +45,8 @@ class EventParser():
 
         if not href:
             raise ValueError("""
-                The thumbnail link of an event could not be found. Expected some <a> tag with attribute href.""")
+                The thumbnail link of an event could not be found. Expected some <a> tag with attribute href. 
+                This can happen if, for example, the beatmapset was deleted.""")
 
         return href
 
