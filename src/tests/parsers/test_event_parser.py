@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 
 from tests.mocks.events import issue_resolve, nominate, problem
-from tests.mocks.events.faulty import no_events
+from tests.mocks.events.faulty import no_events, deleted_beatmap
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.discussion_event_parser import discussion_event_parser
 from parsers.time_parser import from_ISO_8601_to_datetime
@@ -20,6 +20,7 @@ def test_parse_event_type():
 def test_parse_event_type_faulty():
     faulty_values = [
         no_events.tag,
+        deleted_beatmap.tag,
         None
     ]
 
@@ -44,6 +45,7 @@ def test_parse_event_time():
 def test_parse_event_time_faulty():
     faulty_values = [
         no_events.tag,
+        deleted_beatmap.tag,
         None
     ]
 
@@ -68,6 +70,7 @@ def test_parse_event_link():
 def test_parse_event_link_faulty():
     faulty_values = [
         no_events.tag,
+        deleted_beatmap.tag,
         None
     ]
 
@@ -92,6 +95,7 @@ def test_parse_author_id():
 def test_parse_event_author_id_faulty():
     faulty_values = [
         no_events.tag,
+        deleted_beatmap.tag,
         None
     ]
 
@@ -115,6 +119,7 @@ def test_parse_author_name():
 def test_parse_event_author_name_faulty():
     faulty_values = [
         no_events.tag,
+        deleted_beatmap.tag,
         None
     ]
 
