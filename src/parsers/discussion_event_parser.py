@@ -2,10 +2,7 @@ from bs4 import BeautifulSoup
 from typing import Generator
 from bs4.element import Tag
 
-from objects import Event
-from objects import Beatmapset
-from objects import Discussion
-from objects import User
+from objects import Event, Beatmapset, User, Discussion
 from parsers.event_parser import EventParser
 from storage.logger import log_err
 
