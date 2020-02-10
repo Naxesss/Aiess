@@ -6,6 +6,7 @@ from objects import Event, Beatmapset, Discussion, User
 from parsers.event_parser import EventParser
 from parsers.discussion_parser import discussion_parser
 from storage.database import database
+from storage.logger import log_err
 
 class BeatmapsetEventParser(EventParser):
 
@@ -17,32 +18,33 @@ class BeatmapsetEventParser(EventParser):
                 yield parsed_event
     
     def parse_event(self, event: Tag) -> Event:
-        """Returns a BeatmapsetEvent reflecting the given event html Tag object."""
-        # Scrape object data
-        _type = self.parse_event_type(event)
-        time = self.parse_event_time(event)
-
-        link = self.parse_event_link(event)
-        beatmapset_id = self.parse_id_from_beatmapset_link(link)
-        discussion_id = self.parse_id_from_discussion_link(link)
-
-        user_id = self.parse_event_author_id(event)
-        user_name = self.parse_event_author_name(event)
-
-        # Reconstruct objects
+        """Returns a BeatmapsetEvent reflecting the given event html Tag object.
+        Raises if some part could not be parsed (e.g. if the beatmapset has been deleted)."""
         try:
-            beatmapset = Beatmapset(beatmapset_id)
-        except:
-            return None
-        user = User(user_id, user_name) if user_id != None else None
-        discussion = Discussion(discussion_id, beatmapset) if discussion_id != None else None
+            # Scrape object data
+            _type = self.parse_event_type(event)
+            time = self.parse_event_time(event)
 
-        return Event(
-            _type = _type,
-            time = time,
-            beatmapset = beatmapset,
-            discussion = discussion,
-            user = user)
+            link = self.parse_event_link(event)
+            beatmapset_id = self.parse_id_from_beatmapset_link(link)
+            discussion_id = self.parse_id_from_discussion_link(link)
+
+            user_id = self.parse_event_author_id(event)
+            user_name = self.parse_event_author_name(event)
+
+            # Reconstruct objects
+            beatmapset = Beatmapset(beatmapset_id)
+            user = User(user_id, user_name) if user_id != None else None
+            discussion = Discussion(discussion_id, beatmapset) if discussion_id != None else None
+        except ValueError as err:
+            log_err(err)
+        else:
+            return Event(
+                _type = _type,
+                time = time,
+                beatmapset = beatmapset,
+                discussion = discussion,
+                user = user)
     
     def parse_event_type(self, event: Tag) -> str:
         """Returns the type of the given event (e.g. nominate", "issue-resolve", "disqualify")."""
