@@ -4,12 +4,12 @@ PATH_PREFIX = "../logs/"
 
 time_str = None
 
-def init(_time_str):
+def init(_time_str: str):
     """Sets the time string for the log file (i.e. "log-{time_str}.txt")."""
     global time_str
     time_str = _time_str
 
-def log(_obj="", end="\n") -> None:
+def log(_obj="", end: str="\n") -> None:
     """Takes the given object as a string, prints it, and appends it to the current log file."""
     message = str(_obj)
     try:
