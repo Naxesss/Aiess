@@ -18,7 +18,7 @@ class DiscussionEventParser(EventParser):
     
     def parse_event(self, event: Tag) -> Event:
         """Returns a BeatmapsetEvent reflecting the given event html Tag object.
-        Raises if some part could not be parsed (e.g. if the beatmapset has been deleted)."""
+        Ignores any event with an incomplete context (e.g. deleted beatmaps)."""
         try:
             # Scrape object data
             _type = self.parse_event_type(event)
