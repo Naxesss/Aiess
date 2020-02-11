@@ -4,6 +4,7 @@ from datetime import datetime
 import re
 
 from parsers import time_parser
+from parsers.exceptions import ParsingError, DeletedContextError
 
 class EventParser():
 
@@ -20,7 +21,8 @@ class EventParser():
         
         # Failure to parse event type should be met with an exception, as this is abnormal and will likely cause further issues if silent.
         if not event_type:
-            raise ValueError(f"The type of an event could not be parsed. Expected some class starting with \"{class_prefix}\":\r\n{event}")
+            raise ParsingError(f"""
+                The type of an event could not be parsed. Expected some class starting with \"{class_prefix}\":\r\n{event}""")
 
         return event_type
 
@@ -33,7 +35,8 @@ class EventParser():
         
         # Failure to parse event time should be met with an exception for the same reason as failing to parse event type.
         if event_time == None:
-            raise ValueError(f"The time of an event could not be parsed. Expected some time object with class \"timeago\":\r\n{event}")
+            raise ParsingError(f"""
+                The time of an event could not be parsed. Expected some time object with class \"timeago\":\r\n{event}""")
 
         return time_parser.from_ISO_8601_to_datetime(event_time)
 
@@ -44,9 +47,9 @@ class EventParser():
         href = thumb and thumb.attrs["href"]
 
         if not href:
-            raise ValueError("""
-                The thumbnail link of an event could not be found. Expected some <a> tag with attribute href. 
-                This can happen if, for example, the beatmapset was deleted.""")
+            self.raise_if_deleted(event)
+            raise ParsingError(f"""
+                The thumbnail link of an event could not be found. Expected some <a> tag with attribute href.""")
 
         return href
 
@@ -63,7 +66,8 @@ class EventParser():
                 user_id = self.parse_id_from_user_link(user_a["href"])
         
         if must_find and not user_id:
-            raise ValueError(f"""
+            self.raise_if_deleted(event)
+            raise ParsingError(f"""
                 The user id of the author of an event could not be parsed. Expected some <a> tag with class \"user-name\" 
                 and attr \"data-user-id\":\r\n{event}""")
 
@@ -78,7 +82,8 @@ class EventParser():
             user_name = user_href.getText()
         
         if must_find and not user_name:
-            raise ValueError(f"""
+            self.raise_if_deleted(event)
+            raise ParsingError(f"""
                 The user name of the author of an event could not be parsed. Expected some href object with class \"user-name\" 
                 and attr \"data-user-id\":\r\n{event}""")
         
@@ -113,3 +118,13 @@ class EventParser():
         if not match:
             return None
         return match.group(1)
+    
+    def is_beatmap_deleted(self, event: Tag) -> bool:
+        """Returns whether the event includes some span containing "deleted",
+        as any deleted beatmap will include "<span>deleted<br>beatmap</span>"."""
+        span = event and event.find("span")
+        return span and "deleted" in span.text
+    
+    def raise_if_deleted(self, event: Tag) -> bool:
+        if self.is_beatmap_deleted(event):
+            raise DeletedContextError()

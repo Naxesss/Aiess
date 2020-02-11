@@ -4,6 +4,7 @@ from bs4.element import Tag
 
 from objects import Event, Beatmapset, User, Discussion
 from parsers.event_parser import EventParser
+from parsers.exceptions import DeletedContextError
 from storage.logger import log_err
 
 class DiscussionEventParser(EventParser):
@@ -36,7 +37,7 @@ class DiscussionEventParser(EventParser):
             beatmapset = Beatmapset(beatmapset_id)
             discussion_author = User(discussion_author_id, discussion_author_name) if discussion_author_id != None else None
             discussion = Discussion(discussion_id, beatmapset, discussion_author, content) if discussion_id != None else None
-        except ValueError as err:
+        except DeletedContextError as err:
             log_err(err)
         else:
             return Event(

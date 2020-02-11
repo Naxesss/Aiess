@@ -6,6 +6,7 @@ from tests.mocks.events.faulty import no_events, deleted_beatmap
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.discussion_event_parser import discussion_event_parser
 from parsers.time_parser import from_ISO_8601_to_datetime
+from parsers.exceptions import ParsingError, DeletedContextError
 
 def test_parse_event_type():
     tests = [
@@ -24,11 +25,11 @@ def test_parse_event_type_faulty():
     ]
 
     for value in faulty_values:
-        with pytest.raises(ValueError):
+        with pytest.raises(ParsingError):
             beatmapset_event_parser.parse_event_type(value)
     
     for value in faulty_values:
-        with pytest.raises(ValueError):
+        with pytest.raises(ParsingError):
             discussion_event_parser.parse_event_type(value)
 
 def test_parse_event_time():
@@ -48,11 +49,11 @@ def test_parse_event_time_faulty():
     ]
 
     for value in faulty_values:
-        with pytest.raises(ValueError):
+        with pytest.raises(ParsingError):
             beatmapset_event_parser.parse_event_time(value)
     
     for value in faulty_values:
-        with pytest.raises(ValueError):
+        with pytest.raises(ParsingError):
             discussion_event_parser.parse_event_time(value)
 
 def test_parse_event_link():
@@ -67,17 +68,17 @@ def test_parse_event_link():
 
 def test_parse_event_link_faulty():
     faulty_values = [
-        no_events.tag,
-        deleted_beatmap.tag,
-        None
+        [no_events.tag, ParsingError],
+        [deleted_beatmap.tag, DeletedContextError],
+        [None, ParsingError]
     ]
 
-    for value in faulty_values:
-        with pytest.raises(ValueError):
+    for value, expected_exception in faulty_values:
+        with pytest.raises(expected_exception):
             beatmapset_event_parser.parse_event_link(value)
     
-    for value in faulty_values:
-        with pytest.raises(ValueError):
+    for value, expected_exception in faulty_values:
+        with pytest.raises(expected_exception):
             discussion_event_parser.parse_event_link(value)
 
 def test_parse_author_id():
@@ -92,16 +93,16 @@ def test_parse_author_id():
 
 def test_parse_event_author_id_faulty():
     faulty_values = [
-        no_events.tag,
-        deleted_beatmap.tag,
-        None
+        [no_events.tag, ParsingError],
+        [deleted_beatmap.tag, DeletedContextError],
+        [None, ParsingError]
     ]
 
-    for value in faulty_values:
+    for value, expected_exception in faulty_values:
         assert beatmapset_event_parser.parse_event_author_id(value) == None
     
-    for value in faulty_values:
-        with pytest.raises(ValueError):
+    for value, expected_exception in faulty_values:
+        with pytest.raises(expected_exception):
             discussion_event_parser.parse_event_author_id(value)
 
 def test_parse_author_name():
@@ -116,17 +117,17 @@ def test_parse_author_name():
 
 def test_parse_event_author_name_faulty():
     faulty_values = [
-        no_events.tag,
-        deleted_beatmap.tag,
-        None
+        [no_events.tag, ParsingError],
+        [deleted_beatmap.tag, DeletedContextError],
+        [None, ParsingError]
     ]
 
-    for value in faulty_values:
+    for value, expected_exception in faulty_values:
         assert beatmapset_event_parser.parse_event_author_name(value) == None
     
-    for value in faulty_values:
-        with pytest.raises(ValueError):
-            discussion_event_parser.parse_event_author_name(value)
+    for value, expected_exception in faulty_values:
+        with pytest.raises(expected_exception):
+            discussion_event_parser.parse_event_link(value)
 
 def test_parse_id_from_user_link():
     tests = [

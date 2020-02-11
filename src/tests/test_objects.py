@@ -2,6 +2,7 @@ import pytest
 
 import objects
 from tests.mocks import mock_api_responses
+from parsers.exceptions import DeletedContextError
 
 def test_user():
     user = objects.User(101, "Generic Name")
@@ -38,7 +39,7 @@ def test_beatmapset():
     assert beatmapset.__str__() == "The Quick Brown Fox - The Big Black (mapped by Blue Dragon) [osu][taiko]"
 
 def test_beatmapset_non_existent():
-    with pytest.raises(ValueError):
+    with pytest.raises(DeletedContextError):
         objects.Beatmapset(2, beatmapset_json="[]")
 
 def test_discussion():
