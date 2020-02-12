@@ -4,6 +4,7 @@ from typing import Generator, Callable, List
 
 from web.scraper import get_beatmapset_events, get_discussion_events
 from web.scraper import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
+from web import api
 from storage import event_time
 from objects import Event, Discussion
 from storage.database import database
@@ -14,6 +15,9 @@ cached_discussions_json = {}
 
 def get_all_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
     """Returns a generator of all events within the given time frame."""
+    # Ensures name changes, beatmap updates, etc are considered.
+    api.clear_response_cache()
+
     for event in __get_discussion_events_between(start_time, end_time): yield event
     for event in __get_beatmapset_events_between(start_time, end_time): yield event
 

@@ -37,3 +37,9 @@ def request_user(user_id: str) -> object:
         # For when the user does not exist (e.g. restricted).
         # Do not cache, in case they get unrestricted soon.
         return None
+
+def clear_response_cache() -> None:
+    global requested_beatmapsets
+    global requested_users
+    requested_beatmapsets = defaultdict()
+    requested_users = defaultdict()
