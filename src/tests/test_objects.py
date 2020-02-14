@@ -61,14 +61,14 @@ def test_discussion():
 
     assert discussion.id == "1234956"
     assert discussion.beatmapset == beatmapset
-    # TODO: Complete implementation
-    # assert discussion.content == """
-    #   since it ranks soon gonna just dq for fierys discussion #1228459 plus thought 
-    #   about points i brought up privately in dms."""
-    # assert discussion.user.id == "4967662"
-    # assert discussion.user.name == "greenhue"
-    # assert discussion.resolved
-    # assert len(discussion.replies) == 2
+
+    # Some information will not be available until it is supplied by other sources
+    # (e.g. discussion jsons, prior database entires, scraping)
+    discussion = populator.get_complete_discussion_info(discussion, beatmapset)
+
+    assert discussion.user.id == "4967662"
+    assert discussion.user.name == "greenhue"
+    assert discussion.content == "since it ranks soon gonna just dq for fierys discussion https://osu.ppy.sh/beatmapsets/1001546/discussion/-/generalAll#/1228459 plus thought about points i brought up privately in dms."
 
 def test_usergroup():
     usergroup = objects.Usergroup("4")
