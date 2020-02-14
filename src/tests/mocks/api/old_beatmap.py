@@ -1,6 +1,6 @@
 import json
 
-BEATMAPSET_JSON_BIG_BLACK = json.loads("""
+JSON = json.loads("""
 [
   {
     "beatmapset_id": "41823",
