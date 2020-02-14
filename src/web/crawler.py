@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from typing import Generator, Callable, List
 
-from web.scraper import get_beatmapset_events, get_discussion_events
+from web.scraper import get_discussion_events, get_reply_events, get_beatmapset_events
 from web.scraper import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
 from web import api, populator
 from storage import event_time
@@ -17,11 +17,17 @@ def get_all_events_between(start_time: datetime, end_time: datetime) -> Generato
     api.clear_response_cache()
 
     for event in __get_discussion_events_between(start_time, end_time): yield event
+    for event in __get_reply_events_between(start_time, end_time): yield event
     for event in __get_beatmapset_events_between(start_time, end_time): yield event
 
 def __get_discussion_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
     """Returns a generator of discussion events (from /beatmap-disussions) within the given time frame."""
     for event in __get_event_generations_between(get_discussion_events, start_time, end_time):
+        yield event
+
+def __get_reply_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
+    """Returns a generator of discussion events (from /beatmap-disussions) within the given time frame."""
+    for event in __get_event_generations_between(get_reply_events, start_time, end_time):
         yield event
 
 def __get_beatmapset_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
