@@ -36,7 +36,11 @@ class DiscussionEventParser(EventParser):
             # Reconstruct objects
             beatmapset = Beatmapset(beatmapset_id)
             user = User(user_id, user_name) if user_id != None else None
-            discussion = Discussion(discussion_id, beatmapset, user, content) if discussion_id != None else None
+            if _type == "reply":
+                # Replies should look up the discussion they are posted on.
+                discussion = Discussion(discussion_id, beatmapset) if discussion_id != None else None
+            else:
+                discussion = Discussion(discussion_id, beatmapset, user, content) if discussion_id != None else None
         except DeletedContextError as err:
             log_err(err)
         else:
