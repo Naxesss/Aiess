@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 
 from web import api
-from parsers.exceptions import DeletedContextError
+from exceptions import DeletedContextError
 
 class User:
     """Contains the user data either requested from the api or directly supplied (i.e. id, name)."""

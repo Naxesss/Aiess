@@ -2,7 +2,7 @@ import pytest
 
 import objects
 from tests.mocks import mock_api_responses
-from parsers.exceptions import DeletedContextError
+from exceptions import DeletedContextError
 
 def test_user():
     user = objects.User(101, "Generic Name")

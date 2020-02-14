@@ -6,7 +6,7 @@ from tests.mocks.events.faulty import no_events, deleted_beatmap
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.discussion_event_parser import discussion_event_parser
 from parsers.time_parser import from_ISO_8601_to_datetime
-from parsers.exceptions import ParsingError, DeletedContextError
+from exceptions import ParsingError, DeletedContextError
 
 def test_parse_event_type():
     tests = [

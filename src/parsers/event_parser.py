@@ -4,7 +4,7 @@ from datetime import datetime
 import re
 
 from parsers import time_parser
-from parsers.exceptions import ParsingError, DeletedContextError
+from exceptions import ParsingError, DeletedContextError
 
 class EventParser():
 

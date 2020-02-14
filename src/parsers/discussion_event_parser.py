@@ -4,7 +4,7 @@ from bs4.element import Tag
 
 from objects import Event, Beatmapset, User, Discussion
 from parsers.event_parser import EventParser
-from parsers.exceptions import DeletedContextError
+from exceptions import DeletedContextError
 from storage.logger import log_err
 
 class DiscussionEventParser(EventParser):
