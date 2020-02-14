@@ -4,7 +4,7 @@ from bs4.element import Tag
 
 from objects import Event, Beatmapset, User, Discussion
 from parsers.event_parser import EventParser
-from exceptions import DeletedContextError
+from exceptions import ParsingError, DeletedContextError
 from storage.logger import log_err
 
 class DiscussionEventParser(EventParser):
@@ -50,9 +50,20 @@ class DiscussionEventParser(EventParser):
     
     def parse_event_type(self, event: Tag) -> str:
         """Returns the type of the given event (e.g. "suggestion", "problem", "hype")."""
-        return super().parse_event_type(event,
-            event_class="beatmap-discussion-message-type",
-            class_prefix="beatmap-discussion-message-type--")
+        event_class = "beatmap-discussion-message-type"
+        class_prefix = "beatmap-discussion-message-type--"
+        try:
+            return super().parse_event_type(event,
+                event_class=event_class,
+                class_prefix=class_prefix)
+        except ParsingError:
+            if event:
+                is_discussion_message = event.find(attrs={"class": event_class})
+                has_type = event.find(attrs={"class": class_prefix})
+                # Replies have no explicit type.
+                if is_discussion_message and not has_type:
+                    return "reply"
+            raise
     
     def parse_event_author_id(self, event: Tag) -> str:
         """Returns the user id associated with the given event, if applicable (e.g. the user starting a discussion, "1314547")."""
