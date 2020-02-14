@@ -1,8 +1,9 @@
 import pytest
 
 import objects
-from tests.mocks import mock_api_responses
 from exceptions import DeletedContextError
+from tests.mocks.api import beatmap as mock_beatmap
+from tests.mocks.api import old_beatmap as mock_old_beatmap
 
 def test_user():
     user = objects.User(101, "Generic Name")
@@ -26,7 +27,7 @@ def test_user_restricted():
     assert user.__str__() == "1"
 
 def test_beatmapset():
-    beatmapset = objects.Beatmapset(41823, beatmapset_json=mock_api_responses.BEATMAPSET_JSON_BIG_BLACK)
+    beatmapset = objects.Beatmapset(41823, beatmapset_json=mock_old_beatmap.JSON)
 
     assert beatmapset.id == "41823"
     assert beatmapset.artist == "The Quick Brown Fox"
@@ -43,7 +44,7 @@ def test_beatmapset_non_existent():
         objects.Beatmapset(2, beatmapset_json="[]")
 
 def test_discussion():
-    beatmapset = objects.Beatmapset(41823, beatmapset_json=mock_api_responses.BEATMAPSET_JSON_BIG_BLACK)
+    beatmapset = objects.Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
     discussion = objects.Discussion(1234956, beatmapset)
 
     assert discussion.id == "1234956"
