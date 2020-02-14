@@ -104,25 +104,6 @@ class Discussion:
             self.content == other.content
         )
 
-# TODO: Complete implementation
-class DiscussionReply:
-    """"""
-    def __init__(self, _id: str, discussion: Discussion, user: User, content: str):
-        self.id = str(_id)
-        self.discussion = discussion
-        self.user = user
-        self.content = content
-    
-    def __eq__(self, other) -> bool:
-        if type(self) != type(other):
-            return False
-        return (
-            self.id == other.id and
-            self.discussion == other.discussion and
-            self.user == other.user and
-            self.content == other.content
-        )
-
 class Usergroup:
     """Contains the usergroup data (i.e id, name). Name is implied from id if not supplied."""
     GROUP_NAMES = {

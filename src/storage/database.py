@@ -5,7 +5,7 @@ from enum import Enum
 from datetime import datetime
 
 from storage.settings import DB_CONFIG
-from objects import User, Beatmapset, Discussion, DiscussionReply, Event
+from objects import User, Beatmapset, Discussion, Event
 from storage.logger import log
 
 class InterpolationDict(dict):
@@ -226,17 +226,6 @@ class Database:
                 beatmapset_id=discussion.beatmapset.id,
                 user_id=discussion.user.id,
                 content=discussion.content))
-    
-    def insert_discussion_reply(self, discussion_reply: DiscussionReply) -> None:
-        """Inserts/updates the given discussion reply into the discussion replies table.
-        Does not insert/update other values (e.g. discussion or user)."""
-        self.insert_table_data(
-            "discussion_replies",
-            dict(
-                id=discussion_reply.id,
-                discussion_id=discussion_reply.discussion.id,
-                user_id=discussion_reply.user.id,
-                content=discussion_reply.content))
     
     def insert_event(self, event: Event) -> None:
         """Inserts/updates the given event into the events table, along with any other values
