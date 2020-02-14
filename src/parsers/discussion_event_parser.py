@@ -28,15 +28,15 @@ class DiscussionEventParser(EventParser):
             beatmapset_id = self.parse_id_from_beatmapset_link(link)
             discussion_id = self.parse_id_from_discussion_link(link)
 
-            discussion_author_id = self.parse_event_author_id(event)
-            discussion_author_name = self.parse_event_author_name(event)
+            user_id = self.parse_event_author_id(event)
+            user_name = self.parse_event_author_name(event)
 
             content = self.parse_discussion_message(event)
 
             # Reconstruct objects
             beatmapset = Beatmapset(beatmapset_id)
-            discussion_author = User(discussion_author_id, discussion_author_name) if discussion_author_id != None else None
-            discussion = Discussion(discussion_id, beatmapset, discussion_author, content) if discussion_id != None else None
+            user = User(user_id, user_name) if user_id != None else None
+            discussion = Discussion(discussion_id, beatmapset, user, content) if discussion_id != None else None
         except DeletedContextError as err:
             log_err(err)
         else:
@@ -45,7 +45,7 @@ class DiscussionEventParser(EventParser):
                 time = time,
                 beatmapset = beatmapset,
                 discussion = discussion,
-                user = discussion_author,
+                user = user,
                 content = content)
     
     def parse_event_type(self, event: Tag) -> str:
