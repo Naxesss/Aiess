@@ -64,8 +64,12 @@ def get_discussion_events(page: int=1) -> Generator[Event, None, None]:
 
 
 def request_discussions_json(beatmapset: Beatmapset) -> object:
-    """Requests the beatmapset discussion page as a json object."""
-    return request_json(f"https://osu.ppy.sh/beatmapsets/{beatmapset.id}/discussion?format=json")
+    """Requests the beatmapset discussion page as a json object, if it exists, otherwise None.
+    Older beatmapsets have no discussions, for example, so they will return None."""
+    try:
+        return request_json(f"https://osu.ppy.sh/beatmapsets/{beatmapset.id}/discussion?format=json")
+    except json.decoder.JSONDecodeError:
+        return None
 
 def get_map_page_discussions(beatmapset: Beatmapset, discussions_json: object=None) -> Generator[Discussion, None, None]:
     """Returns a generator of discussion objects from the beatmapset discussion page json. If not supplied it is scraped."""
