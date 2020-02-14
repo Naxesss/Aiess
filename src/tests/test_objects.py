@@ -1,9 +1,10 @@
 import pytest
 
 import objects
-from exceptions import DeletedContextError
 from tests.mocks.api import beatmap as mock_beatmap
 from tests.mocks.api import old_beatmap as mock_old_beatmap
+from exceptions import ParsingError, DeletedContextError
+from web import populator
 
 def test_user():
     user = objects.User(101, "Generic Name")
@@ -42,6 +43,17 @@ def test_beatmapset():
 def test_beatmapset_non_existent():
     with pytest.raises(DeletedContextError):
         objects.Beatmapset(2, beatmapset_json="[]")
+
+def test_old_discussion():
+    beatmapset = objects.Beatmapset(41823, beatmapset_json=mock_old_beatmap.JSON)
+    discussion = objects.Discussion(1234956, beatmapset)
+
+    assert discussion.id == "1234956"
+    assert discussion.beatmapset == beatmapset
+    
+    # Can't obtain any discussion data from a beatmapset that doesn't have a discussion interface.
+    with pytest.raises(ParsingError):
+        populator.get_complete_discussion_info(discussion, beatmapset)
 
 def test_discussion():
     beatmapset = objects.Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
