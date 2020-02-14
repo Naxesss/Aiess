@@ -1,13 +1,20 @@
 import pytest
 
-from tests.mocks.events import problem
+from tests.mocks.events import problem, reply
 from tests.mocks.events.faulty import discussion_events
 from parsers.discussion_event_parser import discussion_event_parser
 from parsers.time_parser import from_ISO_8601_to_datetime
+from web import populator
 
 def test_parse_discussion_message():
     actual_content = discussion_event_parser.parse_discussion_message(problem.tag)
     expected_content = problem.CONTENT
+
+    assert actual_content == expected_content
+
+def test_parse_reply_message():
+    actual_content = discussion_event_parser.parse_discussion_message(reply.tag)
+    expected_content = reply.CONTENT
 
     assert actual_content == expected_content
 
@@ -20,6 +27,8 @@ def test_parse():
     
     assert len(generated_events) == 1  # 1 of 2 events is of a beatmapset that no longer exists.
     assert generated_events[0].type == "suggestion"
+
+
 
 @pytest.fixture(scope="module")
 def discussion_event():
@@ -45,3 +54,25 @@ def test_beatmapset_attr(discussion_event):
 def test_discussion_attr(discussion_event):
     assert discussion_event.discussion.id == "1295203"
     assert discussion_event.discussion.beatmapset == discussion_event.beatmapset
+
+
+
+@pytest.fixture(scope="module")
+def reply_event():
+    return discussion_event_parser.parse_event(reply.tag)
+
+def test_reply_event_attr(reply_event):
+    assert reply_event.time == from_ISO_8601_to_datetime("2020-02-14T17:35:47+00:00")
+    assert reply_event.type == "reply"
+    assert reply_event.content == reply.CONTENT
+
+def test_reply_user_attr(reply_event):
+    assert reply_event.user.id == "6751666"
+    assert reply_event.user.name == "Tailsdk"
+
+def test_reply_discussion_attr(reply_event):
+    assert reply_event.discussion.id == "1396395"
+    populator.populate_event(reply_event)
+    assert reply_event.discussion.user.id == "9555243"
+    assert reply_event.discussion.user.name == "Dubstek"
+    assert reply_event.discussion.content == "If you want to express 00:27:528 (27528|1) - this clap sound with LN, I think 00:33:046 (33046|2) - this NM also should be changed into LN for consistency."
