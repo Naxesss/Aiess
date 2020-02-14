@@ -22,26 +22,26 @@ def test_parse():
     assert generated_events[0].type == "suggestion"
 
 @pytest.fixture(scope="module")
-def beatmapset_event():
+def discussion_event():
     return discussion_event_parser.parse_event(problem.tag)
 
-def test_event_attr(beatmapset_event):
-    assert beatmapset_event.time == from_ISO_8601_to_datetime("2019-12-05T16:50:10+00:00")
-    assert beatmapset_event.type == "problem"
-    assert beatmapset_event.content == problem.CONTENT
+def test_event_attr(discussion_event):
+    assert discussion_event.time == from_ISO_8601_to_datetime("2019-12-05T16:50:10+00:00")
+    assert discussion_event.type == "problem"
+    assert discussion_event.content == problem.CONTENT
 
-def test_user_attr(beatmapset_event):
-    assert beatmapset_event.user.id == "197805"
-    assert beatmapset_event.user.name == "Niva"
+def test_user_attr(discussion_event):
+    assert discussion_event.user.id == "197805"
+    assert discussion_event.user.name == "Niva"
 
-def test_beatmapset_attr(beatmapset_event):
-    assert beatmapset_event.beatmapset.id == "1074596"
-    assert beatmapset_event.beatmapset.artist == "Camellia"
-    assert beatmapset_event.beatmapset.title == "werewolf howls. [\"Growling\" Long ver.]"
-    assert beatmapset_event.beatmapset.creator.id == "419954"
-    assert beatmapset_event.beatmapset.creator.name == "Regou"
-    assert beatmapset_event.beatmapset.modes == ["osu"]
+def test_beatmapset_attr(discussion_event):
+    assert discussion_event.beatmapset.id == "1074596"
+    assert discussion_event.beatmapset.artist == "Camellia"
+    assert discussion_event.beatmapset.title == "werewolf howls. [\"Growling\" Long ver.]"
+    assert discussion_event.beatmapset.creator.id == "419954"
+    assert discussion_event.beatmapset.creator.name == "Regou"
+    assert discussion_event.beatmapset.modes == ["osu"]
 
-def test_discussion_attr(beatmapset_event):
-    assert beatmapset_event.discussion.id == "1295203"
-    assert beatmapset_event.discussion.beatmapset == beatmapset_event.beatmapset
+def test_discussion_attr(discussion_event):
+    assert discussion_event.discussion.id == "1295203"
+    assert discussion_event.discussion.beatmapset == discussion_event.beatmapset
