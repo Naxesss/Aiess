@@ -27,6 +27,8 @@ def request_soup(url: str) -> BeautifulSoup:
     text = request_page(url).text
     return soupify(text)
 
+
+
 def request_beatmapset_events(page: int=1) -> BeautifulSoup:
     """Requests the beatmapset events page as a BeautifulSoup object. Only certain events are queried."""
     # This way if events are added we ignore them until we've properly supported them.
@@ -47,17 +49,23 @@ def request_discussion_events(page: int=1) -> BeautifulSoup:
     """Requests the discussion events page as a BeautifulSoup object."""
     return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussions?page={page}&limit=50")
 
-def request_discussions_json(beatmapset: Beatmapset) -> object:
-    """Requests the beatmapset discussion page as a json object."""
-    return request_json(f"https://osu.ppy.sh/beatmapsets/{beatmapset.id}/discussion?format=json")
+
+
 
 def get_beatmapset_events(page: int=1) -> Generator[Event, None, None]:
-    """Returns a generator of BeatmapsetEvent objects from the beatmapset events page. Newer events are yielded first."""
+    """Returns a generator of Event objects from the beatmapset events page. Newer events are yielded first."""
     return beatmapset_event_parser.parse(request_beatmapset_events(page))
 
 def get_discussion_events(page: int=1) -> Generator[Event, None, None]:
-    """Returns a generator of BeatmapsetEvent objects from the discussion events page. Newer events are yielded first."""
+    """Returns a generator of Event objects from the discussion events page. Newer events are yielded first."""
     return discussion_event_parser.parse(request_discussion_events(page))
+
+
+
+
+def request_discussions_json(beatmapset: Beatmapset) -> object:
+    """Requests the beatmapset discussion page as a json object."""
+    return request_json(f"https://osu.ppy.sh/beatmapsets/{beatmapset.id}/discussion?format=json")
 
 def get_map_page_discussions(beatmapset: Beatmapset, discussions_json: object=None) -> Generator[Discussion, None, None]:
     """Returns a generator of discussion objects from the beatmapset discussion page json. If not supplied it is scraped."""
