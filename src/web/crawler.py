@@ -14,7 +14,9 @@ from parsers.discussion_parser import discussion_parser
 def get_all_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
     """Returns a generator of all events within the given time frame."""
     # Ensures name changes, beatmap updates, etc are considered.
+    # Updates once for each pass (more than that isn't necessary considering time is locked).
     api.clear_response_cache()
+    populator.cached_discussions_json = {}
 
     for event in __get_discussion_events_between(start_time, end_time): yield event
     for event in __get_reply_events_between(start_time, end_time): yield event
@@ -33,8 +35,6 @@ def __get_reply_events_between(start_time: datetime, end_time: datetime) -> Gene
 def __get_beatmapset_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
     """Returns a generator of beatmapset events (from /events) within the given time frame.
     Should be run after discussion events so that discussion contexts are available."""
-    populator.cached_discussions_json = {}  # Update once for each pass (more than that isn't necessary considering time is locked).
-
     for event in __get_event_generations_between(get_beatmapset_events, start_time, end_time):
         populator.populate_event(event)
         if not event.marked_for_deletion:
