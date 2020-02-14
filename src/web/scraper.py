@@ -49,6 +49,9 @@ def request_discussion_events(page: int=1) -> BeautifulSoup:
     """Requests the discussion events page as a BeautifulSoup object."""
     return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussions?page={page}&limit=50")
 
+def request_reply_events(page: int=1) -> BeautifulSoup:
+    """Requests the discussion reply events page as a BeautifulSoup object."""
+    return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussion-posts?page={page}&limit=50")
 
 
 
@@ -60,6 +63,9 @@ def get_discussion_events(page: int=1) -> Generator[Event, None, None]:
     """Returns a generator of Event objects from the discussion events page. Newer events are yielded first."""
     return discussion_event_parser.parse(request_discussion_events(page))
 
+def get_reply_events(page: int=1) -> Generator[Event, None, None]:
+    """Returns a generator of Event objects from the discussion reply events page. Newer events are yielded first."""
+    return discussion_event_parser.parse(request_reply_events(page))
 
 
 
