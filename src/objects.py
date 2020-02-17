@@ -42,6 +42,8 @@ class Beatmapset:
         if artist == None or title == None or creator == None or modes == None:
             if not beatmapset_json:
                 beatmapset_json = api.request_beatmapset(_id)
+                if not beatmapset_json:
+                    raise DeletedContextError(f"Could not retrieve any api response for a beatmapset with id {_id}.")
             if str(beatmapset_json) == "[]":
                 raise DeletedContextError(f"No beatmapset with id {_id} exists.")
             beatmap_json = beatmapset_json[0]  # Assumes metadata is the same across the entire set.
