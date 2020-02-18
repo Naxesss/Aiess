@@ -120,19 +120,27 @@ class Database:
                 keyword_format_string=keyword_format_string),
             **where_dict)
 
-    def retrieve_table_data(self, table: str, where_dict: dict, selection: str="*") -> List[Tuple]:
-        """Returns all rows from the table where the dictionary conditions apply (e.g. dict(type="nominate"))."""
-        keyword_format_string = ", ".join(f"{key}=%({key})s" for key in where_dict.keys())
+    def retrieve_table_data(self, table: str, where_dict: dict=None, selection: str="*") -> List[Tuple]:
+        """Returns all rows from the table where the dictionary conditions apply (e.g. dict(type="nominate")),
+        if specified, otherwise any data present in the table."""
+        if where_dict:
+            where_str = " and ".join(f"{key}=%({key})s" for key in where_dict.keys())
+        else:
+            where_str = "TRUE"
         
-        return self.__execute("""
+        query = """
             SELECT %(selection)s FROM %(db_name)s.%(table)s
-            WHERE %(keyword_format_string)s
+            WHERE %(where_str)s
             """ % InterpolationDict(
                 selection=selection,
                 db_name=db_name,
                 table=table,
-                keyword_format_string=keyword_format_string),
-            **where_dict)
+                where_str=where_str)
+        
+        if where_dict:
+            return self.__execute(query, **where_dict)
+        return self.__execute(query)
+
     
     def fetchone_table_data(self, table: str, where_dict: dict, selection: str="*") -> List[Tuple]:
         """Returns the first row from the table where the dictionary conditions apply (e.g. dict(id=1))."""
