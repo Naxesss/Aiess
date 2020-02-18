@@ -38,6 +38,9 @@ class Beatmapset:
     def __init__(self,
     _id: str, artist: str=None, title: str=None, creator: User=None, modes: List[str]=None,
     beatmapset_json: object=None):
+        if _id == None:
+            raise ValueError("Beatmapset id should not be None.")
+
         # No need to get the beatmap json if we already have all the data.
         if artist == None or title == None or creator == None or modes == None:
             if not beatmapset_json:
