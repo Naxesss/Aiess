@@ -10,27 +10,27 @@ from objects import User, Beatmapset, Discussion, Event
 def test_database():
     database = Database("aiess_test")
     # Reset database to state before any tests ran.
-    database.delete_table_data("events", dict(type="test"))
-    database.delete_table_data("discussions", dict(id=1))
-    database.delete_table_data("beatmapsets", dict(id=1))
-    database.delete_table_data("beatmapset_modes", dict(beatmapset_id=1))
-    database.delete_table_data("users", dict(id=1))
+    database.clear_table_data("events")
+    database.clear_table_data("discussions")
+    database.clear_table_data("beatmapsets")
+    database.clear_table_data("beatmapset_modes")
+    database.clear_table_data("users")
 
     return database
 
 def test_correct_setup(test_database):
-    assert not test_database.retrieve_table_data("events", dict(type="test"))
-    assert not test_database.retrieve_table_data("discussions", dict(id=1))
-    assert not test_database.retrieve_table_data("beatmapsets", dict(id=1))
-    assert not test_database.retrieve_table_data("beatmapset_modes", dict(beatmapset_id=1))
-    assert not test_database.retrieve_table_data("users", dict(id=1))
+    assert not test_database.retrieve_table_data("events")
+    assert not test_database.retrieve_table_data("discussions")
+    assert not test_database.retrieve_table_data("beatmapsets")
+    assert not test_database.retrieve_table_data("beatmapset_modes")
+    assert not test_database.retrieve_table_data("users")
 
 def test_insert_delete(test_database):
     test_database.insert_table_data("users", dict(id=1, name="test"))
     assert test_database.retrieve_table_data("users", dict(id=1))
 
     test_database.delete_table_data("users", dict(id=1))
-    assert not test_database.retrieve_table_data("users", dict(id=1))
+    assert not test_database.retrieve_table_data("users")
 
 def test_auto_reconnect(test_database):
     test_database.connection.close()
