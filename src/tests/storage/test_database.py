@@ -62,6 +62,31 @@ def test_insert_retrieve_event(test_database):
     assert retrieved_event.content == event.content
     assert retrieved_event == event
 
+def test_insert_retrieve_discussion_and_replies(test_database):
+    time = datetime.utcnow()
+
+    user_author = User(1, name="one")
+    user_replier = User(2, name="two")
+
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user_replier, modes=["osu", "taiko"])
+    discussion = Discussion(1, beatmapset=beatmapset, user=user_author, content="ping")
+
+    event_problem = Event(_type="problem", time=time, beatmapset=beatmapset, discussion=discussion, user=user_author, content="ping")
+    event_reply1 = Event(_type="reply", time=time, beatmapset=beatmapset, discussion=discussion, user=user_replier, content="pong")
+    event_reply2 = Event(_type="reply", time=time, beatmapset=beatmapset, discussion=discussion, user=user_author, content="miss")
+
+    test_database.insert_event(event_problem)
+    test_database.insert_event(event_reply1)
+    test_database.insert_event(event_reply2)
+
+    retrieved_problem = test_database.retrieve_event(dict(type="problem"))
+    retrieved_reply1 = test_database.retrieve_event(dict(type="reply", user_id=user_replier.id))
+    retrieved_reply2 = test_database.retrieve_event(dict(type="reply", user_id=user_author.id))
+
+    assert retrieved_problem
+    assert retrieved_reply1
+    assert retrieved_reply2
+
 def test_insert_retrieve_small_event(test_database):
     event = Event(_type="test", time=datetime.utcnow())
     test_database.insert_event(event)
