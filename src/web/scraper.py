@@ -47,7 +47,13 @@ def request_beatmapset_events(page: int=1) -> BeautifulSoup:
 
 def request_discussion_events(page: int=1) -> BeautifulSoup:
     """Requests the discussion events page as a BeautifulSoup object."""
-    return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussions?page={page}&limit=50")
+    types = ["suggestion", "problem", "mapper_note", "praise", "hype"]
+
+    type_query = ""
+    for _type in types:
+        type_query += f"&message_types[]={_type}"
+    
+    return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussions?page={page}&limit=50{type_query}")
 
 def request_reply_events(page: int=1) -> BeautifulSoup:
     """Requests the discussion reply events page as a BeautifulSoup object."""
