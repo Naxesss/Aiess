@@ -171,6 +171,17 @@ class Database:
                 table=table,
                 where_str=where_str),
             **where_dict)
+    
+    def clear_table_data(self, table: str) -> None:
+        """Deletes all rows from the table. Ignores the foreign key check, meaning this
+        will disconnect keys from values. As such use with care."""
+        self.__execute("SET FOREIGN_KEY_CHECKS = 0")
+        self.__execute("""
+            TRUNCATE %(db_name)s.%(table)s
+            """ % InterpolationDict(
+                db_name=db_name,
+                table=table))
+        self.__execute("SET FOREIGN_KEY_CHECKS = 1")
 
     def insert_user(self, user: User) -> None:
         """Inserts/updates the given user object into the users table."""
