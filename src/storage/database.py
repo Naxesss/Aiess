@@ -70,8 +70,8 @@ class Database:
                 raise
 
     def __execute(self, query: str, **values: str) -> List[Tuple]:
-        """Executes the given SQL query with the given values. Use like "%(name)s" in query and name=name in values.
-        Returns the fetched result sets as a list of tuples, or None if no result."""
+        """Executes the given SQL query with the given argument values, if any. Use like "%(name)s" in query
+        and name=name in values. Returns the fetched result sets as a list of tuples, or None if no result."""
         cursor = self.__get_cursor()
         cursor.nextset()
         cursor.execute(query, values)
@@ -245,7 +245,7 @@ class Database:
                 content=event.content if event.content != None else None))
     
     def retrieve_user(self, where_dict: dict) -> User:
-        """Returns the user with the given id from the database, or None if no such user is stored."""
+        """Returns the first user with the given column data from the database, or None if no such user is stored."""
         if not where_dict:
             return None
 
@@ -270,7 +270,7 @@ class Database:
         return modes
     
     def retrieve_beatmapset(self, where_dict: dict) -> Beatmapset:
-        """Returns the beatmapset with the given id from the database, or None if no such beatmapset is stored."""
+        """Returns the first beatmapset with the given column data from the database, or None if no such beatmapset is stored."""
         if not where_dict:
             return None
 
@@ -285,7 +285,7 @@ class Database:
         return None
 
     def retrieve_discussion(self, where_dict: dict, beatmapset: Beatmapset=None) -> Discussion:
-        """Returns the discussion with the given id from the database, or None if no such discussion is stored.
+        """Returns the first discussion with the given column data from the database, or None if no such discussion is stored.
         Also retrieves the associated beatmapset from the database if not supplied."""
         if not where_dict:
             return None
@@ -302,7 +302,7 @@ class Database:
         return None
     
     def retrieve_event(self, where_dict: dict) -> Event:
-        """Returns the event with the given id from the database, or None if no such event is stored."""
+        """Returns the first event with the given column data from the database, or None if no such event is stored."""
         if not where_dict:
             return None
 
