@@ -98,11 +98,11 @@ class Database:
             into the database to prevent partial information from being outdated or missing.
             """)
 
-    def insert_table_data(self, table: str, where_dict: dict) -> List[Tuple]:
+    def insert_table_data(self, table: str, new_column_dict: dict) -> List[Tuple]:
         """Inserts the dictionary into the table, or if already present, updates the columns.
         Keys in the dictionary are column names, values are their respective value to assign.
         Returns the result from the query."""
-        keys = where_dict.keys()
+        keys = new_column_dict.keys()
         key_string = ", ".join(keys)
         key_format_string = ", ".join(f"%({key})s" for key in keys)
         keyword_format_string = ", ".join(f"{key}=%({key})s" for key in keys)
@@ -118,7 +118,7 @@ class Database:
                 key_string=key_string,
                 key_format_string=key_format_string,
                 keyword_format_string=keyword_format_string),
-            **where_dict)
+            **new_column_dict)
 
     def retrieve_table_data(self, table: str, where_dict: dict=None, selection: str="*") -> List[Tuple]:
         """Returns all rows from the table where the dictionary conditions apply (e.g. dict(type="nominate")),
@@ -144,32 +144,32 @@ class Database:
     
     def fetchone_table_data(self, table: str, where_dict: dict, selection: str="*") -> List[Tuple]:
         """Returns the first row from the table where the dictionary conditions apply (e.g. dict(id=1))."""
-        keyword_format_string = ", ".join(f"{key}=%({key})s" for key in where_dict.keys())
+        where_str = " and ".join(f"{key}=%({key})s" for key in where_dict.keys())
         
         return self.__execute("""
             SELECT %(selection)s FROM %(db_name)s.%(table)s
-            WHERE %(keyword_format_string)s
+            WHERE %(where_str)s
             LIMIT 1
             """ % InterpolationDict(
                 selection=selection,
                 db_name=db_name,
                 table=table,
-                keyword_format_string=keyword_format_string),
+                where_str=where_str),
             **where_dict)
 
     def delete_table_data(self, table: str, where_dict: dict, ignore_exception: bool=False) -> List[Tuple]:
         """Deletes all rows from the table where the dictionary conditions apply (e.g. dict(type="kudosu-deny")).
         Can optionally allow failure by ignoring any thrown exception from the query. Returns the result of the query."""
-        keyword_format_string = ", ".join(f"{key}=%({key})s" for key in where_dict.keys())
+        where_str = " and ".join(f"{key}=%({key})s" for key in where_dict.keys())
 
         return self.__execute("""
             DELETE %(ignore)sFROM %(db_name)s.%(table)s
-            WHERE %(keyword_format_string)s
+            WHERE %(where_str)s
             """ % InterpolationDict(
                 ignore="IGNORE " if ignore_exception else "",
                 db_name=db_name,
                 table=table,
-                keyword_format_string=keyword_format_string),
+                where_str=where_str),
             **where_dict)
 
     def insert_user(self, user: User) -> None:
