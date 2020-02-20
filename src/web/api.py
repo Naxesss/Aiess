@@ -35,7 +35,7 @@ def request_user(user_id: str) -> object:
     
     user_json = request_api("get_user", f"u={user_id}")
     if len(user_json) > 0:
-        requested_users[user_id] = user_json
+        requested_users[user_id] = user_json[0]
         return user_json[0]
     else:
         # For when the user does not exist (e.g. restricted).
