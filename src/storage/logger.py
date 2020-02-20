@@ -9,7 +9,7 @@ def init(_time_str: str):
     global time_str
     time_str = _time_str
 
-def log(_obj="", end: str="\n") -> None:
+def log(_obj="", end: str="\n", postfix: str="") -> None:
     """Takes the given object as a string, prints it, and appends it to the current log file."""
     message = str(_obj)
     try:
@@ -18,7 +18,7 @@ def log(_obj="", end: str="\n") -> None:
         # Occurs when the message includes character codes which the python terminal doesn't recognize.
         print(f"OSError: {error}")
     
-    write(_obj, end)
+    write(_obj, end, postfix)
 
 def write(_obj, end: str="\n", postfix: str="") -> None:
     """Takes the given object as a string and appends it to the current log file,
