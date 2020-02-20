@@ -37,9 +37,11 @@ def insert_db(events) -> None:
     """Inserts the given event list into the database in reversed order."""
     if not events:
         return
+    
+    events.sort(key=lambda event: event.time)
 
     log(f"--- Inserting {len(events)} Events into the Database ---")
-    for event in reversed(events):
+    for event in events:
         log(".", end="")
         database.insert_event(event)
     log()
