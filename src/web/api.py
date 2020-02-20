@@ -18,7 +18,7 @@ requested_beatmapsets = defaultdict()
 def request_beatmapset(beatmapset_id: str) -> object:
     """Requests a json object of the given beatmapset id.
     Caches any response gotten until cleared manually."""
-    if beatmapset_id in requested_beatmapsets:
+    if beatmapset_id in requested_beatmapsets and requested_beatmapsets[beatmapset_id]:
         return requested_beatmapsets[beatmapset_id]
     
     beatmapset_json = request_api("get_beatmaps", f"s={beatmapset_id}")
@@ -29,8 +29,7 @@ requested_users = defaultdict()
 def request_user(user_id: str) -> object:
     """Requests a json object of the given user id.
     Caches any response gotten until cleared manually."""
-
-    if user_id in requested_users:
+    if user_id in requested_users and requested_users[user_id]:
         return requested_users[user_id]
     
     user_json = request_api("get_user", f"u={user_id}")
