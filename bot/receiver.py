@@ -17,7 +17,7 @@ def parse_command(content: str) -> str:
         name = match.group(1)
         args = match.group(2)
 
-        if args: return Command(name, args.split(" "))
+        if args: return Command(name, *args.split(" "))
         else:    return Command(name)
     
     return None
