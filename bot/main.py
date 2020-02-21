@@ -1,6 +1,7 @@
 import discord
 from discord import Message
 
+import receiver
 from settings import API_KEY
 
 class Client(discord.Client):
@@ -8,7 +9,7 @@ class Client(discord.Client):
         print(f"Logged on as {self.user}!")
 
     async def on_message(self, message: Message) -> None:
-        print(f"Message from {message.author}: {message.content}")
+        receiver.Receive(message)
 
 client = Client()
 client.run(API_KEY)
