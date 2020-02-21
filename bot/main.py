@@ -9,7 +9,7 @@ class Client(discord.Client):
         print(f"Logged on as {self.user}!")
 
     async def on_message(self, message: Message) -> None:
-        receiver.Receive(message)
+        receiver.receive(message)
 
 client = Client()
 client.run(API_KEY)
