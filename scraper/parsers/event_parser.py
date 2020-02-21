@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from datetime import datetime
-import re
+import re as regex
 
 from parsers import time_parser
 from exceptions import ParsingError, DeletedContextError
@@ -94,7 +94,7 @@ class EventParser():
         (i.e. link following this format https://osu.ppy.sh/users/5129592)."""
         if not link:
             return None
-        match = re.search(r"https:\/\/osu\.ppy\.sh\/users\/(\d+)", link)
+        match = regex.search(r"https:\/\/osu\.ppy\.sh\/users\/(\d+)", link)
         if not match:
             return None
         return match.group(1)
@@ -104,7 +104,7 @@ class EventParser():
         (i.e. link following this format https://osu.ppy.sh/beatmapsets/1016042/discussion#/1294751)."""
         if not link:
             return None
-        match = re.search(r"https:\/\/osu\.ppy\.sh\/beatmapsets\/\d+\/discussion#\/(\d+)", link)
+        match = regex.search(r"https:\/\/osu\.ppy\.sh\/beatmapsets\/\d+\/discussion#\/(\d+)", link)
         if not match:
             return None
         return match.group(1)
@@ -114,7 +114,7 @@ class EventParser():
         (i.e. link following this format https://osu.ppy.sh/beatmapsets/1016042)."""
         if not link:
             return None
-        match = re.search(r"https:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)", link)
+        match = regex.search(r"https:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)", link)
         if not match:
             return None
         return match.group(1)
