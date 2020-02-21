@@ -1,12 +1,26 @@
+import re as regex
+
 from discord import Message
+
+from commands import Command
 
 def receive(message: Message) -> None:
     print(f"({message.guild} > #{message.channel}) {message.author}: {message.content}")
-    if qualifies_as_command(message):
-        receive_command(message)
 
-def qualifies_as_command(message: Message) -> None:
-    pass
+    command = parse_command(message.content)
+    if command:
+        receive_command(command)
+
+def parse_command(content: str) -> str:
+    match = regex.search(r"^\+([A-Za-z]+) ?(.+)?", content)
+    if match:
+        name = match.group(1)
+        args = match.group(2)
+
+        if args: return Command(name, args.split(" "))
+        else:    return Command(name)
+    
+    return None
 
 def receive_command(command: str) -> None:
     pass
