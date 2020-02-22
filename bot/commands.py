@@ -1,3 +1,6 @@
+from collections import defaultdict
+from typing import Callable, TypeVar
+
 from discord import Message
 
 class Command():
@@ -18,3 +21,15 @@ class Command():
             self.name == other.name and
             self.args == other.args
         )
+registered_commands = defaultdict()
+
+T = TypeVar("T")
+def register(name: str) -> Callable[[Callable[..., T]], T]:
+    """A decorator which registers the respective function as a command
+    able to be executed by the given name (e.g. "ping" in "+ping")."""
+
+    def wrapper(func: Callable[..., T]) -> T:
+        registered_commands[name] = func
+        return func
+    
+    return wrapper
