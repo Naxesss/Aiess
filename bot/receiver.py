@@ -2,7 +2,7 @@ import re as regex
 
 from discord import Message
 
-from commands import Command
+from commands import Command, registered_commands
 
 def receive(message: Message) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
@@ -26,3 +26,5 @@ def parse_command(content: str, context: Message=None) -> Command:
 
 def receive_command(command: Command) -> None:
     """Handles logic ran upon receiving a command, but not necessarily a valid command."""
+    if command.name in registered_commands:
+        registered_commands[command.name](command)
