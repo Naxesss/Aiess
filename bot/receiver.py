@@ -9,11 +9,11 @@ async def receive(message: Message) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
     print(f"({message.guild} > #{message.channel}) {message.author}: {message.content}")
 
-    command = await parse_command(message.content, message)
+    command = parse_command(message.content, message)
     if command:
         await receive_command(command)
 
-async def parse_command(content: str, context: Message=None) -> Command:
+def parse_command(content: str, context: Message=None) -> Command:
     """Returns the given content string as a command, optionally with the given message as context."""
     match = regex.search(r"^\+([A-Za-z]+) ?(.+)?", content)
     if match:
