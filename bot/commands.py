@@ -23,16 +23,16 @@ class Command():
             self.context == other.context
         )
     
-    async def respond(self, message: str) -> bool:
+    async def respond(self, response: str) -> bool:
         """Returns whether a response was successfully sent."""
         if not self.context:
             return False  # I.e. called from test modules.
         
         try:
-            await self.context.channel.send(message)
+            await self.context.channel.send(response)
         except:
             # I.e. missing permissions to send message or connection issues.
-            print(f"Unable to send message \"{message}\" in {self.context.channel}.")
+            print(f"Unable to send response \"{response}\" in {self.context.channel}.")
 
 registered_commands = defaultdict()
 
