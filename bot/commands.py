@@ -1,6 +1,7 @@
 from discord import Message
 
 class Command():
+    """Represents the values with which a command is called (i.e. name, args, context)."""
     def __init__(self, name: str, *args: str, context: Message=None):
         self.name = name
         self.args = [arg for arg in args]
