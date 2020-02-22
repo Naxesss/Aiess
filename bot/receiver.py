@@ -11,7 +11,7 @@ def receive(message: Message) -> None:
     if command:
         receive_command(command)
 
-def parse_command(content: str) -> str:
+def parse_command(content: str) -> Command:
     match = regex.search(r"^\+([A-Za-z]+) ?(.+)?", content)
     if match:
         name = match.group(1)
@@ -22,5 +22,5 @@ def parse_command(content: str) -> str:
     
     return None
 
-def receive_command(command: str) -> None:
+def receive_command(command: Command) -> None:
     pass
