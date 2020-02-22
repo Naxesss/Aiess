@@ -4,15 +4,15 @@ from discord import Message
 
 from commands import Command, registered_commands
 
-def receive(message: Message) -> None:
+async def receive(message: Message) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
     print(f"({message.guild} > #{message.channel}) {message.author}: {message.content}")
 
-    command = parse_command(message.content, message)
+    command = await parse_command(message.content, message)
     if command:
-        receive_command(command)
+        await receive_command(command)
 
-def parse_command(content: str, context: Message=None) -> Command:
+async def parse_command(content: str, context: Message=None) -> Command:
     """Returns the given content string as a command, optionally with the given message as context."""
     match = regex.search(r"^\+([A-Za-z]+) ?(.+)?", content)
     if match:
@@ -24,9 +24,9 @@ def parse_command(content: str, context: Message=None) -> Command:
     
     return None
 
-def receive_command(command: Command) -> bool:
+async def receive_command(command: Command) -> bool:
     """Returns whether the received command was recognized and executed."""
     if command.name in registered_commands:
-        registered_commands[command.name](command)
+        await registered_commands[command.name](command)
         return True
     return False
