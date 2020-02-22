@@ -19,8 +19,10 @@ class Command():
             return False
         return (
             self.name == other.name and
-            self.args == other.args
+            self.args == other.args and
+            self.context == other.context
         )
+
 registered_commands = defaultdict()
 
 T = TypeVar("T")
