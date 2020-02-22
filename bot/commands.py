@@ -23,6 +23,9 @@ class Command():
             self.context == other.context
         )
     
+    def __hash__(self):
+        return hash((self.name, self.args, self.context))
+    
     async def respond(self, response: str) -> bool:
         """Returns whether a response was successfully sent."""
         if not self.context:
