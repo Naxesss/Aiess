@@ -24,7 +24,9 @@ def parse_command(content: str, context: Message=None) -> Command:
     
     return None
 
-def receive_command(command: Command) -> None:
-    """Handles logic ran upon receiving a command, but not necessarily a valid command."""
+def receive_command(command: Command) -> bool:
+    """Returns whether the received command was recognized and executed."""
     if command.name in registered_commands:
         registered_commands[command.name](command)
+        return True
+    return False
