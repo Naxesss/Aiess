@@ -3,6 +3,7 @@ import re as regex
 from discord import Message
 
 from commands import Command, registered_commands
+import cmd_modules  # This allows the @register decorators inside the modules to execute.
 
 async def receive(message: Message) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
