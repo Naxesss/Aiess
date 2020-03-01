@@ -4,9 +4,9 @@ from time import sleep
 
 from aiess import timestamp, logger
 from aiess.logger import log
+from aiess.database import database
 
 from web.crawler import get_all_events_between
-from database import database
 
 init_time_str = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 

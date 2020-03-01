@@ -4,8 +4,7 @@ from typing import List, Tuple
 from datetime import datetime
 
 from aiess.objects import User, Beatmapset, Discussion, Event
-
-from database import Database
+from aiess.database import Database
 
 @pytest.fixture
 def test_database():

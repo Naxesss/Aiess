@@ -4,12 +4,12 @@ from typing import Generator, Callable, List
 
 from aiess.web import api
 from aiess.objects import Event, Discussion
+from aiess.database import database
 
 from web.scraper import get_discussion_events, get_reply_events, get_beatmapset_events
 from web.scraper import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
 from web import populator
 from storage import event_time
-from storage.database import database
 from parsers import time_parser
 from parsers.discussion_parser import discussion_parser
 
