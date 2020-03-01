@@ -2,7 +2,8 @@ from bs4 import BeautifulSoup
 from typing import Generator
 from bs4.element import Tag
 
-from aiess.objects import Event, Beatmapset, Discussion, User, DeletedContextError
+from aiess.objects import Event, Beatmapset, Discussion, User
+from aiess.errors import DeletedContextError
 from aiess.logger import log_err
 
 from parsers.event_parser import EventParser
