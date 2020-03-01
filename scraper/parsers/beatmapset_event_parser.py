@@ -6,8 +6,6 @@ from aiess.objects import Event, Beatmapset, Discussion, User, DeletedContextErr
 from aiess.logger import log_err
 
 from parsers.event_parser import EventParser
-from parsers.discussion_parser import discussion_parser
-from database import database
 
 class BeatmapsetEventParser(EventParser):
 
