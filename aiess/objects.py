@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import List
 
-from web import api
-from exceptions import DeletedContextError
+from aiess.web import api
+from aiess.errors import DeletedContextError
 
 class User:
     """Contains the user data either requested from the api or directly supplied (i.e. id, name)."""
@@ -90,7 +90,6 @@ class Beatmapset:
             self.modes == other.modes
         )
 
-# TODO: Complete implementation
 class Discussion:
     """Contains the discussion data either supplied or further scraped (latter in case of e.g. disqualify or nomination_reset events)."""
     def __init__(self, _id: str, beatmapset: Beatmapset, user: User=None, content: str=None):

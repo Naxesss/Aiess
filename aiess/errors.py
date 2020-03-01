@@ -1,5 +1,3 @@
-
-
 class ParsingError(Exception):
     """For use in cases where parsing some portion of an event failed and should stop the program."""
     pass

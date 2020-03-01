@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from web import api
-from objects import Beatmapset, User
+from aiess.objects import Beatmapset, User
+from aiess.web import api
 
 def test_cache():
     api.clear_response_cache()

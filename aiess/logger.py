@@ -1,5 +1,3 @@
-
-
 PATH_PREFIX = "../logs/"
 
 time_str = None

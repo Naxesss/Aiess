@@ -1,8 +1,8 @@
 import json
 from collections import defaultdict
 
-from web.ratelimiter import request_with_rate_limit
-from storage.settings import API_KEY, API_RATE_LIMIT
+from aiess.web import request_with_rate_limit
+from aiess.settings import API_KEY, API_RATE_LIMIT
 
 def request_api(request_type: str, query: str) -> object:
     """Requests a json object from the v1 osu!api, where the api key is supplied."""
