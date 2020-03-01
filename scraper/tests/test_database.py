@@ -3,8 +3,9 @@ from mysql.connector.errors import ProgrammingError, OperationalError
 from typing import List, Tuple
 from datetime import datetime
 
-from storage.database import Database
-from objects import User, Beatmapset, Discussion, Event
+from aiess.objects import User, Beatmapset, Discussion, Event
+
+from database import Database
 
 @pytest.fixture
 def test_database():

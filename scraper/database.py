@@ -4,9 +4,9 @@ from typing import List, Tuple
 from enum import Enum
 from datetime import datetime
 
-from storage.settings import DB_CONFIG
-from objects import User, Beatmapset, Discussion, Event
-from storage.logger import log
+from aiess.objects import User, Beatmapset, Discussion, Event
+from aiess.settings import DB_CONFIG
+from aiess.logger import log
 
 class InterpolationDict(dict):
     def __missing__(self, key):
