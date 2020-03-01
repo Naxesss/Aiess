@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from typing import Generator
 
-from objects import Discussion, Beatmapset, User
+from aiess.objects import Discussion, Beatmapset, User
 
 class DiscussionParser():
 

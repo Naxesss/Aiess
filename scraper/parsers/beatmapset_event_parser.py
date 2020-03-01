@@ -2,12 +2,12 @@ from bs4 import BeautifulSoup
 from typing import Generator
 from bs4.element import Tag
 
-from objects import Event, Beatmapset, Discussion, User
+from aiess.objects import Event, Beatmapset, Discussion, User, DeletedContextError
+from aiess.logger import log_err
+
 from parsers.event_parser import EventParser
 from parsers.discussion_parser import discussion_parser
-from exceptions import DeletedContextError
-from storage.database import database
-from storage.logger import log_err
+from database import database
 
 class BeatmapsetEventParser(EventParser):
 

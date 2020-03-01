@@ -1,9 +1,10 @@
 import pytest
 
+from aiess import timestamp
+
 from tests.mocks.events import nominate
 from tests.mocks.events.faulty import beatmapset_events
 from parsers.beatmapset_event_parser import beatmapset_event_parser
-from parsers.time_parser import from_ISO_8601_to_datetime
 
 def test_parse():
     generator = beatmapset_event_parser.parse(beatmapset_events.soup)
@@ -20,7 +21,7 @@ def beatmapset_event():
     return beatmapset_event_parser.parse_event(nominate.tag)
 
 def test_event_attr(beatmapset_event):
-    assert beatmapset_event.time == from_ISO_8601_to_datetime("2019-12-05T12:39:39+00:00")
+    assert beatmapset_event.time == timestamp.from_string("2019-12-05T12:39:39+00:00")
     assert beatmapset_event.type == "nominate"
     assert beatmapset_event.content == None
 

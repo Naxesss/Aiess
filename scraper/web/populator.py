@@ -1,11 +1,12 @@
 
 
-from objects import Discussion, Beatmapset, Event
+from aiess.objects import Discussion, Beatmapset, Event
+from aiess.errors import ParsingError
+from aiess import timestamp
+
 from web.scraper import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
-from storage.database import database
-from parsers import time_parser
+from database import database
 from parsers.discussion_parser import discussion_parser
-from exceptions import ParsingError
 
 cached_discussions_json = {}
 
@@ -64,7 +65,7 @@ def __populate_additional_details(event: Event, discussions_json: object) -> Non
     for page_event in get_map_page_event_jsons(event, discussions_json):
         # Likelihood that two same type of events happen in the same second is very unlikely,
         # so this'll work as identification (we have no access to actual event ids on scraping side, so can't use that).
-        same_time = event.time == time_parser.from_ISO_8601_to_datetime(page_event["created_at"])
+        same_time = event.time == timestamp.from_string(page_event["created_at"])
         same_type = event.type == page_event["type"].replace("_", "-")
         if same_time and same_type:
             if event.type == "disqualify" or event.type == "nomination_reset":  # Content is discussion content.

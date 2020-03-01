@@ -3,8 +3,8 @@ from bs4.element import Tag
 from datetime import datetime
 import re as regex
 
-from parsers import time_parser
-from exceptions import ParsingError, DeletedContextError
+from aiess.errors import ParsingError, DeletedContextError
+from aiess import timestamp
 
 class EventParser():
 
@@ -38,7 +38,7 @@ class EventParser():
             raise ParsingError(f"""
                 The time of an event could not be parsed. Expected some time object with class \"timeago\":\r\n{event}""")
 
-        return time_parser.from_ISO_8601_to_datetime(event_time)
+        return timestamp.from_string(event_time)
 
     def parse_event_link(self, event: Tag) -> str:
         """Returns the beatmapset/discussion link from the thumbnail of a given event 

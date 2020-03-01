@@ -1,9 +1,10 @@
 import pytest
 
+from aiess import timestamp
+
 from tests.mocks.events import problem, reply
 from tests.mocks.events.faulty import discussion_events
 from parsers.discussion_event_parser import discussion_event_parser
-from parsers.time_parser import from_ISO_8601_to_datetime
 from web import populator
 
 def test_parse_discussion_message():
@@ -35,7 +36,7 @@ def discussion_event():
     return discussion_event_parser.parse_event(problem.tag)
 
 def test_event_attr(discussion_event):
-    assert discussion_event.time == from_ISO_8601_to_datetime("2019-12-05T16:50:10+00:00")
+    assert discussion_event.time == timestamp.from_string("2019-12-05T16:50:10+00:00")
     assert discussion_event.type == "problem"
     assert discussion_event.content == problem.CONTENT
 
@@ -62,7 +63,7 @@ def reply_event():
     return discussion_event_parser.parse_event(reply.tag)
 
 def test_reply_event_attr(reply_event):
-    assert reply_event.time == from_ISO_8601_to_datetime("2020-02-14T17:35:47+00:00")
+    assert reply_event.time == timestamp.from_string("2020-02-14T17:35:47+00:00")
     assert reply_event.type == "reply"
     assert reply_event.content == reply.CONTENT
 

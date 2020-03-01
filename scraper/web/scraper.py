@@ -3,12 +3,13 @@ from requests import Response
 from typing import Generator
 import json
 
-from web.ratelimiter import request_with_rate_limit
-from objects import Event, Beatmapset, Discussion
+from aiess.web import request_with_rate_limit
+from aiess.objects import Event, Beatmapset, Discussion
+from aiess.settings import PAGE_RATE_LIMIT
+
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.discussion_event_parser import discussion_event_parser
 from parsers.discussion_parser import discussion_parser
-from storage.settings import PAGE_RATE_LIMIT
 
 def request_page(url: str) -> Response:
     """Requests a response object using the page rate limit."""

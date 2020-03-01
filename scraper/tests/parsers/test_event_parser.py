@@ -1,12 +1,13 @@
 import pytest
 from datetime import datetime
 
+from aiess.errors import ParsingError, DeletedContextError
+from aiess import timestamp
+
 from tests.mocks.events import issue_resolve, nominate, problem
 from tests.mocks.events.faulty import no_events, deleted_beatmap
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.discussion_event_parser import discussion_event_parser
-from parsers.time_parser import from_ISO_8601_to_datetime
-from exceptions import ParsingError, DeletedContextError
 
 def test_parse_event_type():
     tests = [
@@ -34,9 +35,9 @@ def test_parse_event_type_faulty():
 
 def test_parse_event_time():
     tests = [
-        [beatmapset_event_parser.parse_event_time(issue_resolve.tag), from_ISO_8601_to_datetime("2019-12-05T10:26:54+00:00")],
-        [beatmapset_event_parser.parse_event_time(nominate.tag), from_ISO_8601_to_datetime("2019-12-05T12:39:39+00:00")],
-        [discussion_event_parser.parse_event_time(problem.tag), from_ISO_8601_to_datetime("2019-12-05T16:50:10+00:00")]
+        [beatmapset_event_parser.parse_event_time(issue_resolve.tag), timestamp.from_string("2019-12-05T10:26:54+00:00")],
+        [beatmapset_event_parser.parse_event_time(nominate.tag), timestamp.from_string("2019-12-05T12:39:39+00:00")],
+        [discussion_event_parser.parse_event_time(problem.tag), timestamp.from_string("2019-12-05T16:50:10+00:00")]
     ]
 
     for actual, expected in tests:
@@ -171,10 +172,10 @@ def test_from_ISO_8601_to_datetime_raise():
 
     for value in faulty_values:
         with pytest.raises(ValueError):
-            from_ISO_8601_to_datetime(value)
+            timestamp.from_string(value)
 
 def test_from_ISO_8601_to_datetime():
-    test_datetime = from_ISO_8601_to_datetime("2019-12-05T10:26:54+00:00")
+    test_datetime = timestamp.from_string("2019-12-05T10:26:54+00:00")
 
     assert test_datetime.second == 54
     assert test_datetime.minute == 26

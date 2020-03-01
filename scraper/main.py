@@ -2,19 +2,18 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from time import sleep
 
-from storage import event_time
+from aiess import timestamp, logger
+from aiess.logger import log
+
 from web.crawler import get_all_events_between
-from web import crawler
-from storage.database import database
-from storage import logger
-from storage.logger import log
+from database import database
 
 init_time_str = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 
 def loop() -> None:
     """Iterates over new events since the last time, inserts them into the database, and then updates the last time."""
     current_time = datetime.utcnow().replace(microsecond=0)
-    last_time = event_time.get_last("events")
+    last_time = timestamp.get_last("events")
 
     push_events(get_all_events_between, current_time, last_time)
 
@@ -49,7 +48,7 @@ def insert_db(events) -> None:
 def last_updated(current_time) -> None:
     """Updates the last updated file to reflect the given time."""
     log(f"--- Last Updated {current_time} ---")
-    event_time.set_last(current_time, "events")
+    timestamp.set_last(current_time, "events")
 
 logger.init(init_time_str)
 while(True):
