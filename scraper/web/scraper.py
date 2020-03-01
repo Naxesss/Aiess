@@ -3,7 +3,7 @@ from requests import Response
 from typing import Generator
 import json
 
-from aiess.web import request_with_rate_limit
+from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.objects import Event, Beatmapset, Discussion
 from aiess.settings import PAGE_RATE_LIMIT
 
