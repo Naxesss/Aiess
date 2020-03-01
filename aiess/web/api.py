@@ -1,7 +1,7 @@
 import json
 from collections import defaultdict
 
-from aiess.web import request_with_rate_limit
+from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.settings import API_KEY, API_RATE_LIMIT
 
 def request_api(request_type: str, query: str) -> object:
