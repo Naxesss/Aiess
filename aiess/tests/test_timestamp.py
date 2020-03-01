@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 
-import aiess.timestamp
+from aiess import timestamp
 
 def test_get_missing_created():
     time_id = "test_missing"
