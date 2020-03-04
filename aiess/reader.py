@@ -26,18 +26,23 @@ class Reader():
     def __push_new_events(self) -> None:
         """Triggers the on_event method for each new event since the last stored datetime.
         Updates the last stored datetime to the current time afterwards."""
-        last_time = timestamp.get_last(self.reader_id)
+        last_time = timestamp.get_last(self.__time_id())
         current_time = datetime.utcnow()
 
         self.__push_events_between(last_time, current_time)
 
-        timestamp.set_last(current_time, self.reader_id)
+        timestamp.set_last(current_time, self.__time_id())
     
     def __push_events_between(self, last_time: datetime, current_time: datetime) -> None:
         """Triggers the on_event method for each event between the two datetimes."""
         loop = asyncio.get_event_loop()
-        for event in events_between(last_time, current_time):
+        for event in (events_between(last_time, current_time) or []):
             loop.run_until_complete(self.on_event(event))
+    
+    def __time_id(self):
+        """Returns the identifier of the file the reader creates to keep track of the last time.
+        This is based on the identifier supplied to the reader on initialization."""
+        return f"reader-{self.reader_id}"
 
     async def on_event(self, event: Event) -> None:
         """Called for each new event found in the running loop of the reader."""
