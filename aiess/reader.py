@@ -48,6 +48,6 @@ class Reader():
         """Called for each new event found in the running loop of the reader."""
         pass
 
-def events_between(_from: datetime, to: datetime) -> Generator[Event]:
+def events_between(_from: datetime, to: datetime) -> Generator[Event, None, None]:
     """Yields each new event found in the database, from the given time to the current time."""
     pass
