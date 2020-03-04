@@ -1,6 +1,6 @@
 import mysql.connector
 from mysql.connector.errors import Error, OperationalError
-from typing import List, Tuple
+from typing import List, Tuple, Generator
 from enum import Enum
 from datetime import datetime
 
@@ -265,15 +265,18 @@ class Database:
     
     def retrieve_user(self, where_dict: dict) -> User:
         """Returns the first user with the given column data from the database, or None if no such user is stored."""
+        return next(self.retrieve_users(where_dict), None)
+    
+    def retrieve_users(self, where_dict: dict) -> Generator[User, None, None]:
+        """Returns a generator of all users with the given column data from the database."""
         if not where_dict:
-            return None
+            return
 
-        fetched_rows = self.fetchone_table_data("users", where_dict, selection="id, name")
+        fetched_rows = self.retrieve_table_data("users", where_dict, selection="id, name")
         for row in (fetched_rows or []):
             _id = row[0]
             name = row[1]
-            return User(_id, name)
-        return None
+            yield User(_id, name)
     
     def retrieve_beatmapset_modes(self, beatmapset_id: str) -> List[str]:
         """Returns an array of modes corresponding to the given beatmapset id.
@@ -290,26 +293,35 @@ class Database:
     
     def retrieve_beatmapset(self, where_dict: dict) -> Beatmapset:
         """Returns the first beatmapset with the given column data from the database, or None if no such beatmapset is stored."""
+        return next(self.retrieve_beatmapsets(where_dict), None)
+    
+    def retrieve_beatmapsets(self, where_dict: dict) -> Generator[Beatmapset, None, None]:
+        """Returns a generator of all beatmapsets with the given column data from the database."""
         if not where_dict:
-            return None
+            return
 
-        fetched_rows = self.fetchone_table_data("beatmapsets", where_dict, selection="id, title, artist, creator_id")
+        fetched_rows = self.retrieve_table_data("beatmapsets", where_dict, selection="id, title, artist, creator_id")
         for row in (fetched_rows or []):
             _id = row[0]
             title = row[1]
             artist = row[2]
             creator = self.retrieve_user(dict(id=row[3]))
             modes = self.retrieve_beatmapset_modes(_id)
-            return Beatmapset(_id, artist, title, creator, modes)
-        return None
+            yield Beatmapset(_id, artist, title, creator, modes)
 
     def retrieve_discussion(self, where_dict: dict, beatmapset: Beatmapset=None) -> Discussion:
         """Returns the first discussion with the given column data from the database, or None if no such discussion is stored.
         Also retrieves the associated beatmapset from the database if not supplied."""
+        return next(self.retrieve_discussions(where_dict), None)
+    
+    def retrieve_discussions(self, where_dict: dict, beatmapset: Beatmapset=None) -> Generator[Discussion, None, None]:
+        """Returns a generator of all discussions with the given column data from the database.
+        Also retrieves the associated beatmapset from the database if not supplied."""
         if not where_dict:
-            return None
+            return
 
-        fetched_rows = self.fetchone_table_data("discussions", where_dict, selection="id, beatmapset_id, user_id, content")
+        fetched_rows = self.retrieve_table_data(
+            "discussions", where_dict, selection="id, beatmapset_id, user_id, content")
         for row in (fetched_rows or []):
             _id = row[0]
             if not beatmapset:
@@ -317,15 +329,18 @@ class Database:
             user = self.retrieve_user(dict(id=row[2]))
             content = row[3]
 
-            return Discussion(_id, beatmapset, user, content)
-        return None
+            yield Discussion(_id, beatmapset, user, content)
     
     def retrieve_event(self, where_dict: dict) -> Event:
         """Returns the first event with the given column data from the database, or None if no such event is stored."""
+        return next(self.retrieve_events(where_dict), None)
+    
+    def retrieve_events(self, where_dict: dict) -> Generator[Event, None, None]:
+        """Returns a generator of all events with the given column data from the database."""
         if not where_dict:
-            return None
+            return
 
-        fetched_rows = self.fetchone_table_data(
+        fetched_rows = self.retrieve_table_data(
             "events", where_dict, selection="type, time, beatmapset_id, discussion_id, user_id, content")
         for row in (fetched_rows or []):
             _type = row[0]
@@ -334,7 +349,6 @@ class Database:
             discussion = self.retrieve_discussion(dict(id=row[3]))
             user = self.retrieve_user(dict(id=row[4]))
             content = row[5]
-            return Event(_type, time, beatmapset, discussion, user, content=content)
-        return None
+            yield Event(_type, time, beatmapset, discussion, user, content=content)
 
 database = Database()
