@@ -27,16 +27,16 @@ def test_correct_setup(test_database):
 
 def test_insert_delete(test_database):
     test_database.insert_table_data("users", dict(id=1, name="test"))
-    assert test_database.retrieve_table_data("users", dict(id=1))
+    assert test_database.retrieve_table_data("users", "id=1")
 
-    test_database.delete_table_data("users", dict(id=1))
+    test_database.delete_table_data("users", "id=1")
     assert not test_database.retrieve_table_data("users")
 
 def test_auto_reconnect(test_database):
     test_database.connection.close()
     
     test_database.insert_table_data("users", dict(id=1, name="test"))
-    assert test_database.retrieve_user(dict(id=1))
+    assert test_database.retrieve_user("id=1")
 
 def test_missing_table(test_database):
     with pytest.raises(ProgrammingError) as error:
@@ -53,7 +53,7 @@ def test_insert_retrieve_event(test_database):
 
     test_database.insert_event(event)
 
-    retrieved_event = test_database.retrieve_event(dict(type="test"))
+    retrieved_event = test_database.retrieve_event("type=\"test\"")
     assert retrieved_event.type == event.type
     assert retrieved_event.time == event.time
     assert retrieved_event.beatmapset == event.beatmapset
@@ -66,7 +66,7 @@ def test_insert_retrieve_small_event(test_database):
     event = Event(_type="test", time=datetime.utcnow())
     test_database.insert_event(event)
 
-    retrieved_event = test_database.retrieve_event(dict(type="test"))
+    retrieved_event = test_database.retrieve_event("type=\"test\"")
     assert retrieved_event.type == event.type
     assert retrieved_event.time == event.time
     assert retrieved_event.beatmapset == event.beatmapset
@@ -79,7 +79,7 @@ def test_insert_retrieve_user(test_database):
     user = User(1, name="test")
     test_database.insert_user(user)
 
-    retrieved_user = test_database.retrieve_user(dict(id=1))
+    retrieved_user = test_database.retrieve_user("id=1")
     assert retrieved_user.id == user.id
     assert retrieved_user.name == user.name
     assert retrieved_user == user
@@ -98,7 +98,7 @@ def test_insert_retrieve_beatmapset(test_database):
     beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
     test_database.insert_beatmapset(beatmapset)
 
-    retrieved_beatmapset = test_database.retrieve_beatmapset(dict(id=1))
+    retrieved_beatmapset = test_database.retrieve_beatmapset("id=1")
     assert retrieved_beatmapset.id == beatmapset.id
     assert retrieved_beatmapset.artist == beatmapset.artist
     assert retrieved_beatmapset.title == beatmapset.title
@@ -112,7 +112,7 @@ def test_insert_retrieve_discussion(test_database):
     discussion = Discussion(1, beatmapset=beatmapset, user=user, content="testing")
     test_database.insert_discussion(discussion)
 
-    retrieved_discussion = test_database.retrieve_discussion(dict(id=1))
+    retrieved_discussion = test_database.retrieve_discussion("id=1")
     assert retrieved_discussion.id == discussion.id
     assert retrieved_discussion.beatmapset == discussion.beatmapset
     assert retrieved_discussion.user == discussion.user
@@ -145,9 +145,9 @@ def test_insert_retrieve_discussion_and_replies(test_database):
     test_database.insert_event(event_reply1)
     test_database.insert_event(event_reply2)
 
-    retrieved_problem = test_database.retrieve_event(dict(type="problem"))
-    retrieved_reply1 = test_database.retrieve_event(dict(type="reply", user_id=user_replier.id))
-    retrieved_reply2 = test_database.retrieve_event(dict(type="reply", user_id=user_author.id))
+    retrieved_problem = test_database.retrieve_event("type=\"problem\"")
+    retrieved_reply1 = test_database.retrieve_event(f"type=\"reply\" and user_id={user_replier.id}")
+    retrieved_reply2 = test_database.retrieve_event(f"type=\"reply\" and user_id={user_author.id}")
 
     assert retrieved_problem
     assert retrieved_reply1
@@ -160,7 +160,7 @@ def test_insert_retrieve_multiple_users(test_database):
     test_database.insert_user(user1)
     test_database.insert_user(user2)
 
-    retrieved_users = test_database.retrieve_users(dict(name=user1.name))
+    retrieved_users = test_database.retrieve_users(f"name=\"{user1.name}\"")
     assert next(retrieved_users, None) == user1
     assert next(retrieved_users, None) == user2
 
@@ -172,7 +172,7 @@ def test_insert_retrieve_multiple_beatmapsets(test_database):
     test_database.insert_beatmapset(beatmapset1)
     test_database.insert_beatmapset(beatmapset2)
 
-    retrieved_beatmapsets = test_database.retrieve_beatmapsets(dict(creator_id=user.id))
+    retrieved_beatmapsets = test_database.retrieve_beatmapsets(f"creator_id={user.id}")
     assert next(retrieved_beatmapsets, None) == beatmapset1
     assert next(retrieved_beatmapsets, None) == beatmapset2
 
@@ -185,7 +185,7 @@ def test_insert_retrieve_multiple_discussions(test_database):
     test_database.insert_discussion(discussion1)
     test_database.insert_discussion(discussion2)
 
-    retrieved_discussions = test_database.retrieve_discussions(dict(beatmapset_id=beatmapset.id))
+    retrieved_discussions = test_database.retrieve_discussions(f"beatmapset_id={beatmapset.id}")
     assert next(retrieved_discussions, None) == discussion1
     assert next(retrieved_discussions, None) == discussion2
 
@@ -201,6 +201,6 @@ def test_insert_retrieve_multiple_events(test_database):
     test_database.insert_event(event1)
     test_database.insert_event(event2)
 
-    retrieved_events = test_database.retrieve_events(dict(beatmapset_id=beatmapset.id))
+    retrieved_events = test_database.retrieve_events(f"beatmapset_id={beatmapset.id}")
     assert next(retrieved_events, None) == event1
     assert next(retrieved_events, None) == event2

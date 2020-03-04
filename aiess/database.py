@@ -120,14 +120,9 @@ class Database:
                 keyword_format_string=keyword_format_string),
             **new_column_dict)
 
-    def retrieve_table_data(self, table: str, where_dict: dict=None, selection: str="*") -> List[Tuple]:
+    def retrieve_table_data(self, table: str, where_str: str=None, selection: str="*") -> List[Tuple]:
         """Returns all rows from the table where the dictionary conditions apply (e.g. dict(type="nominate")),
         if specified, otherwise any data present in the table."""
-        if where_dict:
-            where_str = " and ".join(f"{key}=%({key})s" for key in where_dict.keys())
-        else:
-            where_str = "TRUE"
-        
         query = """
             SELECT %(selection)s FROM %(db_name)s.%(table)s
             WHERE %(where_str)s
@@ -135,17 +130,12 @@ class Database:
                 selection=selection,
                 db_name=db_name,
                 table=table,
-                where_str=where_str)
+                where_str=where_str if where_str else "TRUE")
         
-        if where_dict:
-            return self.__execute(query, **where_dict)
         return self.__execute(query)
-
     
-    def fetchone_table_data(self, table: str, where_dict: dict, selection: str="*") -> List[Tuple]:
+    def fetchone_table_data(self, table: str, where_str: str, selection: str="*") -> List[Tuple]:
         """Returns the first row from the table where the dictionary conditions apply (e.g. dict(id=1))."""
-        where_str = " and ".join(f"{key}=%({key})s" for key in where_dict.keys())
-        
         return self.__execute("""
             SELECT %(selection)s FROM %(db_name)s.%(table)s
             WHERE %(where_str)s
@@ -154,14 +144,11 @@ class Database:
                 selection=selection,
                 db_name=db_name,
                 table=table,
-                where_str=where_str),
-            **where_dict)
+                where_str=where_str if where_str else "TRUE"))
 
-    def delete_table_data(self, table: str, where_dict: dict, ignore_exception: bool=False) -> List[Tuple]:
+    def delete_table_data(self, table: str, where_str: str, ignore_exception: bool=False) -> List[Tuple]:
         """Deletes all rows from the table where the dictionary conditions apply (e.g. dict(type="kudosu-deny")).
         Can optionally allow failure by ignoring any thrown exception from the query. Returns the result of the query."""
-        where_str = " and ".join(f"{key}=%({key})s" for key in where_dict.keys())
-
         return self.__execute("""
             DELETE %(ignore)sFROM %(db_name)s.%(table)s
             WHERE %(where_str)s
@@ -169,8 +156,7 @@ class Database:
                 ignore="IGNORE " if ignore_exception else "",
                 db_name=db_name,
                 table=table,
-                where_str=where_str),
-            **where_dict)
+                where_str=where_str))
     
     def clear_table_data(self, table: str) -> None:
         """Deletes all rows from the table. Ignores the foreign key check, meaning this
@@ -263,16 +249,16 @@ class Database:
                 user_id=event.user.id if event.user != None else None,
                 content=event.content if event.content != None else None))
     
-    def retrieve_user(self, where_dict: dict) -> User:
-        """Returns the first user with the given column data from the database, or None if no such user is stored."""
-        return next(self.retrieve_users(where_dict), None)
+    def retrieve_user(self, where_str: str) -> User:
+        """Returns the first user from the database matching the given WHERE clause, or None if no such user is stored."""
+        return next(self.retrieve_users(where_str), None)
     
-    def retrieve_users(self, where_dict: dict) -> Generator[User, None, None]:
-        """Returns a generator of all users with the given column data from the database."""
-        if not where_dict:
+    def retrieve_users(self, where_str: str) -> Generator[User, None, None]:
+        """Returns a generator of all users from the database matching the given WHERE clause."""
+        if not where_str:
             return
 
-        fetched_rows = self.retrieve_table_data("users", where_dict, selection="id, name")
+        fetched_rows = self.retrieve_table_data("users", where_str, selection="id, name")
         for row in (fetched_rows or []):
             _id = row[0]
             name = row[1]
@@ -285,69 +271,69 @@ class Database:
             return None
 
         fetched_rows = self.retrieve_table_data(
-            "beatmapset_modes", dict(beatmapset_id=beatmapset_id), selection="mode")
+            "beatmapset_modes", f"beatmapset_id={beatmapset_id}", selection="mode")
         modes = []
         for row in (fetched_rows or []):
             modes.append(row[0])
         return modes
     
-    def retrieve_beatmapset(self, where_dict: dict) -> Beatmapset:
-        """Returns the first beatmapset with the given column data from the database, or None if no such beatmapset is stored."""
-        return next(self.retrieve_beatmapsets(where_dict), None)
+    def retrieve_beatmapset(self, where_str: str) -> Beatmapset:
+        """Returns the first beatmapset from the database matching the given WHERE clause, or None if no such beatmapset is stored."""
+        return next(self.retrieve_beatmapsets(where_str), None)
     
-    def retrieve_beatmapsets(self, where_dict: dict) -> Generator[Beatmapset, None, None]:
-        """Returns a generator of all beatmapsets with the given column data from the database."""
-        if not where_dict:
+    def retrieve_beatmapsets(self, where_str: str) -> Generator[Beatmapset, None, None]:
+        """Returns a generator of all beatmapsets from the database matching the given WHERE clause."""
+        if not where_str:
             return
 
-        fetched_rows = self.retrieve_table_data("beatmapsets", where_dict, selection="id, title, artist, creator_id")
+        fetched_rows = self.retrieve_table_data("beatmapsets", where_str, selection="id, title, artist, creator_id")
         for row in (fetched_rows or []):
             _id = row[0]
             title = row[1]
             artist = row[2]
-            creator = self.retrieve_user(dict(id=row[3]))
+            creator = self.retrieve_user(f"id={row[3]}")
             modes = self.retrieve_beatmapset_modes(_id)
             yield Beatmapset(_id, artist, title, creator, modes)
 
-    def retrieve_discussion(self, where_dict: dict, beatmapset: Beatmapset=None) -> Discussion:
-        """Returns the first discussion with the given column data from the database, or None if no such discussion is stored.
+    def retrieve_discussion(self, where_str: str, beatmapset: Beatmapset=None) -> Discussion:
+        """Returns the first discussion from the database matching the given WHERE clause, or None if no such discussion is stored.
         Also retrieves the associated beatmapset from the database if not supplied."""
-        return next(self.retrieve_discussions(where_dict), None)
+        return next(self.retrieve_discussions(where_str), None)
     
-    def retrieve_discussions(self, where_dict: dict, beatmapset: Beatmapset=None) -> Generator[Discussion, None, None]:
-        """Returns a generator of all discussions with the given column data from the database.
+    def retrieve_discussions(self, where_str: str, beatmapset: Beatmapset=None) -> Generator[Discussion, None, None]:
+        """Returns a generator of all discussions from the database matching the given WHERE clause.
         Also retrieves the associated beatmapset from the database if not supplied."""
-        if not where_dict:
+        if not where_str:
             return
 
         fetched_rows = self.retrieve_table_data(
-            "discussions", where_dict, selection="id, beatmapset_id, user_id, content")
+            "discussions", where_str, selection="id, beatmapset_id, user_id, content")
         for row in (fetched_rows or []):
             _id = row[0]
             if not beatmapset:
-                beatmapset = self.retrieve_beatmapset(dict(id=row[1]))
-            user = self.retrieve_user(dict(id=row[2]))
+                beatmapset = self.retrieve_beatmapset(f"id={row[1]}")
+            user = self.retrieve_user(f"id={row[2]}")
             content = row[3]
 
             yield Discussion(_id, beatmapset, user, content)
     
-    def retrieve_event(self, where_dict: dict) -> Event:
-        """Returns the first event with the given column data from the database, or None if no such event is stored."""
-        return next(self.retrieve_events(where_dict), None)
+    def retrieve_event(self, where_str: str) -> Event:
+        """Returns the first event from the database matching the given WHERE clause, or None if no such event is stored."""
+        return next(self.retrieve_events(where_str), None)
     
-    def retrieve_events(self, where_dict: dict) -> Generator[Event, None, None]:
-        """Returns a generator of all events with the given column data from the database."""
-        if not where_dict:
+    def retrieve_events(self, where_str: str) -> Generator[Event, None, None]:
+        """Returns a generator of all events from the database matching the given WHERE clause."""
+        if not where_str:
             return
 
         fetched_rows = self.retrieve_table_data(
-            "events", where_dict, selection="type, time, beatmapset_id, discussion_id, user_id, content")
+            "events", where_str, selection="type, time, beatmapset_id, discussion_id, user_id, content")
         for row in (fetched_rows or []):
             _type = row[0]
             time = row[1]
-            beatmapset = self.retrieve_beatmapset(dict(id=row[2]))
-            discussion = self.retrieve_discussion(dict(id=row[3]))
-            user = self.retrieve_user(dict(id=row[4]))
+            beatmapset = self.retrieve_beatmapset(f"id={row[2]}" if row[2] else None)
+            discussion = self.retrieve_discussion(f"id={row[3]}" if row[3] else None)
+            user = self.retrieve_user(f"id={row[4]}" if row[4] else None)
             content = row[5]
             yield Event(_type, time, beatmapset, discussion, user, content=content)
 
