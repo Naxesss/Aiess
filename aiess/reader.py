@@ -3,6 +3,7 @@ from datetime import datetime
 import asyncio
 
 from aiess.objects import Event
+from aiess.database import database
 from aiess import timestamp
 
 class Reader():
@@ -13,6 +14,7 @@ class Reader():
     Use this by creating a class inheriting Reader, and override methods (e.g. on_event) as desired."""
     def __init__(self, reader_id: str):
         self.reader_id = reader_id
+        self.database = database
 
     def run(self) -> None:
         """A blocking method which initiates a loop looking through events in the database.
