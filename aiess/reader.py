@@ -38,7 +38,7 @@ class Reader():
     def __push_events_between(self, last_time: datetime, current_time: datetime) -> None:
         """Triggers the on_event method for each event between the two datetimes."""
         loop = asyncio.get_event_loop()
-        for event in (events_between(last_time, current_time) or []):
+        for event in self.events_between(last_time, current_time):
             loop.run_until_complete(self.on_event(event))
     
     def __time_id(self):
@@ -46,10 +46,10 @@ class Reader():
         This is based on the identifier supplied to the reader on initialization."""
         return f"reader-{self.reader_id}"
 
+    def events_between(self, _from: datetime, to: datetime) -> Generator[Event, None, None]:
+        """Yields each event found in the database, from (excluding) the first time to (including) the second time."""
+        return self.database.retrieve_events(f"time > \"{_from}\" AND time <= \"{to}\"")
+
     async def on_event(self, event: Event) -> None:
         """Called for each new event found in the running loop of the reader."""
         pass
-
-def events_between(_from: datetime, to: datetime) -> Generator[Event, None, None]:
-    """Yields each new event found in the database, from the given time to the current time."""
-    pass
