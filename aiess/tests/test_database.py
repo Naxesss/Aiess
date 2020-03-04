@@ -152,3 +152,55 @@ def test_insert_retrieve_discussion_and_replies(test_database):
     assert retrieved_problem
     assert retrieved_reply1
     assert retrieved_reply2
+
+def test_insert_retrieve_multiple_users(test_database):
+    user1 = User(1, name="test")
+    user2 = User(2, name="test")
+
+    test_database.insert_user(user1)
+    test_database.insert_user(user2)
+
+    retrieved_users = test_database.retrieve_users(dict(name=user1.name))
+    assert next(retrieved_users, None) == user1
+    assert next(retrieved_users, None) == user2
+
+def test_insert_retrieve_multiple_beatmapsets(test_database):
+    user = User(1, name="test")
+    beatmapset1 = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    beatmapset2 = Beatmapset(2, artist="456", title="789", creator=user, modes=["osu"])
+
+    test_database.insert_beatmapset(beatmapset1)
+    test_database.insert_beatmapset(beatmapset2)
+
+    retrieved_beatmapsets = test_database.retrieve_beatmapsets(dict(creator_id=user.id))
+    assert next(retrieved_beatmapsets, None) == beatmapset1
+    assert next(retrieved_beatmapsets, None) == beatmapset2
+
+def test_insert_retrieve_multiple_discussions(test_database):
+    user = User(1, name="test")
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    discussion1 = Discussion(1, beatmapset=beatmapset, user=user, content="testing")
+    discussion2 = Discussion(2, beatmapset=beatmapset, user=user, content="real testing")
+
+    test_database.insert_discussion(discussion1)
+    test_database.insert_discussion(discussion2)
+
+    retrieved_discussions = test_database.retrieve_discussions(dict(beatmapset_id=beatmapset.id))
+    assert next(retrieved_discussions, None) == discussion1
+    assert next(retrieved_discussions, None) == discussion2
+
+def test_insert_retrieve_multiple_events(test_database):
+    time = datetime.utcnow()
+
+    user = User(1, name="test")
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    discussion = Discussion(1, beatmapset=beatmapset, user=user, content="testing")
+    event1 = Event(_type="test", time=time, beatmapset=beatmapset, discussion=discussion, user=user)
+    event2 = Event(_type="123", time=time, beatmapset=beatmapset, discussion=discussion, user=user)
+
+    test_database.insert_event(event1)
+    test_database.insert_event(event2)
+
+    retrieved_events = test_database.retrieve_events(dict(beatmapset_id=beatmapset.id))
+    assert next(retrieved_events, None) == event1
+    assert next(retrieved_events, None) == event2
