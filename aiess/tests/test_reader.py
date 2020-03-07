@@ -62,3 +62,16 @@ def test_events_between_greater_than(reader):
     events = reader.events_between(timestamp.from_string("2020-01-01 05:00:00"), timestamp.from_string("2020-01-01 07:00:00"))
     assert next(events, None) == event2
     assert next(events, None) == None
+
+def test_on_event(reader):
+    event1 = Event(_type="hello", time=timestamp.from_string("2020-01-01 05:00:00"))
+    event2 = Event(_type="there", time=timestamp.from_string("2020-01-01 07:00:00"))
+
+    reader.database.insert_event(event1)
+    reader.database.insert_event(event2)
+
+    _from = timestamp.from_string("2020-01-01 00:00:00")
+    to = timestamp.from_string("2020-01-01 10:00:00")
+    reader._Reader__push_events_between(_from, to)
+
+    assert received_events == [event1, event2]
