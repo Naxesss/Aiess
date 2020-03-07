@@ -6,9 +6,9 @@ from aiess.web import api
 from aiess.objects import Event, Discussion
 from aiess.database import database
 
-from web.scraper import get_discussion_events, get_reply_events, get_beatmapset_events
-from web.scraper import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
-from web import populator
+from scraper import get_discussion_events, get_reply_events, get_beatmapset_events
+from scraper import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
+import populator
 from parsers.discussion_parser import discussion_parser
 
 def get_all_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:

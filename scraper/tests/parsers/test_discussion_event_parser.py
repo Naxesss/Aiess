@@ -5,7 +5,7 @@ from aiess import timestamp
 from tests.mocks.events import problem, reply
 from tests.mocks.events.faulty import discussion_events
 from parsers.discussion_event_parser import discussion_event_parser
-from web import populator
+import populator
 
 def test_parse_discussion_message():
     actual_content = discussion_event_parser.parse_discussion_message(problem.tag)

@@ -6,7 +6,7 @@ from aiess import timestamp, logger
 from aiess.logger import log
 from aiess.database import database
 
-from web.crawler import get_all_events_between
+from crawler import get_all_events_between
 
 init_time_str = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 

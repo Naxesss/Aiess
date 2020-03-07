@@ -5,7 +5,7 @@ from aiess.errors import ParsingError
 from aiess.tests.mocks.api import beatmap as mock_beatmap
 from aiess.tests.mocks.api import old_beatmap as mock_old_beatmap
 
-from web import populator
+import populator
 
 def test_old_discussion():
     beatmapset = Beatmapset(41823, beatmapset_json=mock_old_beatmap.JSON)
