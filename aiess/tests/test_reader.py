@@ -12,7 +12,7 @@ class Reader(aiess.Reader):
         super().__init__(reader_id)
         self.database = Database("aiess_test")
 
-    def on_event(self, event: Event):
+    async def on_event(self, event: Event):
         received_events.append(event)
 
 @pytest.fixture
