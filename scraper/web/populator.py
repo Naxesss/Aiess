@@ -108,7 +108,7 @@ def __populate_additional_details(event: Event, discussions_json: object) -> Non
 
 def __complete_discussion_context(discussion: Discussion) -> bool:
     """Completes the context of the discussion from prior database entries, if present. Returns true if succeeded."""
-    cached_discussion = database.retrieve_discussion(dict(id=discussion.id))
+    cached_discussion = database.retrieve_discussion(f"id={discussion.id}")
     if not cached_discussion:
         return False
     
