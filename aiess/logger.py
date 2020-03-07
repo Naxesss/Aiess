@@ -1,4 +1,4 @@
-PATH_PREFIX = "../logs/"
+PATH_PREFIX = "logs/"
 
 time_str = None
 
