@@ -1,11 +1,11 @@
 import discord
 from discord import Message
 
-import receiver
-from settings import API_KEY
-
 import aiess
 from aiess import Event
+
+import receiver
+from settings import API_KEY
 
 class Reader(aiess.Reader):
     async def on_event(self, event: Event):
