@@ -49,7 +49,7 @@ class Database:
                 return self.connection.cursor()
             except OperationalError as error:
                 log(f"WARNING | {error}")
-                self.__init__()
+                self.__init__(db_name)
 
     def __del__(self):
         """Clears up allocated resources such as memory upon destruction."""
