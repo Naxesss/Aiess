@@ -49,6 +49,7 @@ def __get_event_generations_between(
     frame and across multiple pages rather than just one."""
     current_time = start_time
     page = 1
+    noEntriesTries = 0
 
     while current_time > end_time:
         event_generator = generator_function(page)
@@ -70,7 +71,6 @@ def __get_event_generations_between(
         
         # In case the generator for some reason is empty (e.g. site changed routes, class names, or end time is later than events
         # were logged for).
-        noEntriesTries = 0
         if not had_value:
             noEntriesTries += 1
             if noEntriesTries >= 3:
