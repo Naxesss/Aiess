@@ -6,8 +6,8 @@ from aiess.web import api
 from aiess.objects import Event, Discussion
 from aiess.database import database
 
-from scraper import get_discussion_events, get_reply_events, get_beatmapset_events
-from scraper import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
+from requester import get_discussion_events, get_reply_events, get_beatmapset_events
+from requester import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
 import populator
 from parsers.discussion_parser import discussion_parser
 
