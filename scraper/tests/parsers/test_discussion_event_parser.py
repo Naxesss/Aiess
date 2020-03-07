@@ -4,6 +4,7 @@ from aiess import timestamp
 
 from tests.mocks.events import problem, reply
 from tests.mocks.events.faulty import discussion_events
+from tests.mocks import discussions_json
 from parsers.discussion_event_parser import discussion_event_parser
 import populator
 
@@ -29,7 +30,18 @@ def test_parse():
     assert len(generated_events) == 1  # 1 of 2 events is of a beatmapset that no longer exists.
     assert generated_events[0].type == "suggestion"
 
+def test_parse_json():
+    generator = discussion_event_parser.parse(discussions_json.soup)
 
+    generated_events = []
+    for event in generator:
+        generated_events.append(event)
+    
+    assert len(generated_events) == 5
+    assert generated_events[0].type == "suggestion"
+    assert generated_events[0].time == timestamp.from_string("2020-03-07T20:42:58+00:00")
+    assert generated_events[2].user.id == "2597417"
+    assert generated_events[2].user.name == "Jaltzu"
 
 @pytest.fixture(scope="module")
 def discussion_event():
