@@ -45,6 +45,8 @@ class BeatmapsetEventParser(EventParser):
                 beatmapset = beatmapset,
                 discussion = discussion,
                 user = user)
+        
+        return None
     
     def parse_event_type(self, event: Tag) -> str:
         """Returns the type of the given event (e.g. nominate", "issue-resolve", "disqualify")."""

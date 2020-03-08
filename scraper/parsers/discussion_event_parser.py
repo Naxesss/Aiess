@@ -69,6 +69,8 @@ class DiscussionEventParser(EventParser):
                 discussion = discussion,
                 user = user,
                 content = content)
+        
+        return None
     
     def parse_event_json(self, event_json: object, user_jsons: object=None) -> Event:
         """Returns a BeatmapsetEvent reflecting the given event json object.
@@ -106,6 +108,8 @@ class DiscussionEventParser(EventParser):
                 discussion = discussion,
                 user = user,
                 content = content)
+        
+        return None
     
     def __lookup_user_json(self, user_id: str, user_jsons: object):
         if not user_jsons:
