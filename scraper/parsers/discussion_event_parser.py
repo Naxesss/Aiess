@@ -77,6 +77,12 @@ class DiscussionEventParser(EventParser):
         Ignores any event with an incomplete context (e.g. deleted beatmaps).
 
         Requests user names from the api unless supplied with the corresponding user json from the discussion page."""
+        if not event_json:
+            # Seems to occur when the respective beatmapset has been deleted. However, it's there when
+            # viewing the page source manually for some reason, regardless of login status.
+            log_err("WARNING | An event is missing; the beatmapset was probably deleted.")
+            return None
+        
         try:
             # Scrape object data
             _type = event_json["message_type"]
