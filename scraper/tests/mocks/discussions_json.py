@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 
 from requester import soupify
 
+# Includes an event of a deleted beatmapset, as well as an empty event.
 JSON = """
 [
   {
@@ -178,6 +179,60 @@ JSON = """
       "message": "00:46:640 - k",
       "created_at": "2020-03-07T20:41:35+00:00",
       "updated_at": "2020-03-07T20:41:35+00:00",
+      "deleted_at": null
+    }
+  },
+  [],
+  {
+    "id": 1389788,
+    "beatmapset_id": 1010537,
+    "beatmap_id": null,
+    "user_id": 11746150,
+    "deleted_by_id": null,
+    "message_type": "hype",
+    "parent_id": null,
+    "timestamp": null,
+    "resolved": false,
+    "can_be_resolved": false,
+    "can_grant_kudosu": false,
+    "created_at": "2020-02-09T04:00:02+00:00",
+    "updated_at": "2020-02-09T04:00:02+00:00",
+    "deleted_at": null,
+    "last_post_at": "2020-02-09T04:00:02+00:00",
+    "kudosu_denied": false,
+    "beatmapset": {
+      "id": 1010537,
+      "title": "Otome-domo yo.",
+      "artist": "CHiCO with HoneyWorks",
+      "creator": "AIR",
+      "user_id": 2070688,
+      "covers": {
+        "cover": "https://assets.ppy.sh/beatmaps/1010537/covers/cover.jpg?1583036954",
+        "cover@2x": "https://assets.ppy.sh/beatmaps/1010537/covers/cover@2x.jpg?1583036954",
+        "card": "https://assets.ppy.sh/beatmaps/1010537/covers/card.jpg?1583036954",
+        "card@2x": "https://assets.ppy.sh/beatmaps/1010537/covers/card@2x.jpg?1583036954",
+        "list": "https://assets.ppy.sh/beatmaps/1010537/covers/list.jpg?1583036954",
+        "list@2x": "https://assets.ppy.sh/beatmaps/1010537/covers/list@2x.jpg?1583036954",
+        "slimcover": "https://assets.ppy.sh/beatmaps/1010537/covers/slimcover.jpg?1583036954",
+        "slimcover@2x": "https://assets.ppy.sh/beatmaps/1010537/covers/slimcover@2x.jpg?1583036954"
+      },
+      "favourite_count": 14,
+      "play_count": 0,
+      "preview_url": "//b.ppy.sh/preview/1010537.mp3",
+      "video": false,
+      "source": "荒ぶる季節の乙女どもよ。",
+      "status": "graveyard"
+    },
+    "starting_post": {
+      "id": 3909724,
+      "beatmap_discussion_id": 1389788,
+      "user_id": 11746150,
+      "last_editor_id": null,
+      "deleted_by_id": null,
+      "system": false,
+      "message": "12",
+      "created_at": "2020-02-09T04:00:02+00:00",
+      "updated_at": "2020-02-09T04:00:02+00:00",
       "deleted_at": null
     }
   },

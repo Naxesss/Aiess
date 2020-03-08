@@ -37,6 +37,7 @@ def test_parse_json():
     for event in generator:
         generated_events.append(event)
     
+    # There are 7 events, but one is of a beatmapset that has been deleted, and another is empty.
     assert len(generated_events) == 5
     assert generated_events[0].type == "suggestion"
     assert generated_events[0].time == timestamp.from_string("2020-03-07T20:42:58+00:00")
