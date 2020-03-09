@@ -43,7 +43,7 @@ class EventParser():
     def parse_event_link(self, event: Tag) -> str:
         """Returns the beatmapset/discussion link from the thumbnail of a given event 
         (e.g. "https://osu.ppy.sh/beatmapsets/818013/discussion#/1211219")."""
-        thumb = event and event.find("a")
+        thumb = event and event.find("a", {"href": regex.compile(r"^https:\/\/osu\.ppy\.sh\/beatmapsets\/")})
         href = thumb and thumb.attrs["href"]
 
         if not href:
