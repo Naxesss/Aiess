@@ -71,7 +71,7 @@ def test_parse_event_link_faulty():
     faulty_values = [
         [no_events.tag, ParsingError],
         [resolve_deleted_beatmap.tag, DeletedContextError],
-        [kudosu_deleted_beatmap.tag, DeletedContextError]
+        [kudosu_deleted_beatmap.tag, DeletedContextError],
         [None, ParsingError]
     ]
 
