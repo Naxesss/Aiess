@@ -1,3 +1,5 @@
+from datetime import datetime
+
 PATH_PREFIX = "logs/"
 
 time_str = None
@@ -8,8 +10,9 @@ def init(_time_str: str):
     time_str = _time_str
 
 def log(_obj="", end: str="\n", postfix: str="") -> None:
-    """Takes the given object as a string, prints it, and appends it to the current log file."""
-    message = str(_obj)
+    """Takes the given object as a string with the current timestamp,
+    prints it, and appends it to the current log file."""
+    message = timestamped_str(_obj)
     try:
         print(message, end=end)
     except OSError as error:
@@ -25,11 +28,15 @@ def write(_obj, end: str="\n", postfix: str="") -> None:
     if not time_str:
         return  # Tests do not initalize the time string.
 
-    message = str(_obj)
+    message = timestamped_str(_obj)
     with open(f"{PATH_PREFIX}log{postfix}-{time_str}.txt", "a", encoding="utf-8") as _file:
         _file.write(message + end)
 
+def timestamped_str(_obj) -> str:
+    return f"{datetime.utcnow()} - {str(_obj)}"
+
 def log_err(err: Exception) -> None:
-    """Takes the given exception as a string and appends it to both the current log and log-err files."""
+    """Takes the given exception as a string with the current timestamp,
+    and appends it to both the current log and log-err files."""
     log(err)
     write(err, postfix="-err")
