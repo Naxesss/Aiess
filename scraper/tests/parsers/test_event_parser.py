@@ -5,7 +5,7 @@ from aiess.errors import ParsingError, DeletedContextError
 from aiess import timestamp
 
 from tests.mocks.events import issue_resolve, nominate, problem
-from tests.mocks.events.faulty import no_events, deleted_beatmap
+from tests.mocks.events.faulty import no_events, resolve_deleted_beatmap, kudosu_deleted_beatmap
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.discussion_event_parser import discussion_event_parser
 
@@ -70,7 +70,8 @@ def test_parse_event_link():
 def test_parse_event_link_faulty():
     faulty_values = [
         [no_events.tag, ParsingError],
-        [deleted_beatmap.tag, DeletedContextError],
+        [resolve_deleted_beatmap.tag, DeletedContextError],
+        [kudosu_deleted_beatmap.tag, DeletedContextError]
         [None, ParsingError]
     ]
 
@@ -95,7 +96,7 @@ def test_parse_author_id():
 def test_parse_event_author_id_faulty():
     faulty_values = [
         [no_events.tag, ParsingError],
-        [deleted_beatmap.tag, DeletedContextError],
+        [resolve_deleted_beatmap.tag, DeletedContextError],
         [None, ParsingError]
     ]
 
@@ -119,7 +120,7 @@ def test_parse_author_name():
 def test_parse_event_author_name_faulty():
     faulty_values = [
         [no_events.tag, ParsingError],
-        [deleted_beatmap.tag, DeletedContextError],
+        [resolve_deleted_beatmap.tag, DeletedContextError],
         [None, ParsingError]
     ]
 
