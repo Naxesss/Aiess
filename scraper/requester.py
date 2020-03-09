@@ -6,14 +6,22 @@ import json
 from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.objects import Event, Beatmapset, Discussion
 from aiess.settings import PAGE_RATE_LIMIT
+from aiess.logger import log_err
 
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.discussion_event_parser import discussion_event_parser
 from parsers.discussion_parser import discussion_parser
 
 def request_page(url: str) -> Response:
-    """Requests a response object using the page rate limit."""
-    return request_with_rate_limit(url, PAGE_RATE_LIMIT, "page")
+    """Requests a response object using the page rate limit.
+    If cloudflare IUAM (https://blog.cloudflare.com/tag/iuam/) is active we simply wait until it's over."""
+    response = None
+    while not response or "Just a moment..." in response.text:
+        response = request_with_rate_limit(url, PAGE_RATE_LIMIT, "page")
+        if "Just a moment..." in response.text:
+            log_err("WARNING | CloudFlare IUAM is active")
+    
+    return response
 
 def request_json(url: str) -> object:
     """Requests the page from the url as a json object."""
