@@ -41,7 +41,7 @@ def insert_db(events) -> None:
 
     log(f"--- Inserting {len(events)} Events into the Database ---")
     for event in events:
-        log(".", end="")
+        log(".", newline=False)
         database.insert_event(event)
     log()
 
