@@ -14,8 +14,23 @@ def request_with_rate_limit(request_url: str, rate_limit: float, rate_limit_id: 
     if response_time and response_time + timedelta(seconds=rate_limit) > datetime.now():
         tdelta = ((response_time + timedelta(seconds=rate_limit)) - datetime.now())
         sleep(tdelta.total_seconds())
-    
-    response = requests.get(request_url)
+
+    response = request_with_retry(request_url, max_attempts=10)
     last_response_time[rate_limit_id] = datetime.now()
 
     return response
+
+def request_with_retry(request_url, max_attempts=None) -> Response:
+    """Requests a response object and retries if a ConnectionError is raised, sleeping in between retries.
+    If the given max attempts is reached (set to None to never reach), we raise the ConnectionError instead of ignoring it.
+    
+    Backs off exponentially, capping at 120 seconds sleep time between retries; 15 -> 30 -> 60 -> 120."""
+    attempts = 0
+    while True:
+        try:
+            return requests.get(request_url)
+        except ConnectionError:
+            attempts += 1
+            if max_attempts and attempts >= max_attempts:
+                raise
+            sleep(max(15 * 2**(attempts - 1), 120))
