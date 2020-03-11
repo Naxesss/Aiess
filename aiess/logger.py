@@ -19,7 +19,7 @@ def log(_obj="", newline: bool=True, postfix: str="") -> None:
         print(message, end="")
     except OSError as error:
         # Occurs when the message includes character codes which the python terminal doesn't recognize.
-        print(f"OSError: {error}")
+        print(f"OSError: {error}\n")
     
     write(_obj, newline, postfix)
 
