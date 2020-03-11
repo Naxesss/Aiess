@@ -4,6 +4,8 @@ from typing import Generator, Dict
 from time import sleep
 from datetime import datetime, timedelta
 
+from aiess.logger import log_err
+
 last_response_time: Dict[str, datetime] = {}
 
 def request_with_rate_limit(request_url: str, rate_limit: float, rate_limit_id: str=None) -> Response:
@@ -30,6 +32,7 @@ def request_with_retry(request_url, max_attempts=None) -> Response:
         try:
             return requests.get(request_url)
         except ConnectionError:
+            log_err(f"WARNING | ConnectionError was raised on GET \"{request_url}\", retrying...")
             attempts += 1
             if max_attempts and attempts >= max_attempts:
                 raise
