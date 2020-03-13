@@ -9,7 +9,10 @@ from settings import API_KEY
 
 class Reader(aiess.Reader):
     async def on_event(self, event: Event):
-        pass
+        try:
+            print(event)
+        except OSError:
+            pass
 
 reader = Reader("bot")
 
