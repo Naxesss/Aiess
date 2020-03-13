@@ -1,6 +1,5 @@
 from typing import Callable, Generator
 from datetime import datetime
-from time import sleep
 import asyncio
 
 from aiess.objects import Event
@@ -18,7 +17,7 @@ class Reader():
         self.database = database
         self.running = False
 
-    def run(self) -> None:
+    async def run(self) -> None:
         """A blocking method which initiates a loop looking through events in the database.
         This is from where on_event is called, for each new event found.
         
@@ -29,24 +28,23 @@ class Reader():
 
         self.running = True
         while True:
-            self.__push_new_events()
-            sleep(10)
+            await self.__push_new_events()
+            await asyncio.sleep(10)
 
-    def __push_new_events(self) -> None:
+    async def __push_new_events(self) -> None:
         """Triggers the on_event method for each new event since the last stored datetime.
         Updates the last stored datetime to the current time afterwards."""
         last_time = timestamp.get_last(self.__time_id())
         current_time = datetime.utcnow()
 
-        self.__push_events_between(last_time, current_time)
+        await self.__push_events_between(last_time, current_time)
 
         timestamp.set_last(current_time, self.__time_id())
     
-    def __push_events_between(self, last_time: datetime, current_time: datetime) -> None:
+    async def __push_events_between(self, last_time: datetime, current_time: datetime) -> None:
         """Triggers the on_event method for each event between the two datetimes."""
-        loop = asyncio.get_event_loop()
         for event in self.events_between(last_time, current_time):
-            loop.run_until_complete(self.on_event(event))
+            await self.on_event(event)
     
     def __time_id(self):
         """Returns the identifier of the file the reader creates to keep track of the last time.
