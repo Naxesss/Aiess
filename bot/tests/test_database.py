@@ -22,9 +22,9 @@ def test_insert_retrieve_channel_sub(test_database):
     test_database.insert_channel_sub(sub2)
 
     retrieved_subs = test_database.retrieve_channel_subs()
-    assert next(retrieved_subs) == sub1
-    assert next(retrieved_subs) == sub2
-    assert next(retrieved_subs) == None
+    assert next(retrieved_subs, None) == sub1
+    assert next(retrieved_subs, None) == sub2
+    assert next(retrieved_subs, None) == None
 
 def test_insert_retrieve_channel_sub_no_filter(test_database):
     sub = Subscription(guild_id=1, channel_id=1, _filter=None)
