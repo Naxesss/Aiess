@@ -1,5 +1,6 @@
 from typing import Callable, Generator
 from datetime import datetime
+from time import sleep
 import asyncio
 
 from aiess.objects import Event
@@ -24,6 +25,7 @@ class Reader():
         so place this after any setup code."""
         while True:
             self.__push_new_events()
+            sleep(10)
 
     def __push_new_events(self) -> None:
         """Triggers the on_event method for each new event since the last stored datetime.
