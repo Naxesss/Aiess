@@ -35,11 +35,11 @@ class Reader():
         """Triggers the on_event method for each new event since the last stored datetime.
         Updates the last stored datetime to the current time afterwards."""
         last_time = timestamp.get_last(self.__time_id())
-        current_time = datetime.utcnow()
 
-        await self.__push_events_between(last_time, current_time)
-
-        timestamp.set_last(current_time, self.__time_id())
+        current_time = await self.__push_events_between(last_time, datetime.utcnow())
+        
+        if current_time:
+            timestamp.set_last(current_time, self.__time_id())
     
     async def __push_events_between(self, last_time: datetime, current_time: datetime) -> datetime:
         """Triggers the on_event method for each event between the two datetimes.
