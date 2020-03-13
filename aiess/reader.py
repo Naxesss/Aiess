@@ -16,6 +16,7 @@ class Reader():
     def __init__(self, reader_id: str):
         self.reader_id = reader_id
         self.database = database
+        self.running = False
 
     def run(self) -> None:
         """A blocking method which initiates a loop looking through events in the database.
@@ -23,6 +24,10 @@ class Reader():
         
         Being a blocking call, any statement after calling this method will not be executed,
         so place this after any setup code."""
+        if self.running:
+            raise ValueError("Reader is already running.")
+
+        self.running = True
         while True:
             self.__push_new_events()
             sleep(10)
