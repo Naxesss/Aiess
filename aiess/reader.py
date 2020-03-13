@@ -41,10 +41,15 @@ class Reader():
 
         timestamp.set_last(current_time, self.__time_id())
     
-    async def __push_events_between(self, last_time: datetime, current_time: datetime) -> None:
-        """Triggers the on_event method for each event between the two datetimes."""
+    async def __push_events_between(self, last_time: datetime, current_time: datetime) -> datetime:
+        """Triggers the on_event method for each event between the two datetimes.
+        Returns the last event's datetime, if any, otherwise None."""
+        last_event = None
         for event in self.events_between(last_time, current_time):
             await self.on_event(event)
+            last_event = event
+        
+        return last_event.time if last_event else None
     
     def __time_id(self):
         """Returns the identifier of the file the reader creates to keep track of the last time.
