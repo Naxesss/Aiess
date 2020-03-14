@@ -6,6 +6,7 @@ from aiess import Event
 
 import receiver
 from settings import API_KEY
+from cmd_modules import _all
 
 class Reader(aiess.Reader):
     async def on_event(self, event: Event):

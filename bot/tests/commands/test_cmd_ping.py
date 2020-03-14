@@ -1,6 +1,7 @@
 import pytest
 
 from tests.mock_command import MockCommand
+from cmd_modules import cmd_ping
 from receiver import receive_command
 
 @pytest.mark.asyncio
