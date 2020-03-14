@@ -6,7 +6,7 @@ from subscriptions import Subscription
 
 class Database(aiess.Database):
     """Creates an aiess_bot database connection, with methods to insert and retrieve subscriptions."""
-    
+
     def __init__(self, _db_name:str="aiess_bot"):
         super().__init__(_db_name)
     
