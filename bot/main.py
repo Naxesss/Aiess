@@ -3,6 +3,7 @@ from discord import Message
 
 import aiess
 from aiess import Event
+from aiess.logger import log
 
 from settings import API_KEY
 import receiver
@@ -29,10 +30,7 @@ class Reader(aiess.Reader):
     client: Client = None
     
     async def on_event(self, event: Event):
-        try:
-            print(event)
-        except OSError:
-            pass
+        log(event, postfix="bot")
 
 reader = Reader("bot")
 
