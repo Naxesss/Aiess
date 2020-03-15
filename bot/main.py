@@ -1,5 +1,6 @@
 import discord
 from discord import Message
+import asyncio
 
 import aiess
 from aiess import Event
@@ -25,6 +26,12 @@ class Client(discord.Client):
 
     async def on_message(self, message: Message) -> None:
         await receiver.receive(message)
+    
+    async def send_event(self, event: Event, subscription: Subscription):
+        channel = self.get_channel(subscription.channel_id)
+        await channel.send(str(event))
+
+        asyncio.sleep(2)  # TODO: Figure out how to ratelimit discord messages.
 
 class Reader(aiess.Reader):
     client: Client = None
