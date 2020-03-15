@@ -54,4 +54,3 @@ logger.init(init_time_str)
 while(True):
     loop()
     sleep(60)
-
