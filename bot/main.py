@@ -40,6 +40,7 @@ class Reader(aiess.Reader):
     
     async def on_event(self, event: Event):
         log(event, postfix="bot")
+        subscriber.forward(event, self.client)
 
 reader = Reader("bot")
 
