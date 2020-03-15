@@ -8,9 +8,11 @@ from aiess.logger import log
 
 from settings import API_KEY
 import receiver
+import subscriber
 from subscriptions import Subscription
 from cmd_modules import _all
 
+subscriber.load()
 
 class Client(discord.Client):
     def __init__(self, reader):
