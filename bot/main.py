@@ -4,11 +4,30 @@ from discord import Message
 import aiess
 from aiess import Event
 
-import receiver
 from settings import API_KEY
+import receiver
+from subscriptions import Subscription
 from cmd_modules import _all
 
+
+class Client(discord.Client):
+    def __init__(self, reader):
+        super().__init__()
+        self.reader = reader
+        self.reader.client = self
+
+    async def on_ready(self) -> None:
+        print(f"Logged on as {self.user}!")
+
+        if not self.reader.running:
+            await self.reader.run()
+
+    async def on_message(self, message: Message) -> None:
+        await receiver.receive(message)
+
 class Reader(aiess.Reader):
+    client: Client = None
+    
     async def on_event(self, event: Event):
         try:
             print(event)
@@ -17,16 +36,5 @@ class Reader(aiess.Reader):
 
 reader = Reader("bot")
 
-class Client(discord.Client):
-    async def on_ready(self) -> None:
-        print(f"Logged on as {self.user}!")
-
-        global reader
-        if not reader.running:
-            await reader.run()
-
-    async def on_message(self, message: Message) -> None:
-        await receiver.receive(message)
-
-client = Client()
+client = Client(reader)
 client.run(API_KEY)
