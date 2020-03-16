@@ -27,5 +27,12 @@ class Database(aiess.Database):
             channel_id = row[1]
             _filter = row[2]
             yield Subscription(guild_id, channel_id, _filter)
+    
+    def delete_subscription(self, sub: Subscription) -> None:
+        """Deletes the given subscription from the subscriptions table.
+        
+        The filter of the given subscription does not matter, as there is only one in each channel anyway."""
+        self.delete_table_data("subscriptions",
+            where_str=f"guild_id={sub.guild_id} AND channel_id={sub.channel_id}")
 
 database = Database()
