@@ -14,9 +14,6 @@ class InterpolationDict(dict):
 
 class Database:
     """Creates an aiess database connection."""
-
-    db_name = None
-
     class Table(Enum):
         # External code should be able to refer to specific tables,
         # while not breaking if we change anything in the actual database.
@@ -27,11 +24,10 @@ class Database:
         USERS = "users"
 
     def __init__(self, _db_name="aiess"):
-        global db_name
-        db_name = _db_name
+        self.db_name = _db_name
         db_config = {
             "host": DB_CONFIG["host"],
-            "database": db_name,
+            "database": self.db_name,
             "user": DB_CONFIG["user"],
             "password": DB_CONFIG["password"]
         }
@@ -49,7 +45,7 @@ class Database:
                 return self.connection.cursor()
             except OperationalError as error:
                 log(f"WARNING | {error}")
-                self.__init__(db_name)
+                self.__init__(self.db_name)
 
     def __del__(self):
         """Clears up allocated resources such as memory upon destruction."""
@@ -113,7 +109,7 @@ class Database:
             ON DUPLICATE KEY
             UPDATE %(keyword_format_string)s
             """ % InterpolationDict(
-                db_name=db_name,
+                db_name=self.db_name,
                 table=table,
                 key_string=key_string,
                 key_format_string=key_format_string,
@@ -128,7 +124,7 @@ class Database:
             WHERE %(where_str)s
             """ % InterpolationDict(
                 selection=selection,
-                db_name=db_name,
+                db_name=self.db_name,
                 table=table,
                 where_str=where_str if where_str else "TRUE")
         
@@ -142,7 +138,7 @@ class Database:
             LIMIT 1
             """ % InterpolationDict(
                 selection=selection,
-                db_name=db_name,
+                db_name=self.db_name,
                 table=table,
                 where_str=where_str if where_str else "TRUE"))
 
@@ -154,7 +150,7 @@ class Database:
             WHERE %(where_str)s
             """ % InterpolationDict(
                 ignore="IGNORE " if ignore_exception else "",
-                db_name=db_name,
+                db_name=self.db_name,
                 table=table,
                 where_str=where_str))
     
@@ -165,7 +161,7 @@ class Database:
         self.__execute("""
             TRUNCATE %(db_name)s.%(table)s
             """ % InterpolationDict(
-                db_name=db_name,
+                db_name=self.db_name,
                 table=table))
         self.__execute("SET FOREIGN_KEY_CHECKS = 1")
 
@@ -190,13 +186,13 @@ class Database:
         self.__executemany("""
             DELETE IGNORE FROM {db_name}.beatmapset_modes
             WHERE beatmapset_id=%s
-            """.format(db_name=db_name),
+            """.format(db_name=self.db_name),
             beatmapset_ids)
         
         self.__executemany("""
             INSERT IGNORE INTO {db_name}.beatmapset_modes (beatmapset_id, mode)
             VALUES (%s, %s)
-            """.format(db_name=db_name),
+            """.format(db_name=self.db_name),
             beatmapset_mode_pairs)
     
     def insert_beatmapset(self, beatmapset: Beatmapset) -> None:
