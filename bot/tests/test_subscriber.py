@@ -25,3 +25,25 @@ def test_load(test_database: Database):
 
     assert sub1 in subscriber.cache
     assert sub2 in subscriber.cache
+
+def test_add_subscription(test_database: Database):
+    sub1 = Subscription(guild_id=1, channel_id=1, _filter="type:nominate")
+    sub2 = Subscription(guild_id=1, channel_id=2, _filter="type:ranked")
+    sub3 = Subscription(guild_id=1, channel_id=2, _filter="type:qualify")
+
+    subscriber.add_subscription(sub1, test_database)
+    subscriber.add_subscription(sub2, test_database)
+    subscriber.add_subscription(sub3, test_database)
+
+    assert sub1 in subscriber.cache
+    assert sub2 not in subscriber.cache
+    assert sub3 in subscriber.cache
+
+def test_remove_subscription(test_database: Database):
+    sub1 = Subscription(guild_id=1, channel_id=1, _filter="type:nominate")
+
+    subscriber.add_subscription(sub1, test_database)
+    assert sub1 in subscriber.cache
+
+    subscriber.remove_subscription(sub1, test_database)
+    assert sub1 not in subscriber.cache
