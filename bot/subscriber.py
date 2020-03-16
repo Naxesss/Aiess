@@ -34,6 +34,19 @@ def add_subscription(sub: Subscription, _database: Database=None) -> None:
     database.insert_subscription(sub)
     load()
 
+def unsubscribe(channel: TextChannel) -> None:
+    """Deletes a channel and its filter from the subscription table of the database and reloads the cache."""
+    sub = Subscription(channel.guild.id, channel.id, None)
+    remove_subscription(sub)
+
+def remove_subscription(sub: Subscription, _database: Database=None) -> None:
+    """Deletes a subscription from the subscription table of the database and reloads the cache."""
+    if not _database:
+        _database = database
+
+    database.delete_subscription(sub)
+    load()
+
 async def forward(event: Event, client) -> None:
     """Attempts to forward an event through all subscription filters."""
     for sub in cache:
