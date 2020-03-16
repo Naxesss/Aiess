@@ -20,8 +20,16 @@ def load(_database: Database=None) -> None:
         cache.append(sub)
 
 def subscribe(channel: TextChannel, _filter: str) -> None:
-    """Subscribes a channel to events passing the given filter."""
+    """Inserts a channel and filter into the subscription table of the database and updates the cache.
+    Causes any new events passing the filter to be sent to the channel."""
     sub = Subscription(channel.guild.id, channel.id, _filter)
+    add_subscription(sub)
+
+def add_subscription(sub: Subscription, _database: Database=None) -> None:
+    """Inserts a subscription into the subscription table of the database and reloads the cache.
+    Causes any new events passing the filter to be sent to the channel."""
+    if not _database:
+        _database = database
 
     database.insert_subscription(sub)
     load()
