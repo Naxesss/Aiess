@@ -31,8 +31,8 @@ def add_subscription(sub: Subscription, _database: Database=None) -> None:
     if not _database:
         _database = database
 
-    database.insert_subscription(sub)
-    load()
+    _database.insert_subscription(sub)
+    load(_database)
 
 def unsubscribe(channel: TextChannel) -> None:
     """Deletes a channel and its filter from the subscription table of the database and reloads the cache."""
@@ -44,8 +44,8 @@ def remove_subscription(sub: Subscription, _database: Database=None) -> None:
     if not _database:
         _database = database
 
-    database.delete_subscription(sub)
-    load()
+    _database.delete_subscription(sub)
+    load(_database)
 
 async def forward(event: Event, client) -> None:
     """Attempts to forward an event through all subscription filters."""
