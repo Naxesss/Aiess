@@ -2,7 +2,11 @@ from datetime import datetime
 
 from aiess import Event, User, Beatmapset, Discussion
 
-from filterer import expand, dissect
+from filterer import expand, dissect, escape
+
+def test_escape():
+    assert escape("withoutspace") == "withoutspace"
+    assert escape("with space") == "\"with space\""
 
 def test_expand():
     assert expand("type:(nominate or qualify)") == "type:nominate or type:qualify"
