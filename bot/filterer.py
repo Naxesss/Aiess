@@ -1,16 +1,16 @@
-from typing import Union
+from typing import Union, List
 
 from aiess import Event, User, Beatmapset, Discussion
 
-def escape(string: str):
+def escape(string: str) -> str:
     if " " in string:
         return f"\"{string}\""
     return string
 
-def expand(string: str):
+def expand(string: str) -> str:
     pass
 
-def dissect(obj: Union[Event, User, Beatmapset, Discussion]):
+def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
     dissections = []
 
     if isinstance(obj, User):
