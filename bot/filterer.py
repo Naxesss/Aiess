@@ -3,6 +3,7 @@ from typing import Union, List
 from aiess import Event, User, Beatmapset, Discussion
 
 def escape(string: str) -> str:
+    """Returns the same string but surrounded in quotes if it contains a space."""
     if " " in string:
         return f"\"{string}\""
     return string
@@ -50,6 +51,7 @@ def deepest_parentheses_range(string: str) -> [Union[int, None], Union[int, None
     
     return (deepest_start, deepest_end)
 def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
+    """Returns a list of key:value strings representing the given object."""
     dissections = []
 
     if isinstance(obj, User):
