@@ -10,6 +10,45 @@ def escape(string: str) -> str:
 def expand(string: str) -> str:
     pass
 
+def parenthesis_equal(string: str) -> bool:
+    """Returns whether this string has an equal amount of opening and closing parentheses."""
+    parentheses = 0
+    for char in string:
+        if char == "(": parentheses += 1
+        if char == ")": parentheses -= 1
+    return parentheses == 0
+
+def deepest_parentheses(string: str) -> str:
+    """Returns the string within the deepest level of parentheses, without the parentheses. Raises ValueError on parenthesis inequality."""
+    start, end = deepest_parentheses_range(string)
+    return string[start:end].strip("()")
+
+def deepest_parentheses_range(string: str) -> [Union[int, None], Union[int, None]]:
+    """Returns a tuple of the indexes of the first deepest level of opening and closing parenthesis.
+    Raises ValueError on parenthesis inequality."""
+    if not parenthesis_equal(string):
+        raise ValueError("There are not an equal amount of opening and closing parentheses.")
+
+    depth = 0
+    deepest = 0
+    first_deepest = False
+    deepest_start = None
+    deepest_end = None
+
+    for index, char in enumerate(string):
+        if char == "(":
+            depth += 1
+            if depth > deepest:
+                deepest = depth
+                deepest_start = index
+                first_deepest = True
+        if char == ")":
+            if depth == deepest and first_deepest:
+                deepest_end = index
+                first_deepest = False
+            depth -= 1
+    
+    return (deepest_start, deepest_end)
 def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
     dissections = []
 
