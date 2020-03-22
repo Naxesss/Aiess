@@ -1,12 +1,9 @@
+import pytest
 from datetime import datetime
 
 from aiess import Event, User, Beatmapset, Discussion
 
-from filterer import expand, dissect, escape
-
-def test_escape():
-    assert escape("withoutspace") == "withoutspace"
-    assert escape("with space") == "\"with space\""
+from filterer import expand, parenthesis_equal, deepest_parentheses, deepest_parentheses_range, dissect, escape
 
 def test_expand():
     assert expand("type:(nominate or qualify)") == "type:nominate or type:qualify"
@@ -30,6 +27,45 @@ def test_expand_and_quotes():
 def test_expand_multiple_and():
     assert (expand("type:(nominate or qualify) and user:(123 or 456)") ==
         "type:nominate and user:123 or type:nominate and user:456 or type:qualify and user:123 or type:qualify and user:456")
+
+
+
+
+def test_escape():
+    assert escape("withoutspace") == "withoutspace"
+    assert escape("with space") == "\"with space\""
+
+def test_parenthesis_equality():
+    assert parenthesis_equal("A or (B and (C or D))")
+
+def test_parenthesis_inequality_opening():
+    assert not parenthesis_equal("A and (B or not (C and D)")
+
+def test_parenthesis_inequality_closing():
+    assert not parenthesis_equal("A and (B or not C and D))")
+
+def test_deepest_parentheses():
+    assert deepest_parentheses("abc(def((ghi)jkl(mno)))") == "ghi"
+
+def test_deepest_parentheses_raise():
+    with pytest.raises(ValueError) as err:
+        deepest_parentheses("(()")
+    
+    assert "equal" in str(err)
+
+def test_deepest_parentheses_range():
+    assert deepest_parentheses_range("abc(def(ghi))") == (7, 11)
+
+def test_deepest_parentheses_range_multiple():
+    assert deepest_parentheses_range("abc(def(ghi)) and then (some other ((even deeper) parentheses))") == (36, 48)
+
+def test_deepest_parentheses_range_raise():
+    with pytest.raises(ValueError) as err:
+        deepest_parentheses_range("(()")
+    
+    assert "equal" in str(err)
+
+
 
 def test_dissect_simple():
     event = Event(_type="test", time=datetime.utcnow())
