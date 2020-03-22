@@ -8,6 +8,9 @@ from filterer import expand, parenthesis_equal, deepest_parentheses, deepest_par
 def test_expand():
     assert expand("type:(nominate or qualify)") == "type:nominate or type:qualify"
 
+def test_expand_spaces():
+    assert expand(" type :  qualify ") == "type:qualify"
+
 def test_expand_redundancy():
     assert expand("(type:(qualify))") == "type:qualify"
 
@@ -28,6 +31,11 @@ def test_expand_multiple_and():
     assert (expand("type:(nominate or qualify) and user:(123 or 456)") ==
         "type:nominate and user:123 or type:nominate and user:456 or type:qualify and user:123 or type:qualify and user:456")
 
+def test_expand_not():
+    assert expand("type: not (nominate or qualify)") == "not type:nominate and not type:qualify"
+
+def test_expand_mathematical():
+    assert expand("A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))") == "A or (not B and E) or (not C and D and E)"
 
 
 
