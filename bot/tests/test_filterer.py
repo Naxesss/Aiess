@@ -7,6 +7,9 @@ from filterer import expand
 from filterer import parenthesis_equal
 from filterer import deepest_parentheses
 from filterer import deepest_parentheses_range
+from filterer import backwards_leveled
+from filterer import forwards_leveled
+from filterer import split_unescaped
 from filterer import dissect
 from filterer import escape
 
@@ -71,6 +74,30 @@ def test_deepest_parentheses_range_raise():
         deepest_parentheses_range("(()")
     
     assert "equal" in str(err)
+
+def test_backwards_leveled():
+    assert backwards_leveled("a(ab(c)de)fg"[:4]) == "ab"
+
+def test_forwards_leveled():
+    assert forwards_leveled("a(ab(c)de)fg"[6+1:]) == "de"
+
+def test_split_unescaped():
+    generator = split_unescaped("type:\"One & two \"x | y\"\"&user:\"some two or three\"", ["&", "|", " or "])
+    assert next(generator, None) == ("type:\"One & two \"x | y\"\"", "&")
+    assert next(generator, None) == ("user:\"some two or three\"", None)
+    assert next(generator, None) == None
+
+def test_split_unescaped_special_quotes():
+    generator = split_unescaped("type:“One & two “x | y””&user:“some two or three”", ["&", "|", " or "])
+    assert next(generator, None) == ("type:“One & two “x | y””", "&")
+    assert next(generator, None) == ("user:“some two or three”", None)
+    assert next(generator, None) == None
+
+def test_split_unescaped_long_delimiter():
+    generator = split_unescaped("type:\"one and two\" and user:three", [" and "])
+    assert next(generator, None) == ("type:\"one and two\"", " and ")
+    assert next(generator, None) == ("user:three", None)
+    assert next(generator, None) == None
 
 
 
