@@ -13,17 +13,8 @@ from filterer import escape
 def test_expand():
     assert expand("type:(nominate or qualify)") == "type:nominate or type:qualify"
 
-def test_expand_spaces():
-    assert expand(" type :  qualify ") == "type:qualify"
-
 def test_expand_redundancy():
     assert expand("(type:(qualify))") == "type:qualify"
-
-def test_expand_duplicate():
-    assert expand("type:(nominate or qualify or nominate)") == "type:nominate or type:qualify"
-
-def test_expand_unorganized():
-    assert expand("type:(nominate or qualify) or type:hype") == "type:nominate or type:qualify or type:hype"
 
 def test_expand_and():
     assert expand("type:(nominate or qualify) and user:123") == "type:nominate and user:123 or type:qualify and user:123"
