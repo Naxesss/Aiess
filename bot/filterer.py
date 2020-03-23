@@ -2,16 +2,74 @@ from typing import Union, List, Generator, Tuple
 
 from aiess import Event, User, Beatmapset, Discussion
 
+and_gates = [" and ", "&", "∧"]
+or_gates  = [" or ",  "|", "∨"]
+not_gates = [" not ", "!", "¬"]
+
 quote_chars = ["\"", "“", "”"]
+
+def expand(string: str) -> str:
+    """Converts the given expression into disjunctive normal form.
+    Supports literal, programatic and mathematical boolean operators (e.g. "and", "&", as well as "∧").
+    
+    As an example,
+    \"A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))\"
+    would be converted to
+    \"A ∨ ¬B ∧ E ∨ ¬C ∧ D ∧ E\"."""
+    # TODO: Implement NOT gate functionality; De Morgan's laws and double negation elimination.
+
+    # Performing expansion individually for each OR group ensures we don't
+    # get stuck in an infinite loop for inputs such as:
+    # "(one or two) and (three or four)" -> "one and (three or four) or two and (three or four)"
+    temp_string = ""
+    has_delimiter = False
+    for split, delimiter in split_unescaped(string, or_gates):
+        if delimiter:
+            has_delimiter = True
+        
+        if has_delimiter:
+            temp_string += expand(split) + (delimiter if delimiter else "")
+        else:
+            temp_string += split
+    
+    string = temp_string
+
+    start, end = deepest_parentheses_range(string)
+    if not start and not end:
+        # No more parentheses, we're done.
+        return string
+
+    # first some (things here (and then more) along with) even more
+    #             ^^^^^^^^^^^^               ^^^^^^^^^^^
+    #             pre                        post
+
+    content = string[start+1:end]
+    pre = backwards_leveled(string[:start])
+    post = forwards_leveled(string[end+1:])
+
+    # In this case there's no difference between AND or OR gates, as they maintain their relative orders.
+    # e.g. "pre(x | y & z)post" would just become "prexpost | preypost & prezpost"
+    expanded_content = ""
+    for split, delimiter in split_unescaped(content, and_gates + or_gates):
+        expanded_content += pre + split + post + (delimiter if delimiter else "")
+
+    # first some (things here (and then more) along with) even more
+    # ^^^^^^^^^^^^            ^             ^           ^^^^^^^^^^^
+    # pre_start               start         end         post_end
+
+    pre_start = string[:start - len(pre)]
+    post_end = string[end + len(post) + 1:]
+    string = pre_start + expanded_content + post_end
+  
+    return expand(string)
+
+
 
 def escape(string: str) -> str:
     """Returns the same string but surrounded in quotes if it contains a space."""
     if " " in string:
         return f"\"{string}\""
     return string
-
-def expand(string: str) -> str:
-    pass
 
 def parenthesis_equal(string: str) -> bool:
     """Returns whether this string has an equal amount of opening and closing parentheses."""
