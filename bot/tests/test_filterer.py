@@ -31,7 +31,7 @@ def test_expand_not():
     assert expand("type: not (nominate or qualify)") == "not type:nominate and not type:qualify"
 
 def test_expand_mathematical():
-    assert expand("A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))") == "A or (not B and E) or (not C and D and E)"
+    assert expand("A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))") == "A ∨ ¬B ∧ E ∨ ¬C ∧ D ∧ E"
 
 
 
