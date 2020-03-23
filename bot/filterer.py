@@ -1,6 +1,8 @@
-from typing import Union, List
+from typing import Union, List, Generator, Tuple
 
 from aiess import Event, User, Beatmapset, Discussion
+
+quote_chars = ["\"", "“", "”"]
 
 def escape(string: str) -> str:
     """Returns the same string but surrounded in quotes if it contains a space."""
@@ -50,6 +52,68 @@ def deepest_parentheses_range(string: str) -> [Union[int, None], Union[int, None
             depth -= 1
     
     return (deepest_start, deepest_end)
+
+def backwards_leveled(string: str) -> str:
+    """Returns the content before a given position in the string, until our parenthesis level reduces
+    (i.e. more opening parentheses are hit than closing ones)."""
+    read = ""
+    level = 0
+    for char in reversed(string):
+        if char == "(": level -= 1  # Reading backwards, so we're stepping behind this.
+        if char == ")": level += 1
+        if level < 0:
+            break
+        read = char + read  # Reading backwards, so prepend.
+    return read
+
+def forwards_leveled(string: str) -> str:
+    """Returns the content after a given position in the string, until our parenthesis level reduces
+    (i.e. more closing parentheses are hit than opening ones)."""
+    read = ""
+    level = 0
+    for char in string:
+        if char == "(": level += 1
+        if char == ")": level -= 1
+        if level < 0:
+            break
+        read += char
+    return read
+
+def split_unescaped(string: str, delimiters: List[str]) -> Generator[Tuple[str, str], None, None]:
+    """Returns a generator of tuples consisting of splits and their respective following
+    unescaped delimiters (or None if at the end) from the given string. Escaped delimiters are ones
+    inside quotes or parentheses.
+    
+    So for example splitting \"\"A|B\"|C\" by \"|\" would result in (\"\"A|B\"\", \"|\") and (\"C\", None)."""
+    read = ""
+    quotes = 0
+    parentheses = 0
+    for char in string:
+        
+        if char in quote_chars:
+            # So, "this "would work"", but "not"this"".
+            if not quotes or read.endswith(" "):
+                quotes += 1
+            else:
+                quotes -= 1
+        
+        if char == "(": parentheses += 1
+        if char == ")": parentheses -= 1
+        
+        read += char
+
+        # Quotes and parentheses are considered escaped, so we ignore delimiters inside them.
+        if not quotes and not parentheses:
+            for delimiter in delimiters:
+                if read.endswith(delimiter):
+                    split = read[:-len(delimiter)]  # Don't include the delimiter itself in the split.
+                    yield (split, delimiter)
+                    read = ""
+    
+    yield (read, None)
+
+
+
 def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
     """Returns a list of key:value strings representing the given object."""
     dissections = []
