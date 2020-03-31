@@ -4,6 +4,7 @@ from datetime import datetime
 from aiess import Event, User, Beatmapset, Discussion
 
 from filterer import expand
+from filterer import escape
 from filterer import parenthesis_equal
 from filterer import deepest_parentheses
 from filterer import deepest_parentheses_range
@@ -11,7 +12,6 @@ from filterer import backwards_leveled
 from filterer import forwards_leveled
 from filterer import split_unescaped
 from filterer import dissect
-from filterer import escape
 
 def test_expand():
     assert expand("type:(nominate or qualify)") == "type:nominate or type:qualify"
