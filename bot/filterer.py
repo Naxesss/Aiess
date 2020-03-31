@@ -170,6 +170,30 @@ def split_unescaped(string: str, delimiters: List[str]) -> Generator[Tuple[str, 
     
     yield (read, None)
 
+def de_morgans_law(string: str) -> str:
+    """Returns the equivalent boolean expression without NOT gates in front of parentheses,
+    including double negation elimination."""
+    string = double_negation_elimination(string)
+
+    needs_negating = None
+    needs_negating_index = -1
+    for index, char in enumerate(string):
+        if char == "(" and index > 0 and string[index - 1] == "!": # TODO: can't just use !
+            needs_negating = forwards_leveled(string[index + 1:])
+            needs_negating_index = index + 1
+            break
+    
+    if not needs_negating:
+        return string
+    
+    prefix = string[:needs_negating_index - len("!(")] # TODO: can't just use !
+    postfix = string[needs_negating_index + len(needs_negating) + len(")"):]
+
+    negated_part = negate(needs_negating)
+    negated_part = double_negation_elimination(negated_part)
+
+    return prefix + "(" + negated_part + ")" + postfix
+
 def negate(string: str) -> str:
     """Returns an expression where everything in the string outside parentheses is negated, including OR and AND gates."""
 
