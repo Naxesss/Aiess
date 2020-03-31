@@ -102,7 +102,7 @@ def test_split_unescaped_long_delimiter():
     assert next(generator, None) == None
 
 def test_de_morgans_law():
-    assert de_morgans_law("!(A | B & C)") == "!A & (!B | !C)"
+    assert de_morgans_law("!(A | B & C)") == "(!A & (!B | !C))"
 
     # !(A | B & C)      filter out x in first !(x) match
     # A | B & C         insert ! in front of all ground-level terms
@@ -110,7 +110,8 @@ def test_de_morgans_law():
     # !A, !B & !C       replace ground-level & with | for each split
     # !A, !B | !C       surround any successful replacement with ()
     # !A, (!B | !C)     join splits by &
-    # !A & (!B | !C)    return
+    # !A & (!B | !C)    surround by () and add back prefix and postfix
+    # (!A & (!B | !C))  return
 
 def test_de_morgans_law_complex():
     assert de_morgans_law("x!(D & !(A | B & C) | E & F)y") == "x((!D | (A | B & C)) & (!E | !F))y"
@@ -122,7 +123,7 @@ def test_de_morgans_law_complex():
     # !D | !!(A | B & C), !E | !F           surround any successful replacement with ()
     # (!D | !!(A | B & C)), (!E | !F)       join splits by &
     # (!D | !!(A | B & C)) & (!E | !F)      double negation elimination
-    # (!D | (A | B & C)) & (!E | !F)        add back prefix and postfix after surrounding by ()
+    # (!D | (A | B & C)) & (!E | !F)        surround by () and add back prefix and postfix
     # x((!D | (A | B & C)) & (!E | !F))y    return, rest is cleaned up by expand
 
 def test_de_morgans_law_elimination():
