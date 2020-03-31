@@ -194,8 +194,9 @@ def de_morgans_law(string: str) -> str:
 
     return prefix + "(" + negated_part + ")" + postfix
 
-def negate(string: str) -> str:
-    """Returns an expression where everything in the string outside parentheses is negated, including OR and AND gates."""
+def negate(string: str, not_gate: str="!") -> str:
+    """Returns an expression where everything in the string outside parentheses is negated, including OR and AND gates.
+    Uses "!" as not gate, unless another is given."""
 
     reconstruction = ""
     for or_split, or_gate in split_unescaped(string, or_gates):
@@ -203,7 +204,7 @@ def negate(string: str) -> str:
         # e.g. "A & B" -> "A | B"
         and_temp = ""
         for and_split, and_gate in split_unescaped(or_split, and_gates):
-            and_split = surround_nonspace(and_split, "!", "")
+            and_split = surround_nonspace(and_split, not_gate, "")
             if and_gate: and_temp += and_split + flip_gate(and_gate)
             else:        and_temp += and_split
         
