@@ -187,6 +187,21 @@ def double_negation_elimination(string: str) -> str:
     """Returns the same string, but where all double NOT gates are removed."""
     return string.replace("!!", "")
 
+def surround_nonspace(string: str, pre: str, post: str) -> str:
+    """Returns the string surrounded by the given characters, maintaining spaces outside the surrounding."""
+    pre_spaces = ""
+    for char in string:
+        if char == " ": pre_spaces += char
+        else:           break
+    
+    post_spaces = ""
+    for char in reversed(string):
+        if char == " ": post_spaces += char
+        else:           break
+
+    string = string.strip(" ")
+    return pre_spaces + pre + string + post + post_spaces
+
 
 
 def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
