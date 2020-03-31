@@ -170,6 +170,19 @@ def split_unescaped(string: str, delimiters: List[str]) -> Generator[Tuple[str, 
     
     yield (read, None)
 
+def flip_gate(gate: str) -> str:
+    """Returns any AND gate as the equivalent OR gate, and visa versa. So "&" would return "|", "∨" returns "∧", etc.
+    If no such gate exists, we raise a ValueError."""
+    for index, and_gate in enumerate(and_gates):
+        if gate == and_gate:
+            return or_gates[index]
+    
+    for index, or_gate in enumerate(or_gates):
+        if gate == or_gate:
+            return and_gates[index]
+    
+    raise ValueError(f"Cannot flip the gate \"{gate}\".")
+
 def double_negation_elimination(string: str) -> str:
     """Returns the same string, but where all double NOT gates are removed."""
     return string.replace("!!", "")
