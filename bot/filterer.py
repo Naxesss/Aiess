@@ -9,6 +9,7 @@ not_gates = [" not ", "!", "¬"]
 
 # Regular expression for cases like "not A and (not B or not C)"
 not_gate_patterns = ["(^|\W)not\W", "!", "¬"]
+not_gate_double_patterns = ["(^|\W)not *not\W", "! *!", "¬ *¬"]
 
 quote_chars = ["\"", "“", "”"]
 
@@ -250,7 +251,10 @@ def flip_gate(gate: str) -> str:
 
 def double_negation_elimination(string: str) -> str:
     """Returns the same string, but where all double NOT gates are removed."""
-    return string.replace("!!", "")
+    for double_pattern in not_gate_double_patterns:
+        string = re.sub(double_pattern, "", string)
+    
+    return string
 
 def surround_nonspace(string: str, pre: str, post: str) -> str:
     """Returns the string surrounded by the given characters, maintaining spaces outside the surrounding."""
