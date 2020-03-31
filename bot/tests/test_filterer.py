@@ -11,6 +11,7 @@ from filterer import deepest_parentheses_range
 from filterer import backwards_leveled
 from filterer import forwards_leveled
 from filterer import split_unescaped
+from filterer import double_negation_elimination
 from filterer import dissect
 
 def test_expand():
@@ -98,6 +99,13 @@ def test_split_unescaped_long_delimiter():
     assert next(generator, None) == ("type:\"one and two\"", " and ")
     assert next(generator, None) == ("user:three", None)
     assert next(generator, None) == None
+
+def test_double_negation_elimination():
+    assert double_negation_elimination("!!(A & B)") == "(A & B)"
+
+def test_double_negation_elimination_multiple():
+    assert double_negation_elimination("!!!!!(A & B)") == "!(A & B)"
+    assert double_negation_elimination("(!!!A & !!!!B)") == "(!A & B)"
 
 
 
