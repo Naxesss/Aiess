@@ -11,6 +11,7 @@ from filterer import deepest_parentheses_range
 from filterer import backwards_leveled
 from filterer import forwards_leveled
 from filterer import split_unescaped
+from filterer import de_morgans_law
 from filterer import double_negation_elimination
 from filterer import dissect
 
@@ -99,6 +100,33 @@ def test_split_unescaped_long_delimiter():
     assert next(generator, None) == ("type:\"one and two\"", " and ")
     assert next(generator, None) == ("user:three", None)
     assert next(generator, None) == None
+
+def test_de_morgans_law():
+    assert de_morgans_law("!(A | B & C)") == "!A & (!B | !C)"
+
+    # !(A | B & C)      filter out x in first !(x) match
+    # A | B & C         insert ! in front of all ground-level terms
+    # !A | !B & !C      split by ground-level |
+    # !A, !B & !C       replace ground-level & with | for each split
+    # !A, !B | !C       surround any successful replacement with ()
+    # !A, (!B | !C)     join splits by &
+    # !A & (!B | !C)    return
+
+def test_de_morgans_law_complex():
+    assert de_morgans_law("x!(D & !(A | B & C) | E & F)y") == "x((!D | (A | B & C)) & (!E | !F))y"
+
+    # x!(D & !(A | B & C) | E & F)y         filter out x in first !(x) match
+    # D & !(A | B & C) | E & F              insert ! in front of all ground-level terms
+    # !D & !!(A | B & C) | !E & !F          split by ground-level |
+    # !D & !!(A | B & C), !E & !F           replace ground-level & with | for each split
+    # !D | !!(A | B & C), !E | !F           surround any successful replacement with ()
+    # (!D | !!(A | B & C)), (!E | !F)       join splits by &
+    # (!D | !!(A | B & C)) & (!E | !F)      double negation elimination
+    # (!D | (A | B & C)) & (!E | !F)        add back prefix and postfix after surrounding by ()
+    # x((!D | (A | B & C)) & (!E | !F))y    return, rest is cleaned up by expand
+
+def test_de_morgans_law_elimination():
+    assert de_morgans_law("!!(A & B)") == "(A & B)"
 
 def test_double_negation_elimination():
     assert double_negation_elimination("!!(A & B)") == "(A & B)"
