@@ -138,6 +138,12 @@ def test_negate():
 def test_negate_outside_parentheses():
     assert negate("A | (B & !D | E) & C") == "!A & (!(B & !D | E) | !C)"
 
+def test_negate_literal():
+    assert negate("A or B and C", "not ") == "not A and (not B or not C)"
+
+def test_negate_mathematical():
+    assert negate("A ∨ B ∧ C", "¬") == "¬A ∧ (¬B ∨ ¬C)"
+
 def test_flip_gate():
     assert flip_gate(" or ") == " and "
     assert flip_gate(" and ") == " or "
@@ -158,6 +164,12 @@ def test_double_negation_elimination():
 def test_double_negation_elimination_multiple():
     assert double_negation_elimination("!!!!!(A & B)") == "!(A & B)"
     assert double_negation_elimination("(!!!A & !!!!B)") == "(!A & B)"
+
+def test_double_negation_elimination_literal():
+    assert double_negation_elimination("not not (A & not B) Anot not B") == "(A & not B) Anot not B"
+
+def test_double_negation_elimination_mathematical():
+    assert double_negation_elimination("¬¬¬(A & ¬¬B)") == "¬(A & B)"
 
 def test_surround_nonspace():
     assert surround_nonspace("  ab c    ", "(", ")") == "  (ab c)    "
