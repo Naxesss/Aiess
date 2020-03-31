@@ -1,10 +1,14 @@
 from typing import Union, List, Generator, Tuple
+import re
 
 from aiess import Event, User, Beatmapset, Discussion
 
 and_gates = [" and ", "&", "∧"]
 or_gates  = [" or ",  "|", "∨"]
 not_gates = [" not ", "!", "¬"]
+
+# Regular expression for cases like "not A and (not B or not C)"
+not_gate_patterns = ["(^|\W)not\W", "!", "¬"]
 
 quote_chars = ["\"", "“", "”"]
 
@@ -175,21 +179,35 @@ def de_morgans_law(string: str) -> str:
     including double negation elimination."""
     string = double_negation_elimination(string)
 
+    found_not_gate = None
+    found_not_gate_length = 0
     needs_negating = None
     needs_negating_index = -1
+    read = ""
     for index, char in enumerate(string):
-        if char == "(" and index > 0 and string[index - 1] == "!": # TODO: can't just use !
-            needs_negating = forwards_leveled(string[index + 1:])
-            needs_negating_index = index + 1
+        read += char
+
+        if char == "(":
+            for pattern_index, not_gate_pattern in enumerate(not_gate_patterns):
+                match = re.search(not_gate_pattern + "\($", read)
+                if match:
+                    found_not_gate = not_gates[pattern_index]
+                    found_not_gate_length = len(match.group(0)) - len("(")
+
+                    needs_negating = forwards_leveled(string[index + 1:])
+                    needs_negating_index = index + 1
+                    break
+        
+        if found_not_gate:
             break
     
     if not needs_negating:
         return string
     
-    prefix = string[:needs_negating_index - len("!(")] # TODO: can't just use !
+    prefix = string[:needs_negating_index - found_not_gate_length - len("(")]
     postfix = string[needs_negating_index + len(needs_negating) + len(")"):]
 
-    negated_part = negate(needs_negating)
+    negated_part = negate(needs_negating, not_gate=found_not_gate)
     negated_part = double_negation_elimination(negated_part)
 
     return prefix + "(" + negated_part + ")" + postfix
