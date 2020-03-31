@@ -13,6 +13,7 @@ from filterer import forwards_leveled
 from filterer import split_unescaped
 from filterer import de_morgans_law
 from filterer import negate
+from filterer import flip_gate
 from filterer import double_negation_elimination
 from filterer import dissect
 
@@ -135,6 +136,20 @@ def test_negate():
 
 def test_negate_outside_parentheses():
     assert negate("A | (B & !D | E) & C") == "!A & (!(B & !D | E) | !C)"
+
+def test_flip_gate():
+    assert flip_gate(" or ") == " and "
+    assert flip_gate(" and ") == " or "
+    assert flip_gate("|") == "&"
+    assert flip_gate("&") == "|"
+    assert flip_gate("∨") == "∧"
+    assert flip_gate("∧") == "∨"
+
+def test_flip_gate_not_a_gate():
+    with pytest.raises(ValueError) as err:
+        flip_gate("not a gate")
+    
+    assert "Cannot flip" in str(err)
 
 def test_double_negation_elimination():
     assert double_negation_elimination("!!(A & B)") == "(A & B)"
