@@ -15,6 +15,7 @@ from filterer import de_morgans_law
 from filterer import negate
 from filterer import flip_gate
 from filterer import double_negation_elimination
+from filterer import surround_nonspace
 from filterer import dissect
 
 def test_expand():
@@ -157,6 +158,9 @@ def test_double_negation_elimination():
 def test_double_negation_elimination_multiple():
     assert double_negation_elimination("!!!!!(A & B)") == "!(A & B)"
     assert double_negation_elimination("(!!!A & !!!!B)") == "(!A & B)"
+
+def test_surround_nonspace():
+    assert surround_nonspace("  ab c    ", "(", ")") == "  (ab c)    "
 
 
 
