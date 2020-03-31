@@ -12,6 +12,7 @@ from filterer import backwards_leveled
 from filterer import forwards_leveled
 from filterer import split_unescaped
 from filterer import de_morgans_law
+from filterer import negate
 from filterer import double_negation_elimination
 from filterer import dissect
 
@@ -128,6 +129,12 @@ def test_de_morgans_law_complex():
 
 def test_de_morgans_law_elimination():
     assert de_morgans_law("!!(A & B)") == "(A & B)"
+
+def test_negate():
+    assert negate("A | B & C") == "!A & (!B | !C)"
+
+def test_negate_outside_parentheses():
+    assert negate("A | (B & !D | E) & C") == "!A & (!(B & !D | E) | !C)"
 
 def test_double_negation_elimination():
     assert double_negation_elimination("!!(A & B)") == "(A & B)"
