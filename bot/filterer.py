@@ -170,6 +170,28 @@ def split_unescaped(string: str, delimiters: List[str]) -> Generator[Tuple[str, 
     
     yield (read, None)
 
+def negate(string: str) -> str:
+    """Returns an expression where everything in the string outside parentheses is negated, including OR and AND gates."""
+
+    reconstruction = ""
+    for or_split, or_gate in split_unescaped(string, or_gates):
+
+        # e.g. "A & B" -> "A | B"
+        and_temp = ""
+        for and_split, and_gate in split_unescaped(or_split, and_gates):
+            and_split = surround_nonspace(and_split, "!", "")
+            if and_gate: and_temp += and_split + flip_gate(and_gate)
+            else:        and_temp += and_split
+        
+        # e.g. "A " -> "A ", but "A | B " -> "(A | B) "
+        if any(or_gate in and_temp for or_gate in or_gates):
+            and_temp = surround_nonspace(and_temp, "(", ")")
+
+        if or_gate: reconstruction += and_temp + flip_gate(or_gate)
+        else:       reconstruction += and_temp
+    
+    return reconstruction
+
 def flip_gate(gate: str) -> str:
     """Returns any AND gate as the equivalent OR gate, and visa versa. So "&" would return "|", "∨" returns "∧", etc.
     If no such gate exists, we raise a ValueError."""
