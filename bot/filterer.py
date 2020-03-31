@@ -170,6 +170,10 @@ def split_unescaped(string: str, delimiters: List[str]) -> Generator[Tuple[str, 
     
     yield (read, None)
 
+def double_negation_elimination(string: str) -> str:
+    """Returns the same string, but where all double NOT gates are removed."""
+    return string.replace("!!", "")
+
 
 
 def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
