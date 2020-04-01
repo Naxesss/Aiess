@@ -132,6 +132,12 @@ def test_de_morgans_law_complex():
 def test_de_morgans_law_elimination():
     assert de_morgans_law("!!(A & B)") == "(A & B)"
 
+def test_de_morgans_law_negated_word():
+    assert de_morgans_law("not type:(nominate or qualify)") == "not type:nominate and not type:qualify"
+
+def test_de_morgans_law_negated_word():
+    assert de_morgans_law("not type:(nominate or qualify)") == "type:(not nominate and not qualify)"
+
 def test_negate():
     assert negate("A | B & C") == "!A & (!B | !C)"
 
@@ -170,6 +176,18 @@ def test_double_negation_elimination_literal():
 
 def test_double_negation_elimination_mathematical():
     assert double_negation_elimination("¬¬¬(A & ¬¬B)") == "¬(A & B)"
+
+def test_double_negation_elimination_word_between():
+    assert double_negation_elimination("not type: not (A & B)") == "type:(A & B)"
+
+def test_double_negation_elimination_gates_between():
+    assert double_negation_elimination("not type and all between or not (A & B)") == "not type and all between or not (A & B)"
+
+def test_double_negation_elimination_mixed():
+    assert double_negation_elimination("not !(A & !¬¬B)") == "(A & ¬B)"
+
+def test_double_negation_elimination_word_between_and_mixed():
+    assert double_negation_elimination("not type:!A") == "type:A"
 
 def test_surround_nonspace():
     assert surround_nonspace("  ab c    ", "(", ")") == "  (ab c)    "
