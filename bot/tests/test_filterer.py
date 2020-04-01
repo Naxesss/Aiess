@@ -4,6 +4,8 @@ from datetime import datetime
 from aiess import Event, User, Beatmapset, Discussion
 
 from filterer import expand
+from filterer import distribute
+from filterer import cleanup
 from filterer import escape
 from filterer import parenthesis_equal
 from filterer import deepest_parentheses
@@ -49,6 +51,13 @@ def test_expand_mathematical():
 def test_expand_nested_leading_or():
     assert expand("type:(¬B ∨ (¬C ∧ D))") == "¬type:B ∨ ¬type:C ∧ type:D"
 
+
+
+def test_distribute():
+    assert distribute("abc(type:(A and B))") == "abc(type:A and type:B)"
+
+def test_cleanup():
+    assert cleanup("((A &   B))") == "A & B"
 
 def test_escape():
     assert escape("withoutspace") == "withoutspace"
