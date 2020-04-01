@@ -180,7 +180,7 @@ def de_morgans_law(string: str) -> str:
     string = double_negation_elimination(string)
 
     found_not_gate = None
-    found_not_gate_length = 0
+    not_gate_start, not_gate_end = (None, None)
     needs_negating = None
     needs_negating_index = -1
     read = ""
@@ -189,10 +189,14 @@ def de_morgans_law(string: str) -> str:
 
         if char == "(":
             for pattern_index, not_gate_pattern in enumerate(not_gate_patterns):
-                match = re.search(not_gate_pattern + "\($", read)
+                match = None
+                for temp_match in re.finditer(not_gate_pattern, read):
+                    if not any(gate in read[temp_match.start(0):] for gate in (and_gates + or_gates)):
+                        match = temp_match
+
                 if match:
                     found_not_gate = not_gates[pattern_index]
-                    found_not_gate_length = len(match.group(0)) - len("(")
+                    not_gate_start, not_gate_end = match.span()
 
                     needs_negating = forwards_leveled(string[index + 1:])
                     needs_negating_index = index + 1
@@ -204,7 +208,8 @@ def de_morgans_law(string: str) -> str:
     if not needs_negating:
         return string
     
-    prefix = string[:needs_negating_index - found_not_gate_length - len("(")]
+    # Excludes the found NOT gate.
+    prefix = string[:not_gate_start] + string[not_gate_end:needs_negating_index - len("(")]
     postfix = string[needs_negating_index + len(needs_negating) + len(")"):]
 
     negated_part = negate(needs_negating, not_gate=found_not_gate)
