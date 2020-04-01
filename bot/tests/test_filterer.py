@@ -44,7 +44,7 @@ def test_expand_not_before_type():
     assert expand("not type:(nominate or qualify)") == "not type:nominate and not type:qualify"
 
 def test_expand_mathematical():
-    assert expand("A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))") == "A ∨ ¬B ∧ E ∨ ¬C ∧ D ∧ E"
+   assert expand("A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))") == "A ∨ E ∧ ¬B ∨ E ∧ ¬C ∧ E ∧ D"
 
 def test_expand_nested_leading_or():
     assert expand("type:(¬B ∨ (¬C ∧ D))") == "¬type:B ∨ ¬type:C ∧ type:D"
