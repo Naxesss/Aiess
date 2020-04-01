@@ -15,6 +15,7 @@ from filterer import de_morgans_law
 from filterer import negate
 from filterer import flip_gate
 from filterer import double_negation_elimination
+from filterer import normalize_not
 from filterer import surround_nonspace
 from filterer import dissect
 
@@ -188,6 +189,24 @@ def test_double_negation_elimination_mixed():
 
 def test_double_negation_elimination_word_between_and_mixed():
     assert double_negation_elimination("not type:!A") == "type:A"
+
+def test_normalize_not():
+    assert normalize_not("type:not nominate") == "not type:nominate"
+
+def test_normalize_not_multiple():
+    assert normalize_not("type:not nominate and type:not qualify") == "not type:nominate and not type:qualify"
+
+def test_normalize_not_programatic():
+    assert normalize_not("type:!nominate & type:!qualify") == "!type:nominate & !type:qualify"
+
+def test_normalize_not_mathematical():
+    assert normalize_not("type:¬nominate ∧ type:¬qualify") == "¬type:nominate ∧ ¬type:qualify"
+
+def test_normalize_not_parentheses():
+    assert normalize_not("type:¬nominate ∧ (type:¬qualify ∨ type:reply)") == "¬type:nominate ∧ (¬type:qualify ∨ type:reply)"
+
+def test_normalize_not_spacing():
+    assert normalize_not("  some long type:not nominate  ") == "  not some long type:nominate  "
 
 def test_surround_nonspace():
     assert surround_nonspace("  ab c    ", "(", ")") == "  (ab c)    "
