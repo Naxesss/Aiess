@@ -8,7 +8,7 @@ or_gates  = [" or ",  "|", "∨"]
 not_gates = [" not ", "!", "¬"]
 
 # Regular expression for cases like "not A and (not B or not C)"
-not_gate_patterns = ["(^|\W)not\W", "!", "¬"]
+not_gate_patterns = ["(^|\\W)not\\W", "!", "¬"]
 
 quote_chars = ["\"", "“", "”"]
 
