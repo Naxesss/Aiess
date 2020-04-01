@@ -282,7 +282,25 @@ def double_negation_elimination(string: str) -> str:
 def normalize_not(string: str) -> str:
     """Returns the string, but where NOT gates are moved as far back in the string as possible without
     changing the expression. Only works for expressions in disjunctive normal form."""
-    pass
+    reconstruction = ""
+    for split, gate in split_unescaped(string, and_gates + or_gates):
+
+        found = False
+        for index, pattern in enumerate(not_gate_patterns):
+            match = re.search(pattern, split)
+            if match:
+                found = True
+                not_gate = not_gates[index]
+                start, end = combined_captured_span(match)
+                without_not_gate = split[:start] + split[end:]
+
+                # e.g. "type: not nominate" -> "not type:nominate"
+                reconstruction += surround_nonspace(without_not_gate, not_gate, "") + (gate if gate else "")
+        
+        if not found:
+            reconstruction += split + (gate if gate else "")
+    
+    return reconstruction
 
 def surround_nonspace(string: str, pre: str, post: str) -> str:
     """Returns the string surrounded by the given characters, maintaining spaces outside the surrounding."""
