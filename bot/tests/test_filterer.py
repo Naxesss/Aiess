@@ -202,8 +202,9 @@ def test_normalize_not_programatic():
 def test_normalize_not_mathematical():
     assert normalize_not("type:¬nominate ∧ type:¬qualify") == "¬type:nominate ∧ ¬type:qualify"
 
-def test_normalize_not_parentheses():
-    assert normalize_not("type:¬nominate ∧ (type:¬qualify ∨ type:reply)") == "¬type:nominate ∧ (¬type:qualify ∨ type:reply)"
+def test_normalize_not_and_or():
+    assert (normalize_not("type:¬nominate ∧ type:¬qualify ∨ type:¬nominate ∧ type:reply") ==
+        "¬type:nominate ∧ ¬type:qualify ∨ ¬type:nominate ∧ type:reply")
 
 def test_normalize_not_spacing():
     assert normalize_not("  some long type:not nominate  ") == "  not some long type:nominate  "
