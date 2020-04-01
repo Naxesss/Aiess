@@ -20,7 +20,7 @@ def expand(string: str) -> str:
     As an example,
     \"A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))\"
     would be converted to
-    \"A ∨ ¬B ∧ E ∨ ¬C ∧ D ∧ E\"."""
+    \"A ∨ E ∧ ¬B ∨ E ∧ ¬C ∧ E ∧ D\"."""
 
     # e.g. "!(A & B)" -> "(!A | !B)"
     string = de_morgans_law(string)
