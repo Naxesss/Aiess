@@ -46,6 +46,8 @@ def test_expand_not_before_type():
 def test_expand_mathematical():
     assert expand("A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))") == "A ∨ ¬B ∧ E ∨ ¬C ∧ D ∧ E"
 
+def test_expand_nested_leading_or():
+    assert expand("type:(¬B ∨ (¬C ∧ D))") == "¬type:B ∨ ¬type:C ∧ type:D"
 
 
 def test_escape():
