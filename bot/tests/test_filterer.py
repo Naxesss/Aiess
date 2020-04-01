@@ -191,6 +191,9 @@ def test_double_negation_elimination_mixed():
 def test_double_negation_elimination_word_between_and_mixed():
     assert double_negation_elimination("not type:!A") == "type:A"
 
+def test_double_negation_elimination_keep_colon():
+    assert double_negation_elimination("type:not not (A or B)") == "type:(A or B)"
+
 def test_normalize_not():
     assert normalize_not("type:not nominate") == "not type:nominate"
 
