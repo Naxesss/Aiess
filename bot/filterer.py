@@ -20,7 +20,6 @@ def expand(string: str) -> str:
     \"A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))\"
     would be converted to
     \"A ∨ ¬B ∧ E ∨ ¬C ∧ D ∧ E\"."""
-    # TODO: Implement NOT gate functionality; De Morgan's laws and double negation elimination.
 
     # Performing expansion individually for each OR group ensures we don't
     # get stuck in an infinite loop for inputs such as:
@@ -36,7 +35,8 @@ def expand(string: str) -> str:
         else:
             temp_string += split
     
-    string = temp_string
+    # e.g. "!(A & B)" -> "(!A | !B)"
+    string = de_morgans_law(temp_string)
 
     start, end = deepest_parentheses_range(string)
     if not start and not end:
