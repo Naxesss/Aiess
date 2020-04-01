@@ -5,7 +5,7 @@ from aiess import Event, User, Beatmapset, Discussion
 
 and_gates = [" and ", "&", "∧"]
 or_gates  = [" or ",  "|", "∨"]
-not_gates = [" not ", "!", "¬"]
+not_gates = ["not ",  "!", "¬"]
 
 # Regular expression for cases like "not A and (not B or not C)"
 not_gate_patterns = ["(^|\\W)not\\W", "!", "¬"]
