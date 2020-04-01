@@ -40,6 +40,10 @@ def expand(string: str) -> str:
             temp_string += split
     
     dist_string = distribute(temp_string)
+    if string == dist_string:
+        return string
+
+    return expand(dist_string)
 
 
 
