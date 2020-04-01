@@ -22,6 +22,9 @@ def expand(string: str) -> str:
     would be converted to
     \"A ∨ ¬B ∧ E ∨ ¬C ∧ D ∧ E\"."""
 
+    # e.g. "!(A & B)" -> "(!A | !B)"
+    string = de_morgans_law(string)
+
     # Performing expansion individually for each OR group ensures we don't
     # get stuck in an infinite loop for inputs such as:
     # "(A or B) and (C or D)" -> "A and (C or D) or B and (C or D)"
@@ -36,8 +39,6 @@ def expand(string: str) -> str:
         else:
             temp_string += split
     
-    # e.g. "!(A & B)" -> "(!A | !B)"
-    string = de_morgans_law(temp_string)
 
 
 
