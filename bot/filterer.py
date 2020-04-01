@@ -39,6 +39,7 @@ def expand(string: str) -> str:
         else:
             temp_string += split
     
+    dist_string = distribute(temp_string)
 
 
 
