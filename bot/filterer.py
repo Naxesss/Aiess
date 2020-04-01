@@ -39,35 +39,48 @@ def expand(string: str) -> str:
     # e.g. "!(A & B)" -> "(!A | !B)"
     string = de_morgans_law(temp_string)
 
+
+
+def distribute(string: str) -> str:
+    """Returns an equivalent more distributed expression
+    (e.g. "abc(type:(A and B))" -> "abc(type:A and type:B)")."""
     start, end = deepest_parentheses_range(string)
     if not start and not end:
-        # No more parentheses, we're done.
-        return string
+        # No more parentheses, we're done after normalizing NOT gates.
+        # e.g. "type:not nominate" -> "not type:nominate"
+        return normalize_not(string)
 
-    # first some (things here (and then more) along with) even more
-    #             ^^^^^^^^^^^^               ^^^^^^^^^^^
-    #             pre                        post
+    # first some (things or here (and then more) along with) even more
+    #             ^^^^^^^^^^^^^^^               ^^^^^^^^^^^
+    #             pre                           post
+    #                      ^^^^^^               ^^^^^^^^^^^
+    #                      pre_or               post_or
 
     content = string[start+1:end]
     pre = backwards_leveled(string[:start])
     post = forwards_leveled(string[end+1:])
 
+    pre_or = None
+    for pre_or, _ in split_unescaped(pre, or_gates):
+        pass
+    post_or, _ = next(split_unescaped(post, or_gates))
+
     # In this case there's no difference between AND or OR gates, as they maintain their relative orders.
     # e.g. "pre(x | y & z)post" would just become "prexpost | preypost & prezpost"
-    expanded_content = ""
-    for split, delimiter in split_unescaped(content, and_gates + or_gates):
-        expanded_content += pre + split + post + (delimiter if delimiter else "")
+    expanded_content = pre[:-len(pre_or)]
+    for split, gate in split_unescaped(content, and_gates + or_gates):
+        split = surround_nonspace(split, pre_or, post_or)
+        expanded_content += split + (gate if gate else "")
+    expanded_content += post[len(post_or):]
 
-    # first some (things here (and then more) along with) even more
-    # ^^^^^^^^^^^^            ^             ^           ^^^^^^^^^^^
-    # pre_start               start         end         post_end
+    # first some (things or here (and then more) along with) even more
+    # ^^^^^^^^^^^^               ^             ^           ^^^^^^^^^^^
+    # pre_start                  start         end         post_end
 
     pre_start = string[:start - len(pre)]
     post_end = string[end + len(post) + 1:]
-    string = pre_start + expanded_content + post_end
-  
-    return expand(string)
 
+    return cleanup(pre_start + expanded_content + post_end)
 
 def cleanup(string: str) -> str:
     """Returns the string without double spaces and without pairs of parentheses around."""
