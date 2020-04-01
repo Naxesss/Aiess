@@ -213,6 +213,9 @@ def test_normalize_not_and_or():
 def test_normalize_not_spacing():
     assert normalize_not("  some long type:not nominate  ") == "  not some long type:nominate  "
 
+def test_normalize_not_no_spaces():
+    assert normalize_not("type:not(A or B)") == "not type:(A or B)"
+
 def test_surround_nonspace():
     assert surround_nonspace("  ab c    ", "(", ")") == "  (ab c)    "
 
