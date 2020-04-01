@@ -278,6 +278,11 @@ def double_negation_elimination(string: str) -> str:
     # No more double NOT gates.
     return string
 
+def normalize_not(string: str) -> str:
+    """Returns the string, but where NOT gates are moved as far back in the string as
+    possible without changing the expression."""
+    pass
+
 def surround_nonspace(string: str, pre: str, post: str) -> str:
     """Returns the string surrounded by the given characters, maintaining spaces outside the surrounding."""
     pre_spaces = ""
