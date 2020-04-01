@@ -215,7 +215,8 @@ def de_morgans_law(string: str) -> str:
     negated_part = negate(needs_negating, not_gate=found_not_gate)
     negated_part = double_negation_elimination(negated_part)
 
-    return prefix + "(" + negated_part + ")" + postfix
+    # Recursively try to negate parentheses until no longer needed.
+    return de_morgans_law(prefix + "(" + negated_part + ")" + postfix)
 
 def negate(string: str, not_gate: str="!") -> str:
     """Returns an expression where everything in the string outside parentheses is negated, including OR and AND gates.
