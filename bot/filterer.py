@@ -24,7 +24,7 @@ def expand(string: str) -> str:
 
     # Performing expansion individually for each OR group ensures we don't
     # get stuck in an infinite loop for inputs such as:
-    # "(one or two) and (three or four)" -> "one and (three or four) or two and (three or four)"
+    # "(A or B) and (C or D)" -> "A and (C or D) or B and (C or D)"
     temp_string = ""
     has_delimiter = False
     for split, delimiter in split_unescaped(string, or_gates):
