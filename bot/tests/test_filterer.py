@@ -17,6 +17,7 @@ from filterer import flip_gate
 from filterer import double_negation_elimination
 from filterer import normalize_not
 from filterer import surround_nonspace
+from filterer import combined_captured_span
 from filterer import dissect
 
 def test_expand():
@@ -211,6 +212,15 @@ def test_normalize_not_spacing():
 
 def test_surround_nonspace():
     assert surround_nonspace("  ab c    ", "(", ")") == "  (ab c)    "
+
+class MockMatch():
+    def __init__(self, regs):
+        self.regs = regs
+
+def test_combined_captured_span():
+    start, end = combined_captured_span(MockMatch([(0, 8), (-1, -1), (1, 0), (1, 4), (2, 2)]))
+    assert start == 1
+    assert end == 4, "If this is 8, the first group (i.e. the entire match) is being considered."
 
 
 
