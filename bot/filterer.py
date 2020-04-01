@@ -264,13 +264,13 @@ def double_negation_elimination(string: str) -> str:
 
         matches = []
         for pattern in not_gate_patterns:
-            for match in re.finditer("(?=(" +pattern + "))", read):
-                if not any(gate in read[match.start(1):] for gate in (and_gates + or_gates + ["(", ")"])):
+            for match in re.finditer("(?=(?:" +pattern + "))", read):
+                if not any(gate in read[match.start(0):] for gate in (and_gates + or_gates + ["(", ")"])):
                     matches.append(match)
 
         if len(matches) > 1:
-            start1, end1 = matches[0].regs[1]
-            start2, end2 = matches[1].regs[1]
+            start1, end1 = combined_captured_span(matches[0])
+            start2, end2 = combined_captured_span(matches[1])
 
             # Recursively remove double NOT gates.
             string = string[:start1] + string[end1:start2] + string[end2:]
