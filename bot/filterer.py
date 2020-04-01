@@ -1,4 +1,4 @@
-from typing import Union, List, Generator, Tuple
+from typing import Union, List, Generator, Tuple, Match
 import re
 
 from aiess import Event, User, Beatmapset, Discussion
@@ -298,6 +298,18 @@ def surround_nonspace(string: str, pre: str, post: str) -> str:
 
     string = string.strip(" ")
     return pre_spaces + pre + string + post + post_spaces
+
+def combined_captured_span(match: Match) -> (int, int):
+    """Returns the span of all capture groups in the match. That is, from the first start to the last end."""
+    first_start = None
+    last_end = None
+    for start, end in match.regs[1:]:
+        if (first_start == None or first_start > start) and start >= 0:
+            first_start = start
+        if (last_end == None or last_end < end) and end >= 0:
+            last_end = end
+
+    return first_start, last_end
 
 
 
