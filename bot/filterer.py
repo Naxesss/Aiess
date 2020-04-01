@@ -69,6 +69,15 @@ def expand(string: str) -> str:
     return expand(string)
 
 
+def cleanup(string: str) -> str:
+    """Returns the string without double spaces and without pairs of parentheses around."""
+    while "  " in string:
+        string = string.replace("  ", " ")
+    
+    while string.startswith("(") and string.endswith(")"):
+        string = string[1:-1]
+    
+    return string
 
 def escape(string: str) -> str:
     """Returns the same string but surrounded in quotes if it contains a space."""
