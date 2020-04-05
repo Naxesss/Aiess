@@ -148,9 +148,6 @@ def test_de_morgans_law_elimination():
 def test_de_morgans_law_negated_word():
     assert de_morgans_law("not type:(nominate or qualify)") == "not type:nominate and not type:qualify"
 
-def test_de_morgans_law_negated_word():
-    assert de_morgans_law("not type:(nominate or qualify)") == "type:(not nominate and not qualify)"
-
 def test_negate():
     assert negate("A | B & C") == "!A & (!B | !C)"
 
