@@ -21,6 +21,7 @@ from filterer import normalize_not
 from filterer import surround_nonspace
 from filterer import combined_captured_span
 from filterer import dissect
+from filterer import passes_filter
 
 def test_expand():
     assert expand("type:(nominate or qualify)") == "type:nominate or type:qualify"
@@ -312,3 +313,27 @@ def test_dissect_discussion_reply():
         "discussion-content:hello"
     ]
     assert dissect(event) == ["type:reply"] + dissect(discussion) + dissect(replier) + ["content:there"]
+
+def test_passes_filter():
+    assert passes_filter("type:reply", ["mode:osu", "type:reply"])
+    assert not passes_filter("type:qualify", ["mode:osu", "type:reply"])
+
+def test_passes_filter_or():
+    assert passes_filter("type:reply or mode:taiko", ["mode:osu", "type:reply"])
+    assert passes_filter("type:reply or mode:taiko", ["mode:taiko", "type:qualify"])
+    assert not passes_filter("type:reply or mode:taiko", ["mode:osu", "type:qualify"])
+
+def test_passes_filter_and():
+    assert passes_filter("type:reply and mode:taiko", ["mode:taiko", "type:reply"])
+    assert not passes_filter("type:reply and mode:taiko", ["mode:osu", "type:reply"])
+    assert not passes_filter("type:reply and mode:taiko", ["mode:taiko", "type:qualify"])
+
+def test_passes_filter_and_not():
+    assert passes_filter("type:reply and not mode:taiko", ["mode:catch", "type:reply"])
+    assert passes_filter("type:reply and !mode:taiko", ["mode:catch", "type:reply"])
+    assert not passes_filter("type:reply and not mode:taiko", ["mode:taiko", "type:reply"])
+    assert not passes_filter("type:reply and not mode:taiko", ["mode:osu", "type:qualify"])
+
+def test_passes_filter_missing_field():
+    assert not passes_filter("content:hi", ["user:sometwo", "type:nominate"])
+    assert passes_filter("not content:hi", ["user:sometwo", "type:nominate"])
