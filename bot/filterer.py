@@ -403,3 +403,24 @@ def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
             dissections.append(f"content:{escape(obj.content)}")
 
     return dissections
+
+def passes_filter(_filter: str, dissection: List[str]) -> bool:
+    """Returns whether the dissection would pass the filter logically.
+
+    That is, if all AND within any OR evaluate to True, in the expanded filter."""
+    for or_split, _ in split_unescaped(expand(_filter), or_gates):
+        
+        passes_and = True
+        for and_split, _ in split_unescaped(or_split, and_gates):
+            without_not_gate, not_gate = extract_not(and_split)
+            if not_gate:
+                if without_not_gate in dissection:
+                    passes_and = False
+            else:
+                if and_split not in dissection:
+                    passes_and = False
+        
+        if passes_and:
+            return True
+
+    return False
