@@ -18,6 +18,7 @@ from filterer import negate
 from filterer import flip_gate
 from filterer import double_negation_elimination
 from filterer import normalize_not
+from filterer import extract_not
 from filterer import surround_nonspace
 from filterer import combined_captured_span
 from filterer import dissect
@@ -224,6 +225,11 @@ def test_normalize_not_spacing():
 
 def test_normalize_not_no_spaces():
     assert normalize_not("type:not(A or B)") == "not type:(A or B)"
+
+def test_extract_not():
+    without_not_gate, not_gate = extract_not("not me, not you")
+    assert without_not_gate == "me, not you"
+    assert not_gate == "not "
 
 def test_surround_nonspace():
     assert surround_nonspace("  ab c    ", "(", ")") == "  (ab c)    "
