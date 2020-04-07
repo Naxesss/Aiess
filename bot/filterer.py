@@ -313,20 +313,10 @@ def normalize_not(string: str) -> str:
     reconstruction = ""
     for split, gate in split_unescaped(string, and_gates + or_gates):
 
-        found = False
-        for index, pattern in enumerate(not_gate_patterns):
-            match = re.search(pattern, split)
-            if match:
-                found = True
-                not_gate = not_gates[index]
-                start, end = combined_captured_span(match)
-                without_not_gate = split[:start] + split[end:]
+        without_not_gate, not_gate = extract_not(split)
 
-                # e.g. "type: not nominate" -> "not type:nominate"
-                reconstruction += surround_nonspace(without_not_gate, not_gate, "") + (gate if gate else "")
-        
-        if not found:
-            reconstruction += split + (gate if gate else "")
+        normalized_split = surround_nonspace(without_not_gate, not_gate, "") if not_gate else split
+        reconstruction += normalized_split + (gate if gate else "")
     
     return reconstruction
 
