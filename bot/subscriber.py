@@ -5,6 +5,7 @@ from aiess import Event
 
 from database import Database, database
 from subscriptions import Subscription
+from filterer import passes_filter, dissect
 
 cache: List[Subscription] = []
 
@@ -50,9 +51,5 @@ def remove_subscription(sub: Subscription, _database: Database=None) -> None:
 async def forward(event: Event, client) -> None:
     """Attempts to forward an event through all subscription filters."""
     for sub in cache:
-        if passes_filter(event, sub.filter):
+        if passes_filter(sub.filter, dissect(event)):
             await client.send_event(event, sub)
-
-def passes_filter(event: Event, filter: str) -> bool:
-    # TODO: Implement filtering
-    return True
