@@ -4,6 +4,10 @@ from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
 
 from formatter import format_link
+from formatter import format_field_name
+from formatter import format_field_value
+from formatter import format_footer_text
+from formatter import format_footer_icon_url
 
 @pytest.fixture
 def suggestion_event():
@@ -33,3 +37,18 @@ def test_format_link_no_beatmapset():
         format_link(event)
     
     assert "missing a beatmapset" in str(err)
+
+
+
+def test_format_field_name(suggestion_event):
+    assert format_field_name(suggestion_event) == ":yellow_circle: Suggestion"
+
+def test_format_field_value(suggestion_event):
+    assert (format_field_value(suggestion_event) ==
+        "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]")
+
+def test_format_footer_text(suggestion_event):
+    assert format_footer_text(suggestion_event) == "someone \"hi\""
+
+def test_format_footer_icon_url(suggestion_event):
+    assert format_footer_icon_url(suggestion_event) == "https://a.ppy.sh/1"
