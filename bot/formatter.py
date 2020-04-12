@@ -96,14 +96,14 @@ def format_footer_text(event: Event) -> str:
             # Markdown does not function in footer text; trying to escape it here would lead to visible '\'.
             return f"{event.user} \"{event.content}\""
         return event.user
-    return None
+    return Embed.Empty
 
 def format_footer_icon_url(event: Event) -> str:
     """Returns the footer icon url of the event (i.e. the image url of the user's avatar),
     if there's a user associated with the event, otherwise None."""
     if event.user:
         return f"https://a.ppy.sh/{event.user.id}"
-    return None
+    return Embed.Empty
 
 def format_thumbnail_url(event: Event) -> str:
     """Returns the thumbnail url for the event (e.g. beatmapset thumbnail)."""
