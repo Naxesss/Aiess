@@ -44,7 +44,7 @@ def test_format_link_no_beatmapset():
 
 
 def test_format_embed(suggestion_event):
-    embed = format_embed(suggestion_event)
+    embed: Embed = format_embed(suggestion_event)
     
     assert embed.fields[0].name == ":yellow_circle: Suggestion"
     assert (embed.fields[0].value ==
