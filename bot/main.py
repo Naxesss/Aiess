@@ -10,6 +10,7 @@ from settings import API_KEY
 import receiver
 import subscriber
 from subscriptions import Subscription
+from formatter import format_link, format_embed
 from cmd_modules import *
 
 subscriber.load()
@@ -31,9 +32,8 @@ class Client(discord.Client):
     
     async def send_event(self, event: Event, subscription: Subscription):
         channel = self.get_channel(subscription.channel_id)
-        await channel.send(str(event))
 
-        asyncio.sleep(2)  # TODO: Figure out how to ratelimit discord messages.
+        await channel.send(content=format_link(event), embed=format_embed(event))
 
 class Reader(aiess.Reader):
     client: Client = None
