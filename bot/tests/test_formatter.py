@@ -10,6 +10,7 @@ from formatter import format_field_name
 from formatter import format_field_value
 from formatter import format_footer_text
 from formatter import format_footer_icon_url
+from formatter import format_thumbnail_url
 
 @pytest.fixture
 def suggestion_event():
@@ -51,6 +52,7 @@ def test_format_embed(suggestion_event):
     assert embed.footer.text == "someone \"hi\""
     assert embed.footer.icon_url == "https://a.ppy.sh/1"
     assert embed.colour.to_rgb() == (200, 180, 220)
+    assert embed.thumbnail.url == "https://b.ppy.sh/thumb/3l.jpg"
 
 def test_format_field_name(suggestion_event):
     assert format_field_name(suggestion_event) == ":yellow_circle: Suggestion"
@@ -64,3 +66,6 @@ def test_format_footer_text(suggestion_event):
 
 def test_format_footer_icon_url(suggestion_event):
     assert format_footer_icon_url(suggestion_event) == "https://a.ppy.sh/1"
+
+def test_format_thumbnail_url(suggestion_event):
+    assert format_thumbnail_url(suggestion_event) == "https://b.ppy.sh/thumb/3l.jpg"
