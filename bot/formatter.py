@@ -1,10 +1,44 @@
-from discord import Embed
+from discord import Embed, Colour
 
 from aiess import Event
 
-type_field_name = {
-    "suggestion": ":yellow_circle: Suggestion",
-    "problem": ":red_circle: Problem"
+class TypeProps():
+    """Represents the properties of how a type should be represented (i.e. emoji, name, colour)."""
+    def __init__(self, emoji, title, colour):
+        self.emoji = emoji
+        self.title = title
+        self.colour = colour
+
+colour_ranked     = Colour.from_rgb(255,200,90)
+colour_qualified  = Colour.from_rgb(255,75,100)
+colour_nominated  = Colour.from_rgb(50,150,255)
+colour_discussion = Colour.from_rgb(200,180,220)
+colour_resolve    = Colour.from_rgb(70,255,100)
+colour_reopen     = Colour.from_rgb(255,160,70)
+
+type_props = {
+    "rank":             TypeProps(":sparkling_heart:",    "Ranked",           colour_ranked),
+    "love":             TypeProps(":gift_heart:",         "Loved",            colour_ranked),
+
+    "qualify":          TypeProps(":heart:",              "Qualified",        colour_qualified),
+    "disqualify":       TypeProps(":broken_heart:",       "Disqualified",     colour_qualified),
+
+    "nominate":         TypeProps(":blue_heart:",         "Nominated",        colour_nominated),
+    "nomination_reset": TypeProps(":small_blue_diamond:", "Nomination Reset", colour_nominated),
+
+    "suggestion":       TypeProps(":yellow_circle:",      "Suggestion",       colour_discussion),
+    "problem":          TypeProps(":red_circle:",         "Problem",          colour_discussion),
+    "mapper_note":      TypeProps(":purple_circle:",      "Note",             colour_discussion),
+    "hype":             TypeProps(":blue_circle:",        "Hype",             colour_discussion),
+    "reply":            TypeProps(":white_circle:",       "Reply",            colour_discussion),
+
+    "resolve":          TypeProps(":green_circle:",       "Resolve",          colour_resolve),
+    "kudosu-gain":      TypeProps(":arrow_up:",           "Kudosu Gained",    colour_resolve),
+    "kudosu-allow":     TypeProps(":arrow_double_up:",    "Kudosu Allowed",   colour_resolve),
+
+    "reopen":           TypeProps(":orange_circle:",      "Reopen",           colour_reopen),
+    "kudosu-lost":      TypeProps(":arrow_down:",         "Kudosu Lost",      colour_reopen),
+    "kudosu-deny":      TypeProps(":arrow_double_down:",  "Kudosu Denied",    colour_reopen)
 }
 
 def format_link(event: Event) -> str:
@@ -39,7 +73,7 @@ def escape_markdown(obj: str) -> str:
 
 def format_field_name(event: Event) -> str:
     """Returns the embed title of the given event (e.g. :heart: Qualified)."""
-    return type_field_name[event.type]
+    return f"{type_props[event.type].emoji} {type_props[event.type].title}"
 
 def format_field_value(event: Event) -> str:
     """Returns the embed contents of the given event (i.e. the \"artist - title, mapped by creator [modes]\" part)."""
