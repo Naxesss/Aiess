@@ -58,6 +58,7 @@ def format_embed(event: Event) -> str:
     embed.add_field(name=format_field_name(event), value=format_field_value(event), inline=False)
     embed.set_footer(text=format_footer_text(event), icon_url=format_footer_icon_url(event))
     embed.colour = type_props[event.type].colour
+    embed.set_thumbnail(url=format_thumbnail_url(event))
 
     return embed
 
@@ -103,3 +104,7 @@ def format_footer_icon_url(event: Event) -> str:
     if event.user:
         return f"https://a.ppy.sh/{event.user.id}"
     return None
+
+def format_thumbnail_url(event: Event) -> str:
+    """Returns the thumbnail url for the event (e.g. beatmapset thumbnail)."""
+    return f"https://b.ppy.sh/thumb/{event.beatmapset.id}l.jpg"
