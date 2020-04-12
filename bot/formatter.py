@@ -1,3 +1,5 @@
+from discord import Embed
+
 from aiess import Event
 
 type_field_name = {
@@ -13,6 +15,13 @@ def format_link(event: Event) -> str:
         return f"https://osu.ppy.sh/beatmapsets/{event.beatmapset.id}"
     
     raise ValueError("Cannot format a link of an event missing a beatmapset.")
+
+def format_embed(event: Event) -> str:
+    embed = Embed()
+    embed.add_field(name=format_field_name(event), value=format_field_value(event), inline=False)
+    embed.set_footer(text=format_footer_text(event), icon_url=format_footer_icon_url(event))
+
+    return embed
 
 
 
