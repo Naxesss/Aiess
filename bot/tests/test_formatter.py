@@ -1,9 +1,11 @@
 import pytest
+from discord import Embed
 
 from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
 
 from formatter import format_link
+from formatter import format_embed
 from formatter import format_field_name
 from formatter import format_field_value
 from formatter import format_footer_text
@@ -39,6 +41,15 @@ def test_format_link_no_beatmapset():
     assert "missing a beatmapset" in str(err)
 
 
+
+def test_format_embed(suggestion_event):
+    embed = format_embed(suggestion_event)
+    
+    assert embed.fields[0].name == ":yellow_circle: Suggestion"
+    assert (embed.fields[0].value ==
+        "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]")
+    assert embed.footer.text == "someone \"hi\""
+    assert embed.footer.icon_url == "https://a.ppy.sh/1"
 
 def test_format_field_name(suggestion_event):
     assert format_field_name(suggestion_event) == ":yellow_circle: Suggestion"
