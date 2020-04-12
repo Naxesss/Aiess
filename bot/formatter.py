@@ -57,6 +57,7 @@ def format_embed(event: Event) -> str:
     embed = Embed()
     embed.add_field(name=format_field_name(event), value=format_field_value(event), inline=False)
     embed.set_footer(text=format_footer_text(event), icon_url=format_footer_icon_url(event))
+    embed.colour = type_props[event.type].colour
 
     return embed
 
