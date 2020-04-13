@@ -98,11 +98,11 @@ def cleanup(string: str) -> str:
     
     return string
 
-def escape(string: str) -> str:
-    """Returns the same string but surrounded in quotes if it contains a space."""
-    if " " in string:
-        return f"\"{string}\""
-    return string
+def escape(obj: str) -> str:
+    """Returns the same object cast to string, but surrounded in quotes if it contains a space."""
+    if " " in str(obj):
+        return f"\"{obj}\""
+    return str(obj)
 
 def parenthesis_equal(string: str) -> bool:
     """Returns whether this string has an equal amount of opening and closing parentheses."""
