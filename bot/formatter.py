@@ -33,12 +33,12 @@ type_props = {
     "hype":             TypeProps(":blue_circle:",        "Hype",             colour_discussion),
     "reply":            TypeProps(":white_circle:",       "Reply",            colour_discussion),
 
-    "resolve":          TypeProps(":green_circle:",       "Resolve",          colour_resolve),
-    "kudosu-gain":      TypeProps(":arrow_up:",           "Kudosu Gained",    colour_resolve),
+    "issue-resolve":    TypeProps(":green_circle:",       "Issue Resolved",         colour_resolve),
+    "kudosu-gain":      TypeProps(":arrow_up:",           "Kudosu Given",     colour_resolve),
     "kudosu-allow":     TypeProps(":arrow_double_up:",    "Kudosu Allowed",   colour_resolve),
 
-    "reopen":           TypeProps(":orange_circle:",      "Reopen",           colour_reopen),
-    "kudosu-lost":      TypeProps(":arrow_down:",         "Kudosu Lost",      colour_reopen),
+    "issue-reopen":     TypeProps(":orange_circle:",      "Issue Reopened",         colour_reopen),
+    "kudosu-lost":      TypeProps(":arrow_down:",         "Kudosu Taken",      colour_reopen),
     "kudosu-deny":      TypeProps(":arrow_double_down:",  "Kudosu Denied",    colour_reopen)
 }
 
