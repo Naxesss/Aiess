@@ -94,9 +94,12 @@ def format_footer_text(event: Event) -> str:
     if there's a user associated with the event, otherwise None."""
     if event.user:
         if event.content:
+            preview = event.content.partition("\n")[0]
+            preview = preview if len(preview) <= 60 else preview[:57] + "..."
+
             # Markdown does not function in footer text; trying to escape it here would lead to visible '\'.
-            return f"{event.user} \"{event.content}\""
-        return event.user
+            return f"{event.user} \"{preview}\""
+        return str(event.user)
     return Embed.Empty
 
 def format_footer_icon_url(event: Event) -> str:
