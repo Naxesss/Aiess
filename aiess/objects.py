@@ -9,17 +9,18 @@ class User:
     def __init__(self, _id: str, name: str=None):
         self.id = str(_id)
         if name != None:
-            self.name = name
+            # Cast for ease-of-use, e.g. with names consisting of just digits.
+            self.name = str(name)
         else:
             user_json = api.request_user(_id)
             if user_json != None:
-                self.name = user_json["username"]
+                self.name = str(user_json["username"])
             else:
                 # User doesn't exist, likely restricted.
                 self.name = None
     
     def __str__(self) -> str:
-        return self.name if self.name != None else self.id
+        return self.name if self.name != None else str(self.id)
     
     def __eq__(self, other) -> bool:
         if type(self) != type(other):
