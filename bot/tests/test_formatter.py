@@ -53,7 +53,7 @@ def test_format_embed(suggestion_event):
         "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]")
     assert embed.footer.text == "someone \"hi\""
     assert embed.footer.icon_url == "https://a.ppy.sh/1"
-    assert embed.colour.to_rgb() == (200, 180, 220)
+    assert embed.colour.to_rgb() == (65, 65, 65)
     assert embed.thumbnail.url == "https://b.ppy.sh/thumb/3l.jpg"
 
 def test_format_field_name(suggestion_event):

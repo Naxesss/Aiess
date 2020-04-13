@@ -12,8 +12,8 @@ class TypeProps():
 colour_ranked     = Colour.from_rgb(255,200,90)
 colour_qualified  = Colour.from_rgb(255,75,100)
 colour_nominated  = Colour.from_rgb(50,150,255)
-colour_discussion = Colour.from_rgb(200,180,220)
-colour_resolve    = Colour.from_rgb(70,255,100)
+colour_discussion = Colour.from_rgb(65,65,65)
+colour_resolve    = Colour.from_rgb(100,200,100)
 colour_reopen     = Colour.from_rgb(255,160,70)
 
 type_props = {
