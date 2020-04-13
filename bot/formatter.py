@@ -29,6 +29,7 @@ type_props = {
     "suggestion":       TypeProps(":yellow_circle:",      "Suggestion",       colour_discussion),
     "problem":          TypeProps(":red_circle:",         "Problem",          colour_discussion),
     "mapper_note":      TypeProps(":purple_circle:",      "Note",             colour_discussion),
+    "praise":           TypeProps(":blue_heart:",         "Praise",           colour_discussion),
     "hype":             TypeProps(":blue_circle:",        "Hype",             colour_discussion),
     "reply":            TypeProps(":white_circle:",       "Reply",            colour_discussion),
 
