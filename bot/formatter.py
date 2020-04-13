@@ -23,8 +23,8 @@ type_props = {
     "qualify":          TypeProps(":heart:",              "Qualified",        colour_qualified),
     "disqualify":       TypeProps(":broken_heart:",       "Disqualified",     colour_qualified),
 
-    "nominate":         TypeProps(":blue_heart:",         "Nominated",        colour_nominated),
-    "nomination_reset": TypeProps(":small_blue_diamond:", "Nomination Reset", colour_nominated),
+    "nominate":         TypeProps(":thought_balloon:",    "Nominated",        colour_nominated),
+    "nomination_reset": TypeProps(":anger_right:",        "Nomination Reset", colour_nominated),
 
     "suggestion":       TypeProps(":yellow_circle:",      "Suggestion",       colour_discussion),
     "problem":          TypeProps(":red_circle:",         "Problem",          colour_discussion),
