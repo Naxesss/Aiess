@@ -76,6 +76,18 @@ def test_format_footer_text(suggestion_event):
 def test_format_footer_text_no_user(qualify_event):
     assert format_footer_text(qualify_event) == Embed.Empty
 
+def test_format_footer_text_long(suggestion_event):
+    suggestion_event.content = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"
+    assert format_footer_text(suggestion_event) == "someone \"04:25:218 (3,4) - the guitar is really strong here so map...\""
+
+def test_format_footer_text_newline(suggestion_event):
+    suggestion_event.content = "04:25:218 (3,4) - the guitar is really strong here so\nmapping to the red beats only feels unfitting"
+    assert format_footer_text(suggestion_event) == "someone \"04:25:218 (3,4) - the guitar is really strong here so\""
+
+def test_format_footer_text_no_comment(suggestion_event):
+    suggestion_event.content = ""
+    assert format_footer_text(suggestion_event) == "someone"
+
 def test_format_footer_icon_url(suggestion_event):
     assert format_footer_icon_url(suggestion_event) == "https://a.ppy.sh/1"
 
