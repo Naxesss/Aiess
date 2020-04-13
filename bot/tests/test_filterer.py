@@ -323,6 +323,14 @@ def test_dissect_discussion_reply():
     ]
     assert dissect(event) == ["type:reply"] + dissect(discussion) + dissect(replier) + ["content:there"]
 
+def test_dissect_aliases():
+    event = Event(_type="nominate", time=datetime.utcnow())
+
+    assert "type:nominate" in dissect(event)
+    assert "type:nomination" in dissect(event)
+    assert "type:nominated" in dissect(event)
+    assert "type:bubbled" in dissect(event)
+
 def test_passes_filter():
     assert passes_filter("type:reply", ["mode:osu", "type:reply"])
     assert not passes_filter("type:qualify", ["mode:osu", "type:reply"])
