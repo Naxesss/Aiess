@@ -92,6 +92,14 @@ def format_field_value(event: Event) -> str:
 def format_footer_text(event: Event) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
     if there's a user associated with the event, otherwise None."""
+
+    if event.type in ["kudosu-gain", "kudosu-loss", "kudosu-deny", "kudosu-allow"]:
+        if not event.discussion:
+            raise ValueError("A kudosu type event did not have an associated discussion instance.")
+        if event.user:
+            return f"{event.user} → {event.discussion.user}"
+        return f"(Moderator) → {event.discussion.user}"
+
     if event.user:
         if event.content:
             preview = event.content.partition("\n")[0]
@@ -100,6 +108,7 @@ def format_footer_text(event: Event) -> str:
             # Markdown does not function in footer text; trying to escape it here would lead to visible '\'.
             return f"{event.user} \"{preview}\""
         return str(event.user)
+    
     return Embed.Empty
 
 def format_footer_icon_url(event: Event) -> str:
