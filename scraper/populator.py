@@ -69,7 +69,8 @@ def __populate_additional_details(event: Event, discussions_json: object) -> Non
         same_type = event.type == page_event["type"].replace("_", "-")
         if same_time and same_type:
             if event.type == "disqualify" or event.type == "nomination_reset":  # Content is discussion content.
-                event.content = event.discussion.content
+                if event.discussion:  # Discussion may have been deleted.
+                    event.content = event.discussion.content
 
             if event.type == "issue-resolve":  # User is resolver, not discussion creator.
                 post_author = discussion_parser.parse_discussion_post_author(
