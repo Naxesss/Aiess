@@ -65,6 +65,9 @@ def test_escape():
     assert escape("withoutspace") == "withoutspace"
     assert escape("with space") == "\"with space\""
 
+def test_escape_int():
+    assert escape(42) == "42"
+
 def test_parenthesis_equality():
     assert parenthesis_equal("A or (B and (C or D))")
 
