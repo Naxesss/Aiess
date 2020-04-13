@@ -20,8 +20,8 @@ type_variations = {
     "love":             ["loved"],
     "qualify":          ["qualified",        "qualification",    "qual"],
     "disqualify":       ["disqualified",     "disqualification", "dq"],
-    "nominate":         ["nominated",        "nomination",       "nom",       "bubble", "bubbled"],
-    "nomination_reset": ["nomination reset",                     "nom reset", "pop",    "popped"],
+    "nominate":         ["nominated",        "nomination",       "nom",   "bubble", "bubbled"],
+    "nomination_reset": ["nomination reset",                     "reset", "pop",    "popped"],
 
     "suggestion":       [],
     "problem":          [],
