@@ -364,7 +364,7 @@ def combined_captured_span(match: Match) -> (int, int):
 
 
 def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
-    """Returns a list of key:value strings representing the given object."""
+    """Returns a list of lowercased key:value strings representing the given object."""
     dissections = []
 
     if isinstance(obj, User):
@@ -402,12 +402,14 @@ def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
         if obj.content:
             dissections.append(f"content:{escape(obj.content)}")
 
-    return dissections
+    # Lowercase everything for ease-of-access when filtering.
+    return list(map(lambda dissection: dissection.lower(), dissections))
 
 def passes_filter(_filter: str, dissection: List[str]) -> bool:
-    """Returns whether the dissection would pass the filter logically.
+    """Returns whether the dissection would pass the filter logically. This is case insensitive.
 
     That is, if all AND within any OR evaluate to True, in the expanded filter."""
+    _filter = _filter.lower()
     for or_split, _ in split_unescaped(expand(_filter), or_gates):
         
         passes_and = True
