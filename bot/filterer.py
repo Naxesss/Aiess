@@ -13,6 +13,32 @@ not_gate_patterns = ["(?:(?:^|[^A-Za-z0-9_ ])|( ))(not)(?:(?:[^A-Za-z0-9_ ])|( )
 
 quote_chars = ["\"", "“", "”"]
 
+# Any of these values can be substituted for the respective key;
+# if the user expects it to work, it should work.
+type_variations = {
+    "rank":             ["ranked"],
+    "love":             ["loved"],
+    "qualify":          ["qualified",        "qualification",    "qual"],
+    "disqualify":       ["disqualified",     "disqualification", "dq"],
+    "nominate":         ["nominated",        "nomination",       "nom",       "bubble", "bubbled"],
+    "nomination_reset": ["nomination reset",                     "nom reset", "pop",    "popped"],
+
+    "suggestion":       [],
+    "problem":          [],
+    "mapper_note":      ["mapper note", "note"],
+    "praise":           [],
+    "hype":             [],
+    "reply":            [],
+
+    "issue-resolve":    ["issue resolve", "issue resolved", "resolve", "resolved"],
+    "issue-reopen":     ["issue reopen",  "issue reopened", "reopen",  "reopened"],
+
+    "kudosu-gain":      ["kudosu gain",  "kudosu gained", "kudosu given"],
+    "kudosu-lost":      ["kudosu loss",  "kudosu lost",   "kudosu taken"],
+    "kudosu-deny":      ["kudosu deny",  "kudosu denied"],
+    "kudosu-allow":     ["kudosu allow", "kudosu allowed"]
+}
+
 def expand(string: str) -> str:
     """Converts the given expression into disjunctive normal form.
     Supports literal, programatic and mathematical boolean operators (e.g. "and", "&", as well as "∧").
@@ -390,6 +416,10 @@ def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
     
     elif isinstance(obj, Event):
         dissections.append(f"type:{escape(obj.type)}")
+
+        if obj.type in type_variations:
+            for variation in type_variations[obj.type]:
+                dissections.append(f"type:{escape(variation)}")
 
         # The dissection of the discussion includes the dissection of the beatmapset, if present.
         if obj.discussion:
