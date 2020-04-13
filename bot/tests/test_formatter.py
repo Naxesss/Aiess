@@ -28,6 +28,16 @@ def qualify_event():
 
     return event
 
+@pytest.fixture
+def kudosu_gain_event():
+    mapper = User(2, "sometwo")
+    beatmapset = Beatmapset(3, "artist", "title", mapper, ["osu"])
+    user = User(1, "someone")
+    discussion = Discussion(5, beatmapset, user, content="hi")
+    event = Event("kudosu-gain", from_string("2020-04-11 20:00:00"), beatmapset, discussion, mapper)
+
+    return event
+
 
 def test_format_link_discussion(suggestion_event):
     assert format_link(suggestion_event) == "https://osu.ppy.sh/beatmapsets/3/discussion#/5"
@@ -87,6 +97,14 @@ def test_format_footer_text_newline(suggestion_event):
 def test_format_footer_text_no_comment(suggestion_event):
     suggestion_event.content = ""
     assert format_footer_text(suggestion_event) == "someone"
+
+def test_format_footer_text_kudosu_given(kudosu_gain_event):
+    assert format_footer_text(kudosu_gain_event) == "sometwo → someone"
+
+def test_format_footer_text_kudosu_denied(kudosu_gain_event):
+    kudosu_gain_event.type = "kudosu-deny"
+    kudosu_gain_event.user = None
+    assert format_footer_text(kudosu_gain_event) == "(Moderator) → someone"
 
 def test_format_footer_icon_url(suggestion_event):
     assert format_footer_icon_url(suggestion_event) == "https://a.ppy.sh/1"
