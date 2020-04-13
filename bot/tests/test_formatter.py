@@ -48,7 +48,7 @@ def test_format_link_no_beatmapset():
 def test_format_embed(suggestion_event):
     embed: Embed = format_embed(suggestion_event)
     
-    assert embed.fields[0].name == ":yellow_circle: Suggestion"
+    assert embed.fields[0].name == ":yellow_circle: Suggestion"
     assert (embed.fields[0].value ==
         "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]")
     assert embed.footer.text == "someone \"hi\""
@@ -57,10 +57,10 @@ def test_format_embed(suggestion_event):
     assert embed.thumbnail.url == "https://b.ppy.sh/thumb/3l.jpg"
 
 def test_format_field_name(suggestion_event):
-    assert format_field_name(suggestion_event) == ":yellow_circle: Suggestion"
+    assert format_field_name(suggestion_event) == ":yellow_circle: Suggestion"
 
 def test_format_field_name_qualify(qualify_event):
-    assert format_field_name(qualify_event) == ":heart: Qualified"
+    assert format_field_name(qualify_event) == ":heart: Qualified"
 
 def test_format_field_value(suggestion_event):
     assert (format_field_value(suggestion_event) ==
