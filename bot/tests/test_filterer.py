@@ -343,3 +343,7 @@ def test_passes_filter_and_not():
 def test_passes_filter_missing_field():
     assert not passes_filter("content:hi", ["user:sometwo", "type:nominate"])
     assert passes_filter("not content:hi", ["user:sometwo", "type:nominate"])
+
+def test_passes_filter_case_sensitivity():
+    assert passes_filter("type:Reply AND mode:OSU", ["mode:osu", "type:reply"])
+    assert not passes_filter("TYPE:QUALIFY", ["mode:osu", "type:reply"])
