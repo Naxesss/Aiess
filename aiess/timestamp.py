@@ -1,7 +1,9 @@
 from datetime import datetime
 import os
 
-PATH_PREFIX = "time/"
+from aiess.settings import ROOT_PATH
+
+PATH_PREFIX = ROOT_PATH + "time/"
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 TIME_FORMAT_ALT = "%Y-%m-%dT%H:%M:%S+00:00"
 FILE_NAME_PREFIX = "last_datetime-"

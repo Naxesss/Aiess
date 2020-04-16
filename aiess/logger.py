@@ -1,8 +1,9 @@
 from datetime import datetime
 
 from aiess import timestamp
+from aiess.settings import ROOT_PATH
 
-PATH_PREFIX = "logs/"
+PATH_PREFIX = ROOT_PATH + "logs/"
 
 time_str = None
 
