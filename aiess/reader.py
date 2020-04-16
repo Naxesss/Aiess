@@ -44,6 +44,9 @@ class Reader():
     async def __push_events_between(self, last_time: datetime, current_time: datetime) -> datetime:
         """Triggers the on_event method for each event between the two datetimes.
         Returns the last event's datetime, if any, otherwise None."""
+        # Needs to be a separate generator from the loop, would otherwise become exhausted.
+        await self.on_event_batch(self.events_between(last_time, current_time))
+
         last_event = None
         for event in self.events_between(last_time, current_time):
             await self.on_event(event)
@@ -62,4 +65,10 @@ class Reader():
 
     async def on_event(self, event: Event) -> None:
         """Called for each new event found in the running loop of the reader."""
+        pass
+
+    async def on_event_batch(self, events: Generator[Event, None, None]) -> None:
+        """Called for each new event batch found in the running loop of the reader.
+        A batch of events always include every event up to and equal to the last time,
+        since the previous batch."""
         pass
