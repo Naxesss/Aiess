@@ -50,7 +50,7 @@ class Reader():
             last_event = event
         
         return last_event.time if last_event else None
-    
+
     def __time_id(self):
         """Returns the identifier of the file the reader creates to keep track of the last time.
         This is based on the identifier supplied to the reader on initialization."""
