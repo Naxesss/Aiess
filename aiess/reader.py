@@ -57,6 +57,8 @@ class Reader():
 
         merged_events = self.merge_concurrent(list(events))
         await self.on_events(merged_events)
+        for event in merged_events:
+            await self.on_event(event)
 
         last_event = merged_events[-1]
         return last_event.time if last_event else None
@@ -92,5 +94,12 @@ class Reader():
         since the previous batch.
         
         Some types of events in this batch are merged together if concurrent
+        (e.g. user nominates + system qualifies -> user qualifies)."""
+        pass
+
+    async def on_event(self, event: Event) -> None:
+        """Called for each new event found in the running loop of the reader.
+        
+        Some types of events are merged together if concurrent
         (e.g. user nominates + system qualifies -> user qualifies)."""
         pass
