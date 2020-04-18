@@ -51,11 +51,11 @@ class Reader():
     async def __push_events_between(self, last_time: datetime, current_time: datetime) -> datetime:
         """Triggers the on_event method for each event between the two datetimes.
         Returns the last event's datetime, if any, otherwise None."""
-        events = self.events_between(last_time, current_time)
+        events = list(self.events_between(last_time, current_time))
         if not events:
             return None
 
-        merged_events = self.merge_concurrent(list(events))
+        merged_events = self.merge_concurrent(events)
         await self.on_events(merged_events)
         for event in merged_events:
             await self.on_event(event)
