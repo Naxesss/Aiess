@@ -6,6 +6,13 @@ from aiess.objects import Event
 from aiess.database import database
 from aiess import timestamp
 
+# The former element takes the type of the second, which is removed.
+mergable_types = [
+    ("nominate", "qualify"),
+    ("reply",    "resolve"),
+    ("reply",    "reopen")
+]
+
 class Reader():
     """This constitutes an object from which a loop looking through new events in the database can be executed.
     In this case, "new" refers to any event after the previously stored datetime in the respective file,
@@ -62,6 +69,21 @@ class Reader():
         """Yields each event found in the database, from (excluding) the first time to (including) the second time."""
         return self.database.retrieve_events(f"time > \"{_from}\" AND time <= \"{to}\"")
 
+    def merge_concurrent(self, events: List[Event]) -> List[Event]:
+        """Returns a list of events where certain types of events are combined if they happened together
+        (e.g. user nominates + system qualifies -> user qualifies)."""
+        for event in events:
+            for other_event in events:
+                if event.time != other_event.time:
+                    continue
+
+                if (event.type, other_event.type) in mergable_types:
+                    # Former event has all properties the second does and more,
+                    # and is represented better having the type of the latter.
+                    event.type = other_event.type
+                    other_event.marked_for_deletion = True
+
+        return list(filter(lambda event: not event.marked_for_deletion, events))
 
     async def on_events(self, events: List[Event]) -> None:
         """Called for each new event batch found in the running loop of the reader.
