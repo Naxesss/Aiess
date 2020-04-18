@@ -49,7 +49,6 @@ class Reader():
 
         last_event = None
         for event in self.events_between(last_time, current_time):
-            await self.on_event(event)
             last_event = event
         
         return last_event.time if last_event else None
@@ -63,9 +62,6 @@ class Reader():
         """Yields each event found in the database, from (excluding) the first time to (including) the second time."""
         return self.database.retrieve_events(f"time > \"{_from}\" AND time <= \"{to}\"")
 
-    async def on_event(self, event: Event) -> None:
-        """Called for each new event found in the running loop of the reader."""
-        pass
 
     async def on_event_batch(self, events: Generator[Event, None, None]) -> None:
         """Called for each new event batch found in the running loop of the reader.

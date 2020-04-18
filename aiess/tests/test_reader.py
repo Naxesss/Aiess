@@ -6,16 +6,12 @@ from aiess import Event
 from aiess import timestamp
 from aiess.database import Database
 
-received_events = []
 received_event_batches = []
 
 class Reader(aiess.Reader):
     def __init__(self, reader_id: str):
         super().__init__(reader_id)
         self.database = Database("aiess_test")
-
-    async def on_event(self, event: Event):
-        received_events.append(event)
     
     async def on_event_batch(self, events: Generator[Event, None, None]):
         received_event_batches.append(events)
@@ -69,20 +65,6 @@ def test_events_between_greater_than(reader):
     events = reader.events_between(timestamp.from_string("2020-01-01 05:00:00"), timestamp.from_string("2020-01-01 07:00:00"))
     assert next(events, None) == event2
     assert next(events, None) == None
-
-@pytest.mark.asyncio
-async def test_on_event(reader):
-    event1 = Event(_type="hello", time=timestamp.from_string("2020-01-01 05:00:00"))
-    event2 = Event(_type="there", time=timestamp.from_string("2020-01-01 07:00:00"))
-
-    reader.database.insert_event(event1)
-    reader.database.insert_event(event2)
-
-    _from = timestamp.from_string("2020-01-01 00:00:00")
-    to = timestamp.from_string("2020-01-01 10:00:00")
-    await reader._Reader__push_events_between(_from, to)
-
-    assert received_events == [event1, event2]
 
 @pytest.mark.asyncio
 async def test_on_event_batch(reader):
