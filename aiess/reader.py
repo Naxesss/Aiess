@@ -1,4 +1,4 @@
-from typing import Callable, Generator
+from typing import Callable, Generator, List
 from datetime import datetime
 import asyncio
 
@@ -63,7 +63,7 @@ class Reader():
         return self.database.retrieve_events(f"time > \"{_from}\" AND time <= \"{to}\"")
 
 
-    async def on_event_batch(self, events: Generator[Event, None, None]) -> None:
+    async def on_events(self, events: List[Event]) -> None:
         """Called for each new event batch found in the running loop of the reader.
         A batch of events always include every event up to and equal to the last time,
         since the previous batch."""
