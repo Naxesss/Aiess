@@ -6,6 +6,7 @@ from aiess import Event
 from aiess import timestamp
 from aiess.database import Database
 
+received_events = []
 received_event_batches = []
 
 class Reader(aiess.Reader):
@@ -15,6 +16,9 @@ class Reader(aiess.Reader):
     
     async def on_events(self, events: List[Event]):
         received_event_batches.append(events)
+    
+    async def on_event(self, event: Event):
+        received_events.append(event)
 
 @pytest.fixture
 def reader():
@@ -89,6 +93,20 @@ async def test_on_event_batch(reader):
     assert len(received_event_batches) == 2
     assert received_event_batches[0] == [event1, event2]
     assert received_event_batches[1] == [event3, event4, event5]
+
+@pytest.mark.asyncio
+async def test_on_event(reader):
+    event1 = Event(_type="hello", time=timestamp.from_string("2020-01-01 05:00:00"))
+    event2 = Event(_type="there", time=timestamp.from_string("2020-01-01 07:00:00"))
+
+    reader.database.insert_event(event1)
+    reader.database.insert_event(event2)
+
+    _from = timestamp.from_string("2020-01-01 00:00:00")
+    to = timestamp.from_string("2020-01-01 10:00:00")
+    await reader._Reader__push_events_between(_from, to)
+
+    assert received_events == [event1, event2]
 
 @pytest.mark.asyncio
 async def test_merge_concurrent(reader):
