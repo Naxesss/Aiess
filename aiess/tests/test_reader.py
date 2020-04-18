@@ -1,5 +1,5 @@
 import pytest
-from typing import Generator
+from typing import List
 
 import aiess
 from aiess import Event
@@ -13,7 +13,7 @@ class Reader(aiess.Reader):
         super().__init__(reader_id)
         self.database = Database("aiess_test")
     
-    async def on_event_batch(self, events: Generator[Event, None, None]):
+    async def on_events(self, events: List[Event]):
         received_event_batches.append(events)
 
 @pytest.fixture
@@ -87,14 +87,7 @@ async def test_on_event_batch(reader):
     await reader._Reader__push_events_between(middle, end)
 
     assert len(received_event_batches) == 2
+    assert received_event_batches[0] == [event1, event2]
+    assert received_event_batches[1] == [event3, event4, event5]
 
-    first_batch = received_event_batches[0]
-    assert next(first_batch, None) == event1
-    assert next(first_batch, None) == event2
-    assert next(first_batch, None) == None
 
-    second_batch = received_event_batches[1]
-    assert next(second_batch, None) == event3
-    assert next(second_batch, None) == event4
-    assert next(second_batch, None) == event5
-    assert next(second_batch, None) == None
