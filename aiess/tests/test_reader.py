@@ -71,7 +71,7 @@ def test_events_between_greater_than(reader):
     assert next(events, None) == None
 
 @pytest.mark.asyncio
-async def test_on_event_batch(reader):
+async def test_on_events(reader):
     event1 = Event(_type="hello", time=timestamp.from_string("2020-01-01 05:00:00"))
     event2 = Event(_type="there", time=timestamp.from_string("2020-01-01 07:00:00"))
     event3 = Event(_type="hi", time=timestamp.from_string("2020-01-01 11:00:00"))
