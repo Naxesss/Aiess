@@ -1,4 +1,4 @@
-from typing import Callable, Generator, List
+from typing import Generator, List
 from datetime import datetime
 import asyncio
 
