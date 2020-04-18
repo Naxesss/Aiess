@@ -90,4 +90,24 @@ async def test_on_event_batch(reader):
     assert received_event_batches[0] == [event1, event2]
     assert received_event_batches[1] == [event3, event4, event5]
 
+@pytest.mark.asyncio
+async def test_merge_concurrent(reader):
+    event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 05:00:00"))
+    event2 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 05:00:00"))
+    event3 = Event(_type="something else", time=timestamp.from_string("2020-01-01 07:00:00"))
 
+    merged_events = reader.merge_concurrent([event1, event2, event3])
+    assert len(merged_events) == 2
+    assert merged_events[0].type == event2.type
+    assert merged_events[0].user == event1.user
+    assert merged_events[1] == event3
+
+@pytest.mark.asyncio
+async def test_merge_concurrent_different_times(reader):
+    event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 11:00:00"))
+    event2 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 13:00:00"))
+
+    merged_events = reader.merge_concurrent([event1, event2])
+    assert len(merged_events) == 2
+    assert merged_events[0] == event1
+    assert merged_events[1] == event2
