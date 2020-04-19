@@ -113,11 +113,13 @@ def test_format_footer_text_kudosu_denied(kudosu_gain_event):
 
 def test_format_preview_long():
     text = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"
-    assert format_preview(User(1, "someone"), text) == "someone \"04:25:218 (3,4) - the guitar is really strong here so map...\""
+    assert format_preview(text) == "someone \"04:25:218 (3,4) - the guitar is really strong here so map...\""
+    assert format_preview(text, length=75) == "someone \"04:25:218 (3,4) - the guitar is really strong here so mapping to the red...\""
 
 def test_format_preview_newline():
     text = "04:25:218 (3,4) - the guitar is really strong here so\nmapping to the red beats only feels unfitting"
-    assert format_preview(User(1, "someone"), text) == "someone \"04:25:218 (3,4) - the guitar is really strong here so\""
+    assert format_preview(text) == "someone \"04:25:218 (3,4) - the guitar is really strong here so\""
+    assert format_preview(text, split_newline=False) == "someone \"04:25:218 (3,4) - the guitar is really strong here so\nma...\""
 
 def test_format_footer_icon_url(suggestion_event):
     assert format_footer_icon_url(suggestion_event) == "https://a.ppy.sh/1"

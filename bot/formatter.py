@@ -102,21 +102,21 @@ def format_field_value(event: Event) -> str:
 def format_footer_text(event: Event) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
     if there's a user associated with the event, otherwise None."""
-    preview = format_preview(event.user, event.content)
+    preview = f"{event.user} {format_preview(event.content)}"
     return preview if preview != None else Embed.Empty
 
-def format_preview(user: User, content: str) -> str:
+def format_preview(content: str, length: int=60, split_newline: bool=True) -> str:
     """Returns a string of the user with the truncated content in quotes, if any,
     else just the user, again if any, otherwise None."""
-    if user:
-        if content:
-            preview = content.partition("\n")[0]
-            preview = preview if len(preview) <= 60 else preview[:57] + "..."
+    if not content:
+        return ""
+    
+    if split_newline:
+        preview = content.partition("\n")[0]
+    preview = preview if len(preview) <= length else preview[:length-3] + "..."
 
-            # Markdown does not function in footer text; trying to escape it here would lead to visible '\'.
-            return f"{user} \"{preview}\""
-        return str(user)
-    return None
+    # Markdown does not function in footer text; trying to escape it here would lead to visible '\'.
+    return f"\"{preview}\""
 
 def format_footer_icon_url(event: Event) -> str:
     """Returns the footer icon url of the event (i.e. the image url of the user's avatar),
