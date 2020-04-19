@@ -9,6 +9,7 @@ from formatter import format_embed
 from formatter import format_field_name
 from formatter import format_field_value
 from formatter import format_footer_text
+from formatter import format_preview
 from formatter import format_footer_icon_url
 from formatter import format_thumbnail_url
 
@@ -86,13 +87,9 @@ def test_format_footer_text(suggestion_event):
 def test_format_footer_text_no_user(qualify_event):
     assert format_footer_text(qualify_event) == Embed.Empty
 
-def test_format_footer_text_long(suggestion_event):
+def test_format_footer_text_preview(suggestion_event):
     suggestion_event.content = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"
-    assert format_footer_text(suggestion_event) == "someone \"04:25:218 (3,4) - the guitar is really strong here so map...\""
-
-def test_format_footer_text_newline(suggestion_event):
-    suggestion_event.content = "04:25:218 (3,4) - the guitar is really strong here so\nmapping to the red beats only feels unfitting"
-    assert format_footer_text(suggestion_event) == "someone \"04:25:218 (3,4) - the guitar is really strong here so\""
+    assert format_footer_text(suggestion_event) == format_preview(suggestion_event.user, suggestion_event.content)
 
 def test_format_footer_text_no_comment(suggestion_event):
     suggestion_event.content = ""
@@ -105,6 +102,14 @@ def test_format_footer_text_kudosu_denied(kudosu_gain_event):
     kudosu_gain_event.type = "kudosu-deny"
     kudosu_gain_event.user = None
     assert format_footer_text(kudosu_gain_event) == "(Moderator) → someone"
+
+def test_format_preview_long():
+    text = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"
+    assert format_preview(User(1, "someone"), text) == "someone \"04:25:218 (3,4) - the guitar is really strong here so map...\""
+
+def test_format_preview_newline():
+    text = "04:25:218 (3,4) - the guitar is really strong here so\nmapping to the red beats only feels unfitting"
+    assert format_preview(User(1, "someone"), text) == "someone \"04:25:218 (3,4) - the guitar is really strong here so\""
 
 def test_format_footer_icon_url(suggestion_event):
     assert format_footer_icon_url(suggestion_event) == "https://a.ppy.sh/1"

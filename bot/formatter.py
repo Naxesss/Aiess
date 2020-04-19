@@ -1,6 +1,6 @@
 from discord import Embed, Colour
 
-from aiess import Event
+from aiess import Event, User
 from aiess import event_types as types
 
 class TypeProps():
@@ -107,16 +107,21 @@ def format_footer_text(event: Event) -> str:
             return f"{event.user} → {event.discussion.user}"
         return f"(Moderator) → {event.discussion.user}"
 
-    if event.user:
-        if event.content:
-            preview = event.content.partition("\n")[0]
+    preview = format_preview(event.user, event.content)
+    return preview if preview != None else Embed.Empty
+
+def format_preview(user: User, content: str) -> str:
+    """Returns a string of the user with the truncated content in quotes, if any,
+    else just the user, again if any, otherwise None."""
+    if user:
+        if content:
+            preview = content.partition("\n")[0]
             preview = preview if len(preview) <= 60 else preview[:57] + "..."
 
             # Markdown does not function in footer text; trying to escape it here would lead to visible '\'.
-            return f"{event.user} \"{preview}\""
-        return str(event.user)
-    
-    return Embed.Empty
+            return f"{user} \"{preview}\""
+        return str(user)
+    return None
 
 def format_footer_icon_url(event: Event) -> str:
     """Returns the footer icon url of the event (i.e. the image url of the user's avatar),
