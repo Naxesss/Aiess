@@ -10,7 +10,7 @@ RESET = "nomination-reset"
 
 SUGGESTION = "suggestion"
 PROBLEM = "problem"
-NOTE = "mapper-note"
+NOTE = "mapper_note"
 PRAISE = "praise"
 HYPE = "hype"
 REPLY = "reply"
