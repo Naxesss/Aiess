@@ -10,6 +10,7 @@ from aiess import event_types as types
 # The former element takes the type of the second, which is removed.
 mergable_types = [
     (types.NOMINATE, types.QUALIFY),
+    (types.PROBLEM,  types.RESET),
     (types.REPLY,    types.RESOLVE),
     (types.REPLY,    types.REOPEN)
 ]
