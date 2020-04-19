@@ -4,6 +4,7 @@ from aiess.objects import Discussion, Beatmapset, Event
 from aiess.errors import ParsingError
 from aiess.database import database
 from aiess import timestamp
+from aiess import types
 
 from requester import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
 from parsers.discussion_parser import discussion_parser
@@ -68,32 +69,32 @@ def __populate_additional_details(event: Event, discussions_json: object) -> Non
         same_time = event.time == timestamp.from_string(page_event["created_at"])
         same_type = event.type == page_event["type"].replace("_", "-")
         if same_time and same_type:
-            if event.type == "disqualify" or event.type == "nomination_reset":  # Content is discussion content.
+            if event.type == types.DISQUALIFY or event.type == types.RESET:  # Content is discussion content.
                 if event.discussion:  # Discussion may have been deleted.
                     event.content = event.discussion.content
 
-            if event.type == "issue-resolve":  # User is resolver, not discussion creator.
+            if event.type == types.RESOLVE:  # User is resolver, not discussion creator.
                 post_author = discussion_parser.parse_discussion_post_author(
                     page_event["comment"]["beatmap_discussion_post_id"],
                     beatmapset_json)
                 if post_author != None:
                     event.user = post_author
             
-            if event.type == "kudosu-gain":  # User is giver, not discussion creator.
+            if event.type == types.KUDOSU_GAIN:  # User is giver, not discussion creator.
                 kudosu_giver = discussion_parser.parse_user(
                     page_event["comment"]["new_vote"]["user_id"],
                     beatmapset_json)
                 if kudosu_giver != None:
                     event.user = kudosu_giver
             
-            if event.type == "kudosu-lost":  # User is remover, not discussion creator.
+            if event.type == types.KUDOSU_LOSS:  # User is remover, not discussion creator.
                 kudosu_remover = discussion_parser.parse_user(
                     page_event["comment"]["new_vote"]["user_id"],
                     beatmapset_json)
                 if kudosu_remover != None:
                     event.user = kudosu_remover
             
-            if event.type == "issue-reopen":  # User is reopener, not discussion creator.
+            if event.type == types.REOPEN:  # User is reopener, not discussion creator.
                 issue_reopener = discussion_parser.parse_discussion_post_author(
                     page_event["comment"]["beatmap_discussion_post_id"],
                     beatmapset_json)

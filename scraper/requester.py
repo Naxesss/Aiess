@@ -7,6 +7,7 @@ from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.objects import Event, Beatmapset, Discussion
 from aiess.settings import PAGE_RATE_LIMIT
 from aiess.logger import log_err
+from aiess import types
 
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.discussion_event_parser import discussion_event_parser
@@ -41,25 +42,25 @@ def request_soup(url: str) -> BeautifulSoup:
 def request_beatmapset_events(page: int=1) -> BeautifulSoup:
     """Requests the beatmapset events page as a BeautifulSoup object. Only certain events are queried."""
     # This way if events are added we ignore them until we've properly supported them.
-    types = [
-        "nominate", "qualify", "rank", "love", "nomination_reset", "disqualify", "approve",  # Beatmap Status Events
-        "kudosu_gain", "kudosu_lost", "kudosu_allow", "kudosu_deny",  # Kudosu Events
-        "issue_resolve", "issue_reopen",  # Discussion Status Events
-        "discussion_delete", "discussion_restore", "discussion_post_delete", "discussion_post_restore"  # Delete/Restore Events
+    event_types = [
+        types.NOMINATE, types.QUALIFY, types.RANK, types.LOVE, types.RESET, types.DISQUALIFY,  # Beatmap Status Events
+        types.KUDOSU_GAIN, types.KUDOSU_LOSS, types.KUDOSU_ALLOW, types.KUDOSU_DENY,  # Kudosu Events
+        types.RESOLVE, types.REOPEN,  # Discussion Status Events
+        types.DISCUSSION_DELETE, types.DISCUSSION_RESTORE, types.REPLY_DELETE, types.REPLY_RESTORE  # Delete/Restore Events
     ]
 
     type_query = ""
-    for _type in types:
+    for _type in event_types:
         type_query += f"&types[]={_type}"
     
     return request_soup(f"https://osu.ppy.sh/beatmapsets/events?page={page}&limit=50{type_query}")
 
 def request_discussion_events(page: int=1) -> BeautifulSoup:
     """Requests the discussion events page as a BeautifulSoup object."""
-    types = ["suggestion", "problem", "mapper_note", "praise", "hype"]
+    event_types = [types.SUGGESTION, types.PROBLEM, types.NOTE, types.PRAISE, types.HYPE]
 
     type_query = ""
-    for _type in types:
+    for _type in event_types:
         type_query += f"&message_types[]={_type}"
     
     return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussions?page={page}&limit=50{type_query}")

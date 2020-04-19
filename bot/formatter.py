@@ -17,29 +17,29 @@ colour_resolve    = Colour.from_rgb(100,200,100)
 colour_reopen     = Colour.from_rgb(255,160,70)
 
 type_props = {
-    "rank":             TypeProps(":sparkling_heart:",    "Ranked",           colour_ranked),
-    "love":             TypeProps(":gift_heart:",         "Loved",            colour_ranked),
+    types.RANK:               TypeProps(":sparkling_heart:",    "Ranked",           colour_ranked),
+    types.LOVE:               TypeProps(":gift_heart:",         "Loved",            colour_ranked),
 
-    "qualify":          TypeProps(":heart:",              "Qualified",        colour_qualified),
-    "disqualify":       TypeProps(":broken_heart:",       "Disqualified",     colour_qualified),
+    types.QUALIFY:            TypeProps(":heart:",              "Qualified",        colour_qualified),
+    types.DISQUALIFY:         TypeProps(":broken_heart:",       "Disqualified",     colour_qualified),
 
-    "nominate":         TypeProps(":thought_balloon:",    "Nominated",        colour_nominated),
-    "nomination_reset": TypeProps(":anger_right:",        "Nomination Reset", colour_nominated),
+    types.NOMINATE:           TypeProps(":thought_balloon:",    "Nominated",        colour_nominated),
+    types.RESET:              TypeProps(":anger_right:",        "Nomination Reset", colour_nominated),
 
-    "suggestion":       TypeProps(":yellow_circle:",      "Suggestion",       colour_discussion),
-    "problem":          TypeProps(":red_circle:",         "Problem",          colour_discussion),
-    "mapper_note":      TypeProps(":purple_circle:",      "Note",             colour_discussion),
-    "praise":           TypeProps(":blue_heart:",         "Praise",           colour_discussion),
-    "hype":             TypeProps(":blue_circle:",        "Hype",             colour_discussion),
-    "reply":            TypeProps(":white_circle:",       "Reply",            colour_discussion),
+    types.SUGGESTION:         TypeProps(":yellow_circle:",      "Suggestion",       colour_discussion),
+    types.PROBLEM:            TypeProps(":red_circle:",         "Problem",          colour_discussion),
+    types.NOTE:               TypeProps(":purple_circle:",      "Note",             colour_discussion),
+    types.PRAISE:             TypeProps(":blue_heart:",         "Praise",           colour_discussion),
+    types.HYPE:               TypeProps(":blue_circle:",        "Hype",             colour_discussion),
+    types.REPLY:              TypeProps(":white_circle:",       "Reply",            colour_discussion),
 
-    "issue-resolve":    TypeProps(":green_circle:",       "Issue Resolved",         colour_resolve),
-    "kudosu-gain":      TypeProps(":arrow_up:",           "Kudosu Given",     colour_resolve),
-    "kudosu-allow":     TypeProps(":arrow_double_up:",    "Kudosu Allowed",   colour_resolve),
+    types.RESOLVE:            TypeProps(":green_circle:",       "Resolved",         colour_resolve),
+    types.KUDOSU_GAIN:        TypeProps(":arrow_up:",           "Kudosu Given",     colour_resolve),
+    types.KUDOSU_ALLOW:       TypeProps(":arrow_double_up:",    "Kudosu Allowed",   colour_resolve),
 
-    "issue-reopen":     TypeProps(":orange_circle:",      "Issue Reopened",         colour_reopen),
-    "kudosu-lost":      TypeProps(":arrow_down:",         "Kudosu Taken",      colour_reopen),
-    "kudosu-deny":      TypeProps(":arrow_double_down:",  "Kudosu Denied",    colour_reopen)
+    types.REOPEN:             TypeProps(":orange_circle:",      "Reopened",         colour_reopen),
+    types.KUDOSU_LOSS:        TypeProps(":arrow_down:",         "Kudosu Taken",     colour_reopen),
+    types.KUDOSU_DENY:        TypeProps(":arrow_double_down:",  "Kudosu Denied",    colour_reopen),
 }
 
 def format_link(event: Event) -> str:
@@ -93,7 +93,7 @@ def format_footer_text(event: Event) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
     if there's a user associated with the event, otherwise None."""
 
-    if event.type in ["kudosu-gain", "kudosu-loss", "kudosu-deny", "kudosu-allow"]:
+    if event.type in [types.KUDOSU_GAIN, types.KUDOSU_LOSS, types.KUDOSU_DENY, types.KUDOSU_ALLOW]:
         if not event.discussion:
             raise ValueError("A kudosu type event did not have an associated discussion instance.")
         if event.user:

@@ -5,12 +5,13 @@ import asyncio
 from aiess.objects import Event
 from aiess.database import database
 from aiess import timestamp
+from aiess import types
 
 # The former element takes the type of the second, which is removed.
 mergable_types = [
-    ("nominate", "qualify"),
-    ("reply",    "resolve"),
-    ("reply",    "reopen")
+    (types.NOMINATE, types.QUALIFY),
+    (types.REPLY,    types.RESOLVE),
+    (types.REPLY,    types.REOPEN)
 ]
 
 class Reader():
