@@ -102,14 +102,6 @@ def format_field_value(event: Event) -> str:
 def format_footer_text(event: Event) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
     if there's a user associated with the event, otherwise None."""
-
-    if event.type in [types.KUDOSU_GAIN, types.KUDOSU_LOSS, types.KUDOSU_DENY, types.KUDOSU_ALLOW]:
-        if not event.discussion:
-            raise ValueError("A kudosu type event did not have an associated discussion instance.")
-        if event.user:
-            return f"{event.user} → {event.discussion.user}"
-        return f"(Moderator) → {event.discussion.user}"
-
     preview = format_preview(event.user, event.content)
     return preview if preview != None else Embed.Empty
 

@@ -104,12 +104,12 @@ def test_format_footer_text_no_comment(suggestion_event):
     assert format_footer_text(suggestion_event) == "someone"
 
 def test_format_footer_text_kudosu_given(kudosu_gain_event):
-    assert format_footer_text(kudosu_gain_event) == "sometwo → someone"
+    assert format_footer_text(kudosu_gain_event) == "sometwo"
 
 def test_format_footer_text_kudosu_denied(kudosu_gain_event):
     kudosu_gain_event.type = "kudosu-deny"
     kudosu_gain_event.user = None
-    assert format_footer_text(kudosu_gain_event) == "(Moderator) → someone"
+    assert format_footer_text(kudosu_gain_event) == Embed.Empty
 
 def test_format_preview_long():
     text = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"
