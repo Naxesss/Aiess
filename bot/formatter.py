@@ -69,7 +69,7 @@ def format_embed(event: Event) -> str:
     embed.set_thumbnail(url=format_thumbnail_url(event))
 
     if type_props[event.type].show_context and event.discussion:
-        embed.add_field(name="Context", value=format_context_field_value(event))
+        embed.add_field(name=event.discussion.user, value=format_preview(event.discussion.content))
 
     return embed
 
@@ -128,10 +128,3 @@ def format_footer_icon_url(event: Event) -> str:
 def format_thumbnail_url(event: Event) -> str:
     """Returns the thumbnail url for the event (e.g. beatmapset thumbnail)."""
     return f"https://b.ppy.sh/thumb/{event.beatmapset.id}l.jpg"
-
-def format_context_field_value(event: Event) -> str:
-    """Returns the discussion context for this event (i.e. the original discussion it's associated with) as a preview."""
-    if not event.discussion:
-        raise ValueError("Cannot produce context for an event without a discussion.")
-
-    return format_preview(event.discussion.user, event.discussion.content)
