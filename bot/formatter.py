@@ -102,8 +102,13 @@ def format_field_value(event: Event) -> str:
 def format_footer_text(event: Event) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
     if there's a user associated with the event, otherwise None."""
-    preview = f"{event.user} {format_preview(event.content)}"
-    return preview if preview != None else Embed.Empty
+    if not event.user:
+        return Embed.Empty
+    
+    if not event.content:
+        return str(event.user)
+
+    return f"{event.user} {format_preview(event.content)}"
 
 def format_preview(content: str, length: int=60, split_newline: bool=True) -> str:
     """Returns a string of the user with the truncated content in quotes, if any,
