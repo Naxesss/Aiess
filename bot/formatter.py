@@ -116,6 +116,7 @@ def format_preview(content: str, length: int=60, split_newline: bool=True) -> st
     if not content:
         return ""
     
+    preview = content
     if split_newline:
         preview = content.partition("\n")[0]
     preview = preview if len(preview) <= length else preview[:length-3] + "..."
