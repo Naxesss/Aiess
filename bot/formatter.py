@@ -41,6 +41,11 @@ type_props = {
     types.REOPEN:             TypeProps(":orange_circle:",      "Reopened",         colour_reopen),
     types.KUDOSU_LOSS:        TypeProps(":arrow_down:",         "Kudosu Taken",     colour_reopen),
     types.KUDOSU_DENY:        TypeProps(":arrow_double_down:",  "Kudosu Denied",    colour_reopen),
+
+    types.DISCUSSION_DELETE:  TypeProps(":zap:",                "Deleted",          colour_discussion),
+    types.DISCUSSION_RESTORE: TypeProps(":wrench:",             "Restored",         colour_discussion),
+    types.REPLY_DELETE:       TypeProps(":zap:",                "Reply Deleted",    colour_discussion),
+    types.REPLY_RESTORE:      TypeProps(":wrench:",             "Reply Restored",   colour_discussion)
 }
 
 def format_link(event: Event) -> str:
