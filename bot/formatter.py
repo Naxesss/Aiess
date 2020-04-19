@@ -39,7 +39,7 @@ type_props = {
     types.KUDOSU_ALLOW:       TypeProps(":arrow_double_up:",    "Kudosu Allowed",   colour_resolve),
 
     types.REOPEN:             TypeProps(":orange_circle:",      "Reopened",         colour_reopen),
-    types.KUDOSU_LOSS:        TypeProps(":arrow_down:",         "Kudosu Taken",     colour_reopen),
+    types.KUDOSU_LOSS:        TypeProps(":arrow_down:",         "Kudosu Removed",   colour_reopen),
     types.KUDOSU_DENY:        TypeProps(":arrow_double_down:",  "Kudosu Denied",    colour_reopen),
 
     types.DISCUSSION_DELETE:  TypeProps(":zap:",                "Deleted",          colour_discussion),
