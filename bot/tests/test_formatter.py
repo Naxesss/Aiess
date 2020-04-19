@@ -12,6 +12,7 @@ from formatter import format_footer_text
 from formatter import format_preview
 from formatter import format_footer_icon_url
 from formatter import format_thumbnail_url
+from formatter import format_context_field_value
 
 @pytest.fixture
 def suggestion_event():
@@ -67,6 +68,13 @@ def test_format_embed(suggestion_event):
     assert embed.colour.to_rgb() == (65, 65, 65)
     assert embed.thumbnail.url == "https://b.ppy.sh/thumb/3l.jpg"
 
+def test_format_embed_context(kudosu_gain_event):
+    embed: Embed = format_embed(kudosu_gain_event)
+    
+    assert len(embed.fields) == 2
+    assert embed.fields[1].name == "Context"
+    assert embed.fields[1].value == "someone \"hi\""
+
 def test_format_field_name(suggestion_event):
     assert format_field_name(suggestion_event) == ":yellow_circle: Suggestion"
 
@@ -119,3 +127,12 @@ def test_format_footer_icon_url_no_user(qualify_event):
 
 def test_format_thumbnail_url(suggestion_event):
     assert format_thumbnail_url(suggestion_event) == "https://b.ppy.sh/thumb/3l.jpg"
+
+def test_format_context_field_value(kudosu_gain_event):
+    assert format_context_field_value(kudosu_gain_event) == "someone \"hi\""
+
+def test_format_context_field_value_no_discussion(qualify_event):
+    with pytest.raises(ValueError) as err:
+        format_context_field_value(qualify_event)
+    
+    assert "without a discussion" in str(err)
