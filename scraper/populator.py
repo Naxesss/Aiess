@@ -100,13 +100,6 @@ def __populate_additional_details(event: Event, discussions_json: object) -> Non
                     beatmapset_json)
                 if issue_reopener != None:
                     event.user = issue_reopener
-            
-            if event.type == "discussion-delete":  # User is discussion creator (which we would normally not have access to).
-                if event.discussion:
-                    event.user = event.discussion.user
-            
-            if event.type == "discussion_post_delete":  # User is discussion post creator, to which we would no longer have access.
-                event.marked_for_deletion = True  # TODO: Not yet supported.
 
 def __complete_discussion_context(discussion: Discussion) -> bool:
     """Completes the context of the discussion from prior database entries, if present. Returns true if succeeded."""
