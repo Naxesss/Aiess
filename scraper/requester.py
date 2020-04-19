@@ -7,7 +7,7 @@ from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.objects import Event, Beatmapset, Discussion
 from aiess.settings import PAGE_RATE_LIMIT
 from aiess.logger import log_err
-from aiess import types
+from aiess import event_types as types
 
 from parsers.beatmapset_event_parser import beatmapset_event_parser
 from parsers.discussion_event_parser import discussion_event_parser

@@ -5,7 +5,7 @@ import asyncio
 from aiess.objects import Event
 from aiess.database import database
 from aiess import timestamp
-from aiess import types
+from aiess import event_types as types
 
 # The former element takes the type of the second, which is removed.
 mergable_types = [
