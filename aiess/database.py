@@ -330,7 +330,7 @@ class Database:
             beatmapset = self.retrieve_beatmapset(f"id={row[2]}" if row[2] else None)
             discussion = self.retrieve_discussion(f"id={row[3]}" if row[3] else None)
             user = self.retrieve_user(f"id={row[4]}" if row[4] else None)
-            content = row[5]
+            content = str(row[5])
             yield Event(_type, time, beatmapset, discussion, user, content=content)
 
 database = Database()
