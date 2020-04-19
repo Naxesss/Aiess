@@ -77,29 +77,25 @@ def __populate_additional_details(event: Event, discussions_json: object) -> Non
                 post_author = discussion_parser.parse_discussion_post_author(
                     page_event["comment"]["beatmap_discussion_post_id"],
                     beatmapset_json)
-                if post_author != None:
-                    event.user = post_author
+                event.user = post_author
             
             if event.type == types.KUDOSU_GAIN:  # User is giver, not discussion creator.
                 kudosu_giver = discussion_parser.parse_user(
                     page_event["comment"]["new_vote"]["user_id"],
                     beatmapset_json)
-                if kudosu_giver != None:
-                    event.user = kudosu_giver
+                event.user = kudosu_giver
             
             if event.type == types.KUDOSU_LOSS:  # User is remover, not discussion creator.
                 kudosu_remover = discussion_parser.parse_user(
                     page_event["comment"]["new_vote"]["user_id"],
                     beatmapset_json)
-                if kudosu_remover != None:
-                    event.user = kudosu_remover
+                event.user = kudosu_remover
             
             if event.type == types.REOPEN:  # User is reopener, not discussion creator.
                 issue_reopener = discussion_parser.parse_discussion_post_author(
                     page_event["comment"]["beatmap_discussion_post_id"],
                     beatmapset_json)
-                if issue_reopener != None:
-                    event.user = issue_reopener
+                event.user = issue_reopener
 
 def __complete_discussion_context(discussion: Discussion) -> bool:
     """Completes the context of the discussion from prior database entries, if present. Returns true if succeeded."""
