@@ -1,6 +1,7 @@
 from discord import Embed, Colour
 
 from aiess import Event
+from aiess import types
 
 class TypeProps():
     """Represents the properties of how a type should be represented (i.e. emoji, name, colour)."""
