@@ -12,7 +12,6 @@ from formatter import format_footer_text
 from formatter import format_preview
 from formatter import format_footer_icon_url
 from formatter import format_thumbnail_url
-from formatter import format_context_field_value
 
 @pytest.fixture
 def suggestion_event():
@@ -72,8 +71,8 @@ def test_format_embed_context(kudosu_gain_event):
     embed: Embed = format_embed(kudosu_gain_event)
     
     assert len(embed.fields) == 2
-    assert embed.fields[1].name == "Context"
-    assert embed.fields[1].value == "someone \"hi\""
+    assert embed.fields[1].name == "someone"
+    assert embed.fields[1].value == "\"hi\""
 
 def test_format_field_name(suggestion_event):
     assert format_field_name(suggestion_event) == ":yellow_circle: Suggestion"
@@ -97,7 +96,7 @@ def test_format_footer_text_no_user(qualify_event):
 
 def test_format_footer_text_preview(suggestion_event):
     suggestion_event.content = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"
-    assert format_footer_text(suggestion_event) == format_preview(suggestion_event.user, suggestion_event.content)
+    assert format_footer_text(suggestion_event) == f"{suggestion_event.user} {format_preview(suggestion_event.content)}"
 
 def test_format_footer_text_no_comment(suggestion_event):
     suggestion_event.content = ""
@@ -113,13 +112,13 @@ def test_format_footer_text_kudosu_denied(kudosu_gain_event):
 
 def test_format_preview_long():
     text = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"
-    assert format_preview(text) == "someone \"04:25:218 (3,4) - the guitar is really strong here so map...\""
-    assert format_preview(text, length=75) == "someone \"04:25:218 (3,4) - the guitar is really strong here so mapping to the red...\""
+    assert format_preview(text) == "\"04:25:218 (3,4) - the guitar is really strong here so map...\""
+    assert format_preview(text, length=75) == "\"04:25:218 (3,4) - the guitar is really strong here so mapping to the red...\""
 
 def test_format_preview_newline():
     text = "04:25:218 (3,4) - the guitar is really strong here so\nmapping to the red beats only feels unfitting"
-    assert format_preview(text) == "someone \"04:25:218 (3,4) - the guitar is really strong here so\""
-    assert format_preview(text, split_newline=False) == "someone \"04:25:218 (3,4) - the guitar is really strong here so\nma...\""
+    assert format_preview(text) == "\"04:25:218 (3,4) - the guitar is really strong here so\""
+    assert format_preview(text, split_newline=False) == "\"04:25:218 (3,4) - the guitar is really strong here so\nmap...\""
 
 def test_format_footer_icon_url(suggestion_event):
     assert format_footer_icon_url(suggestion_event) == "https://a.ppy.sh/1"
@@ -129,12 +128,3 @@ def test_format_footer_icon_url_no_user(qualify_event):
 
 def test_format_thumbnail_url(suggestion_event):
     assert format_thumbnail_url(suggestion_event) == "https://b.ppy.sh/thumb/3l.jpg"
-
-def test_format_context_field_value(kudosu_gain_event):
-    assert format_context_field_value(kudosu_gain_event) == "someone \"hi\""
-
-def test_format_context_field_value_no_discussion(qualify_event):
-    with pytest.raises(ValueError) as err:
-        format_context_field_value(qualify_event)
-    
-    assert "without a discussion" in str(err)
