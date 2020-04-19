@@ -4,11 +4,12 @@ from aiess import Event
 from aiess import event_types as types
 
 class TypeProps():
-    """Represents the properties of how a type should be represented (i.e. emoji, name, colour)."""
-    def __init__(self, emoji, title, colour):
+    """Represents the properties of how a type should be represented (e.g. emoji, name, colour)."""
+    def __init__(self, emoji, title, colour, show_context = False):
         self.emoji = emoji
         self.title = title
         self.colour = colour
+        self.show_context = show_context
 
 colour_ranked     = Colour.from_rgb(255,200,90)
 colour_qualified  = Colour.from_rgb(255,75,100)
@@ -32,20 +33,20 @@ type_props = {
     types.NOTE:               TypeProps(":purple_circle:",      "Note",             colour_discussion),
     types.PRAISE:             TypeProps(":blue_heart:",         "Praise",           colour_discussion),
     types.HYPE:               TypeProps(":blue_circle:",        "Hype",             colour_discussion),
-    types.REPLY:              TypeProps(":white_circle:",       "Reply",            colour_discussion),
+    types.REPLY:              TypeProps(":white_circle:",       "Reply",            colour_discussion,  show_context=True),
 
-    types.RESOLVE:            TypeProps(":green_circle:",       "Resolved",         colour_resolve),
-    types.KUDOSU_GAIN:        TypeProps(":arrow_up:",           "Kudosu Given",     colour_resolve),
-    types.KUDOSU_ALLOW:       TypeProps(":arrow_double_up:",    "Kudosu Allowed",   colour_resolve),
+    types.RESOLVE:            TypeProps(":green_circle:",       "Resolved",         colour_resolve,     show_context=True),
+    types.KUDOSU_GAIN:        TypeProps(":arrow_up:",           "Kudosu Given",     colour_resolve,     show_context=True),
+    types.KUDOSU_ALLOW:       TypeProps(":arrow_double_up:",    "Kudosu Allowed",   colour_resolve,     show_context=True),
 
-    types.REOPEN:             TypeProps(":orange_circle:",      "Reopened",         colour_reopen),
-    types.KUDOSU_LOSS:        TypeProps(":arrow_down:",         "Kudosu Removed",   colour_reopen),
-    types.KUDOSU_DENY:        TypeProps(":arrow_double_down:",  "Kudosu Denied",    colour_reopen),
+    types.REOPEN:             TypeProps(":orange_circle:",      "Reopened",         colour_reopen,      show_context=True),
+    types.KUDOSU_LOSS:        TypeProps(":arrow_down:",         "Kudosu Removed",   colour_reopen,      show_context=True),
+    types.KUDOSU_DENY:        TypeProps(":arrow_double_down:",  "Kudosu Denied",    colour_reopen,      show_context=True),
 
-    types.DISCUSSION_DELETE:  TypeProps(":zap:",                "Deleted",          colour_discussion),
-    types.DISCUSSION_RESTORE: TypeProps(":wrench:",             "Restored",         colour_discussion),
-    types.REPLY_DELETE:       TypeProps(":zap:",                "Reply Deleted",    colour_discussion),
-    types.REPLY_RESTORE:      TypeProps(":wrench:",             "Reply Restored",   colour_discussion)
+    types.DISCUSSION_DELETE:  TypeProps(":zap:",                "Deleted",          colour_discussion,  show_context=True),
+    types.DISCUSSION_RESTORE: TypeProps(":wrench:",             "Restored",         colour_discussion,  show_context=True),
+    types.REPLY_DELETE:       TypeProps(":zap:",                "Reply Deleted",    colour_discussion,  show_context=True),
+    types.REPLY_RESTORE:      TypeProps(":wrench:",             "Reply Restored",   colour_discussion,  show_context=True)
 }
 
 def format_link(event: Event) -> str:
