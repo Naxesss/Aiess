@@ -50,7 +50,7 @@ def request_beatmapset_events(page: int=1) -> BeautifulSoup:
     ]
 
     type_query = ""
-    for _type in event_types:
+    for _type in map(lambda _type: _type.replace("-", "_"), event_types):
         type_query += f"&types[]={_type}"
     
     return request_soup(f"https://osu.ppy.sh/beatmapsets/events?page={page}&limit=50{type_query}")
@@ -60,7 +60,7 @@ def request_discussion_events(page: int=1) -> BeautifulSoup:
     event_types = [types.SUGGESTION, types.PROBLEM, types.NOTE, types.PRAISE, types.HYPE]
 
     type_query = ""
-    for _type in event_types:
+    for _type in map(lambda _type: _type.replace("-", "_"), event_types):
         type_query += f"&message_types[]={_type}"
     
     return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussions?page={page}&limit=50{type_query}")
