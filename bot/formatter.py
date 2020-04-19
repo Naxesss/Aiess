@@ -5,7 +5,7 @@ from aiess import event_types as types
 
 class TypeProps():
     """Represents the properties of how a type should be represented (e.g. emoji, name, colour)."""
-    def __init__(self, emoji, title, colour, show_context = False):
+    def __init__(self, emoji: str, title: str, colour: Colour, show_context: bool=False):
         self.emoji = emoji
         self.title = title
         self.colour = colour
