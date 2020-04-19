@@ -67,7 +67,7 @@ def __populate_additional_details(event: Event, discussions_json: object) -> Non
         # Likelihood that two same type of events happen in the same second is very unlikely,
         # so this'll work as identification (we have no access to actual event ids on scraping side, so can't use that).
         same_time = event.time == timestamp.from_string(page_event["created_at"])
-        same_type = event.type == page_event["type"].replace("_", "-")
+        same_type = event.type == page_event["type"]
         if same_time and same_type:
             if event.type == types.DISQUALIFY or event.type == types.RESET:  # Content is discussion content.
                 if event.discussion:  # Discussion may have been deleted.
