@@ -137,8 +137,8 @@ def format_thumbnail_url(event: Event) -> str:
 
 def format_context_field_name(event: Event) -> str:
     """Returns the title for the discussion context; the name of the discussion author."""
-    return event.discussion.user
+    return escape_markdown(event.discussion.user)
 
 def format_context_field_value(event: Event) -> str:
     """Returns the content for the discussion context, surrounded in quotes."""
-    return f"\"{event.discussion.content}\""
+    return f"\"{escape_markdown(event.discussion.content)}\""
