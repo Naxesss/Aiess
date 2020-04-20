@@ -35,8 +35,8 @@ def qualify_event():
 def kudosu_gain_event():
     mapper = User(2, "sometwo")
     beatmapset = Beatmapset(3, "artist", "title", mapper, ["osu"])
-    user = User(1, "someone")
-    discussion = Discussion(5, beatmapset, user, content="hi")
+    user = User(1, "_someone_")
+    discussion = Discussion(5, beatmapset, user, content="hi*")
     event = Event("kudosu-gain", from_string("2020-04-11 20:00:00"), beatmapset, discussion, mapper)
 
     return event
@@ -132,7 +132,7 @@ def test_format_thumbnail_url(suggestion_event):
     assert format_thumbnail_url(suggestion_event) == "https://b.ppy.sh/thumb/3l.jpg"
 
 def test_context_field_name(kudosu_gain_event):
-    assert format_context_field_name(kudosu_gain_event) == "someone"
+    assert format_context_field_name(kudosu_gain_event) == "\\_someone\\_"
 
 def test_context_field_value(kudosu_gain_event):
-    assert format_context_field_value(kudosu_gain_event) == "\"hi\""
+    assert format_context_field_value(kudosu_gain_event) == "\"hi\\*\""
