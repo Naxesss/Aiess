@@ -69,7 +69,7 @@ def format_embed(event: Event) -> str:
     embed.set_thumbnail(url=format_thumbnail_url(event))
 
     if type_props[event.type].show_context and event.discussion:
-        embed.add_field(name=event.discussion.user, value=format_preview(event.discussion.content))
+        embed.add_field(name=format_context_field_name(event), value=format_context_field_value(event))
 
     return embed
 
@@ -134,3 +134,11 @@ def format_footer_icon_url(event: Event) -> str:
 def format_thumbnail_url(event: Event) -> str:
     """Returns the thumbnail url for the event (e.g. beatmapset thumbnail)."""
     return f"https://b.ppy.sh/thumb/{event.beatmapset.id}l.jpg"
+
+def format_context_field_name(event: Event) -> str:
+    """Returns the title for the discussion context; the name of the discussion author."""
+    return event.discussion.user
+
+def format_context_field_value(event: Event) -> str:
+    """Returns the content for the discussion context, surrounded in quotes."""
+    return f"\"{event.discussion.content}\""

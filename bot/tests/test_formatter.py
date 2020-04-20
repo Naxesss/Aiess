@@ -12,6 +12,8 @@ from formatter import format_footer_text
 from formatter import format_preview
 from formatter import format_footer_icon_url
 from formatter import format_thumbnail_url
+from formatter import format_context_field_name
+from formatter import format_context_field_value
 
 @pytest.fixture
 def suggestion_event():
@@ -71,8 +73,8 @@ def test_format_embed_context(kudosu_gain_event):
     embed: Embed = format_embed(kudosu_gain_event)
     
     assert len(embed.fields) == 2
-    assert embed.fields[1].name == "someone"
-    assert embed.fields[1].value == "\"hi\""
+    assert embed.fields[1].name == format_context_field_name(kudosu_gain_event)
+    assert embed.fields[1].value == format_context_field_value(kudosu_gain_event)
 
 def test_format_field_name(suggestion_event):
     assert format_field_name(suggestion_event) == ":yellow_circle: Suggestion"
@@ -128,3 +130,9 @@ def test_format_footer_icon_url_no_user(qualify_event):
 
 def test_format_thumbnail_url(suggestion_event):
     assert format_thumbnail_url(suggestion_event) == "https://b.ppy.sh/thumb/3l.jpg"
+
+def test_context_field_name(kudosu_gain_event):
+    assert format_context_field_name(kudosu_gain_event) == "someone"
+
+def test_context_field_value(kudosu_gain_event):
+    assert format_context_field_value(kudosu_gain_event) == "\"hi\""
