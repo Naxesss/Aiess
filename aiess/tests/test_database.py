@@ -75,6 +75,21 @@ def test_insert_retrieve_small_event(test_database):
     assert retrieved_event.content == event.content
     assert retrieved_event == event
 
+def test_insert_retrieve_event_digit_properties(test_database):
+    user = User(1, "497")
+    beatmapset = Beatmapset(3, artist="5", title="2", creator=user, modes=["osu"])
+    discussion = Discussion(2, beatmapset, user, content="8")
+    event = Event(_type="test", time=datetime.utcnow(), user=user, beatmapset=beatmapset, discussion=discussion, content="4")
+    test_database.insert_event(event)
+
+    retrieved_event = test_database.retrieve_event("type=\"test\"")
+    # Ensures the database field retrieval retains the `str` type, rather than reinterpreting as `int`.
+    assert retrieved_event.content == "4"
+    assert retrieved_event.user.name == "497"
+    assert retrieved_event.beatmapset.artist == "5"
+    assert retrieved_event.beatmapset.title == "2"
+    assert retrieved_event.discussion.content == "8"
+
 def test_insert_retrieve_user(test_database):
     user = User(1, name="test")
     test_database.insert_user(user)
