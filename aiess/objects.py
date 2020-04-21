@@ -53,8 +53,8 @@ class Beatmapset:
             beatmap_json = beatmapset_json[0]  # Assumes metadata is the same across the entire set.
 
         self.id = str(_id)
-        self.artist = artist if artist != None else beatmap_json["artist"]
-        self.title = title if title != None else beatmap_json["title"]
+        self.artist = str(artist) if artist != None else beatmap_json["artist"]
+        self.title = str(title) if title != None else beatmap_json["title"]
         self.creator = creator if creator != None else User(
             beatmap_json["creator_id"],
             beatmap_json["creator"])
@@ -97,7 +97,7 @@ class Discussion:
         self.id = str(_id)
         self.beatmapset = beatmapset
         self.user = user if user != None else None
-        self.content = content if content != None else None
+        self.content = str(content) if content != None else None
     
     def __eq__(self, other) -> bool:
         if type(self) != type(other):
@@ -123,7 +123,7 @@ class Usergroup:
 
     def __init__(self, _id: str, name: str=None):
         self.id = str(_id)
-        self.name = name if name != None else self.__get_name(_id)
+        self.name = name if name != None else self.__get_name(str(_id))
 
     def __get_name(self, _id: str) -> str:
         """Returns the name of the given group id, or None if unrecognized."""
