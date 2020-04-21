@@ -27,6 +27,13 @@ def test_user_restricted():
     assert user.name == None
     assert user.__str__() == "1"
 
+def test_user_int_name():
+    user = User(3, 487)
+
+    assert user.id == "3"
+    assert user.name == "487"
+    assert user.__str__() == "487"
+
 def test_beatmapset():
     beatmapset = Beatmapset(41823, beatmapset_json=mock_old_beatmap.JSON)
 
@@ -39,6 +46,12 @@ def test_beatmapset():
 
     assert beatmapset.mode_str() == "[osu][taiko]"
     assert beatmapset.__str__() == "The Quick Brown Fox - The Big Black (mapped by Blue Dragon) [osu][taiko]"
+
+def test_beatmapset_int_artist_title():
+    beatmapset = Beatmapset(41823, 5, 6, User(2, 222), ["osu"])
+
+    assert beatmapset.artist == "5"
+    assert beatmapset.title == "6"
 
 def test_beatmapset_non_existent():
     with pytest.raises(DeletedContextError):
@@ -59,9 +72,22 @@ def test_discussion():
     assert discussion.id == "1234956"
     assert discussion.beatmapset == beatmapset
 
+def test_discussion_int_content():
+    beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
+    discussion = Discussion(1234956, beatmapset, content=4)
+
+    assert discussion.id == "1234956"
+    assert discussion.content == "4"
+    assert discussion.beatmapset == beatmapset
+
 def test_usergroup():
     usergroup = Usergroup("4")
 
     assert usergroup.id == "4"
     assert usergroup.name == "Global Moderation Team"
 
+def test_usergroup_int_id():
+    usergroup = Usergroup(4)
+
+    assert usergroup.id == "4"
+    assert usergroup.name == "Global Moderation Team"
