@@ -148,7 +148,7 @@ class Event:
         self.discussion = discussion
         self.user = user
         self.group = group
-        self.content = content
+        self.content = str(content)
 
         # Occurs in cases where the event should not be logged.
         # e.g. discussion deleted but we don't have the discussion cached (no relevant information).

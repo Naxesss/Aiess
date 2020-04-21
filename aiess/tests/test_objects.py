@@ -1,6 +1,7 @@
 import pytest
+from datetime import datetime
 
-from aiess.objects import User, Beatmapset, Discussion, Usergroup
+from aiess.objects import User, Beatmapset, Discussion, Usergroup, Event
 from aiess.errors import ParsingError, DeletedContextError
 
 from aiess.tests.mocks.api import beatmap as mock_beatmap
@@ -91,3 +92,8 @@ def test_usergroup_int_id():
 
     assert usergroup.id == "4"
     assert usergroup.name == "Global Moderation Team"
+
+def test_event_int_content():
+    event = Event(_type="test", time=datetime.utcnow(), content=4)
+
+    assert event.content == "4"
