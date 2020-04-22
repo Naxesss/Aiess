@@ -11,6 +11,7 @@ from aiess import event_types as types
 mergable_types = [
     (types.NOMINATE, types.QUALIFY),
     (types.PROBLEM,  types.RESET),
+    (types.PROBLEM,  types.DISQUALIFY),
     (types.REPLY,    types.RESOLVE),
     (types.REPLY,    types.REOPEN)
 ]
