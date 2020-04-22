@@ -29,7 +29,7 @@ class EventParser():
     def parse_event_time(self, event: Tag) -> datetime:
         """Returns the datetime of the given event (e.g. "2019-10-12T02:19:27+00:00" into its datetime equivalent)."""
         event_time = None
-        time = event and event.find(attrs={"class": "timeago"})
+        time = event and event.find(attrs={"class": "js-timeago"})
         if time:
             event_time = time.attrs["datetime"]
         
