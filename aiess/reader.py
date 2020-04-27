@@ -93,6 +93,7 @@ class Reader():
 
     async def on_events(self, events: List[Event]) -> None:
         """Called for each new event batch found in the running loop of the reader.
+        This happens before on_event is called for each event.
         
         Some types of events in this batch are merged together if concurrent
         (e.g. user nominates + system qualifies -> user qualifies)."""
