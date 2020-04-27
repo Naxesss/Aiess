@@ -5,11 +5,16 @@ from aiess import event_types as types
 
 class TypeProps():
     """Represents the properties of how a type should be represented (e.g. emoji, name, colour)."""
-    def __init__(self, emoji: str, title: str, colour: Colour, show_context: bool=False):
+    def __init__(self, emoji: str, title: str, colour: Colour, **kwargs):
         self.emoji = emoji
         self.title = title
         self.colour = colour
-        self.show_context = show_context
+
+        self.show_history = False
+        self.show_in_history = False
+        self.show_context = False
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
 colour_ranked     = Colour.from_rgb(255,200,90)
 colour_qualified  = Colour.from_rgb(255,75,100)
