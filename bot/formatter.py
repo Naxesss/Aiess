@@ -1,7 +1,9 @@
 from discord import Embed, Colour
 
-from aiess import Event, User
+from aiess import Event, User, Beatmapset
 from aiess import event_types as types
+
+from database import Database
 
 class TypeProps():
     """Represents the properties of how a type should be represented (e.g. emoji, name, colour)."""
@@ -147,3 +149,42 @@ def format_context_field_name(event: Event) -> str:
 def format_context_field_value(event: Event) -> str:
     """Returns the content for the discussion context, surrounded in quotes."""
     return f"\"{escape_markdown(event.discussion.content)}\""
+
+def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Database=None) -> str:
+    """Returns the nomination history of this beatmapset (i.e. icons and names of actions and their authors).
+    Optionally within a certain length, smartly shortening/truncating the contents if needed."""
+    if not database: database = Database("aiess")  # Using wrapped database to access events.
+
+    # Note that these events are sorted in descending order, so newer events first.
+    events = list(filter(
+        lambda event: type_props[event.type].show_in_history,
+        database.retrieve_beatmapset_events(beatmapset)))
+
+    long_history = ""
+    for event in events:
+        long_history = (
+            f"{type_props[event.type].emoji} [{event.user}](https://osu.ppy.sh/users/{event.user.id})" +
+            (" " if long_history else "") +
+            long_history
+        )
+
+    if length_limit == None or len(long_history) <= length_limit:
+        return long_history
+    
+    short_history = ""
+    for event in events:
+        emoji = (
+            f"{type_props[event.type].emoji}" +
+            (" " if short_history else "")
+        )
+
+        # `- 3` to give space to ellipses if we need them.
+        if len(short_history) + len(emoji) <= length_limit - 3:
+            short_history = emoji + short_history
+        else:
+            # If there isn't enough space for anything, we skip the history completely.
+            if len(short_history):
+                short_history = "..." + short_history
+            break
+    
+    return short_history
