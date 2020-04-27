@@ -4,6 +4,8 @@ from discord import Embed
 from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
 
+from database import Database
+
 from formatter import format_link
 from formatter import format_embed
 from formatter import format_field_name
@@ -14,6 +16,7 @@ from formatter import format_footer_icon_url
 from formatter import format_thumbnail_url
 from formatter import format_context_field_name
 from formatter import format_context_field_value
+from formatter import format_history
 
 @pytest.fixture
 def suggestion_event():
@@ -41,6 +44,11 @@ def kudosu_gain_event():
 
     return event
 
+@pytest.fixture
+def test_database():
+    database = Database("aiess_test")
+    database.clear_table_data("events")
+    return database
 
 def test_format_link_discussion(suggestion_event):
     assert format_link(suggestion_event) == "https://osu.ppy.sh/beatmapsets/3/discussion#/5"
@@ -136,3 +144,44 @@ def test_context_field_name(kudosu_gain_event):
 
 def test_context_field_value(kudosu_gain_event):
     assert format_context_field_value(kudosu_gain_event) == "\"hi\\*\""
+
+def test_history(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
+    qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+
+    test_database.insert_event(nom_event)
+    test_database.insert_event(qual_event)
+
+    history = format_history(beatmapset, database=test_database)
+    assert history == ":thought_balloon: [someone](https://osu.ppy.sh/users/1) :heart: [sometwo](https://osu.ppy.sh/users/2)"
+
+def test_history_filtering(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    suggestion_event = Event("suggestion", from_string("2020-01-01 01:00:00"), beatmapset, user=User(0, "somezero"))
+    nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
+    qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+
+    test_database.insert_event(suggestion_event)
+    test_database.insert_event(nom_event)
+    test_database.insert_event(qual_event)
+
+    # The suggestion event should not appear in the history.
+    history = format_history(beatmapset, database=test_database)
+    assert history == ":thought_balloon: [someone](https://osu.ppy.sh/users/1) :heart: [sometwo](https://osu.ppy.sh/users/2)"
+
+def test_history_truncated(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
+    qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+
+    for _ in range(20):
+        test_database.insert_event(nom_event)
+    test_database.insert_event(qual_event)
+
+    history = format_history(beatmapset, length_limit=200, database=test_database)
+    expected_history = "..."
+    for _ in range(10):
+        expected_history += ":thought_balloon: "
+    assert history == expected_history + ":heart:"
+    assert len(history) <= 200
