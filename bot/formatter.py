@@ -24,14 +24,14 @@ colour_resolve    = Colour.from_rgb(100,200,100)
 colour_reopen     = Colour.from_rgb(255,160,70)
 
 type_props = {
-    types.RANK:               TypeProps(":sparkling_heart:",    "Ranked",           colour_ranked),
-    types.LOVE:               TypeProps(":gift_heart:",         "Loved",            colour_ranked),
+    types.RANK:               TypeProps(":sparkling_heart:",    "Ranked",           colour_ranked,      show_history=True),
+    types.LOVE:               TypeProps(":gift_heart:",         "Loved",            colour_ranked,      show_history=True),
 
-    types.QUALIFY:            TypeProps(":heart:",              "Qualified",        colour_qualified),
-    types.DISQUALIFY:         TypeProps(":broken_heart:",       "Disqualified",     colour_qualified),
+    types.QUALIFY:            TypeProps(":heart:",              "Qualified",        colour_qualified,   show_in_history=True),
+    types.DISQUALIFY:         TypeProps(":broken_heart:",       "Disqualified",     colour_qualified,   show_in_history=True),
 
-    types.NOMINATE:           TypeProps(":thought_balloon:",    "Nominated",        colour_nominated),
-    types.RESET:              TypeProps(":anger_right:",        "Nomination Reset", colour_nominated),
+    types.NOMINATE:           TypeProps(":thought_balloon:",    "Nominated",        colour_nominated,   show_in_history=True),
+    types.RESET:              TypeProps(":anger_right:",        "Nomination Reset", colour_nominated,   show_in_history=True),
 
     types.SUGGESTION:         TypeProps(":yellow_circle:",      "Suggestion",       colour_discussion),
     types.PROBLEM:            TypeProps(":red_circle:",         "Problem",          colour_discussion),
