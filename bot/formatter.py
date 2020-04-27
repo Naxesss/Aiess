@@ -104,7 +104,14 @@ def format_field_value(event: Event) -> str:
     mapped_by_str = f"Mapped by [{creator_str}](https://osu.ppy.sh/users/{event.beatmapset.creator.id})"
     mode_str = event.beatmapset.mode_str().replace("[", "[**").replace("]", "**]")
 
-    return f"{beatmap_str}\n{mapped_by_str} {mode_str}"
+    result = f"{beatmap_str}\n{mapped_by_str} {mode_str}"
+
+    if type_props[event.type].show_history:
+        # Give how much room the function has to work with, allowing it to smartly shorten/truncate if needed.
+        # This is to account for the embed field value character limit of 1024.
+        result += format_history(event, length_limit=1024-len(result))
+
+    return result
 
 def format_footer_text(event: Event) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
