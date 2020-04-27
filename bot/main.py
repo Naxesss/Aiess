@@ -9,6 +9,7 @@ from aiess.logger import log
 from settings import API_KEY
 import receiver
 import subscriber
+from database import database
 from subscriptions import Subscription
 from formatter import format_link, format_embed
 from cmd_modules import *
@@ -38,6 +39,10 @@ class Client(discord.Client):
 class Reader(aiess.Reader):
     client: Client = None
     
+    async def on_events(self, events):
+        # This is called before any on_event for each batch.
+        database.clear_cache()
+
     async def on_event(self, event: Event):
         log(event, postfix=self.reader_id)
         await subscriber.forward(event, self.client)
