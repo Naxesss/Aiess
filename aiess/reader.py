@@ -58,7 +58,7 @@ class Reader():
         if not events:
             return None
 
-        merged_events = self.merge_concurrent(events)
+        merged_events = merge_concurrent(events)
         await self.on_events(merged_events)
         for event in merged_events:
             await self.on_event(event)
@@ -75,22 +75,6 @@ class Reader():
         """Yields each event found in the database, from (excluding) the first time to (including) the second time."""
         return self.database.retrieve_events(f"time > \"{_from}\" AND time <= \"{to}\"")
 
-    def merge_concurrent(self, events: List[Event]) -> List[Event]:
-        """Returns a list of events where certain types of events are combined if they happened together
-        (e.g. user nominates + system qualifies -> user qualifies)."""
-        for event in events:
-            for other_event in events:
-                if event.time != other_event.time:
-                    continue
-
-                if (event.type, other_event.type) in mergable_types:
-                    # Former event has all properties the second does and more,
-                    # and is represented better having the type of the latter.
-                    event.type = other_event.type
-                    other_event.marked_for_deletion = True
-
-        return list(filter(lambda event: not event.marked_for_deletion, events))
-
     async def on_events(self, events: List[Event]) -> None:
         """Called for each new event batch found in the running loop of the reader.
         This happens before on_event is called for each event.
@@ -105,3 +89,21 @@ class Reader():
         Some types of events are merged together if concurrent
         (e.g. user nominates + system qualifies -> user qualifies)."""
         pass
+
+
+
+def merge_concurrent(events: List[Event]) -> List[Event]:
+    """Returns a list of events where certain types of events are combined if they happened together
+    (e.g. user nominates + system qualifies -> user qualifies)."""
+    for event in events:
+        for other_event in events:
+            if event.time != other_event.time:
+                continue
+
+            if (event.type, other_event.type) in mergable_types:
+                # Former event has all properties the second does and more,
+                # and is represented better having the type of the latter.
+                event.type = other_event.type
+                other_event.marked_for_deletion = True
+
+    return list(filter(lambda event: not event.marked_for_deletion, events))
