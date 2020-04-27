@@ -72,6 +72,6 @@ def test_retrieve_beatmapset_events_cache(test_database):
     assert test_database.beatmapset_event_cache["3"] == [qual_event, nom_event]
 
     test_database.clear_cache()
-    assert 3 not in test_database.beatmapset_event_cache
+    assert "3" not in test_database.beatmapset_event_cache
     assert nom_event not in test_database.beatmapset_event_cache.values()
     assert qual_event not in test_database.beatmapset_event_cache.values()
