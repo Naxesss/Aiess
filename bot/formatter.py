@@ -109,7 +109,7 @@ def format_field_value(event: Event) -> str:
     if type_props[event.type].show_history:
         # Give how much room the function has to work with, allowing it to smartly shorten/truncate if needed.
         # This is to account for the embed field value character limit of 1024.
-        result += format_history(event, length_limit=1024-len(result))
+        result += format_history(event.beatmapset, length_limit=1024-len(result))
 
     return result
 
