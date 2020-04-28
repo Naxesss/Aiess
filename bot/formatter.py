@@ -176,7 +176,7 @@ def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Dat
         )
 
     if length_limit == None or len(long_history) <= length_limit:
-        return long_history
+        return f"\n{long_history}"
     
     short_history = ""
     for event in events:
@@ -194,4 +194,4 @@ def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Dat
                 short_history = "..." + short_history
             break
     
-    return short_history
+    return f"\n{short_history}"
