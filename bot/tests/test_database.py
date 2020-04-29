@@ -1,7 +1,7 @@
 import pytest
 from mysql.connector.errors import IntegrityError
 
-from aiess import Event, User, Beatmapset
+from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
 
 from database import Database
@@ -79,3 +79,45 @@ def test_retrieve_beatmapset_events_cache(test_database):
 
     test_database.clear_cache()
     assert not test_database.beatmapset_event_cache
+
+def test_retrieve_last_type(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+    discussion = Discussion(7, beatmapset, nominator, "nice")
+
+    praise_event = Event("praise", from_string("2020-01-01 04:56:00"), beatmapset, discussion, user=User(2, "sometwo"))
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+
+    test_database.insert_event(praise_event)
+    test_database.insert_event(nom_event)
+
+    retrieved_event = test_database.retrieve_last_type(nominator, beatmapset, "praise")
+    assert retrieved_event == praise_event
+
+def test_retrieve_last_type_cache(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+    discussion = Discussion(7, beatmapset, nominator, "nice")
+
+    praise_event = Event("praise", from_string("2020-01-01 04:56:00"), beatmapset, discussion, user=User(2, "sometwo"))
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+
+    test_database.insert_event(praise_event)
+    test_database.insert_event(nom_event)
+
+    test_database.retrieve_last_type(nominator, beatmapset, "praise")
+    assert f"{nominator.id}-{beatmapset.id}-praise" in test_database.last_type_cache
+
+    test_database.clear_cache()
+    assert not test_database.last_type_cache
+
+def test_retrieve_last_type_none(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+
+    test_database.insert_event(nom_event)
+
+    retrieved_event = test_database.retrieve_last_type(nominator, beatmapset, "praise")
+    assert not retrieved_event
