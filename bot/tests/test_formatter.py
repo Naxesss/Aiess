@@ -154,7 +154,7 @@ def test_history(test_database):
     test_database.insert_event(qual_event)
 
     history = format_history(beatmapset, database=test_database)
-    assert history == ":thought_balloon: [someone](https://osu.ppy.sh/users/1) :heart: [sometwo](https://osu.ppy.sh/users/2)"
+    assert history == "\n:thought_balloon: [someone](https://osu.ppy.sh/users/1) :heart: [sometwo](https://osu.ppy.sh/users/2)"
 
 def test_history_filtering(test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
@@ -168,7 +168,7 @@ def test_history_filtering(test_database):
 
     # The suggestion event should not appear in the history.
     history = format_history(beatmapset, database=test_database)
-    assert history == ":thought_balloon: [someone](https://osu.ppy.sh/users/1) :heart: [sometwo](https://osu.ppy.sh/users/2)"
+    assert history == "\n:thought_balloon: [someone](https://osu.ppy.sh/users/1) :heart: [sometwo](https://osu.ppy.sh/users/2)"
 
 def test_history_truncated(test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
@@ -180,7 +180,7 @@ def test_history_truncated(test_database):
     test_database.insert_event(qual_event)
 
     history = format_history(beatmapset, length_limit=200, database=test_database)
-    expected_history = "..."
+    expected_history = "\n..."
     for _ in range(10):
         expected_history += ":thought_balloon: "
     assert history == expected_history + ":heart:"
