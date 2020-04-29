@@ -65,7 +65,7 @@ class Database(aiess.Database):
             event = self.retrieve_event(f"""
                 beatmapset_id = {beatmapset.id} AND
                 user_id = {user.id} AND
-                {where_type_str}
+                ({where_type_str})
                 ORDER BY time DESC
                 LIMIT 1""")
             self.last_type_cache[args_id] = event
