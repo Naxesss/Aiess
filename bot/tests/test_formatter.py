@@ -199,3 +199,14 @@ def test_recent_praise(test_database):
 
     praise = format_recent_praise(nominator, beatmapset, database=test_database)
     assert praise == "nice"
+
+def test_recent_praise_none(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=nominator)
+
+    test_database.insert_event(nom_event)
+
+    praise = format_recent_praise(nominator, beatmapset, database=test_database)
+    assert praise == None
