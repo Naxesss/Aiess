@@ -2,6 +2,7 @@ from typing import Union, List, Generator, Tuple, Match
 import re
 
 from aiess import Event, User, Beatmapset, Discussion
+from aiess import event_types as types
 
 and_gates = [" and ", "&", "∧"]
 or_gates  = [" or ",  "|", "∨"]
@@ -16,27 +17,27 @@ quote_chars = ["\"", "“", "”"]
 # Any of these values can be substituted for the respective key;
 # if the user expects it to work, it should work.
 type_variations = {
-    "rank":             ["ranked"],
-    "love":             ["loved"],
-    "qualify":          ["qualified",        "qualification",    "qual"],
-    "disqualify":       ["disqualified",     "disqualification", "dq"],
-    "nominate":         ["nominated",        "nomination",       "nom",   "bubble", "bubbled"],
-    "nomination_reset": ["nomination reset",                     "reset", "pop",    "popped"],
+    types.RANK:         ["ranked"],
+    types.LOVE:         ["loved"],
+    types.QUALIFY:      ["qualified",        "qualification",    "qual"],
+    types.DISQUALIFY:   ["disqualified",     "disqualification", "dq"],
+    types.NOMINATE:     ["nominated",        "nomination",       "nom",   "bubble", "bubbled"],
+    types.RESET:        ["nomination reset",                     "reset", "pop",    "popped"],
 
-    "suggestion":       [],
-    "problem":          [],
-    "mapper_note":      ["mapper note", "note"],
-    "praise":           [],
-    "hype":             [],
-    "reply":            [],
+    types.SUGGESTION:   [],
+    types.PROBLEM:      [],
+    types.NOTE:         ["mapper note", "note"],
+    types.PRAISE:       [],
+    types.HYPE:         [],
+    types.REPLY:        [],
 
-    "issue-resolve":    ["issue resolve", "issue resolved", "resolve", "resolved"],
-    "issue-reopen":     ["issue reopen",  "issue reopened", "reopen",  "reopened"],
+    types.RESOLVE:      ["issue resolve", "issue resolved", "resolve", "resolved"],
+    types.REOPEN:       ["issue reopen",  "issue reopened", "reopen",  "reopened"],
 
-    "kudosu-gain":      ["kudosu gain",  "kudosu gained", "kudosu given"],
-    "kudosu-lost":      ["kudosu loss",  "kudosu lost",   "kudosu taken"],
-    "kudosu-deny":      ["kudosu deny",  "kudosu denied"],
-    "kudosu-allow":     ["kudosu allow", "kudosu allowed"]
+    types.KUDOSU_GAIN:  ["kudosu gain",  "kudosu gained", "kudosu given"],
+    types.KUDOSU_LOSS:  ["kudosu loss",  "kudosu lost",   "kudosu taken"],
+    types.KUDOSU_DENY:  ["kudosu deny",  "kudosu denied"],
+    types.KUDOSU_ALLOW: ["kudosu allow", "kudosu allowed"]
 }
 
 def expand(string: str) -> str:
