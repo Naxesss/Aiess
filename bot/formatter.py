@@ -195,3 +195,12 @@ def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Dat
             break
     
     return f"\n{short_history}"
+
+def format_recent_praise(user: User, beatmapset: Beatmapset, database: Database=None):
+    """Obtains the content of the most recent praise from the given user on the given beatmapset."""
+    if not database: database = Database("aiess")
+
+    praise_event = database.retrieve_last_type(user, beatmapset, _type="praise")
+    if praise_event:
+        return format_preview(praise_event.content)
+    return None

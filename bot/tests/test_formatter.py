@@ -17,6 +17,7 @@ from formatter import format_thumbnail_url
 from formatter import format_context_field_name
 from formatter import format_context_field_value
 from formatter import format_history
+from formatter import format_recent_praise
 
 @pytest.fixture
 def suggestion_event():
