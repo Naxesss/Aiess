@@ -45,8 +45,7 @@ class Database(aiess.Database):
         the result in a cache used for any consecutive call. Concurrent events
         are merged together using the same method as on_event.
         
-        The cache must be cleared manually before new information can be obtained,
-        see `clear_cache`."""
+        The cache must be cleared before new information can be obtained, see `clear_cache`."""
         if beatmapset.id not in self.beatmapset_event_cache:
             # Retriving events from the database will give us non-merged events (e.g.
             # user nominates -> system qualifies, instead of user qualifies), hence merge.
@@ -59,8 +58,7 @@ class Database(aiess.Database):
         """Retrieves the last event of the given type made by the given user on the given beatmapset.
         This is first done from the database, and then from a cache for any consecutive call.
         
-        The cache must be cleared manually before new information can be obtained,
-        see `clear_cache`."""
+        The cache must be cleared before new information can be obtained, see `clear_cache`."""
         args_id = f"{user.id}-{beatmapset.id}-{_type}"
         if args_id not in self.last_type_cache:
             event = self.retrieve_event(f"""
