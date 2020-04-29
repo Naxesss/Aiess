@@ -202,5 +202,5 @@ def format_recent_praise(user: User, beatmapset: Beatmapset, database: Database=
 
     praise_event = database.retrieve_last_type(user, beatmapset, _type="praise")
     if praise_event:
-        return format_preview(praise_event.content)
+        return praise_event.content
     return None
