@@ -91,7 +91,7 @@ def test_retrieve_last_type(test_database):
     test_database.insert_event(praise_event)
     test_database.insert_event(nom_event)
 
-    retrieved_event = test_database.retrieve_last_type(nominator, beatmapset, "praise")
+    retrieved_event = test_database.retrieve_last_type(nominator, beatmapset, "type = \"praise\"")
     assert retrieved_event == praise_event
 
 def test_retrieve_last_type_cache(test_database):
@@ -105,8 +105,8 @@ def test_retrieve_last_type_cache(test_database):
     test_database.insert_event(praise_event)
     test_database.insert_event(nom_event)
 
-    test_database.retrieve_last_type(nominator, beatmapset, "praise")
-    assert f"{nominator.id}-{beatmapset.id}-praise" in test_database.last_type_cache
+    test_database.retrieve_last_type(nominator, beatmapset, "type = \"praise\"")
+    assert f"{nominator.id}-{beatmapset.id}-type = \"praise\"" in test_database.last_type_cache
 
     test_database.clear_cache()
     assert not test_database.last_type_cache
@@ -119,5 +119,5 @@ def test_retrieve_last_type_none(test_database):
 
     test_database.insert_event(nom_event)
 
-    retrieved_event = test_database.retrieve_last_type(nominator, beatmapset, "praise")
+    retrieved_event = test_database.retrieve_last_type(nominator, beatmapset, "type = \"praise\"")
     assert not retrieved_event

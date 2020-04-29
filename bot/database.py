@@ -54,17 +54,18 @@ class Database(aiess.Database):
 
         return self.beatmapset_event_cache[beatmapset.id]
     
-    def retrieve_last_type(self, user: User, beatmapset: Beatmapset, _type: str) -> Event:
-        """Retrieves the last event of the given type made by the given user on the given beatmapset.
-        This is first done from the database, and then from a cache for any consecutive call.
+    def retrieve_last_type(self, user: User, beatmapset: Beatmapset, where_type_str: str) -> Event:
+        """Retrieves the last event made by the given user on the given beatmapset, satisfying the
+        additional where clause for types (e.g. `type = \"praise\" OR type = \"hype\"`). This is
+        first done from the database, and then from a cache for any consecutive call.
         
         The cache must be cleared before new information can be obtained, see `clear_cache`."""
-        args_id = f"{user.id}-{beatmapset.id}-{_type}"
+        args_id = f"{user.id}-{beatmapset.id}-{where_type_str}"
         if args_id not in self.last_type_cache:
             event = self.retrieve_event(f"""
                 beatmapset_id = {beatmapset.id} AND
                 user_id = {user.id} AND
-                type = \"{_type}\"
+                {where_type_str}
                 ORDER BY time DESC
                 LIMIT 1""")
             self.last_type_cache[args_id] = event
