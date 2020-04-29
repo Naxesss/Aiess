@@ -210,3 +210,18 @@ def test_recent_praise_none(test_database):
 
     praise = format_recent_praise(nominator, beatmapset, database=test_database)
     assert praise == None
+
+def test_recent_praise_preview(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+    discussion = Discussion(7, beatmapset, user=nominator,
+        content="nice nice nice nice nice nice nice nice nice nice nice nice nice nice nice nice nice nice")
+
+    praise_event = Event("praise", from_string("2020-01-01 04:56:00"), beatmapset, discussion, user=nominator, content=discussion.content)
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=nominator)
+
+    test_database.insert_event(praise_event)
+    test_database.insert_event(nom_event)
+
+    praise = format_recent_praise(nominator, beatmapset, database=test_database)
+    assert praise == "\"nice nice nice nice nice nice nice nice nice nice nice ni...\""
