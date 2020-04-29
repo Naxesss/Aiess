@@ -200,7 +200,7 @@ def format_recent_praise(user: User, beatmapset: Beatmapset, database: Database=
     """Obtains the content of the most recent praise from the given user on the given beatmapset."""
     if not database: database = Database("aiess")
 
-    praise_event = database.retrieve_last_type(user, beatmapset, _type="praise")
+    praise_event = database.retrieve_last_type(user, beatmapset, where_type_str="type = \"praise\" OR type = \"hype\"")
     if praise_event:
         return praise_event.content
     return None
