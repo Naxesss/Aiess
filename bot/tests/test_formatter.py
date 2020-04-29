@@ -191,8 +191,8 @@ def test_recent_praise(test_database):
     nominator = User(2, "sometwo")
     discussion = Discussion(7, beatmapset, nominator, "nice")
 
-    praise_event = Event("praise", from_string("2020-01-01 04:56:00"), beatmapset, discussion, user=User(2, "sometwo"))
     nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+    praise_event = Event("praise", from_string("2020-01-01 04:56:00"), beatmapset, discussion, user=nominator, content=discussion.content)
 
     test_database.insert_event(praise_event)
     test_database.insert_event(nom_event)
