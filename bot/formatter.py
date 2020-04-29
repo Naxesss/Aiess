@@ -113,13 +113,22 @@ def format_field_value(event: Event) -> str:
 
     return result
 
-def format_footer_text(event: Event) -> str:
+def format_footer_text(event: Event, database: Database=None) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
     if there's a user associated with the event, otherwise None."""
     if not event.user:
         return Embed.Empty
     
     if not event.content:
+        if event.type in [types.NOMINATE, types.QUALIFY]:
+            if not database:
+                # Allows tests to use test databases instead of the production one.
+                database = Database("aiess")
+            
+            praise_text = format_recent_praise(event.user, event.beatmapset, database)
+            if praise_text:
+                return f"{event.user} {format_preview(praise_text)}"
+        
         return str(event.user)
 
     return f"{event.user} {format_preview(event.content)}"
