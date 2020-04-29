@@ -40,10 +40,10 @@ class Database(aiess.Database):
             where_str=f"guild_id={sub.guild_id} AND channel_id={sub.channel_id}")
     
     def retrieve_beatmapset_events(self, beatmapset: Beatmapset) -> List[Event]:
-        """Retrieves all events which have the given beatmapset id associated in
-        descending order (i.e. newer events first), from the database, then stores
-        the result in a cache used for any consecutive call. Concurrent events
-        are merged together using the same method as on_event.
+        """Retrieves all events which have the given beatmapset id associated in descending
+        order (i.e. newer events first), from the database, then stores the result in a cache
+        used for any consecutive call. Concurrent events are merged together using the same
+        method as on_event.
         
         The cache must be cleared before new information can be obtained, see `clear_cache`."""
         if beatmapset.id not in self.beatmapset_event_cache:
