@@ -198,7 +198,7 @@ def test_recent_praise(test_database):
     test_database.insert_event(nom_event)
 
     praise = format_recent_praise(nominator, beatmapset, database=test_database)
-    assert praise == "nice"
+    assert praise == "\"nice\""
 
 def test_recent_praise_none(test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
