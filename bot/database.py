@@ -1,7 +1,7 @@
 from typing import Generator, Dict, List
 
 import aiess
-from aiess import Event, Beatmapset
+from aiess import Event, Beatmapset, User
 from aiess.reader import merge_concurrent
 
 from subscriptions import Subscription
@@ -11,6 +11,7 @@ class Database(aiess.Database):
 
     def __init__(self, _db_name:str="aiess_bot"):
         self.beatmapset_event_cache: Dict[int, List[Event]] = {}
+        self.last_type_cache: Dict[str, Event] = {}
         super().__init__(_db_name)
     
     def insert_subscription(self, subscription: Subscription):
@@ -53,10 +54,29 @@ class Database(aiess.Database):
             self.beatmapset_event_cache[beatmapset.id] = merge_concurrent(raw_events)
 
         return self.beatmapset_event_cache[beatmapset.id]
+    
+    def retrieve_last_type(self, user: User, beatmapset: Beatmapset, _type: str) -> Event:
+        """Retrieves the last event of the given type made by the given user on the given beatmapset.
+        This is first done from the database, and then from a cache for any consecutive call.
+        
+        The cache must be cleared manually before new information can be obtained,
+        see `clear_cache`."""
+        args_id = f"{user.id}-{beatmapset.id}-{_type}"
+        if args_id not in self.last_type_cache:
+            event = self.retrieve_event(f"""
+                beatmapset_id = {beatmapset.id} AND
+                user_id = {user.id} AND
+                type = \"{_type}\"
+                ORDER BY time DESC
+                LIMIT 1""")
+            self.last_type_cache[args_id] = event
+
+        return self.last_type_cache[args_id]
 
     def clear_cache(self) -> None:
         """Clears any cache the database may be using, allowing new info to be obtained
         (e.g. for retrieving all events related to a beatmapset)."""
         self.beatmapset_event_cache.clear()
+        self.last_type_cache.clear()
 
 database = Database()
