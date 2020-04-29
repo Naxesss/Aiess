@@ -121,3 +121,20 @@ def test_retrieve_last_type_none(test_database):
 
     retrieved_event = test_database.retrieve_last_type(nominator, beatmapset, "type = \"praise\"")
     assert not retrieved_event
+
+def test_retrieve_last_type_or_priority(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    other_beatmapset = Beatmapset(2, "other artist", "other title", User(5, "other mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+    discussion = Discussion(7, beatmapset, nominator, "nice")
+
+    praise_event = Event("praise", from_string("2020-01-01 04:50:00"), beatmapset, discussion, user=User(2, "sometwo"))
+    hype_event = Event("hype", from_string("2020-01-01 04:56:00"), other_beatmapset, discussion, user=User(2, "sometwo"))
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+
+    test_database.insert_event(praise_event)
+    test_database.insert_event(hype_event)
+    test_database.insert_event(nom_event)
+
+    retrieved_event = test_database.retrieve_last_type(nominator, beatmapset, "type = \"praise\" OR type = \"hype\"")
+    assert retrieved_event == praise_event
