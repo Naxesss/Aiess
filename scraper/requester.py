@@ -33,7 +33,7 @@ def request_json(url: str) -> object:
 
 def soupify(html: str) -> BeautifulSoup:
     """Returns the given html as a BeautifulSoup object."""
-    return BeautifulSoup(html, "html.parser")
+    return BeautifulSoup(html, features="html.parser")
 
 def request_soup(url: str) -> BeautifulSoup:
     """Requests the page from the url as a BeautifulSoup object."""
