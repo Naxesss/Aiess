@@ -5,8 +5,7 @@ import aiess
 from aiess import Event
 from aiess import timestamp
 from aiess.database import Database
-
-from reader import merge_concurrent
+from aiess.reader import merge_concurrent
 
 received_events = []
 received_event_batches = []
