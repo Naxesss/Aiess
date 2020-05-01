@@ -47,7 +47,7 @@ HTML = """
                             <div class="beatmap-discussion-post__message">its for the vocal</div>
                             <div class="beatmap-discussion-post__info-container">
                                 <span class="beatmap-discussion-post__info">
-                                    <time class="timeago" datetime="2020-02-14T17:35:47+00:00" title="February 14, 2020 at 5:35:47 PM UTC">12 minutes ago</time>
+                                    <time class="js-timeago" datetime="2020-02-14T17:35:47+00:00" title="February 14, 2020 at 5:35:47 PM UTC">12 minutes ago</time>
                                 </span>
                             </div>
                         </div>

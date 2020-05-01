@@ -57,7 +57,7 @@ HTML = """
                                     Deserve to have slightly lower value, 0.8 or smth, so the difference can be more clear in comparison with other stuff which is more intense in some way 00:23:411, 01:05:609 etc.
                                 </div>
                                 <div class="beatmap-discussion-post__info-container">
-                                    <span class="beatmap-discussion-post__info"><time class="timeago" datetime="2020-01-24T11:17:51+00:00" title="January 24, 2020 at 11:17:51 AM UTC">about a minute ago</time></span>
+                                    <span class="beatmap-discussion-post__info"><time class="js-timeago" datetime="2020-01-24T11:17:51+00:00" title="January 24, 2020 at 11:17:51 AM UTC">about a minute ago</time></span>
                                 </div>
                             </div>
                         </div>
@@ -109,7 +109,7 @@ HTML = """
                             <div class="beatmap-discussion-post__message-container">
                                 <div class="beatmap-discussion-post__message">((in a more serious note tho : 04:05:694 (1) - aimod tells that this slider's end is not snapped properly))</div>
                                 <div class="beatmap-discussion-post__info-container">
-                                    <span class="beatmap-discussion-post__info"><time class="timeago" datetime="2019-12-05T16:50:10+00:00" title="December 5, 2019 at 4:50:10 PM UTC">about 2 hours ago</time></span>
+                                    <span class="beatmap-discussion-post__info"><time class="js-timeago" datetime="2019-12-05T16:50:10+00:00" title="December 5, 2019 at 4:50:10 PM UTC">about 2 hours ago</time></span>
                                 </div>
                             </div>
                         </div>

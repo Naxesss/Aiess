@@ -14,7 +14,7 @@ HTML = """
             <div class="beatmapset-event__content">
                 Issue #1336967 marked as resolved.
             </div>
-            <div><time class="timeago" datetime="2020-01-03T21:08:34+00:00" data-orig-title="January 3, 2020 at 9:08:34 PM UTC" data-hasqtip="8" aria-describedby="qtip-8">about a month ago</time></div>
+            <div><time class="js-timeago" datetime="2020-01-03T21:08:34+00:00" data-orig-title="January 3, 2020 at 9:08:34 PM UTC" data-hasqtip="8" aria-describedby="qtip-8">about a month ago</time></div>
         </div>
     </div>
 </div>

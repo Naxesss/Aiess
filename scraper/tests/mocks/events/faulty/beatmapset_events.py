@@ -22,7 +22,7 @@ HTML = """
                     Issue <a href="https://osu.ppy.sh/beatmapsets/978604/discussion#/1261263">#1261263</a> marked as resolved.
                 </div>
                 <div>
-                    <time class="timeago" datetime="2020-01-24T10:59:48+00:00" title="January 24, 2020 at 10:59:48 AM UTC">
+                    <time class="js-timeago" datetime="2020-01-24T10:59:48+00:00" title="January 24, 2020 at 10:59:48 AM UTC">
                         less than a minute ago
                     </time>
                 </div>
@@ -42,7 +42,7 @@ HTML = """
                     <div class="beatmapset-event__content">
                         Nominated by <a class="user-name js-usercard" data-user-id="1653229" href="https://osu.ppy.sh/users/1653229" style="color: #6B3FA0">_Stan</a>.
                     </div>
-                    <div><time class="timeago" datetime="2019-12-05T12:39:39+00:00" title="December 5, 2019 at 12:39:39 PM UTC">about 6 hours ago</time></div>
+                    <div><time class="js-timeago" datetime="2019-12-05T12:39:39+00:00" title="December 5, 2019 at 12:39:39 PM UTC">about 6 hours ago</time></div>
                 </div>
         </div>
     </div>

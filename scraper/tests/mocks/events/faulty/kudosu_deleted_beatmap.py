@@ -19,7 +19,7 @@ HTML = """
                 obtained enough votes for kudosu.
             </div>
             <div>
-                <time class="timeago" datetime="2020-02-05T20:27:10+00:00" data-orig-title="February 5, 2020 at 8:27:10 PM UTC" data-hasqtip="40" aria-describedby="qtip-40">
+                <time class="js-timeago" datetime="2020-02-05T20:27:10+00:00" data-orig-title="February 5, 2020 at 8:27:10 PM UTC" data-hasqtip="40" aria-describedby="qtip-40">
                     about a month ago
                 </time>
             </div>

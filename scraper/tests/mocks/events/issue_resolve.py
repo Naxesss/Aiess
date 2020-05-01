@@ -19,7 +19,7 @@ HTML = """
             <div class="beatmapset-event__content">
                 Issue <a href="https://osu.ppy.sh/beatmapsets/1011055/discussion#/1294675">#1294675</a> marked as resolved.
             </div>
-            <div><time class="timeago" datetime="2019-12-05T10:26:54+00:00" title="December 5, 2019 at 10:26:54 AM UTC">about 7 hours ago</time></div>
+            <div><time class="js-timeago" datetime="2019-12-05T10:26:54+00:00" title="December 5, 2019 at 10:26:54 AM UTC">about 7 hours ago</time></div>
         </div>
     </div>
 </div>

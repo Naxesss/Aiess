@@ -19,7 +19,7 @@ HTML = """
                 <div class="beatmapset-event__content">
                     Nominated by <a class="user-name js-usercard" data-user-id="1653229" href="https://osu.ppy.sh/users/1653229" style="color: #6B3FA0">_Stan</a>.
                 </div>
-                <div><time class="timeago" datetime="2019-12-05T12:39:39+00:00" title="December 5, 2019 at 12:39:39 PM UTC">about 6 hours ago</time></div>
+                <div><time class="js-timeago" datetime="2019-12-05T12:39:39+00:00" title="December 5, 2019 at 12:39:39 PM UTC">about 6 hours ago</time></div>
             </div>
     </div>
 </div>
