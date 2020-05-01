@@ -29,8 +29,8 @@ class DiscussionEventParser(EventParser):
             json_discussions = events.find("script", {"id": "json-discussions"})
             json_users = events.find("script", {"id": "json-users"})
 
-            event_jsons = json.loads(json_discussions.text)
-            user_jsons = json.loads(json_users.text)
+            event_jsons = json.loads(json_discussions.string)
+            user_jsons = json.loads(json_users.string)
 
             for event_json in event_jsons:
                 event = self.parse_event_json(event_json, user_jsons)
