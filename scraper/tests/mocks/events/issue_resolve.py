@@ -1,6 +1,9 @@
+import sys
+sys.path.append('..')
+
 from bs4 import BeautifulSoup, Tag
 
-from requester import soupify
+from scraper.requester import soupify
 
 HTML = """
 <div class="beatmapset-events__event">

@@ -1,4 +1,7 @@
-from commands import Command
+import sys
+sys.path.append('..')
+
+from bot.commands import Command
 
 def test_init():
     command = Command("test", "1", "2", "3")

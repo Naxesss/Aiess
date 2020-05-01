@@ -1,6 +1,9 @@
-from bs4 import BeautifulSoup
+import sys
+sys.path.append('..')
 
-from requester import soupify
+from bs4 import BeautifulSoup, Tag
+
+from scraper.requester import soupify
 
 # Includes an event of a deleted beatmapset, as well as an empty event.
 JSON = """

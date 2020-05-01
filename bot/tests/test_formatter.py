@@ -1,23 +1,25 @@
+import sys
+sys.path.append('..')
+
 import pytest
 from discord import Embed
 
 from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
 
-from database import Database
-
-from formatter import format_link
-from formatter import format_embed
-from formatter import format_field_name
-from formatter import format_field_value
-from formatter import format_footer_text
-from formatter import format_preview
-from formatter import format_footer_icon_url
-from formatter import format_thumbnail_url
-from formatter import format_context_field_name
-from formatter import format_context_field_value
-from formatter import format_history
-from formatter import format_recent_praise
+from bot.database import Database
+from bot.formatter import format_link
+from bot.formatter import format_embed
+from bot.formatter import format_field_name
+from bot.formatter import format_field_value
+from bot.formatter import format_footer_text
+from bot.formatter import format_preview
+from bot.formatter import format_footer_icon_url
+from bot.formatter import format_thumbnail_url
+from bot.formatter import format_context_field_name
+from bot.formatter import format_context_field_value
+from bot.formatter import format_history
+from bot.formatter import format_recent_praise
 
 @pytest.fixture
 def suggestion_event():

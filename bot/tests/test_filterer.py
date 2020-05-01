@@ -1,28 +1,31 @@
+import sys
+sys.path.append('..')
+
 import pytest
 from datetime import datetime
 
 from aiess import Event, User, Beatmapset, Discussion
 
-from filterer import expand
-from filterer import distribute
-from filterer import cleanup
-from filterer import escape
-from filterer import parenthesis_equal
-from filterer import deepest_parentheses
-from filterer import deepest_parentheses_range
-from filterer import backwards_leveled
-from filterer import forwards_leveled
-from filterer import split_unescaped
-from filterer import de_morgans_law
-from filterer import negate
-from filterer import flip_gate
-from filterer import double_negation_elimination
-from filterer import normalize_not
-from filterer import extract_not
-from filterer import surround_nonspace
-from filterer import combined_captured_span
-from filterer import dissect
-from filterer import passes_filter
+from bot.filterer import expand
+from bot.filterer import distribute
+from bot.filterer import cleanup
+from bot.filterer import escape
+from bot.filterer import parenthesis_equal
+from bot.filterer import deepest_parentheses
+from bot.filterer import deepest_parentheses_range
+from bot.filterer import backwards_leveled
+from bot.filterer import forwards_leveled
+from bot.filterer import split_unescaped
+from bot.filterer import de_morgans_law
+from bot.filterer import negate
+from bot.filterer import flip_gate
+from bot.filterer import double_negation_elimination
+from bot.filterer import normalize_not
+from bot.filterer import extract_not
+from bot.filterer import surround_nonspace
+from bot.filterer import combined_captured_span
+from bot.filterer import dissect
+from bot.filterer import passes_filter
 
 def test_expand():
     assert expand("type:(nominate or qualify)") == "type:nominate or type:qualify"

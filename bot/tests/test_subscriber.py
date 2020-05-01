@@ -1,11 +1,14 @@
+import sys
+sys.path.append('..')
+
 import pytest
 from datetime import datetime
 
 from aiess import Event
 
-import subscriber
-from subscriptions import Subscription
-from database import Database
+from bot import subscriber
+from bot.subscriptions import Subscription
+from bot.database import Database
 
 @pytest.fixture
 def test_database():

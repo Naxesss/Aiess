@@ -1,9 +1,12 @@
+import sys
+sys.path.append('..')
+
 from discord import Embed, Colour
 
 from aiess import Event, User, Beatmapset
 from aiess import event_types as types
 
-from database import Database
+from bot.database import Database
 
 class TypeProps():
     """Represents the properties of how a type should be represented (e.g. emoji, name, colour)."""

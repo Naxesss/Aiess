@@ -1,13 +1,16 @@
+import sys
+sys.path.append('..')
+
 import pytest
 from datetime import datetime
 
 from aiess.errors import ParsingError, DeletedContextError
 from aiess import timestamp
 
-from tests.mocks.events import issue_resolve, nominate, problem
-from tests.mocks.events.faulty import no_events, resolve_deleted_beatmap, kudosu_deleted_beatmap
-from parsers.beatmapset_event_parser import beatmapset_event_parser
-from parsers.discussion_event_parser import discussion_event_parser
+from scraper.tests.mocks.events import issue_resolve, nominate, problem
+from scraper.tests.mocks.events.faulty import no_events, resolve_deleted_beatmap, kudosu_deleted_beatmap
+from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
+from scraper.parsers.discussion_event_parser import discussion_event_parser
 
 def test_parse_event_type():
     tests = [

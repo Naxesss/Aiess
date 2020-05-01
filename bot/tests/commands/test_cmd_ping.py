@@ -1,8 +1,11 @@
+import sys
+sys.path.append('..')
+
 import pytest
 
-from tests.mock_command import MockCommand
-from cmd_modules import cmd_ping
-from receiver import receive_command
+from bot.tests.mock_command import MockCommand
+from bot.cmd_modules import cmd_ping
+from bot.receiver import receive_command
 
 @pytest.mark.asyncio
 async def test_ping():

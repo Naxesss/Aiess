@@ -1,5 +1,8 @@
-from commands import Command, register
-from subscriber import unsubscribe
+import sys
+sys.path.append('..')
+
+from bot.commands import Command, register
+from bot.subscriber import unsubscribe
 
 @register("unsub")
 async def cmd_ping(command: Command):

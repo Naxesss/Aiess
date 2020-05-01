@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 import discord
 from discord import Message
 import asyncio
@@ -6,13 +9,12 @@ import aiess
 from aiess import Event
 from aiess.logger import log
 
-from settings import API_KEY
-import receiver
-import subscriber
-from database import database
-from subscriptions import Subscription
-from formatter import format_link, format_embed
-from cmd_modules import *
+from bot.settings import API_KEY
+from bot import receiver, subscriber
+from bot.subscriptions import Subscription
+from bot.database import database
+from bot.formatter import format_link, format_embed
+from bot.cmd_modules import *
 
 subscriber.load()
 

@@ -1,11 +1,15 @@
+import sys
+sys.path.append('..')
+
 from typing import List
 from discord import TextChannel
 
 from aiess import Event
 
-from database import Database, database
-from subscriptions import Subscription
-from filterer import passes_filter, dissect
+from bot.subscriptions import Subscription
+from bot.database import Database
+from bot.database import database
+from bot.filterer import passes_filter, dissect
 
 cache: List[Subscription] = []
 

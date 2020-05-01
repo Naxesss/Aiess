@@ -1,4 +1,7 @@
-from commands import Command
+import sys
+sys.path.append('..')
+
+from bot.commands import Command
 
 class MockGuild():
     def __init__(self, _id: int):

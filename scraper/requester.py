@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 from bs4 import BeautifulSoup
 from requests import Response
 from typing import Generator
@@ -9,9 +12,9 @@ from aiess.settings import PAGE_RATE_LIMIT
 from aiess.logger import log_err
 from aiess import event_types as types
 
-from parsers.beatmapset_event_parser import beatmapset_event_parser
-from parsers.discussion_event_parser import discussion_event_parser
-from parsers.discussion_parser import discussion_parser
+from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
+from scraper.parsers.discussion_event_parser import discussion_event_parser
+from scraper.parsers.discussion_parser import discussion_parser
 
 def request_page(url: str) -> Response:
     """Requests a response object using the page rate limit.

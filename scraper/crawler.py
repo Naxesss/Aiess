@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 from bs4 import BeautifulSoup
 from datetime import datetime
 from datetime import timedelta
@@ -7,10 +10,10 @@ from aiess.web import api
 from aiess.objects import Event, Discussion
 from aiess.database import database
 
-from requester import get_discussion_events, get_reply_events, get_beatmapset_events
-from requester import request_discussions_json, get_map_page_event_jsons
-import populator
-from parsers.discussion_parser import discussion_parser
+from scraper.requester import get_discussion_events, get_reply_events, get_beatmapset_events
+from scraper.requester import request_discussions_json, get_map_page_event_jsons
+from scraper.parsers.discussion_parser import discussion_parser
+from scraper import populator
 
 def get_all_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
     """Returns a generator of all events within the given time frame."""

@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 from bs4 import BeautifulSoup
 from typing import Generator
 from bs4.element import Tag
@@ -8,7 +11,7 @@ from aiess.errors import ParsingError, DeletedContextError
 from aiess import timestamp
 from aiess.logger import log_err
 
-from parsers.event_parser import EventParser
+from scraper.parsers.event_parser import EventParser
 
 class DiscussionEventParser(EventParser):
 

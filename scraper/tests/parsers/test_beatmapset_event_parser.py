@@ -1,10 +1,13 @@
+import sys
+sys.path.append('..')
+
 import pytest
 
 from aiess import timestamp
 
-from tests.mocks.events import nominate
-from tests.mocks.events.faulty import beatmapset_events
-from parsers.beatmapset_event_parser import beatmapset_event_parser
+from scraper.tests.mocks.events import nominate
+from scraper.tests.mocks.events.faulty import beatmapset_events
+from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
 
 def test_parse():
     generator = beatmapset_event_parser.parse(beatmapset_events.soup)

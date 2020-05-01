@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 from typing import Union, List, Generator, Tuple, Match
 import re
 

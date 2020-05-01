@@ -1,8 +1,12 @@
+import sys
+sys.path.append('..')
+
 import re as regex
 
 from discord import Message
 
-from commands import Command, registered_commands
+from bot.commands import Command
+from bot.commands import registered_commands
 
 async def receive(message: Message) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""

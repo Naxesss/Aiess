@@ -1,10 +1,13 @@
+import sys
+sys.path.append('..')
+
 from typing import Generator, Dict, List
 
 import aiess
 from aiess import Event, Beatmapset, User
 from aiess.reader import merge_concurrent
 
-from subscriptions import Subscription
+from bot.subscriptions import Subscription
 
 class Database(aiess.Database):
     """Creates an aiess_bot database connection, with methods to insert and retrieve subscriptions."""

@@ -1,12 +1,15 @@
-from bs4 import BeautifulSoup
+import sys
+sys.path.append('..')
+
 from typing import Generator
+from bs4 import BeautifulSoup
 from bs4.element import Tag
 
 from aiess.objects import Event, Beatmapset, Discussion, User
 from aiess.errors import DeletedContextError
 from aiess.logger import log_err
 
-from parsers.event_parser import EventParser
+from scraper.parsers.event_parser import EventParser
 
 class BeatmapsetEventParser(EventParser):
 

@@ -1,11 +1,14 @@
+import sys
+sys.path.append('..')
+
 import pytest
 from mysql.connector.errors import IntegrityError
 
 from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
 
-from database import Database
-from subscriptions import Subscription
+from bot.database import Database
+from bot.subscriptions import Subscription
 
 @pytest.fixture
 def test_database():

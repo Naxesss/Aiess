@@ -1,7 +1,10 @@
+import sys
+sys.path.append('..')
+
 from bs4 import BeautifulSoup
 from typing import Generator
 
-from aiess.objects import Discussion, Beatmapset, User
+from aiess import Discussion, Beatmapset, User
 
 class DiscussionParser():
 

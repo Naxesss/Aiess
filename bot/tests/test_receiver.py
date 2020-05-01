@@ -1,6 +1,8 @@
+import sys
+sys.path.append('..')
 
-from commands import Command
-from receiver import parse_command, receive_command
+from bot.commands import Command
+from bot.receiver import parse_command, receive_command
 
 def test_find_command():
     assert parse_command("+test") == Command("test")

@@ -1,4 +1,7 @@
-from commands import Command, register
+import sys
+sys.path.append('..')
+
+from bot.commands import Command, register
 
 @register("ping")
 async def cmd_ping(command: Command):

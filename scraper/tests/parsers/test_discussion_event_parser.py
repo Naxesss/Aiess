@@ -1,12 +1,15 @@
+import sys
+sys.path.append('..')
+
 import pytest
 
 from aiess import timestamp
 
-from tests.mocks.events import problem, reply
-from tests.mocks.events.faulty import discussion_events
-from tests.mocks import discussions_json
-from parsers.discussion_event_parser import discussion_event_parser
-import populator
+from scraper.tests.mocks.events import problem, reply
+from scraper.tests.mocks.events.faulty import discussion_events
+from scraper.tests.mocks import discussions_json
+from scraper.parsers.discussion_event_parser import discussion_event_parser
+from scraper import populator
 
 def test_parse_discussion_message():
     actual_content = discussion_event_parser.parse_discussion_message(problem.tag)

@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from datetime import datetime

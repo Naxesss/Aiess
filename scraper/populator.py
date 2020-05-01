@@ -1,4 +1,5 @@
-
+import sys
+sys.path.append('..')
 
 from aiess.objects import Discussion, Beatmapset, Event
 from aiess.errors import ParsingError
@@ -6,8 +7,8 @@ from aiess.database import database
 from aiess import timestamp
 from aiess import event_types as types
 
-from requester import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
-from parsers.discussion_parser import discussion_parser
+from scraper.requester import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
+from scraper.parsers.discussion_parser import discussion_parser
 
 cached_discussions_json = {}
 

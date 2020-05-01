@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 class Subscription():
     """Represents a channel subscription, containing channel identifying information as well as a filter.
     This allows for figuring out where to send data, as well as which data to send."""
