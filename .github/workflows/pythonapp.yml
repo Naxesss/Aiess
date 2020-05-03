@@ -32,6 +32,9 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
+      env:
+        OSU_API_KEY: ${{ secrets.OSU_API_KEY }}
+        ROOT_PATH: /home/runner/work/Aiess/Aiess
       run: |
         # ignore any tests which depend on the database
         pytest
