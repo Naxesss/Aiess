@@ -9,7 +9,13 @@ def request_api(request_type: str, query: str) -> object:
     request = f"https://osu.ppy.sh/api/{request_type}?{query}&k={API_KEY}"
     response = request_with_rate_limit(request, API_RATE_LIMIT, "api")
     try:
-        return json.loads(response.text)
+        json_response = json.loads(response.text)
+        if "error" in json_response:
+            # e.g. "Please provide a valid API key." if it's incorrect.
+            error_str = json_response["error"]
+            raise ValueError(f"The osu! api responded with an error \"{error_str}\"")
+
+        return json_response
     except json.decoder.JSONDecodeError:
         # This happens whenever the response text is empty (e.g. "[]").
         return None
