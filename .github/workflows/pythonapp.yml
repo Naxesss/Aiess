@@ -33,4 +33,10 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        # ignore any tests which depend on the database
         pytest
+          --ignore=aiess/tests/test_database.py
+          --ignore=aiess/tests/test_reader.py
+          --ignore=bot/tests/test_database.py
+          --ignore=bot/tests/test_formatter.py
+          --ignore=bot/tests/test_subscriber.py
