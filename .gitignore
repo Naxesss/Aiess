@@ -7,9 +7,9 @@ htmlcov/
 .coverage
 
 # Specific instance details
-settings.py
 logs/
 time/
+.env
 
 # VS Code config
 .vscode
