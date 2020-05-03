@@ -1,0 +1,14 @@
+{
+    "api-key": "${OSU_API_KEY}",
+    "api-rate-limit": 1,
+    "page-rate-limit": 60,
+    "discord-api-key": "${DISCORD_API_KEY}",
+    "root-path": "${ROOT_PATH}",
+    "db-config":
+    {
+        "host": "localhost",
+        "database": "aiess",
+        "user": "root",
+        "password": "${DB_PASSWORD}"
+    }
+}
