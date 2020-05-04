@@ -23,7 +23,7 @@ jobs:
     - name: Setup database
       run: |
         sudo /etc/init.d/mysql start
-        mysql -h 127.0.0.1 -uroot -p"${{ secrets.DB_PASSWORD }}" < /home/runner/work/Aiess/Aiess/test_schema.sql
+        mysql -h 127.0.0.1 -uroot -p < /home/runner/work/Aiess/Aiess/test_schema.sql
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
