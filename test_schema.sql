@@ -1,0 +1,76 @@
+-- Subscription database
+CREATE DATABASE  IF NOT EXISTS `aiess_bot_test`;
+USE `aiess_bot_test`;
+
+DROP TABLE IF EXISTS `subscriptions`;
+CREATE TABLE `subscriptions` (
+  `guild_id` bigint(20) unsigned NOT NULL,
+  `channel_id` bigint(20) unsigned NOT NULL,
+  `filter` mediumtext NOT NULL,
+  PRIMARY KEY (`guild_id`,`channel_id`),
+  UNIQUE KEY `UNIQUE` (`channel_id`,`guild_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Event database
+CREATE DATABASE  IF NOT EXISTS `aiess_test`;
+USE `aiess_test`;
+
+DROP TABLE IF EXISTS `beatmapset_modes`;
+CREATE TABLE `beatmapset_modes` (
+  `beatmapset_id` bigint(20) unsigned NOT NULL,
+  `mode` varchar(20) NOT NULL,
+  PRIMARY KEY (`beatmapset_id`,`mode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DROP TABLE IF EXISTS `beatmapsets`;
+CREATE TABLE `beatmapsets` (
+  `id` bigint(20) unsigned NOT NULL,
+  `title` mediumtext,
+  `artist` mediumtext,
+  `creator_id` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `beatmapsetsfk_creator_id_idx` (`creator_id`),
+  CONSTRAINT `beatmapsetsfk_creator_id` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DROP TABLE IF EXISTS `discussions`;
+CREATE TABLE `discussions` (
+  `id` bigint(20) unsigned NOT NULL,
+  `beatmapset_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `content` mediumtext,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  KEY `discussionsfk_beatmapset_id_idx` (`beatmapset_id`),
+  KEY `discussionsfk_user_id_idx` (`user_id`),
+  CONSTRAINT `discussionsfk_beatmapset_id` FOREIGN KEY (`beatmapset_id`) REFERENCES `beatmapsets` (`id`),
+  CONSTRAINT `discussionsfk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DROP TABLE IF EXISTS `events`;
+CREATE TABLE `events` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `insert_time` datetime NOT NULL,
+  `time` datetime NOT NULL,
+  `type` varchar(64) NOT NULL,
+  `beatmapset_id` bigint(20) unsigned DEFAULT NULL,
+  `discussion_id` bigint(20) unsigned DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `content` mediumtext,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  KEY `eventsfk_beatmapset_id_idx` (`beatmapset_id`),
+  KEY `eventsfk_discussion_id_idx` (`discussion_id`),
+  KEY `eventsfk_user_id_idx` (`user_id`),
+  CONSTRAINT `eventsfk_beatmapset_id` FOREIGN KEY (`beatmapset_id`) REFERENCES `beatmapsets` (`id`),
+  CONSTRAINT `eventsfk_discussion_id` FOREIGN KEY (`discussion_id`) REFERENCES `discussions` (`id`),
+  CONSTRAINT `eventsfk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` bigint(20) unsigned NOT NULL,
+  `name` mediumtext,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
