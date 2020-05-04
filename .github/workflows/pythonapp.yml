@@ -9,6 +9,15 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+            - '8888:3306'
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
@@ -23,7 +32,7 @@ jobs:
     - name: Setup database
       run: |
         sudo /etc/init.d/mysql start
-        mysql -uroot -p"${{ secrets.DB_PASSWORD }}" < /home/runner/work/Aiess/Aiess/test_schema.sql
+        mysql -h 127.0.0.1 -uroot -p"${{ secrets.DB_PASSWORD }}" < /home/runner/work/Aiess/Aiess/test_schema.sql
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
