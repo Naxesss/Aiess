@@ -23,6 +23,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest requests discord.py mysql-connector-python
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Setup database
+      run: |
+        sudo /etc/init.d/mysql start
+        mysql -uroot -p"${{DB_PASSWORD}}" < /home/runner/work/Aiess/Aiess/test_schema.sql
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -34,10 +38,4 @@ jobs:
         OSU_API_KEY: ${{ secrets.OSU_API_KEY }}
         ROOT_PATH: /home/runner/work/Aiess/Aiess
       run: |
-        # ignore any tests which depend on the database
         pytest
-          --ignore=aiess/tests/test_database.py
-          --ignore=aiess/tests/test_reader.py
-          --ignore=bot/tests/test_database.py
-          --ignore=bot/tests/test_formatter.py
-          --ignore=bot/tests/test_subscriber.py
