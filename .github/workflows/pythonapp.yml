@@ -14,6 +14,8 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_USER: user
+          MYSQL_PASSWORD: pass
         ports:
             - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -31,7 +33,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Setup database
       run: |
-        mysql -h127.0.0.1 -P${{ job.services.mysql.ports['3306'] }} -uroot -p"{{ secrets.DB_PASSWORD }}" -e"SHOW DATABASES"
+        mysql -h127.0.0.1 -P${{ job.services.mysql.ports['3306'] }} -uuser -ppass -e"SHOW DATABASES"
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
