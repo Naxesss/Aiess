@@ -6,7 +6,7 @@
     "root-path": "${ROOT_PATH}",
     "db-config":
     {
-        "host": "localhost",
+        "host": "127.0.0.1",
         "database": "aiess",
         "user": "root",
         "password": "${DB_PASSWORD}"
