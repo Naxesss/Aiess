@@ -22,6 +22,14 @@ CREATE TABLE `beatmapset_modes` (
   PRIMARY KEY (`beatmapset_id`,`mode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` bigint(20) unsigned NOT NULL,
+  `name` mediumtext,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 DROP TABLE IF EXISTS `beatmapsets`;
 CREATE TABLE `beatmapsets` (
   `id` bigint(20) unsigned NOT NULL,
@@ -66,11 +74,3 @@ CREATE TABLE `events` (
   CONSTRAINT `eventsfk_discussion_id` FOREIGN KEY (`discussion_id`) REFERENCES `discussions` (`id`),
   CONSTRAINT `eventsfk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE `users` (
-  `id` bigint(20) unsigned NOT NULL,
-  `name` mediumtext,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
