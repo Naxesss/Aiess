@@ -15,7 +15,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
-            - '8888:3306'
+            - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
@@ -31,8 +31,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Setup database
       run: |
-        sudo /etc/init.d/mysql start
-        mysql -h127.0.0.1 --port=8888 -uroot -p"{{ secrets.DB_PASSWORD }}" < /home/runner/work/Aiess/Aiess/test_schema.sql
+        mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -uroot -p"{{ secrets.DB_PASSWORD }}" -e < /home/runner/work/Aiess/Aiess/test_schema.sql
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
