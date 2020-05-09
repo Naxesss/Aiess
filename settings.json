@@ -7,6 +7,7 @@
     "db-config":
     {
         "host": "127.0.0.1",
+        "port": "${DB_PORT}",
         "database": "aiess",
         "user": "root",
         "password": "${DB_PASSWORD}"
