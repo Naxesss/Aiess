@@ -31,8 +31,8 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Setup database
       run: |
-        mysql -h0.0.0.0 -P${{ job.services.mysql.ports['3306'] }} -uroot -p${{ secrets.DB_PASSWORD }} < /home/runner/work/Aiess/Aiess/test_schema.sql
-        mysql -h0.0.0.0 -P${{ job.services.mysql.ports['3306'] }} -uroot -p${{ secrets.DB_PASSWORD }} -e"SELECT host, user FROM mysql.user;"
+        mysql -h127.0.0.1 -P${{ job.services.mysql.ports['3306'] }} -uroot -p${{ secrets.DB_PASSWORD }} < /home/runner/work/Aiess/Aiess/test_schema.sql
+        mysql -h127.0.0.1 -P${{ job.services.mysql.ports['3306'] }} -uroot -p${{ secrets.DB_PASSWORD }} -e"SELECT host, user FROM mysql.user;"
         mysqld --verbose --help | grep bind-address
     - name: Lint with flake8
       run: |
