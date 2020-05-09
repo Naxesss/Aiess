@@ -24,10 +24,13 @@ def bot_test_database():
     database.clear_table_data("subscriptions")
     return database
 
-def test_correct_setup(test_bot_database):
-    assert not test_bot_database.retrieve_table_data("subscriptions")
+def test_correct_bot_db_setup(bot_test_database):
+    assert not bot_test_database.retrieve_table_data("subscriptions")
 
-def test_insert_retrieve_channel_sub(test_bot_database):
+def test_correct_scraper_db_setup(scraper_test_database):
+    assert not scraper_test_database.retrieve_table_data("events")
+
+def test_insert_retrieve_channel_sub(bot_test_database):
     sub1 = Subscription(guild_id=3, channel_id=1, _filter="type:problem and state:qualified")
     sub2 = Subscription(guild_id=3, channel_id=2, _filter="type:ranked")
 
