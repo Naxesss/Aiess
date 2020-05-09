@@ -3,7 +3,7 @@ sys.path.append('..')
 
 from aiess.objects import Discussion, Beatmapset, Event
 from aiess.errors import ParsingError
-from aiess.database import database
+from aiess.database import Database, SCRAPER_DB_NAME
 from aiess import timestamp
 from aiess import event_types as types
 
@@ -100,7 +100,7 @@ def __populate_additional_details(event: Event, discussions_json: object) -> Non
 
 def __complete_discussion_context(discussion: Discussion) -> bool:
     """Completes the context of the discussion from prior database entries, if present. Returns true if succeeded."""
-    cached_discussion = database.retrieve_discussion(f"id={discussion.id}")
+    cached_discussion = Database(SCRAPER_DB_NAME).retrieve_discussion(f"id={discussion.id}")
     if not cached_discussion:
         return False
     

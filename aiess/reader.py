@@ -2,8 +2,8 @@ from typing import Generator, List
 from datetime import datetime
 import asyncio
 
-from aiess.objects import Event
-from aiess.database import database
+from aiess import Event
+from aiess.database import Database, SCRAPER_DB_NAME
 from aiess import timestamp
 from aiess import event_types as types
 
@@ -24,7 +24,7 @@ class Reader():
     Use this by creating a class inheriting Reader, and override methods (e.g. on_event) as desired."""
     def __init__(self, reader_id: str):
         self.reader_id = reader_id
-        self.database = database
+        self.database = Database(SCRAPER_DB_NAME)
         self.running = False
 
     async def run(self) -> None:

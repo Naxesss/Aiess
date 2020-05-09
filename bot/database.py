@@ -9,10 +9,13 @@ from aiess.reader import merge_concurrent
 
 from bot.subscriptions import Subscription
 
+BOT_DB_NAME      = "aiess_bot"
+BOT_TEST_DB_NAME = "aiess_bot_test"
+
 class Database(aiess.Database):
     """Creates an aiess_bot database connection, with methods to insert and retrieve subscriptions."""
 
-    def __init__(self, _db_name:str="aiess_bot"):
+    def __init__(self, _db_name: str):
         self.beatmapset_event_cache: Dict[int, List[Event]] = {}
         self.last_type_cache: Dict[str, Event] = {}
         super().__init__(_db_name)
@@ -80,5 +83,3 @@ class Database(aiess.Database):
         (e.g. for retrieving all events related to a beatmapset)."""
         self.beatmapset_event_cache.clear()
         self.last_type_cache.clear()
-
-database = Database()

@@ -4,11 +4,11 @@ from typing import List, Tuple
 from datetime import datetime
 
 from aiess.objects import User, Beatmapset, Discussion, Event
-from aiess.database import Database
+from aiess.database import Database, SCRAPER_TEST_DB_NAME
 
 @pytest.fixture
 def test_database():
-    database = Database("aiess_test")
+    database = Database(SCRAPER_TEST_DB_NAME)
     # Reset database to state before any tests ran.
     database.clear_table_data("events")
     database.clear_table_data("discussions")

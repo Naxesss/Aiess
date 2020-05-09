@@ -7,21 +7,20 @@ from discord import TextChannel
 from aiess import Event
 
 from bot.subscriptions import Subscription
-from bot.database import Database
-from bot.database import database
+from bot.database import Database, BOT_DB_NAME
 from bot.filterer import passes_filter, dissect
 
 cache: List[Subscription] = []
 
-def load(_database: Database=None) -> None:
+def load(database: Database=None) -> None:
     """Retrieves all subscriptions from the database and appends them to the internal list."""
-    if not _database:
-        _database = database
+    if not database:
+        database = Database(BOT_DB_NAME)
 
     global cache
     cache = []
 
-    for sub in _database.retrieve_subscriptions():
+    for sub in database.retrieve_subscriptions():
         cache.append(sub)
 
 def subscribe(channel: TextChannel, _filter: str) -> None:
@@ -30,27 +29,27 @@ def subscribe(channel: TextChannel, _filter: str) -> None:
     sub = Subscription(channel.guild.id, channel.id, _filter)
     add_subscription(sub)
 
-def add_subscription(sub: Subscription, _database: Database=None) -> None:
+def add_subscription(sub: Subscription, database: Database=None) -> None:
     """Inserts a subscription into the subscription table of the database and reloads the cache.
     Causes any new events passing the filter to be sent to the channel."""
-    if not _database:
-        _database = database
+    if not database:
+        database = Database(BOT_DB_NAME)
 
-    _database.insert_subscription(sub)
-    load(_database)
+    database.insert_subscription(sub)
+    load(database)
 
 def unsubscribe(channel: TextChannel) -> None:
     """Deletes a channel and its filter from the subscription table of the database and reloads the cache."""
     sub = Subscription(channel.guild.id, channel.id, None)
     remove_subscription(sub)
 
-def remove_subscription(sub: Subscription, _database: Database=None) -> None:
+def remove_subscription(sub: Subscription, database: Database=None) -> None:
     """Deletes a subscription from the subscription table of the database and reloads the cache."""
-    if not _database:
-        _database = database
+    if not database:
+        database = Database(BOT_DB_NAME)
 
-    _database.delete_subscription(sub)
-    load(_database)
+    database.delete_subscription(sub)
+    load(database)
 
 async def forward(event: Event, client) -> None:
     """Attempts to forward an event through all subscription filters."""

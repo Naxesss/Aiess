@@ -8,6 +8,9 @@ from aiess.objects import User, Beatmapset, Discussion, Event
 from aiess.settings import DB_CONFIG
 from aiess.logger import log
 
+SCRAPER_DB_NAME      = "aiess"
+SCRAPER_TEST_DB_NAME = "aiess_test"
+
 class InterpolationDict(dict):
     def __missing__(self, key):
         return "%(" + key + ")s"
@@ -23,7 +26,7 @@ class Database:
         DISCUSSION_REPLIES = "discussion_replies"
         USERS = "users"
 
-    def __init__(self, _db_name="aiess"):
+    def __init__(self, _db_name: str):
         self.db_name = _db_name
         db_config = {
             "host": DB_CONFIG["host"],
@@ -333,5 +336,3 @@ class Database:
             user = self.retrieve_user(f"id={row[4]}" if row[4] else None)
             content = row[5]
             yield Event(_type, time, beatmapset, discussion, user, content=content)
-
-database = Database()
