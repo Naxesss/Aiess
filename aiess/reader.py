@@ -17,7 +17,7 @@ mergable_types = [
 ]
 
 class Reader():
-    """This constitutes an object from which a loop looking through new events in the database can be executed.
+    """This constitutes an object from which a loop, looking through new events in the database, can be executed.
     In this case, "new" refers to any event after the previously stored datetime in the respective file,
     named after the given identifier.
     
