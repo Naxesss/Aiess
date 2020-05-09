@@ -27,7 +27,7 @@ class Database:
         self.db_name = _db_name
         db_config = {
             "host": DB_CONFIG["host"],
-            "port": DB_CONFIG["port"],
+            "port": int(DB_CONFIG["port"]),
             "database": self.db_name,
             "user": DB_CONFIG["user"],
             "password": DB_CONFIG["password"]
