@@ -32,8 +32,6 @@ jobs:
     - name: Setup database
       run: |
         mysql -h127.0.0.1 -P${{ job.services.mysql.ports['3306'] }} -uroot -p${{ secrets.DB_PASSWORD }} < /home/runner/work/Aiess/Aiess/test_schema.sql
-        mysql -h127.0.0.1 -P${{ job.services.mysql.ports['3306'] }} -uroot -p${{ secrets.DB_PASSWORD }} -e"SELECT host, user FROM mysql.user;"
-        mysqld --verbose --help | grep bind-address
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
