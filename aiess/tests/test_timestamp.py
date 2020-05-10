@@ -1,12 +1,14 @@
 from datetime import datetime
 import os
+from contextlib import suppress
 
 from aiess import timestamp
 
 def test_get_missing_created():
     time_id = "test_missing"
     expected_path = timestamp.get_path(time_id)
-    os.remove(expected_path)
+    with suppress(OSError):
+        os.remove(expected_path)
 
     assert not timestamp.exists(time_id)
     assert not os.path.exists(expected_path)
