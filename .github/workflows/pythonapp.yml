@@ -43,6 +43,6 @@ jobs:
         OSU_API_KEY: ${{ secrets.OSU_API_KEY }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_PORT: ${{ job.services.mysql.ports['3306'] }}
-        ROOT_PATH: /home/runner/work/Aiess/Aiess
+        ROOT_PATH: /home/runner/work/Aiess/Aiess/
       run: |
         pytest
