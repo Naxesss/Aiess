@@ -40,8 +40,6 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Codecov
       uses: codecov/codecov-action@v1.0.7
-      run: |
-        codecov
     - name: Test with pytest
       env:
         OSU_API_KEY: ${{ secrets.OSU_API_KEY }}
@@ -50,3 +48,6 @@ jobs:
         ROOT_PATH: /home/runner/work/Aiess/Aiess/
       run: |
         pytest
+    - name: Run codecov
+      run: |
+        codecov
