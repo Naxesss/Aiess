@@ -8,6 +8,7 @@ from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
 from aiess.database import SCRAPER_TEST_DB_NAME
 
+from bot import database as db_module
 from bot.database import Database
 from bot.formatter import format_link
 from bot.formatter import format_embed
@@ -52,6 +53,7 @@ def kudosu_gain_event():
 def test_database():
     database = Database(SCRAPER_TEST_DB_NAME)
     database.clear_table_data("events")
+    db_module.clear_cache(SCRAPER_TEST_DB_NAME)
     return database
 
 def test_format_link_discussion(suggestion_event):
