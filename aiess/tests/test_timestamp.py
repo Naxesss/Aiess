@@ -6,6 +6,7 @@ from aiess import timestamp
 def test_get_missing_created():
     time_id = "test_missing"
     expected_path = timestamp.get_path(time_id)
+    os.remove(expected_path)
 
     assert not timestamp.exists(time_id)
     assert not os.path.exists(expected_path)
