@@ -31,9 +31,10 @@ def reader():
     temp_reader.database.clear_table_data("events")
     return temp_reader
 
-def test_file_created(reader):
+@pytest.mark.asyncio
+async def test_file_created(reader):
     expected_id = reader._Reader__time_id()
-    reader._Reader__push_new_events()
+    await reader._Reader__push_new_events()
 
     assert "test" in expected_id
     assert timestamp.exists(expected_id)
