@@ -66,5 +66,5 @@ CREATE TABLE `events` (
   `user_id` bigint(20) unsigned DEFAULT NULL,
   `content` mediumtext,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
