@@ -7,6 +7,7 @@ from aiess.objects import Beatmapset, Discussion
 from aiess.errors import ParsingError
 from aiess.tests.mocks.api import beatmap as mock_beatmap
 from aiess.tests.mocks.api import old_beatmap as mock_old_beatmap
+from aiess.database import SCRAPER_TEST_DB_NAME
 
 from scraper import populator
 
@@ -16,7 +17,7 @@ def test_old_discussion():
     
     # Can't obtain any discussion data from a beatmapset that doesn't have a discussion interface.
     with pytest.raises(ParsingError):
-        populator.get_complete_discussion_info(discussion, beatmapset)
+        populator.get_complete_discussion_info(discussion, beatmapset, db_name=SCRAPER_TEST_DB_NAME)
 
 def test_discussion():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
@@ -24,7 +25,7 @@ def test_discussion():
 
     # Some information will not be available until it is supplied by other sources
     # (e.g. discussion jsons, prior database entires, scraping)
-    discussion = populator.get_complete_discussion_info(discussion, beatmapset)
+    discussion = populator.get_complete_discussion_info(discussion, beatmapset, db_name=SCRAPER_TEST_DB_NAME)
 
     assert discussion.user.id == "4967662"
     assert discussion.user.name == "greenhue"

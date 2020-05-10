@@ -34,7 +34,9 @@ def get_discussions_json(discussion: Discussion, beatmapset: Beatmapset) -> obje
     
     return discussions_json
 
-def get_complete_discussion_info(discussion: Discussion, beatmapset: Beatmapset, discussions_json: object=None) -> Discussion:
+def get_complete_discussion_info(
+        discussion: Discussion, beatmapset: Beatmapset,
+        discussions_json: object=None, db_name: str=SCRAPER_DB_NAME) -> Discussion:
     """Returns a discussion with complete information from the beatmapset discussion json
     (e.g. user and content, neither of which are guaranteed)."""
     if not discussion or discussion.user != None and discussion.content != None:
@@ -43,7 +45,7 @@ def get_complete_discussion_info(discussion: Discussion, beatmapset: Beatmapset,
     if not discussions_json:
         # Discussions json is the quickest option, which is why we check this first.
         # The next quickest option is retrieving the complete info from the database, if it exists.
-        if __complete_discussion_context(discussion):
+        if __complete_discussion_context(discussion, db_name=db_name):
             return discussion
         
         discussions_json = get_discussions_json(discussion, beatmapset)
@@ -54,10 +56,10 @@ def get_complete_discussion_info(discussion: Discussion, beatmapset: Beatmapset,
         if other_discussion.id == discussion.id:
             return other_discussion
 
-def __populate_additional_details(event: Event, discussions_json: object) -> None:
+def __populate_additional_details(event: Event, discussions_json: object, db_name: str=SCRAPER_DB_NAME) -> None:
     """Populates additional details in the given event from the beatmapset discussion json (e.g. who voted)."""
     if event.discussion and (not event.discussion.user or not event.discussion.content):
-        if not __complete_discussion_context(event.discussion):
+        if not __complete_discussion_context(event.discussion, db_name=db_name):
             # After being deleted, many properties of discussions are inaccessible without referring to cached information.
             # Without cached information, we skip the event, since this its context is no longer visible to the public anyway.
             event.marked_for_deletion = True
@@ -98,9 +100,9 @@ def __populate_additional_details(event: Event, discussions_json: object) -> Non
                     beatmapset_json)
                 event.user = issue_reopener
 
-def __complete_discussion_context(discussion: Discussion) -> bool:
+def __complete_discussion_context(discussion: Discussion, db_name: str=SCRAPER_DB_NAME) -> bool:
     """Completes the context of the discussion from prior database entries, if present. Returns true if succeeded."""
-    cached_discussion = Database(SCRAPER_DB_NAME).retrieve_discussion(f"id={discussion.id}")
+    cached_discussion = Database(db_name).retrieve_discussion(f"id={discussion.id}")
     if not cached_discussion:
         return False
     
