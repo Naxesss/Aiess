@@ -16,6 +16,9 @@ def get_last(id: str=None) -> datetime:
     # In any other case we should throw an exception if data is missing (e.g. corruption due to power loss),
     # to prevent silent failure.
     path = get_path(id)
+    if not os.path.exists(path):
+        os.makedirs(path)
+    
     if not exists(id):
         with open(path, "w") as _file:
             _file.write(to_string(datetime.utcnow()))
@@ -31,7 +34,11 @@ def get_last(id: str=None) -> datetime:
 
 def set_last(new_datetime: datetime, id: str=None) -> None:
     """Sets the last datetime we're done with for this id. Creates the respective file if it does not exist."""
-    with open(get_path(id), "w") as _file:
+    path = get_path(id)
+    if not os.path.exists(path):
+        os.makedirs(path)
+    
+    with open(path, "w") as _file:
         _file.write(to_string(new_datetime))
 
 def exists(id: str=None) -> bool:
