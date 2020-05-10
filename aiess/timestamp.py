@@ -15,10 +15,10 @@ def get_last(id: str=None) -> datetime:
     # Only in cases where the file does not already exist do we want to create and initialize one.
     # In any other case we should throw an exception if data is missing (e.g. corruption due to power loss),
     # to prevent silent failure.
-    path = get_path(id)
-    if not os.path.exists(path):
-        os.makedirs(path)
+    if not os.path.exists(get_dir_path(id)):
+        os.makedirs(get_dir_path(id))
     
+    path = get_path(id)
     if not exists(id):
         with open(path, "w") as _file:
             _file.write(to_string(datetime.utcnow()))
@@ -34,11 +34,10 @@ def get_last(id: str=None) -> datetime:
 
 def set_last(new_datetime: datetime, id: str=None) -> None:
     """Sets the last datetime we're done with for this id. Creates the respective file if it does not exist."""
-    path = get_path(id)
-    if not os.path.exists(path):
-        os.makedirs(path)
+    if not os.path.exists(get_dir_path(id)):
+        os.makedirs(get_dir_path(id))
     
-    with open(path, "w") as _file:
+    with open(get_path(id), "w") as _file:
         _file.write(to_string(new_datetime))
 
 def exists(id: str=None) -> bool:
@@ -49,6 +48,11 @@ def get_path(id: str=None) -> str:
     """Returns the path to the event time file with the given identifier."""
     global PATH_PREFIX, FILE_NAME_PREFIX, FILE_NAME_POSTFIX
     return f"{PATH_PREFIX}{FILE_NAME_PREFIX}{id}{FILE_NAME_POSTFIX}"
+
+def get_dir_path(id: str=None) -> str:
+    """Returns the path to the event time file with the given identifier."""
+    global PATH_PREFIX
+    return f"{PATH_PREFIX}"
 
 def to_string(_datetime: datetime) -> str:
     """Returns the ISO 8601 format (except timezone and microsecond values) of the given datetime."""
