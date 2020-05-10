@@ -6,6 +6,7 @@ from discord import Embed
 
 from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
+from aiess.database import SCRAPER_TEST_DB_NAME
 
 from bot.database import Database
 from bot.formatter import format_link
@@ -49,7 +50,7 @@ def kudosu_gain_event():
 
 @pytest.fixture
 def test_database():
-    database = Database("aiess_test")
+    database = Database(SCRAPER_TEST_DB_NAME)
     database.clear_table_data("events")
     return database
 
