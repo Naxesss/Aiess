@@ -22,9 +22,9 @@ class Reader():
     named after the given identifier.
     
     Use this by creating a class inheriting Reader, and override methods (e.g. on_event) as desired."""
-    def __init__(self, reader_id: str):
+    def __init__(self, reader_id: str, db_name: str):
         self.reader_id = reader_id
-        self.database = Database(SCRAPER_DB_NAME)
+        self.database = Database(db_name)
         self.running = False
 
     async def run(self) -> None:

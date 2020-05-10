@@ -4,7 +4,7 @@ from typing import List
 import aiess
 from aiess import Event
 from aiess import timestamp
-from aiess.database import Database
+from aiess.database import Database, SCRAPER_TEST_DB_NAME
 from aiess.reader import merge_concurrent
 
 received_events = []
@@ -12,8 +12,7 @@ received_event_batches = []
 
 class Reader(aiess.Reader):
     def __init__(self, reader_id: str):
-        super().__init__(reader_id)
-        self.database = Database("aiess_test")
+        super().__init__(reader_id, db_name=SCRAPER_TEST_DB_NAME)
     
     async def on_events(self, events: List[Event]):
         received_event_batches.append(events)
