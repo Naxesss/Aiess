@@ -50,7 +50,7 @@ class Reader(aiess.Reader):
         log(event, postfix=self.reader_id)
         await subscriber.forward(event, self.client)
 
-reader = Reader("bot")
+reader = Reader("bot", db_name=BOT_DB_NAME)
 
 client = Client(reader)
 client.run(API_KEY)
