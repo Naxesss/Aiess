@@ -69,8 +69,5 @@ CREATE TABLE `events` (
   UNIQUE KEY `id_UNIQUE` (`id`),
   KEY `eventsfk_beatmapset_id_idx` (`beatmapset_id`),
   KEY `eventsfk_discussion_id_idx` (`discussion_id`),
-  KEY `eventsfk_user_id_idx` (`user_id`),
-  CONSTRAINT `eventsfk_beatmapset_id` FOREIGN KEY (`beatmapset_id`) REFERENCES `beatmapsets` (`id`),
-  CONSTRAINT `eventsfk_discussion_id` FOREIGN KEY (`discussion_id`) REFERENCES `discussions` (`id`),
-  CONSTRAINT `eventsfk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  KEY `eventsfk_user_id_idx` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
