@@ -67,7 +67,4 @@ CREATE TABLE `events` (
   `content` mediumtext,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
-  KEY `eventsfk_beatmapset_id_idx` (`beatmapset_id`),
-  KEY `eventsfk_discussion_id_idx` (`discussion_id`),
-  KEY `eventsfk_user_id_idx` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
