@@ -8,6 +8,7 @@ from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
 from aiess.database import SCRAPER_TEST_DB_NAME
 
+from bot import database as db_module
 from bot.database import Database, BOT_TEST_DB_NAME
 from bot.subscriptions import Subscription
 
@@ -16,19 +17,25 @@ def scraper_test_database():
     database = Database(SCRAPER_TEST_DB_NAME)
     # Reset database to state before any tests ran.
     database.clear_table_data("events")
+    db_module.clear_cache(SCRAPER_TEST_DB_NAME)
     return database
 
 @pytest.fixture
 def bot_test_database():
     database = Database(BOT_TEST_DB_NAME)
     database.clear_table_data("subscriptions")
+    db_module.clear_cache(BOT_TEST_DB_NAME)
     return database
 
 def test_correct_bot_db_setup(bot_test_database):
     assert not bot_test_database.retrieve_table_data("subscriptions")
+    assert not db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME]
+    assert not db_module.last_type_cache[SCRAPER_TEST_DB_NAME]
 
 def test_correct_scraper_db_setup(scraper_test_database):
     assert not scraper_test_database.retrieve_table_data("events")
+    assert not db_module.beatmapset_event_cache[BOT_TEST_DB_NAME]
+    assert not db_module.last_type_cache[BOT_TEST_DB_NAME]
 
 def test_insert_retrieve_channel_sub(bot_test_database):
     sub1 = Subscription(guild_id=3, channel_id=1, _filter="type:problem and state:qualified")
