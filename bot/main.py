@@ -12,7 +12,8 @@ from aiess.logger import log
 from bot.settings import API_KEY
 from bot import receiver, subscriber
 from bot.subscriptions import Subscription
-from bot.database import database
+from bot import database
+from bot.database import BOT_DB_NAME
 from bot.formatter import format_link, format_embed
 from bot.cmd_modules import *
 
@@ -43,7 +44,7 @@ class Reader(aiess.Reader):
     
     async def on_events(self, events):
         # This is called before any on_event for each batch.
-        database.clear_cache()
+        database.clear_cache(BOT_DB_NAME)
 
     async def on_event(self, event: Event):
         log(event, postfix=self.reader_id)

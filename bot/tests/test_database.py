@@ -82,10 +82,10 @@ def test_retrieve_beatmapset_events_cache(scraper_test_database):
     
     scraper_test_database.retrieve_beatmapset_events(beatmapset)
     qual_event.user = nom2_event.user
-    assert scraper_test_database.beatmapset_event_cache["3"] == [qual_event, nom_event]
+    assert db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME]["3"] == [qual_event, nom_event]
 
-    scraper_test_database.clear_cache()
-    assert not scraper_test_database.beatmapset_event_cache
+    db_module.clear_cache(SCRAPER_TEST_DB_NAME)
+    assert not db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME]
 
 def test_retrieve_last_type(scraper_test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
@@ -113,10 +113,10 @@ def test_retrieve_last_type_cache(scraper_test_database):
     scraper_test_database.insert_event(nom_event)
 
     scraper_test_database.retrieve_last_type(nominator, beatmapset, "type = \"praise\"")
-    assert f"{nominator.id}-{beatmapset.id}-type = \"praise\"" in scraper_test_database.last_type_cache
+    assert f"{nominator.id}-{beatmapset.id}-type = \"praise\"" in db_module.last_type_cache[SCRAPER_TEST_DB_NAME]
 
-    scraper_test_database.clear_cache()
-    assert not scraper_test_database.last_type_cache
+    db_module.clear_cache(SCRAPER_TEST_DB_NAME)
+    assert not db_module.last_type_cache[SCRAPER_TEST_DB_NAME]
 
 def test_retrieve_last_type_none(scraper_test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
