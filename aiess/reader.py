@@ -97,7 +97,8 @@ def merge_concurrent(events: List[Event]) -> List[Event]:
     (e.g. user nominates + system qualifies -> user qualifies)."""
     for event in events:
         for other_event in events:
-            if event.time != other_event.time:
+            # The system event is rarely 1 second late, hence the leniency.
+            if abs((event.time - other_event.time).total_seconds()) > 1:
                 continue
 
             if (event.type, other_event.type) in mergable_types:
