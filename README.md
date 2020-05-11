@@ -1,5 +1,5 @@
 # Aiess
-![Python Tests](https://github.com/Naxesss/Aiess/workflows/Python%20Tests/badge.svg) [![codecov](https://codecov.io/gh/Naxesss/Aiess/branch/master/graph/badge.svg)](https://codecov.io/gh/Naxesss/Aiess)
+![tests](https://github.com/Naxesss/Aiess/workflows/tests/badge.svg) [![codecov](https://codecov.io/gh/Naxesss/Aiess/branch/master/graph/badge.svg)](https://codecov.io/gh/Naxesss/Aiess)
 
 Aiess is a web scraper which gathers and stores event data from the [osu! website](https://osu.ppy.sh). This mainly concerns events related to the [beatmap ranking procedure](https://osu.ppy.sh/help/wiki/Beatmap_ranking_procedure), such as suggestions, nominations, and disqualifications. The purpose of Aiess is to grant third-party access to this flow of information, allowing for webhook feeds, statistical analysis, and performance evaluations.
 
