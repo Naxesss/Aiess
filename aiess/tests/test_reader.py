@@ -2,7 +2,7 @@ import pytest
 from typing import List
 
 import aiess
-from aiess import Event
+from aiess import Event, User
 from aiess import timestamp
 from aiess.database import Database, SCRAPER_TEST_DB_NAME
 from aiess.reader import merge_concurrent
@@ -110,7 +110,7 @@ async def test_on_event(reader):
     assert received_events == [event1, event2]
 
 def test_merge_concurrent():
-    event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 05:00:00"))
+    event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 05:00:00"), user=User(1, "someone"))
     event2 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 05:00:00"))
     event3 = Event(_type="something else", time=timestamp.from_string("2020-01-01 07:00:00"))
 
@@ -121,7 +121,7 @@ def test_merge_concurrent():
     assert merged_events[1] == event3
 
 def test_merge_concurrent_different_times():
-    event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 11:00:00"))
+    event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 11:00:00"), user=User(1, "someone"))
     event2 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 13:00:00"))
 
     merged_events = merge_concurrent([event1, event2])
