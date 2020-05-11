@@ -42,7 +42,7 @@ def request_soup(url: str) -> BeautifulSoup:
 
 
 
-def request_beatmapset_events(page: int=1) -> BeautifulSoup:
+def request_beatmapset_events(page: int=1, limit: int=50) -> BeautifulSoup:
     """Requests the beatmapset events page as a BeautifulSoup object. Only certain events are queried."""
     # This way if events are added we ignore them until we've properly supported them.
     event_types = [
@@ -56,9 +56,9 @@ def request_beatmapset_events(page: int=1) -> BeautifulSoup:
     for _type in map(lambda _type: _type.replace("-", "_"), event_types):
         type_query += f"&types[]={_type}"
     
-    return request_soup(f"https://osu.ppy.sh/beatmapsets/events?page={page}&limit=50{type_query}")
+    return request_soup(f"https://osu.ppy.sh/beatmapsets/events?page={page}&limit={limit}{type_query}")
 
-def request_discussion_events(page: int=1) -> BeautifulSoup:
+def request_discussion_events(page: int=1, limit: int=50) -> BeautifulSoup:
     """Requests the discussion events page as a BeautifulSoup object."""
     event_types = [types.SUGGESTION, types.PROBLEM, types.NOTE, types.PRAISE, types.HYPE]
 
@@ -66,25 +66,25 @@ def request_discussion_events(page: int=1) -> BeautifulSoup:
     for _type in map(lambda _type: _type.replace("-", "_"), event_types):
         type_query += f"&message_types[]={_type}"
     
-    return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussions?page={page}&limit=50{type_query}")
+    return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussions?page={page}&limit={limit}{type_query}")
 
-def request_reply_events(page: int=1) -> BeautifulSoup:
+def request_reply_events(page: int=1, limit: int=50) -> BeautifulSoup:
     """Requests the discussion reply events page as a BeautifulSoup object."""
-    return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussion-posts?page={page}&limit=50")
+    return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussion-posts?page={page}&limit={limit}")
 
 
 
-def get_beatmapset_events(page: int=1) -> Generator[Event, None, None]:
+def get_beatmapset_events(page: int=1, limit: int=50) -> Generator[Event, None, None]:
     """Returns a generator of Event objects from the beatmapset events page. Newer events are yielded first."""
-    return beatmapset_event_parser.parse(request_beatmapset_events(page))
+    return beatmapset_event_parser.parse(request_beatmapset_events(page, limit))
 
-def get_discussion_events(page: int=1) -> Generator[Event, None, None]:
+def get_discussion_events(page: int=1, limit: int=50) -> Generator[Event, None, None]:
     """Returns a generator of Event objects from the discussion events page. Newer events are yielded first."""
-    return discussion_event_parser.parse(request_discussion_events(page))
+    return discussion_event_parser.parse(request_discussion_events(page, limit))
 
-def get_reply_events(page: int=1) -> Generator[Event, None, None]:
+def get_reply_events(page: int=1, limit: int=50) -> Generator[Event, None, None]:
     """Returns a generator of Event objects from the discussion reply events page. Newer events are yielded first."""
-    return discussion_event_parser.parse(request_reply_events(page))
+    return discussion_event_parser.parse(request_reply_events(page, limit))
 
 
 
