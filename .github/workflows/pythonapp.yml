@@ -46,7 +46,7 @@ jobs:
         ROOT_PATH: /home/runner/work/Aiess/Aiess/
       run: |
         pytest --cov=./ --cov-report=xml
-    - name: Codecov
+    - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1.0.7
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
