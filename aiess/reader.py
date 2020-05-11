@@ -101,6 +101,10 @@ def merge_concurrent(events: List[Event]) -> List[Event]:
             if abs((event.time - other_event.time).total_seconds()) > 1:
                 continue
 
+            # System events always happen on the same beatmapset the event took place.
+            if event.beatmapset != other_event.beatmapset:
+                continue
+
             if (event.type, other_event.type) in mergable_types:
                 # Former event has all properties the second does and more,
                 # and is represented better having the type of the latter.
