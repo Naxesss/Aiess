@@ -2,7 +2,7 @@ import pytest
 from typing import List
 
 import aiess
-from aiess import Event, User
+from aiess import Event, Beatmapset, User
 from aiess import timestamp
 from aiess.database import Database, SCRAPER_TEST_DB_NAME
 from aiess.reader import merge_concurrent
@@ -123,6 +123,26 @@ def test_merge_concurrent():
 def test_merge_concurrent_different_times():
     event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 11:00:00"), user=User(1, "someone"))
     event2 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 13:00:00"))
+
+    merged_events = merge_concurrent([event1, event2])
+    assert len(merged_events) == 2
+    assert merged_events[0] == event1
+    assert merged_events[1] == event2
+
+def test_merge_concurrent_1_second_off():
+    event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 13:00:00"), user=User(1, "someone"))
+    event2 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 13:00:01"))
+
+    merged_events = merge_concurrent([event1, event2])
+    assert len(merged_events) == 1
+    assert merged_events[0].type == event2.type
+    assert merged_events[0].user == event1.user
+
+def test_merge_concurrent_different_beatmapsets():
+    beatmapset1 = Beatmapset(1, "artist", "title", User(1, "someone"), modes=["osu"])
+    beatmapset2 = Beatmapset(2, "artist", "title", User(2, "sometwo"), modes=["osu"])
+    event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 13:00:00"), beatmapset=beatmapset1, user=User(1, "someone"))
+    event2 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 13:00:01"), beatmapset=beatmapset2)
 
     merged_events = merge_concurrent([event1, event2])
     assert len(merged_events) == 2
