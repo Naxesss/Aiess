@@ -8,12 +8,12 @@ import asyncio
 import aiess
 from aiess import Event
 from aiess.logger import log
+from aiess.database import SCRAPER_DB_NAME
 
 from bot.settings import API_KEY
 from bot import receiver, subscriber
 from bot.subscriptions import Subscription
 from bot import database
-from bot.database import BOT_DB_NAME
 from bot.formatter import format_link, format_embed
 from bot.cmd_modules import *
 
@@ -44,13 +44,13 @@ class Reader(aiess.Reader):
     
     async def on_events(self, events):
         # This is called before any on_event for each batch.
-        database.clear_cache(BOT_DB_NAME)
+        database.clear_cache(SCRAPER_DB_NAME)
 
     async def on_event(self, event: Event):
         log(event, postfix=self.reader_id)
         await subscriber.forward(event, self.client)
 
-reader = Reader("bot", db_name=BOT_DB_NAME)
+reader = Reader("bot", db_name=SCRAPER_DB_NAME)
 
 client = Client(reader)
 client.run(API_KEY)
