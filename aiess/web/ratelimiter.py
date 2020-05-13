@@ -32,10 +32,13 @@ def request_with_retry(request_url, max_attempts=None) -> Response:
     while True:
         try:
             return requests.get(request_url)
-        except (ConnectionError, gaierror) as err:
+        except (ConnectionError, TimeoutError, gaierror) as err:
             if err is gaierror:
                 # `gaierror` is raised if getaddrinfo() fails (e.g. request_url is something like "/beatmapsets/...").
                 raise ValueError(f"The request to url \"{request_url}\" is invalid.")
+
+            if err is TimeoutError:
+                raise ValueError(f"The request to url \"{request_url}\" timed out.")
             
             log_err(f"WARNING | ConnectionError was raised on GET \"{request_url}\", retrying...")
             attempts += 1
