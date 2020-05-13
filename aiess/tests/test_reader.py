@@ -148,3 +148,15 @@ def test_merge_concurrent_different_beatmapsets():
     assert len(merged_events) == 2
     assert merged_events[0] == event1
     assert merged_events[1] == event2
+
+def test_merge_concurrent_duplicates():
+    nom_event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 05:00:00"), user=User(1, "someone"))
+    nom_event2 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 05:00:00"), user=User(1, "someone"))
+    nom_event3 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 05:00:00"), user=User(1, "someone"))
+    qual_event1 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 05:00:00"))
+    qual_event2 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 05:00:00"))
+
+    merged_events = merge_concurrent([nom_event1, nom_event2, nom_event3, qual_event1, qual_event2])
+    assert len(merged_events) == 1
+    assert merged_events[0].type == qual_event1.type
+    assert merged_events[0].user == nom_event1.user
