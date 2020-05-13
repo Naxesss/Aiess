@@ -7,7 +7,7 @@ from time import sleep
 
 from aiess import timestamp, logger
 from aiess.logger import log
-from aiess.database import database
+from aiess.database import Database, SCRAPER_DB_NAME
 
 from scraper.crawler import get_all_events_between
 
@@ -54,6 +54,7 @@ def last_updated(current_time) -> None:
     timestamp.set_last(current_time, "events")
 
 logger.init(init_time_str)
+database = Database(SCRAPER_DB_NAME)
 while(True):
     loop()
     sleep(60)
