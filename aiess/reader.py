@@ -48,8 +48,7 @@ class Reader():
         Updates the last stored datetime to the current time afterwards."""
         last_time = timestamp.get_last(self.__time_id())
 
-        # Complete this in steps rather than all at once to preserve memory and time, hence 1 hour intervals.
-        current_time = await self.__push_events_between(last_time, last_time + timedelta(hours=1))
+        current_time = await self.__push_events_between(last_time, datetime.utcnow())
         
         if current_time:
             timestamp.set_last(current_time, self.__time_id())
