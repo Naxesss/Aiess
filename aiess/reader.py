@@ -1,6 +1,8 @@
 from typing import Generator, List
 from datetime import datetime, timedelta
+import itertools
 import asyncio
+import copy
 
 from aiess import Event
 from aiess.database import Database, SCRAPER_DB_NAME
@@ -96,20 +98,22 @@ class Reader():
 def merge_concurrent(events: List[Event]) -> List[Event]:
     """Returns a list of events where certain types of events are combined if they happened together
     (e.g. user nominates + system qualifies -> user qualifies)."""
-    for event in events:
-        for other_event in events:
-            # The system event is rarely 1 second late, hence the leniency.
-            if abs((event.time - other_event.time).total_seconds()) > 1:
-                continue
+    # Casting to set ensures any duplicate events in the db are filtered.
+    # This is copied such that any modification we make to this list won't affect the original references.
+    new_events = set(copy.deepcopy(events))
 
-            # System events always happen on the same beatmapset the event took place.
-            if event.beatmapset != other_event.beatmapset:
-                continue
+    for event, other_event in itertools.permutations(new_events, 2):
+        # The system event is rarely 1 second late, hence the leniency.
+        if abs((event.time - other_event.time).total_seconds()) > 1:
+            continue
 
-            if (event.type, other_event.type) in mergable_types:
-                # Former event has all properties the second does and more,
-                # and is represented better having the type of the latter.
-                event.type = other_event.type
-                other_event.marked_for_deletion = True
+        if event.beatmapset != other_event.beatmapset:
+            continue
 
-    return list(filter(lambda event: not event.marked_for_deletion, events))
+        if (event.type, other_event.type) in mergable_types:
+            # Former event has all properties the second does and more,
+            # and is represented better having the type of the latter.
+            event.type = other_event.type
+            new_events.remove(other_event)
+
+    return list(sorted(new_events, key=lambda event: event.time))
