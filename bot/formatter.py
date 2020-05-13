@@ -181,6 +181,13 @@ def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Dat
 
     long_history = ""
     for event in events:
+        # Some nomination events seem to be missing a user.
+        if not event.user:
+            if event.discussion and event.discussion.user:
+                event.user = event.discussion.user
+            else:
+                raise ValueError("Nomination event has no user.")
+
         long_history = (
             f"{type_props[event.type].emoji} [{event.user}](https://osu.ppy.sh/users/{event.user.id})" +
             (" " if long_history else "") +
