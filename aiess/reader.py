@@ -113,6 +113,7 @@ def merge_concurrent(events: List[Event]) -> List[Event]:
             # Former event has all properties the second does and more,
             # and is represented better having the type of the latter.
             event.type = other_event.type
-            new_events.remove(other_event)
+            if other_event in new_events:
+                new_events.remove(other_event)
 
     return list(sorted(new_events, key=lambda event: event.time))
