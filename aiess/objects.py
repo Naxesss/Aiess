@@ -22,10 +22,19 @@ class User:
     def __str__(self) -> str:
         return self.name if self.name != None else str(self.id)
     
+    def __key(self) -> tuple:
+        return (
+            self.id,
+            self.name
+        )
+    
     def __eq__(self, other) -> bool:
         if type(self) != type(other):
             return False
-        return self.id == other.id and self.name == other.name
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())
 
 class Beatmapset:
     """Contains the beatmapset data requested from the api or supplied as a json object (e.g. artist, title, creator)."""
@@ -80,16 +89,22 @@ class Beatmapset:
                 mode_names.append(mode_name)
         return mode_names
     
+    def __key(self) -> tuple:
+        return (
+            self.id,
+            self.artist,
+            self.title,
+            self.creator,
+            tuple(self.modes)  # Cannot hash mutable types; list is mutable, tuple is immutable.
+        )
+    
     def __eq__(self, other) -> bool:
         if type(self) != type(other):
             return False
-        return (
-            self.id == other.id and
-            self.artist == other.artist and
-            self.title == other.title and
-            self.creator == other.creator and
-            self.modes == other.modes
-        )
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())
 
 class Discussion:
     """Contains the discussion data either supplied or further scraped (latter in case of e.g. disqualify or nomination_reset events)."""
@@ -99,15 +114,21 @@ class Discussion:
         self.user = user if user != None else None
         self.content = str(content) if content != None else None
     
+    def __key(self) -> tuple:
+        return (
+            self.id,
+            self.beatmapset,
+            self.user,
+            self.content
+        )
+    
     def __eq__(self, other) -> bool:
         if type(self) != type(other):
             return False
-        return (
-            self.id == other.id and
-            self.beatmapset == other.beatmapset and
-            self.user == other.user and
-            self.content == other.content
-        )
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())
 
 class Usergroup:
     """Contains the usergroup data (i.e id, name). Name is implied from id if not supplied."""
@@ -129,13 +150,19 @@ class Usergroup:
         """Returns the name of the given group id, or None if unrecognized."""
         return self.GROUP_NAMES[_id] if _id in self.GROUP_NAMES else None
     
+    def __key(self) -> tuple:
+        return (
+            self.id,
+            self.name
+        )
+
     def __eq__(self, other) -> bool:
         if type(self) != type(other):
             return False
-        return (
-            self.id == other.id and
-            self.name == other.name
-        )
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())
 
 class Event:
     """Contains the event data (i.e. type, time, mapset, discussion, user, group, content). 
@@ -163,15 +190,21 @@ class Event:
         
         return string
     
+    def __key(self) -> tuple:
+        return (
+            self.type,
+            self.time,
+            self.beatmapset,
+            self.discussion,
+            self.user,
+            self.group,
+            self.content
+        )
+
     def __eq__(self, other) -> bool:
         if type(self) != type(other):
             return False
-        return (
-            self.type == other.type and
-            self.time == other.time and
-            self.beatmapset == other.beatmapset and
-            self.discussion == other.discussion and
-            self.user == other.user and
-            self.group == other.group and
-            self.content == other.content
-        )
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())
