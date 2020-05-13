@@ -8,7 +8,6 @@ from typing import Generator, Callable, List
 
 from aiess.web import api
 from aiess.objects import Event, Discussion
-from aiess.database import database
 
 from scraper.requester import get_discussion_events, get_reply_events, get_beatmapset_events
 from scraper.requester import request_discussions_json, get_map_page_event_jsons
