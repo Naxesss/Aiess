@@ -97,9 +97,9 @@ class Reader():
 def merge_concurrent(events: List[Event]) -> List[Event]:
     """Returns a list of events where certain types of events are combined if they happened together
     (e.g. user nominates + system qualifies -> user qualifies)."""
-    # Casting to set ensures any duplicate events in the db are filtered.
+    # `dict.fromkeys` removes duplicates in the db, as keys in a dictonary are unique. We essentially merge same events.
     # This is copied such that any modification we make to this list won't affect the original references.
-    new_events = set(copy.deepcopy(events))
+    new_events = list(dict.fromkeys(copy.deepcopy(events)))
 
     for event, other_event in itertools.permutations(new_events, 2):
         # The system event is rarely 1 second late, hence the leniency.
@@ -116,4 +116,4 @@ def merge_concurrent(events: List[Event]) -> List[Event]:
             if other_event in new_events:
                 new_events.remove(other_event)
 
-    return list(sorted(new_events, key=lambda event: event.time))
+    return new_events
