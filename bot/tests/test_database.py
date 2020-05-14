@@ -47,7 +47,7 @@ def test_insert_retrieve_channel_sub(bot_test_database):
     retrieved_subs = bot_test_database.retrieve_subscriptions()
     assert next(retrieved_subs, None) == sub1
     assert next(retrieved_subs, None) == sub2
-    assert next(retrieved_subs, None) == None
+    assert next(retrieved_subs, None) is None
 
 def test_insert_retrieve_channel_sub_no_filter(bot_test_database):
     sub = Subscription(guild_id=1, channel_id=1, _filter=None)

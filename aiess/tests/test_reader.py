@@ -52,12 +52,12 @@ def test_events_between(reader):
     assert next(all_events, None) == event1
     assert next(all_events, None) == event2
     assert next(all_events, None) == event3
-    assert next(all_events, None) == None
+    assert next(all_events, None) is None
 
     latter_events = reader.events_between(timestamp.from_string("2020-01-01 06:00:00"), timestamp.from_string("2020-01-03 00:00:00"))
     assert next(latter_events, None) == event2
     assert next(latter_events, None) == event3
-    assert next(latter_events, None) == None
+    assert next(latter_events, None) is None
 
 def test_events_between_greater_than(reader):
     event1 = Event(_type="test", time=timestamp.from_string("2020-01-01 05:00:00"))
@@ -69,7 +69,7 @@ def test_events_between_greater_than(reader):
     # If we resume at 05:00:00, the event at exactly 05:00:00 should be ignored.
     events = reader.events_between(timestamp.from_string("2020-01-01 05:00:00"), timestamp.from_string("2020-01-01 07:00:00"))
     assert next(events, None) == event2
-    assert next(events, None) == None
+    assert next(events, None) is None
 
 @pytest.mark.asyncio
 async def test_on_events(reader):

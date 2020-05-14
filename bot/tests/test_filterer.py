@@ -111,19 +111,19 @@ def test_split_unescaped():
     generator = split_unescaped("type:\"One & two \"x | y\"\"&user:\"some two or three\"", ["&", "|", " or "])
     assert next(generator, None) == ("type:\"One & two \"x | y\"\"", "&")
     assert next(generator, None) == ("user:\"some two or three\"", None)
-    assert next(generator, None) == None
+    assert next(generator, None) is None
 
 def test_split_unescaped_special_quotes():
     generator = split_unescaped("type:“One & two “x | y””&user:“some two or three”", ["&", "|", " or "])
     assert next(generator, None) == ("type:“One & two “x | y””", "&")
     assert next(generator, None) == ("user:“some two or three”", None)
-    assert next(generator, None) == None
+    assert next(generator, None) is None
 
 def test_split_unescaped_long_delimiter():
     generator = split_unescaped("type:\"one and two\" and user:three", [" and "])
     assert next(generator, None) == ("type:\"one and two\"", " and ")
     assert next(generator, None) == ("user:three", None)
-    assert next(generator, None) == None
+    assert next(generator, None) is None
 
 def test_de_morgans_law():
     assert de_morgans_law("!(A | B & C)") == "(!A & (!B | !C))"

@@ -8,19 +8,19 @@ class User:
     """Contains the user data either requested from the api or directly supplied (i.e. id, name)."""
     def __init__(self, _id: str, name: str=None):
         self.id = str(_id)
-        if name != None:
+        if name is not None:
             # Cast for ease-of-use, e.g. with names consisting of just digits.
             self.name = str(name)
         else:
             user_json = api.request_user(_id)
-            if user_json != None:
+            if user_json is not None:
                 self.name = str(user_json["username"])
             else:
                 # User doesn't exist, likely restricted.
                 self.name = None
     
     def __str__(self) -> str:
-        return self.name if self.name != None else str(self.id)
+        return self.name if self.name is not None else str(self.id)
     
     def __key(self) -> tuple:
         return (
@@ -48,11 +48,11 @@ class Beatmapset:
     def __init__(self,
     _id: str, artist: str=None, title: str=None, creator: User=None, modes: List[str]=None,
     beatmapset_json: object=None):
-        if _id == None:
+        if _id is None:
             raise ValueError("Beatmapset id should not be None.")
 
         # No need to get the beatmap json if we already have all the data.
-        if artist == None or title == None or creator == None or modes == None:
+        if artist is None or title is None or creator is None or modes is None:
             if not beatmapset_json:
                 beatmapset_json = api.request_beatmapset(_id)
                 if not beatmapset_json:
@@ -62,13 +62,13 @@ class Beatmapset:
             beatmap_json = beatmapset_json[0]  # Assumes metadata is the same across the entire set.
 
         self.id = str(_id)
-        self.artist = str(artist) if artist != None else beatmap_json["artist"]
-        self.title = str(title) if title != None else beatmap_json["title"]
-        self.creator = creator if creator != None else User(
+        self.artist = str(artist) if artist is not None else beatmap_json["artist"]
+        self.title = str(title) if title is not None else beatmap_json["title"]
+        self.creator = creator if creator is not None else User(
             beatmap_json["creator_id"],
             beatmap_json["creator"])
         
-        self.modes = modes if modes != None else self.__get_modes(beatmapset_json)
+        self.modes = modes if modes is not None else self.__get_modes(beatmapset_json)
     
     def __str__(self) -> str:
         return f"{self.artist} - {self.title} (mapped by {self.creator}) {self.mode_str()}"
@@ -111,8 +111,8 @@ class Discussion:
     def __init__(self, _id: str, beatmapset: Beatmapset, user: User=None, content: str=None):
         self.id = str(_id)
         self.beatmapset = beatmapset
-        self.user = user if user != None else None
-        self.content = str(content) if content != None else None
+        self.user = user if user is not None else None
+        self.content = str(content) if content is not None else None
     
     def __key(self) -> tuple:
         return (
@@ -144,7 +144,7 @@ class Usergroup:
 
     def __init__(self, _id: str, name: str=None):
         self.id = str(_id)
-        self.name = name if name != None else self.__get_name(str(_id))
+        self.name = name if name is not None else self.__get_name(str(_id))
 
     def __get_name(self, _id: str) -> str:
         """Returns the name of the given group id, or None if unrecognized."""
@@ -175,7 +175,7 @@ class Event:
         self.discussion = discussion
         self.user = user
         self.group = group
-        self.content = str(content) if content != None else None
+        self.content = str(content) if content is not None else None
 
         # Occurs in cases where the event should not be logged.
         # e.g. discussion deleted but we don't have the discussion cached (no relevant information).

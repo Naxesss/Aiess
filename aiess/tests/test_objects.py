@@ -25,7 +25,7 @@ def test_user_restricted():
     user = User(1)
 
     assert user.id == "1"
-    assert user.name == None
+    assert user.name is None
     assert user.__str__() == "1"
 
 def test_user_int_name():

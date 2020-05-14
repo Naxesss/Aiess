@@ -221,8 +221,8 @@ class Database:
         # These will be missing when scraped from /events (e.g. disqualify, nomination_reset),
         # but should then be filled in through the respective /beatmap-discussions events before
         # being inserted into the database.
-        if discussion.user == None: self.__raise_missing("User is missing from discussion")
-        if discussion.content == None: self.__raise_missing("Content is missing from discussion")
+        if discussion.user is None: self.__raise_missing("User is missing from discussion")
+        if discussion.content is None: self.__raise_missing("Content is missing from discussion")
 
         self.insert_table_data(
             "discussions",
@@ -244,10 +244,10 @@ class Database:
                 insert_time=datetime.utcnow(),
                 time=event.time,
                 type=event.type,
-                beatmapset_id=event.beatmapset.id if event.beatmapset != None else None,
-                discussion_id=event.discussion.id if event.discussion != None else None,
-                user_id=event.user.id if event.user != None else None,
-                content=event.content if event.content != None else None))
+                beatmapset_id=event.beatmapset.id if event.beatmapset is not None else None,
+                discussion_id=event.discussion.id if event.discussion is not None else None,
+                user_id=event.user.id if event.user is not None else None,
+                content=event.content if event.content is not None else None))
     
     def retrieve_user(self, where_str: str) -> User:
         """Returns the first user from the database matching the given WHERE clause, or None if no such user is stored."""

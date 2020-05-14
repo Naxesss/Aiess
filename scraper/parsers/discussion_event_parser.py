@@ -56,12 +56,12 @@ class DiscussionEventParser(EventParser):
 
             # Reconstruct objects
             beatmapset = Beatmapset(beatmapset_id)
-            user = User(user_id, user_name) if user_id != None else None
+            user = User(user_id, user_name) if user_id is not None else None
             if _type == "reply":
                 # Replies should look up the discussion they are posted on.
-                discussion = Discussion(discussion_id, beatmapset) if discussion_id != None else None
+                discussion = Discussion(discussion_id, beatmapset) if discussion_id is not None else None
             else:
-                discussion = Discussion(discussion_id, beatmapset, user, content) if discussion_id != None else None
+                discussion = Discussion(discussion_id, beatmapset, user, content) if discussion_id is not None else None
         except DeletedContextError as err:
             log_err(err)
         else:
@@ -103,10 +103,10 @@ class DiscussionEventParser(EventParser):
 
             # Reconstruct objects
             beatmapset = Beatmapset(beatmapset_id)
-            user = User(user_id, user_name) if user_id != None else None
+            user = User(user_id, user_name) if user_id is not None else None
             # TODO: This portion is missing handling for replies, see the other method.
             # Still unclear which message_type replies use; will need to find out if/when replies get json formats.
-            discussion = Discussion(discussion_id, beatmapset, user, content) if discussion_id != None else None
+            discussion = Discussion(discussion_id, beatmapset, user, content) if discussion_id is not None else None
         except DeletedContextError as err:
             log_err(err)
         else:

@@ -26,7 +26,7 @@ def beatmapset_event():
 def test_event_attr(beatmapset_event):
     assert beatmapset_event.time == timestamp.from_string("2019-12-05T12:39:39+00:00")
     assert beatmapset_event.type == "nominate"
-    assert beatmapset_event.content == None
+    assert beatmapset_event.content is None
 
 def test_user_attr(beatmapset_event):
     assert beatmapset_event.user.id == "1653229"
@@ -41,4 +41,4 @@ def test_beatmapset_attr(beatmapset_event):
     assert beatmapset_event.beatmapset.modes == ["mania"]
 
 def test_discussion_attr(beatmapset_event):
-    assert beatmapset_event.discussion == None
+    assert beatmapset_event.discussion is None

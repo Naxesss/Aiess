@@ -384,9 +384,9 @@ def combined_captured_span(match: Match) -> (int, int):
     first_start = None
     last_end = None
     for start, end in match.regs[1:]:
-        if (first_start == None or first_start > start) and start >= 0:
+        if (first_start is None or first_start > start) and start >= 0:
             first_start = start
-        if (last_end == None or last_end < end) and end >= 0:
+        if (last_end is None or last_end < end) and end >= 0:
             last_end = end
 
     return first_start, last_end

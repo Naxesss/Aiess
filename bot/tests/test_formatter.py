@@ -230,4 +230,4 @@ def test_recent_praise_none(test_database):
     test_database.insert_event(nom_event)
 
     praise = format_recent_praise(nominator, beatmapset, database=test_database)
-    assert praise == None
+    assert praise is None

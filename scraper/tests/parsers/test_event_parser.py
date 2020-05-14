@@ -104,7 +104,7 @@ def test_parse_event_author_id_faulty():
     ]
 
     for value, expected_exception in faulty_values:
-        assert beatmapset_event_parser.parse_event_author_id(value) == None
+        assert beatmapset_event_parser.parse_event_author_id(value) is None
     
     for value, expected_exception in faulty_values:
         with pytest.raises(expected_exception):
@@ -128,7 +128,7 @@ def test_parse_event_author_name_faulty():
     ]
 
     for value, expected_exception in faulty_values:
-        assert beatmapset_event_parser.parse_event_author_name(value) == None
+        assert beatmapset_event_parser.parse_event_author_name(value) is None
     
     for value, expected_exception in faulty_values:
         with pytest.raises(expected_exception):

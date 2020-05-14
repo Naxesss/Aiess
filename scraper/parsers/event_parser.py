@@ -37,7 +37,7 @@ class EventParser():
             event_time = time.attrs["datetime"]
         
         # Failure to parse event time should be met with an exception for the same reason as failing to parse event type.
-        if event_time == None:
+        if event_time is None:
             raise ParsingError(f"""
                 The time of an event could not be parsed. Expected some time object with class \"timeago\":\r\n{event}""")
 

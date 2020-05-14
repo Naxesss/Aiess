@@ -16,7 +16,7 @@ def populate_event(event: Event) -> None:
     """Populates the given event using the beatmapset discussion json
     (e.g. missing discussion info and additional details like who did votes)."""
     discussions_json = get_discussions_json(event.discussion, event.beatmapset)
-    if discussions_json == None:
+    if discussions_json is None:
         raise ValueError("Could not get a discussion.")
 
     event.discussion = get_complete_discussion_info(event.discussion, event.beatmapset, discussions_json)
@@ -39,7 +39,7 @@ def get_complete_discussion_info(
         discussions_json: object=None, db_name: str=SCRAPER_DB_NAME) -> Discussion:
     """Returns a discussion with complete information from the beatmapset discussion json
     (e.g. user and content, neither of which are guaranteed)."""
-    if not discussion or discussion.user != None and discussion.content != None:
+    if not discussion or discussion.user is not None and discussion.content is not None:
         return discussion  # Either None (i.e. unused by the event type) or already completed.
 
     if not discussions_json:
@@ -106,7 +106,7 @@ def __complete_discussion_context(discussion: Discussion, db_name: str=SCRAPER_D
     if not cached_discussion:
         return False
     
-    if cached_discussion.user == None or cached_discussion.content == None:
+    if cached_discussion.user is None or cached_discussion.content is None:
         raise ValueError("""
             Retrieved an incomplete discussion instance. This should not be possible when
             preventing input of incomplete instances.""")
