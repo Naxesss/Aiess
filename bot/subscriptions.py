@@ -12,12 +12,18 @@ class Subscription():
     
     def __str__(self) -> str:
         return f"Guild {self.guild_id}, Channel {self.channel_id}, Filter \"{self.filter}\""
-
+    
+    def __key(self) -> tuple:
+        return (
+            self.guild_id,
+            self.channel_id,
+            self.filter
+        )
+    
     def __eq__(self, other) -> bool:
         if not isinstance(other, Subscription):
             return False
-        return (
-            self.guild_id == other.guild_id and
-            self.channel_id == other.channel_id and
-            self.filter == other.filter
-        )
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())

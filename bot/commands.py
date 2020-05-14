@@ -17,17 +17,20 @@ class Command():
         args = [f" {arg}" for arg in self.args]
         return f"+{self.name}{args}"
     
+    def __key(self) -> tuple:
+        return (
+            self.name,
+            self.args,
+            self.context
+        )
+    
     def __eq__(self, other) -> bool:
         if not isinstance(other, Command):
             return False
-        return (
-            self.name == other.name and
-            self.args == other.args and
-            self.context == other.context
-        )
+        return self.__key() == other.__key()
     
-    def __hash__(self):
-        return hash((self.name, self.args, self.context))
+    def __hash__(self) -> str:
+        return hash(self.__key())
     
     async def respond(self, response: str) -> bool:
         """Returns whether a response was successfully sent."""
