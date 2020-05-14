@@ -1,4 +1,5 @@
 from datetime import datetime
+from contextlib import suppress
 import os
 
 from aiess.settings import ROOT_PATH
@@ -61,11 +62,11 @@ def to_string(_datetime: datetime) -> str:
 def from_string(string: str) -> datetime:
     """Returns the datetime of the given ISO 8601 formatted string (except timezone and microsecond
     values), otherwise raises ValueError (e.g. wrong format)."""
-    try: return datetime.strptime(string, TIME_FORMAT)
-    except: pass
+    with suppress(ValueError):
+        return datetime.strptime(string, TIME_FORMAT)
 
-    try: return datetime.strptime(string, TIME_FORMAT_ALT)
-    except: pass
+    with suppress(ValueError):
+        return datetime.strptime(string, TIME_FORMAT_ALT)
 
     # Any other case (e.g. time being None or not matching the format).
     raise ValueError(f"The given string, {string}, did not match the format \"{TIME_FORMAT}\".")
