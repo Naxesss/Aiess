@@ -3,6 +3,7 @@ sys.path.append('..')
 
 import pytest
 from discord import Embed
+from datetime import timedelta
 
 from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
@@ -196,6 +197,7 @@ def test_history_truncated(test_database):
 
     for _ in range(20):
         test_database.insert_event(nom_event)
+        nom_event.time += timedelta(seconds=15)
     test_database.insert_event(qual_event)
 
     history = format_history(beatmapset, length_limit=200, database=test_database)
