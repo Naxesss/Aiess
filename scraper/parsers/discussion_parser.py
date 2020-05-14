@@ -12,7 +12,7 @@ class DiscussionParser():
         """Returns a generator of discussions from the given beatmapset discussion page json, or None if no discussions exist."""
         discussion_jsons = discussions_json["beatmapset"]["discussions"]
         for discussion_json in discussion_jsons:
-            if len(discussion_json) == 0: continue
+            if not discussion_json: continue
             yield self.parse_discussion(discussion_json, discussions_json["beatmapset"], beatmapset)
         return None
     
