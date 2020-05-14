@@ -14,7 +14,7 @@ class Subscription():
         return f"Guild {self.guild_id}, Channel {self.channel_id}, Filter \"{self.filter}\""
 
     def __eq__(self, other) -> bool:
-        if type(self) != type(other):
+        if not isinstance(other, Subscription):
             return False
         return (
             self.guild_id == other.guild_id and

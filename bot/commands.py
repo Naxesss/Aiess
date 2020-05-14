@@ -18,7 +18,7 @@ class Command():
         return f"+{self.name}{args}"
     
     def __eq__(self, other) -> bool:
-        if type(self) != type(other):
+        if not isinstance(other, Command):
             return False
         return (
             self.name == other.name and

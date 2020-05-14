@@ -29,7 +29,7 @@ class User:
         )
     
     def __eq__(self, other) -> bool:
-        if type(self) != type(other):
+        if not isinstance(other, User):
             return False
         return self.__key() == other.__key()
     
@@ -99,7 +99,7 @@ class Beatmapset:
         )
     
     def __eq__(self, other) -> bool:
-        if type(self) != type(other):
+        if not isinstance(other, Beatmapset):
             return False
         return self.__key() == other.__key()
     
@@ -123,7 +123,7 @@ class Discussion:
         )
     
     def __eq__(self, other) -> bool:
-        if type(self) != type(other):
+        if not isinstance(other, Discussion):
             return False
         return self.__key() == other.__key()
     
@@ -157,7 +157,7 @@ class Usergroup:
         )
 
     def __eq__(self, other) -> bool:
-        if type(self) != type(other):
+        if not isinstance(other, Usergroup):
             return False
         return self.__key() == other.__key()
     
@@ -202,7 +202,7 @@ class Event:
         )
 
     def __eq__(self, other) -> bool:
-        if type(self) != type(other):
+        if not isinstance(other, Event):
             return False
         return self.__key() == other.__key()
     
