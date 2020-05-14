@@ -31,5 +31,5 @@ def test_get_set():
     assert abs((new_time - timestamp.get_last("test")).total_seconds()) < 1
 
 def test_exists():
-    assert timestamp.exists("test_missing") == False
-    assert timestamp.exists("test") == True
+    assert not timestamp.exists("test_missing")
+    assert timestamp.exists("test")
