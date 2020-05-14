@@ -174,7 +174,7 @@ def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Dat
     Optionally within a certain length, smartly shortening/truncating the contents if needed."""
     if not database: database = Database("aiess")  # Using wrapped database to access events.
 
-    # Note that these events are sorted in descending order, so newer events first.
+    # Sorted by time ascending; newer events first.
     events = list(filter(
         lambda event: type_props[event.type].show_in_history,
         database.retrieve_beatmapset_events(beatmapset)))
