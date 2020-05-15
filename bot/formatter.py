@@ -209,7 +209,7 @@ def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Dat
             short_history = emoji + short_history
         else:
             # If there isn't enough space for anything, we skip the history completely.
-            if len(short_history):
+            if short_history:
                 short_history = "..." + short_history
             break
     
