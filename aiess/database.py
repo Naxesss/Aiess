@@ -66,8 +66,7 @@ class Database:
         except mysql.connector.errors.InterfaceError as error:
             if error.msg == "No result set to fetch from.":
                 return None  # Reached end of result set, not an issue. 
-            else:
-                raise
+            raise
 
     def __execute(self, query: str, **values: str) -> List[Tuple]:
         """Executes the given SQL query with the given argument values, if any. Use like "%(name)s" in query

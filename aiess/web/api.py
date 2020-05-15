@@ -42,10 +42,10 @@ def request_user(user_id: str) -> object:
     if len(user_json) > 0:
         requested_users[user_id] = user_json[0]
         return user_json[0]
-    else:
-        # For when the user does not exist (e.g. restricted).
-        # Do not cache, in case they get unrestricted soon.
-        return None
+    
+    # For when the user does not exist (e.g. restricted).
+    # Do not cache, in case they get unrestricted soon.
+    return None
 
 def clear_response_cache() -> None:
     global requested_beatmapsets

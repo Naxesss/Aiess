@@ -23,9 +23,9 @@ def parse_command(content: str, context: Message=None) -> Command:
         name = match.group(1)
         args = match.group(2)
 
-        if args: return Command(name, *args.split(" "), context=context)
-        else:    return Command(name, context=context)
-    
+        if args:
+            return Command(name, *args.split(" "), context=context)
+        return Command(name, context=context)
     return None
 
 async def receive_command(command: Command) -> bool:
