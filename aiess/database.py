@@ -106,7 +106,7 @@ class Database:
         key_format_string = ", ".join(f"%({key})s" for key in keys)
         keyword_format_string = ", ".join(f"{key}=%({key})s" for key in keys)
         
-        return self.__execute("""
+        query = """
             INSERT INTO %(db_name)s.%(table)s (%(key_string)s)
             VALUES (%(key_format_string)s)
             ON DUPLICATE KEY
@@ -116,22 +116,21 @@ class Database:
                 table=table,
                 key_string=key_string,
                 key_format_string=key_format_string,
-                keyword_format_string=keyword_format_string),
-            **new_column_dict)
+                keyword_format_string=keyword_format_string)
+
+        return self.__execute(query, **new_column_dict)
 
     def retrieve_table_data(self, table: str, where_str: str=None, selection: str="*") -> List[Tuple]:
         """Returns all rows from the table where the dictionary conditions apply (e.g. dict(type="nominate")),
         if specified, otherwise any data present in the table."""
-        query = """
+        return self.__execute("""
             SELECT %(selection)s FROM %(db_name)s.%(table)s
             WHERE %(where_str)s
             """ % InterpolationDict(
                 selection=selection,
                 db_name=self.db_name,
                 table=table,
-                where_str=where_str if where_str else "TRUE")
-        
-        return self.__execute(query)
+                where_str=where_str if where_str else "TRUE"))
     
     def fetchone_table_data(self, table: str, where_str: str, selection: str="*") -> List[Tuple]:
         """Returns the first row from the table where the dictionary conditions apply (e.g. dict(id=1))."""
