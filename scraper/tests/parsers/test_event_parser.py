@@ -169,10 +169,12 @@ def test_parse_id_from_beatmapset_link():
 
 def test_from_ISO_8601_to_datetime_raise():
     faulty_values = [
-        None,
         "",
         "https://osu.ppy.sh/users/1653229"
     ]
+
+    with pytest.raises(TypeError):
+        timestamp.from_string(None)
 
     for value in faulty_values:
         with pytest.raises(ValueError):
