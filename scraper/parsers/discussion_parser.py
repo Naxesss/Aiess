@@ -14,7 +14,6 @@ class DiscussionParser():
         for discussion_json in discussion_jsons:
             if not discussion_json: continue
             yield self.parse_discussion(discussion_json, discussions_json["beatmapset"], beatmapset)
-        return None
     
     def parse_discussion(self, discussion_json: object, beatmapset_json: object, beatmapset: Beatmapset) -> Discussion:
         """Returns a discussion from the given discussion json. The beatmapset json is also included for efficient username querying."""
