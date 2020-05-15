@@ -5,6 +5,7 @@ from collections import defaultdict
 from typing import Callable, TypeVar
 
 from discord import Message
+from discord import Forbidden, HTTPException
 
 class Command():
     """Represents the values with which a command is called (i.e. name, args, context)."""
@@ -39,9 +40,15 @@ class Command():
         
         try:
             await self.context.channel.send(response)
-        except:
-            # I.e. missing permissions to send message or connection issues.
-            print(f"Unable to send response \"{response}\" in {self.context.channel}.")
+            return True
+        except Forbidden:
+            print(f"Lacking permissions to write \"{response}\" in {self.context.channel}.")
+        except HTTPException:
+            print(f"Unable to send \"{response}\" in {self.context.channel} due to connection issues.")
+        except Exception:
+            raise  # Any other exception we don't expect.
+        
+        return False
 
 registered_commands = defaultdict()
 
