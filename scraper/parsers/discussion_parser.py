@@ -31,9 +31,9 @@ class DiscussionParser():
     def parse_discussion_post_author(self, _id: str, beatmapset_json: object) -> User:
         """Returns the author of the given discussion post id if one exists, otherwise None."""
         for page_discussion in beatmapset_json["discussions"]:
-            if len(page_discussion) == 0: continue
+            if not page_discussion: continue
             for page_discussion_post in page_discussion["posts"]:
-                if len(page_discussion_post) == 0: continue
+                if not page_discussion_post: continue
                 if page_discussion_post["id"] == _id:
                     return self.parse_user(page_discussion_post["user_id"], beatmapset_json)
         return None
