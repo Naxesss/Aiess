@@ -79,7 +79,7 @@ def __get_event_generations_between(
         # were logged for).
         if not had_value:
             noEntriesTries += 1
-            if noEntriesTries >= 3:
+            if noEntriesTries >= 10:
                 raise ValueError("""
                     No events were returned from the generator. Are we parsing the events properly? Are we looking too far back in time?""")
         else:
