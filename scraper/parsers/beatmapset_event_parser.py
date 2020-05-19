@@ -81,11 +81,11 @@ class BeatmapsetEventParser(EventParser):
         
         try:
             # Scrape object data
-            _type = event_json["message_type"]
+            _type = event_json["type"].replace("_", "-")
             time = timestamp.from_string(event_json["created_at"])
 
-            beatmapset_id = event_json["beatmapset_id"]
-            discussion_id = event_json["starting_post"]["beatmap_discussion_id"]
+            beatmapset_id = event_json["beatmapset"]["id"]
+            discussion_id = event_json["discussion"]["id"]
 
             user_id = event_json["user_id"]
             user_json = self.__lookup_user_json(user_id, user_jsons)
