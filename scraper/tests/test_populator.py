@@ -65,18 +65,6 @@ def test_additional_details_dq():
 
     assert dq_event.content == dq_event.discussion.content
 
-def test_additional_details_dq():
-    beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
-    discussion = Discussion(1234956, beatmapset, user=User(4967662, "greenhue"),
-        content="since it ranks soon gonna just dq for fierys discussion https://osu.ppy.sh/beatmapsets/1001546/discussion/-/generalAll#/1228459 plus thought about points i brought up privately in dms.")
-
-    dq_event = Event(types.DISQUALIFY, from_string("2019-10-27T04:23:20+00:00"), beatmapset, discussion)
-    
-    discussion_json = json.loads(mock_discussion_json)
-    __populate_additional_details(dq_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
-
-    assert dq_event.content == dq_event.discussion.content
-
 def test_additional_details_resolve():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
     discussion = Discussion(1234956, beatmapset, user=User(4967662, "greenhue"),
