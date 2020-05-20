@@ -72,33 +72,25 @@ def __populate_additional_details(event: Event, discussions_json: object, db_nam
         same_time = event.time == timestamp.from_string(page_event["created_at"])
         same_type = event.type == page_event["type"].replace("_", "-")  # Json uses _ instead of -.
         if same_time and same_type:
-            if event.type in [types.DISQUALIFY, types.RESET]:  # Content is discussion content.
+
+            # Event content should reflect discussion content.
+            if event.type in [types.DISQUALIFY, types.RESET]:
                 if event.discussion:  # Discussion may have been deleted.
                     event.content = event.discussion.content
 
-            if event.type == types.RESOLVE:  # User is resolver, not discussion creator.
+            # Event user should be whoever resolved or reopened, rather than the discussion author.
+            if event.type in [types.RESOLVE, types.REOPEN]:
                 post_author = discussion_parser.parse_discussion_post_author(
                     page_event["comment"]["beatmap_discussion_post_id"],
                     beatmapset_json)
                 event.user = post_author
             
-            if event.type == types.KUDOSU_GAIN:  # User is giver, not discussion creator.
-                kudosu_giver = discussion_parser.parse_user(
+            # Event user should be whoever gave or removed the kudosu, not the discssion author.
+            if event.type in [types.KUDOSU_GAIN, types.KUDOSU_LOSS]:
+                kudosu_author = discussion_parser.parse_user(
                     page_event["comment"]["new_vote"]["user_id"],
                     beatmapset_json)
-                event.user = kudosu_giver
-            
-            if event.type == types.KUDOSU_LOSS:  # User is remover, not discussion creator.
-                kudosu_remover = discussion_parser.parse_user(
-                    page_event["comment"]["new_vote"]["user_id"],
-                    beatmapset_json)
-                event.user = kudosu_remover
-            
-            if event.type == types.REOPEN:  # User is reopener, not discussion creator.
-                issue_reopener = discussion_parser.parse_discussion_post_author(
-                    page_event["comment"]["beatmap_discussion_post_id"],
-                    beatmapset_json)
-                event.user = issue_reopener
+                event.user = kudosu_author
 
 def __complete_discussion_context(discussion: Discussion, db_name: str=SCRAPER_DB_NAME) -> bool:
     """Completes the context of the discussion from prior database entries, if present. Returns true if succeeded."""
