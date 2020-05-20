@@ -39,6 +39,20 @@ def test_discussion():
     assert discussion.user.name == "greenhue"
     assert discussion.content == "since it ranks soon gonna just dq for fierys discussion https://osu.ppy.sh/beatmapsets/1001546/discussion/-/generalAll#/1228459 plus thought about points i brought up privately in dms."
 
+def test_incomplete_context():
+    beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
+    discussion = Discussion(99, beatmapset)  # Missing user and content.
+    
+    assert not __complete_discussion_context(discussion, db_name=SCRAPER_TEST_DB_NAME)
+
+def test_delete_incomplete_context():
+    beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
+    discussion = Discussion(99, beatmapset)  # Missing user and content.
+    event = Event("test", from_string("2020-01-01 00:00:00"), discussion=discussion)
+    
+    __populate_additional_details(event, "", db_name=SCRAPER_TEST_DB_NAME)
+    assert event.marked_for_deletion
+
 def test_additional_details_dq():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
     discussion = Discussion(1234956, beatmapset, user=User(4967662, "greenhue"),
