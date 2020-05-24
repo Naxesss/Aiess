@@ -5,16 +5,16 @@ import pytest
 
 from aiess import timestamp
 
-from scraper.tests.mocks.events import nominate
-from scraper.tests.mocks.events.faulty import beatmapset_events
 from scraper.requester import soupify
 
+from scraper.tests.mocks.events import nominate as mock_nominate
+from scraper.tests.mocks.events.faulty import beatmapset_events as mock_beatmapset_events
 from scraper.tests.mocks import events_json as mock_events_json
 
 from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
 
 def test_parse():
-    generator = beatmapset_event_parser.parse(beatmapset_events.soup)
+    generator = beatmapset_event_parser.parse(mock_beatmapset_events.soup)
 
     generated_events = []
     for event in generator:
@@ -42,7 +42,7 @@ def test_parse_prefer_json():
 
 @pytest.fixture(scope="module")
 def beatmapset_event():
-    return beatmapset_event_parser.parse_event(nominate.tag)
+    return beatmapset_event_parser.parse_event(mock_nominate.tag)
 
 def test_event_attr(beatmapset_event):
     assert beatmapset_event.time == timestamp.from_string("2019-12-05T12:39:39+00:00")
