@@ -82,3 +82,7 @@ def __get_event_generations_between(
                     No events were returned from the generator. Are we parsing the events properly? Are we looking too far back in time?""")
         else:
             page += 1
+            if page > 500:
+                # Assuming 60 s / page, this would take 8 hours to hit, but that's within acceptable bounds for this purpose.
+                raise ValueError("""
+                    The page index has exceeded 500, we're probably stuck in a loop.""")
