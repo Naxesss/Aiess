@@ -7,6 +7,10 @@ from aiess import timestamp
 
 from scraper.tests.mocks.events import nominate
 from scraper.tests.mocks.events.faulty import beatmapset_events
+from scraper.requester import soupify
+
+from scraper.tests.mocks import events_json as mock_events_json
+
 from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
 
 def test_parse():
@@ -18,6 +22,23 @@ def test_parse():
     
     assert len(generated_events) == 1  # 1 of 2 events is of a beatmapset that no longer exists.
     assert generated_events[0].type == "nominate"
+
+def test_parse_no_json_or_tags():
+    generated_events = []
+    with pytest.raises(ValueError) as err:
+        for event in beatmapset_event_parser.parse(soupify("")):
+            generated_events.append(event)
+    
+    assert len(generated_events) == 0
+    assert "json" in str(err) and "HTML" in str(err)
+
+def test_parse_prefer_json():
+    generated_events = []
+    for event in beatmapset_event_parser.parse(mock_events_json.soup):
+        generated_events.append(event)
+    
+    # For this test, the json has 5 events and the HTML has 1.
+    assert len(generated_events) == 5
 
 @pytest.fixture(scope="module")
 def beatmapset_event():
