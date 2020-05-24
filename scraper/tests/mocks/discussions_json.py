@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup, Tag
 from scraper.requester import soupify
 
 # Includes an event of a deleted beatmapset, as well as an empty event.
-JSON = """
+DISCUSSIONS_JSON = """
 [
   {
     "id": 1436266,
@@ -409,7 +409,7 @@ USER_JSON = """
 
 HTML = f"""
 <script id="json-discussions" type="application/json">
-{JSON}
+{DISCUSSIONS_JSON}
 </script>
 <script id="json-users" type="application/json">
 {USER_JSON}
