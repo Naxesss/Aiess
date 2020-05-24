@@ -16,7 +16,7 @@ init_time_str = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 def loop() -> None:
     """Iterates over new events since the last time, inserts them into the database, and then updates the last time."""
     current_time = datetime.utcnow().replace(microsecond=0)
-    last_time = timestamp.get_last("events")
+    last_time = timestamp.get_last("events").replace(microsecond=0)
 
     push_events(get_all_events_between, current_time, last_time)
 
