@@ -17,25 +17,27 @@ class DiscussionEventParser(EventParser):
 
     def parse(self, events: BeautifulSoup) -> Generator[Event, None, None]:
         """Returns a generator of BeatmapsetEvents, from the given /beatmapset-discussions BeautifulSoup response, parsed top-down."""
-        event_tags = events.findAll("div", {"class": "beatmapset-activities__discussion-post"})
-        if event_tags:
-            for event_tag in event_tags:
-                event = self.parse_event(event_tag)
-                if event:
-                    yield event
-        else:
-            # In case the page uses a json format script to fill out the page.
-            # Currently /beatmap-discussions does this, but not /beatmap-discussion-posts.
-            json_discussions = events.find("script", {"id": "json-discussions"})
-            json_users = events.find("script", {"id": "json-users"})
+        json_discussions = events.find("script", {"id": "json-discussions"})
+        json_users = events.find("script", {"id": "json-users"})
 
-            event_jsons = json.loads(json_discussions.string)
-            user_jsons = json.loads(json_users.string)
+        if not json_discussions or not json_users:
+            # Currently /beatmap-discussions uses json, but not /beatmap-discussion-posts,
+            # both of which are handled by this function, hence why we parse HTML tags here.
+            event_tags = events.findAll("div", {"class": "beatmapset-activities__discussion-post"})
+            if event_tags:
+                for event_tag in event_tags:
+                    event = self.parse_event(event_tag)
+                    if event:
+                        yield event
+            return
 
-            for event_json in event_jsons:
-                event = self.parse_event_json(event_json, user_jsons)
-                if event:
-                    yield event
+        event_jsons = json.loads(json_discussions.string)
+        user_jsons = json.loads(json_users.string)
+
+        for event_json in event_jsons:
+            event = self.parse_event_json(event_json, user_jsons)
+            if event:
+                yield event
     
     def parse_event(self, event: Tag) -> Event:
         """Returns a BeatmapsetEvent reflecting the given event html Tag object.

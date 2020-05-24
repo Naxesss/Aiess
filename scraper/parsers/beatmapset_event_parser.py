@@ -17,26 +17,29 @@ class BeatmapsetEventParser(EventParser):
 
     def parse(self, events: BeautifulSoup) -> Generator[Event, None, None]:
         """Returns a generator of BeatmapsetEvents, from the given /events BeautifulSoup response, parsed top-down."""
-        event_tags = events.findAll("div", {"class": "beatmapset-event"})
-        if event_tags:
+        json_events = events.find("script", {"id": "json-events"})
+        json_users = events.find("script", {"id": "json-users"})
+
+        if not json_events or not json_users:
+            # In case the jsons for some reason fail to appear, we can always
+            # parse the HTML tags instead.
+            event_tags = events.findAll("div", {"class": "beatmapset-event"})
+            if not event_tags:
+                raise ValueError("Neither json nor HTML tags available for parsing beatmapset events.")
+
             for event_tag in event_tags:
                 event = self.parse_event(event_tag)
                 if event:
                     yield event
-        else:
-            # In case the page uses a json format script to fill out the page.
-            # The usage of server-side rendering is somewhat inconsistent at the moment,
-            # hence the need to support both structures.
-            json_discussions = events.find("script", {"id": "json-events"})
-            json_users = events.find("script", {"id": "json-users"})
+            return
 
-            event_jsons = json.loads(json_discussions.string)
-            user_jsons = json.loads(json_users.string)
+        event_jsons = json.loads(json_events.string)
+        user_jsons = json.loads(json_users.string)
 
-            for event_json in event_jsons:
-                event = self.parse_event_json(event_json, user_jsons)
-                if event:
-                    yield event
+        for event_json in event_jsons:
+            event = self.parse_event_json(event_json, user_jsons)
+            if event:
+                yield event
     
     def parse_event(self, event: Tag) -> Event:
         """Returns a BeatmapsetEvent reflecting the given event html Tag object.
