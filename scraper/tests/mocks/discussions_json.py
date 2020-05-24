@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup, Tag
 from scraper.requester import soupify
 
 # Includes an event of a deleted beatmapset, as well as an empty event.
-DISCUSSIONS_JSON = """
+DISCUSSIONS_JSON = r"""
 [
   {
     "id": 1436266,
@@ -360,7 +360,7 @@ DISCUSSIONS_JSON = """
 ]
 """
 
-USER_JSON = """
+USER_JSON = r"""
 [
   {
     "id": 2597417,
