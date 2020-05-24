@@ -60,10 +60,7 @@ def __get_event_generations_between(
         
         for event in event_generator:
             had_value = True
-
-            if datetime.utcnow() - event.time > timedelta(days=3):
-                raise ValueError("Attempted to parse an event older than 3 days; seems unable to keep up.")
-
+            
             # Skip any event earlier than our current time, as we'll either handle them during the next pass,
             # or have already done so in the current (e.g. new event pushed old event into next page as we were reading the first).
             if current_time >= event.time:
