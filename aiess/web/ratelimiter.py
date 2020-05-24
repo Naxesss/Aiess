@@ -38,6 +38,7 @@ def request_with_retry(request_url, max_attempts=None) -> Response:
             attempts += 1
             if max_attempts and attempts >= max_attempts:
                 raise
+            # Back-off to give the website some room to breathe if there are already many incoming connections causing this.
             sleep(max(15 * 2**(attempts - 1), 120))
         
         except TimeoutError:
