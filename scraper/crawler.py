@@ -52,15 +52,14 @@ def __get_event_generations_between(
     frame and across multiple pages rather than just one."""
     current_time = start_time
     page = 1
-    noEntriesTries = 0
+    noYieldTries = 0
 
     while current_time > end_time:
         event_generator = generator_function(page)
-        had_value = False
+        yielded = False
         
         for event in event_generator:
-            had_value = True
-            
+
             # Skip any event earlier than our current time, as we'll either handle them during the next pass,
             # or have already done so in the current (e.g. new event pushed old event into next page as we were reading the first).
             if event.time > current_time:
@@ -71,13 +70,14 @@ def __get_event_generations_between(
             if current_time <= end_time:
                 break
             
+            yielded = True
             yield event
         
         # In case the generator for some reason is empty (e.g. site changed routes, class names, or end time is later than events
         # were logged for).
-        if not had_value:
-            noEntriesTries += 1
-            if noEntriesTries >= 10:
+        if not yielded:
+            noYieldTries += 1
+            if noYieldTries >= 10:
                 raise ValueError("""
                     No events were returned from the generator. Are we parsing the events properly? Are we looking too far back in time?""")
         else:
