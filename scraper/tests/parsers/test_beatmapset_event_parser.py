@@ -43,6 +43,17 @@ def test_parse_prefer_json():
     # For this test, the json has 5 events and the HTML has 1.
     assert len(generated_events) == 5
 
+def test_parse_json():
+    generated_events = []
+    for event in beatmapset_event_parser.parse(mock_events_json.soup):
+        generated_events.append(event)
+    
+    assert len(generated_events) == 5
+    assert generated_events[0].type == "kudosu-gain"
+    assert generated_events[0].beatmapset.id == "534054"
+    assert generated_events[0].beatmapset.creator.name == "SkyFlame"
+    assert generated_events[4].type == "issue-resolve"
+
 @pytest.fixture(scope="module")
 def beatmapset_event():
     return beatmapset_event_parser.parse_event(mock_nominate.tag)
