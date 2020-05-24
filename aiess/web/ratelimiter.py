@@ -7,19 +7,18 @@ from datetime import datetime, timedelta
 
 from aiess.logger import log_err
 
-last_response_time: Dict[str, datetime] = {}
+next_request_time: Dict[str, datetime] = {}
 
 def request_with_rate_limit(request_url: str, rate_limit: float, rate_limit_id: str=None) -> Response:
     """Requests a response object at most once every rate_limit seconds for the same rate_limit_id (default None)."""
-    global last_response_time
+    global next_request_time
     
-    response_time = last_response_time.get(rate_limit_id)
-    if response_time and response_time + timedelta(seconds=rate_limit) > datetime.now():
-        tdelta = ((response_time + timedelta(seconds=rate_limit)) - datetime.now())
-        sleep(tdelta.total_seconds())
+    request_time = next_request_time.get(rate_limit_id)
+    if request_time and request_time > datetime.now():
+        sleep((request_time - datetime.now()).total_seconds())
 
-    response = request_with_retry(request_url, max_attempts=10)
-    last_response_time[rate_limit_id] = datetime.now()
+    response = request_with_retry(request_url)
+    next_request_time[rate_limit_id] = datetime.now() + timedelta(seconds=rate_limit)
 
     return response
 
