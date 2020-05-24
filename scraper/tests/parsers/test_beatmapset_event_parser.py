@@ -14,10 +14,8 @@ from scraper.tests.mocks import events_json as mock_events_json
 from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
 
 def test_parse():
-    generator = beatmapset_event_parser.parse(mock_beatmapset_events.soup)
-
     generated_events = []
-    for event in generator:
+    for event in beatmapset_event_parser.parse(mock_beatmapset_events.soup):
         generated_events.append(event)
     
     assert len(generated_events) == 1  # 1 of 2 events is of a beatmapset that no longer exists.
