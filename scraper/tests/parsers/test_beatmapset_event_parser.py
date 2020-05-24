@@ -31,8 +31,13 @@ def test_parse_no_json_or_tags():
     assert "json" in str(err) and "HTML" in str(err)
 
 def test_parse_prefer_json():
+    combined_soup = soupify(f"""
+        {mock_nominate.HTML}
+        {mock_events_json.HTML}
+    """)
+
     generated_events = []
-    for event in beatmapset_event_parser.parse(mock_events_json.soup):
+    for event in beatmapset_event_parser.parse(combined_soup):
         generated_events.append(event)
     
     # For this test, the json has 5 events and the HTML has 1.
