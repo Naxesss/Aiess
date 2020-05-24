@@ -88,7 +88,7 @@ class BeatmapsetEventParser(EventParser):
             time = timestamp.from_string(event_json["created_at"])
 
             beatmapset_id = event_json["beatmapset"]["id"]
-            discussion_id = event_json["discussion"]["id"] if "discussion" in event_json else None
+            discussion_id = event_json["discussion"]["id"] if "discussion" in event_json and event_json["discussion"] else None
 
             user_id = event_json["user_id"] if "user_id" in event_json else None
             user_json = self.__lookup_user_json(user_id, user_jsons)
