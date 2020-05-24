@@ -9,7 +9,6 @@ import json
 from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.objects import Event, Beatmapset, Discussion
 from aiess.settings import PAGE_RATE_LIMIT
-from aiess.logger import log_err
 from aiess import event_types as types
 
 from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
@@ -22,8 +21,6 @@ def request_page(url: str) -> Response:
     response = None
     while response is None or str(response.status_code).startswith('5'):
         response = request_with_rate_limit(url, PAGE_RATE_LIMIT, "page")
-        if "<title>Just a moment...</title>" in response.text:
-            log_err("WARNING | CloudFlare IUAM is active")
     
     return response
 
