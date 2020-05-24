@@ -59,15 +59,12 @@ def __get_event_generations_between(
         yielded = False
         
         for event in event_generator:
-
-            # Skip any event earlier than our current time, as we'll either handle them during the next pass,
-            # or have already done so in the current (e.g. new event pushed old event into next page as we were reading the first).
             if event.time > current_time:
                 continue
 
-            # Once we reach an event later than our end time, we stop knowing any further events will also be later.
             current_time = event.time
             if current_time <= end_time:
+                # Since events are sorted, any remaining element time is also <= `end_time`.
                 break
             
             yielded = True
