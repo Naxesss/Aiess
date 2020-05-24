@@ -22,8 +22,8 @@ def request_page(url: str) -> Response:
     response = None
     while response is None or str(response.status_code).startswith('5'):
         response = request_with_rate_limit(url, PAGE_RATE_LIMIT, "page")
-        if "Just a moment..." in response.text:  # People could abuse this by including "Just a moment..." in previews.
-            raise ValueError("CloudFlare IUAM is active, take a look at the HTML response and find a non-reproducible pattern.")
+        if "<title>Just a moment...</title>" in response.text:
+            log_err("WARNING | CloudFlare IUAM is active")
     
     return response
 
