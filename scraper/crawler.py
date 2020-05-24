@@ -63,14 +63,15 @@ def __get_event_generations_between(
             
             # Skip any event earlier than our current time, as we'll either handle them during the next pass,
             # or have already done so in the current (e.g. new event pushed old event into next page as we were reading the first).
-            if current_time >= event.time:
-                current_time = event.time
+            if event.time > current_time:
+                continue
 
-                # Once we reach an event later than our end time, we stop knowing any further events will also be later.
-                if current_time <= end_time:
-                    break
-                
-                yield event
+            # Once we reach an event later than our end time, we stop knowing any further events will also be later.
+            current_time = event.time
+            if current_time <= end_time:
+                break
+            
+            yield event
         
         # In case the generator for some reason is empty (e.g. site changed routes, class names, or end time is later than events
         # were logged for).
