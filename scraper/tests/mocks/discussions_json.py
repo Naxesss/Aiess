@@ -408,12 +408,12 @@ USER_JSON = """
 """
 
 HTML = f"""
-<script id="json-discussions" type="application/json">
-{DISCUSSIONS_JSON}
-</script>
-<script id="json-users" type="application/json">
-{USER_JSON}
-</script>
+  <script id="json-discussions" type="application/json">
+    {DISCUSSIONS_JSON}
+  </script>
+  <script id="json-users" type="application/json">
+    {USER_JSON}
+  </script>
 """
 
 soup: BeautifulSoup = soupify(HTML)
