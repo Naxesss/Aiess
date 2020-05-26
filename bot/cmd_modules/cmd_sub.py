@@ -5,7 +5,7 @@ from bot.commands import Command, register
 from bot.subscriber import subscribe
 
 @register("sub")
-async def cmd_ping(command: Command):
+async def cmd_sub(command: Command):
     if len(command.args) == 0:
         await command.respond("✗ missing arg")
         return
