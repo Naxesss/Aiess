@@ -4,7 +4,7 @@ sys.path.append('..')
 import pytest
 
 from aiess.errors import ParsingError, DeletedContextError
-from aiess import timestamp
+from aiess.timestamp import from_string
 
 from scraper.tests.mocks.events import issue_resolve, nominate, problem
 from scraper.tests.mocks.events.faulty import no_events, resolve_deleted_beatmap, kudosu_deleted_beatmap
@@ -37,9 +37,9 @@ def test_parse_event_type_faulty():
 
 def test_parse_event_time():
     tests = [
-        [beatmapset_event_parser.parse_event_time(issue_resolve.tag), timestamp.from_string("2019-12-05T10:26:54+00:00")],
-        [beatmapset_event_parser.parse_event_time(nominate.tag), timestamp.from_string("2019-12-05T12:39:39+00:00")],
-        [discussion_event_parser.parse_event_time(problem.tag), timestamp.from_string("2019-12-05T16:50:10+00:00")]
+        [beatmapset_event_parser.parse_event_time(issue_resolve.tag), from_string("2019-12-05T10:26:54+00:00")],
+        [beatmapset_event_parser.parse_event_time(nominate.tag), from_string("2019-12-05T12:39:39+00:00")],
+        [discussion_event_parser.parse_event_time(problem.tag), from_string("2019-12-05T16:50:10+00:00")]
     ]
 
     for actual, expected in tests:
@@ -173,14 +173,14 @@ def test_from_ISO_8601_to_datetime_raise():
     ]
 
     with pytest.raises(TypeError):
-        timestamp.from_string(None)
+        from_string(None)
 
     for value in faulty_values:
         with pytest.raises(ValueError):
-            timestamp.from_string(value)
+            from_string(value)
 
 def test_from_ISO_8601_to_datetime():
-    test_datetime = timestamp.from_string("2019-12-05T10:26:54+00:00")
+    test_datetime = from_string("2019-12-05T10:26:54+00:00")
 
     assert test_datetime.second == 54
     assert test_datetime.minute == 26
