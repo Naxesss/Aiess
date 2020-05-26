@@ -44,8 +44,10 @@ class Database(aiess.Database):
         """Deletes the given subscription from the subscriptions table.
         
         The filter of the given subscription does not matter, as there is only one in each channel anyway."""
-        self.delete_table_data("subscriptions",
-            where_str=f"guild_id={sub.guild_id} AND channel_id={sub.channel_id}")
+        self.delete_table_data(
+            "subscriptions",
+            where_str=f"guild_id={sub.guild_id} AND channel_id={sub.channel_id}"
+        )
     
     def retrieve_beatmapset_events(self, beatmapset: Beatmapset) -> List[Event]:
         """Retrieves all events which have the given beatmapset id associated in descending

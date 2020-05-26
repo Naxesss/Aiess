@@ -137,9 +137,11 @@ class DiscussionEventParser(EventParser):
         event_class = "beatmap-discussion-message-type"
         class_prefix = "beatmap-discussion-message-type--"
         try:
-            return super().parse_event_type(event,
+            return super().parse_event_type(
+                event,
                 event_class=event_class,
-                class_prefix=class_prefix)
+                class_prefix=class_prefix
+            )
         except ParsingError:
             if event:
                 is_discussion_message = event.find(attrs={"class": event_class})
@@ -151,15 +153,19 @@ class DiscussionEventParser(EventParser):
     
     def parse_event_author_id(self, event: Tag) -> str:
         """Returns the user id associated with the given event, if applicable (e.g. the user starting a discussion, "1314547")."""
-        return super().parse_event_author_id(event,
+        return super().parse_event_author_id(
+            event,
             href_class="beatmap-discussion-user-card__user-link",
-            must_find=True)
+            must_find=True
+        )
     
     def parse_event_author_name(self, event: Tag) -> str:
         """Returns the user name associated the given event, if applicable (e.g. the user starting a discussion, 5129592)."""
-        return super().parse_event_author_name(event,
+        return super().parse_event_author_name(
+            event,
             name_class="beatmap-discussion-user-card__user-text",
-            must_find=True)
+            must_find=True
+        )
 
     def parse_discussion_message(self, event: Tag) -> str:
         """Parses the raw message content of a discussion post."""

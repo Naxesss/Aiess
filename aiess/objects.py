@@ -45,9 +45,9 @@ class Beatmapset:
         "3": "mania"
     }
 
-    def __init__(self,
-    _id: str, artist: str=None, title: str=None, creator: User=None, modes: List[str]=None,
-    beatmapset_json: object=None):
+    def __init__(
+            self, _id: str, artist: str=None, title: str=None, creator: User=None,
+            modes: List[str]=None, beatmapset_json: object=None):
         if _id is None:
             raise ValueError("Beatmapset id should not be None.")
 
@@ -167,8 +167,9 @@ class Usergroup:
 class Event:
     """Contains the event data (i.e. type, time, mapset, discussion, user, group, content).
     Some of these properties will be None depending on type."""
-    def __init__(self, _type: str, time: datetime,
-            beatmapset: Beatmapset=None, discussion: Discussion=None, user: User=None, group: Usergroup=None, content: str=None):
+    def __init__(
+            self, _type: str, time: datetime, beatmapset: Beatmapset=None, discussion: Discussion=None,
+            user: User=None, group: Usergroup=None, content: str=None):
         self.type = _type
         self.time = time.replace(microsecond=0)  # Simplify precision to database-level
         self.beatmapset = beatmapset

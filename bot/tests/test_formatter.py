@@ -77,8 +77,10 @@ def test_format_embed(suggestion_event):
     embed: Embed = format_embed(suggestion_event)
     
     assert embed.fields[0].name == ":yellow_circle: Suggestion"
-    assert (embed.fields[0].value ==
-        "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]")
+    assert (
+        embed.fields[0].value ==
+        "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]"
+    )
     assert embed.footer.text == "someone \"hi\""
     assert embed.footer.icon_url == "https://a.ppy.sh/1"
     assert embed.colour.to_rgb() == (65, 65, 65)
@@ -98,12 +100,16 @@ def test_format_field_name_qualify(qualify_event):
     assert format_field_name(qualify_event) == ":heart: Qualified"
 
 def test_format_field_value(suggestion_event):
-    assert (format_field_value(suggestion_event) ==
-        "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]")
+    assert (
+        format_field_value(suggestion_event) ==
+        "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]"
+    )
 
 def test_format_field_value_markdown(qualify_event):
-    assert (format_field_value(qualify_event) ==
-        "[**artist\\_with\\*strange\\~symbols\\` - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [\\_sometwo\\_](https://osu.ppy.sh/users/2) [**osu**]")
+    assert (
+        format_field_value(qualify_event) ==
+        "[**artist\\_with\\*strange\\~symbols\\` - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [\\_sometwo\\_](https://osu.ppy.sh/users/2) [**osu**]"
+    )
 
 def test_format_footer_text(suggestion_event):
     assert format_footer_text(suggestion_event) == "someone \"hi\""

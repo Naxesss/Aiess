@@ -37,12 +37,16 @@ def test_expand_and():
     assert expand("type:(nominate or qualify) and user:123") == "type:nominate and user:123 or type:qualify and user:123"
 
 def test_expand_and_quotes():
-    assert (expand("type:(nominate or qualify) and user:\"some user with and in their name\"") ==
-        "type:nominate and user:\"some user with and in their name\" or type:qualify and user:\"some user with and in their name\"")
+    assert (
+        expand("type:(nominate or qualify) and user:\"some user with and in their name\"") ==
+        "type:nominate and user:\"some user with and in their name\" or type:qualify and user:\"some user with and in their name\""
+    )
 
 def test_expand_multiple_and():
-    assert (expand("type:(nominate or qualify) and user:(123 or 456)") ==
-        "type:nominate and user:123 or type:nominate and user:456 or type:qualify and user:123 or type:qualify and user:456")
+    assert (
+        expand("type:(nominate or qualify) and user:(123 or 456)") ==
+        "type:nominate and user:123 or type:nominate and user:456 or type:qualify and user:123 or type:qualify and user:456"
+    )
 
 def test_expand_not():
     assert expand("type: not (nominate or qualify)") == "not type:nominate and not type:qualify"
@@ -223,8 +227,10 @@ def test_normalize_not_mathematical():
     assert normalize_not("type:¬nominate ∧ type:¬qualify") == "¬type:nominate ∧ ¬type:qualify"
 
 def test_normalize_not_and_or():
-    assert (normalize_not("type:¬nominate ∧ type:¬qualify ∨ type:¬nominate ∧ type:reply") ==
-        "¬type:nominate ∧ ¬type:qualify ∨ ¬type:nominate ∧ type:reply")
+    assert (
+        normalize_not("type:¬nominate ∧ type:¬qualify ∨ type:¬nominate ∧ type:reply") ==
+        "¬type:nominate ∧ ¬type:qualify ∨ ¬type:nominate ∧ type:reply"
+    )
 
 def test_normalize_not_spacing():
     assert normalize_not("  some long type:not nominate  ") == "  not some long type:nominate  "

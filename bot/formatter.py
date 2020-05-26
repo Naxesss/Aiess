@@ -88,11 +88,13 @@ def format_embed(event: Event) -> str:
 def escape_markdown(obj: str) -> str:
     """Returns the given object cast to string, and where all markdown
     markers (e.g. '*', '_', and '~' characters) are escaped using backslash."""
-    return (str(obj)
-        .replace("*", "\\*")   # Italic / Bold
-        .replace("_", "\\_")   # Italic / Underline
-        .replace("~", "\\~")   # Strikethrough
-        .replace("`", "\\`"))  # Code / Code Block
+    return (
+        str(obj)
+        .replace("*", "\\*")  # Italic / Bold
+        .replace("_", "\\_")  # Italic / Underline
+        .replace("~", "\\~")  # Strikethrough
+        .replace("`", "\\`")  # Code / Code Block
+    )
 
 def format_field_name(event: Event) -> str:
     """Returns the embed title of the given event (e.g. :heart: Qualified)."""

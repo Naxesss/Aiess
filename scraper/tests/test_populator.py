@@ -54,8 +54,10 @@ def test_delete_incomplete_context():
 
 def test_additional_details_dq():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
-    discussion = Discussion(1234956, beatmapset, user=User(4967662, "greenhue"),
-        content="since it ranks soon gonna just dq for fierys discussion https://osu.ppy.sh/beatmapsets/1001546/discussion/-/generalAll#/1228459 plus thought about points i brought up privately in dms.")
+    discussion = Discussion(
+        1234956, beatmapset, user=User(4967662, "greenhue"),
+        content="since it ranks soon gonna just dq for fierys discussion https://osu.ppy.sh/beatmapsets/1001546/discussion/-/generalAll#/1228459 plus thought about points i brought up privately in dms."
+    )
 
     dq_event = Event(types.DISQUALIFY, from_string("2019-10-27T04:23:20+00:00"), beatmapset, discussion)
     
@@ -66,8 +68,10 @@ def test_additional_details_dq():
 
 def test_additional_details_resolve():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
-    discussion = Discussion(1234956, beatmapset, user=User(4967662, "greenhue"),
-        content="since it ranks soon gonna just dq for fierys discussion https://osu.ppy.sh/beatmapsets/1001546/discussion/-/generalAll#/1228459 plus thought about points i brought up privately in dms.")
+    discussion = Discussion(
+        1234956, beatmapset, user=User(4967662, "greenhue"),
+        content="since it ranks soon gonna just dq for fierys discussion https://osu.ppy.sh/beatmapsets/1001546/discussion/-/generalAll#/1228459 plus thought about points i brought up privately in dms."
+    )
 
     resolve_event = Event(types.RESOLVE, from_string("2019-10-27T09:00:00+00:00"), beatmapset, discussion)
     
@@ -78,8 +82,10 @@ def test_additional_details_resolve():
 
 def test_additional_details_kudosu():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
-    discussion = Discussion(1182017, beatmapset, user=User(9590557, "Firika"),
-        content="00:08:232 (5) - need fix too ;-;")
+    discussion = Discussion(
+        1182017, beatmapset, user=User(9590557, "Firika"),
+        content="00:08:232 (5) - need fix too ;-;"
+    )
 
     kudosu_event = Event(types.KUDOSU_GAIN, from_string("2019-10-04T11:50:40+00:00"), beatmapset, discussion)
     

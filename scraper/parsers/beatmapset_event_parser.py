@@ -125,19 +125,19 @@ class BeatmapsetEventParser(EventParser):
 
     def parse_event_type(self, event: Tag) -> str:
         """Returns the type of the given event (e.g. nominate", "issue-resolve", "disqualify")."""
-        return super().parse_event_type(event,
+        return super().parse_event_type(
+            event,
             event_class="beatmapset-event__icon",
-            class_prefix="beatmapset-event__icon--")
+            class_prefix="beatmapset-event__icon--"
+        )
     
     def parse_event_author_id(self, event: Tag) -> str:
         """Returns the user id associated with the given event, if applicable (e.g. the user nominating, "1314547")."""
-        return super().parse_event_author_id(event,
-            href_class="user-name")
+        return super().parse_event_author_id(event, href_class="user-name")
     
     def parse_event_author_name(self, event: Tag) -> str:
         """Returns the user name associated the given event, if applicable (e.g. the user nominating, 5129592)."""
-        return super().parse_event_author_name(event,
-            name_class="user-name")
+        return super().parse_event_author_name(event, name_class="user-name")
 
 # Only need one instance since it's always the same.
 beatmapset_event_parser = BeatmapsetEventParser()
