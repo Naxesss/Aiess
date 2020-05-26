@@ -87,6 +87,9 @@ class BeatmapsetEventParser(EventParser):
             _type = event_json["type"].replace("_", "-")
             time = timestamp.from_string(event_json["created_at"])
 
+            if "beatmapset" not in event_json or not event_json["beatmapset"]:
+                raise DeletedContextError("No beatmapset was found in this event. It was likely deleted.")
+
             beatmapset_id = event_json["beatmapset"]["id"]
             discussion_id = event_json["discussion"]["id"] if "discussion" in event_json and event_json["discussion"] else None
 
