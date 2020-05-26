@@ -45,8 +45,6 @@ class Command():
             print(f"Lacking permissions to write \"{response}\" in {self.context.channel}.")
         except HTTPException:
             print(f"Unable to send \"{response}\" in {self.context.channel} due to connection issues.")
-        except Exception:
-            raise  # Any other exception we don't expect.
         
         return False
 
