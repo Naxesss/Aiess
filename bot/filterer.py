@@ -354,13 +354,13 @@ def extract_not(expr: str) -> (str, str):
     """Returns a tuple of the given expression without the first NOT gate found and
     the NOT gate that was found, if any, otherwise None."""
     for index, pattern in enumerate(not_gate_patterns):
-            match = re.search(pattern, expr)
-            if match:
-                not_gate = not_gates[index]
-                start, end = combined_captured_span(match)
-                without_not_gate = expr[:start] + expr[end:]
+        match = re.search(pattern, expr)
+        if match:
+            not_gate = not_gates[index]
+            start, end = combined_captured_span(match)
+            without_not_gate = expr[:start] + expr[end:]
 
-                return (without_not_gate, not_gate)
+            return (without_not_gate, not_gate)
     
     return (expr, None)
 
