@@ -50,7 +50,7 @@ class EventParser():
 
         if not href:
             self.raise_if_deleted(event)
-            raise ParsingError(f"""
+            raise ParsingError("""
                 The thumbnail link of an event could not be found. Expected some <a> tag with attribute href.""")
 
         return href
