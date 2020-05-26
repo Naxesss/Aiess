@@ -44,7 +44,7 @@ class EventParser():
         return timestamp.from_string(event_time)
 
     def parse_event_link(self, event: Tag) -> str:
-        """Returns the beatmapset/discussion link from the thumbnail of a given event 
+        """Returns the beatmapset/discussion link from the thumbnail of a given event
         (e.g. "https://osu.ppy.sh/beatmapsets/818013/discussion#/1211219")."""
         thumb = event and event.find("a", {"href": regex.compile(r"^https:\/\/osu\.ppy\.sh\/beatmapsets\/")})
         href = thumb and thumb.attrs["href"]
@@ -71,7 +71,7 @@ class EventParser():
         if must_find and not user_id:
             self.raise_if_deleted(event)
             raise ParsingError(f"""
-                The user id of the author of an event could not be parsed. Expected some <a> tag with class \"user-name\" 
+                The user id of the author of an event could not be parsed. Expected some <a> tag with class \"user-name\"
                 and attr \"data-user-id\":\r\n{event}""")
 
         return user_id
@@ -87,7 +87,7 @@ class EventParser():
         if must_find and not user_name:
             self.raise_if_deleted(event)
             raise ParsingError(f"""
-                The user name of the author of an event could not be parsed. Expected some href object with class \"user-name\" 
+                The user name of the author of an event could not be parsed. Expected some href object with class \"user-name\"
                 and attr \"data-user-id\":\r\n{event}""")
         
         return user_name

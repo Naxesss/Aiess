@@ -65,7 +65,7 @@ class Database:
             return cursor.fetchall()
         except mysql.connector.errors.InterfaceError as error:
             if error.msg == "No result set to fetch from.":
-                return None  # Reached end of result set, not an issue. 
+                return None  # Reached end of result set, not an issue.
             raise
 
     def __execute(self, query: str, **values: str) -> List[Tuple]:

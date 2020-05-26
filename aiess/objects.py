@@ -165,7 +165,7 @@ class Usergroup:
         return hash(self.__key())
 
 class Event:
-    """Contains the event data (i.e. type, time, mapset, discussion, user, group, content). 
+    """Contains the event data (i.e. type, time, mapset, discussion, user, group, content).
     Some of these properties will be None depending on type."""
     def __init__(self, _type: str, time: datetime,
             beatmapset: Beatmapset=None, discussion: Discussion=None, user: User=None, group: Usergroup=None, content: str=None):
