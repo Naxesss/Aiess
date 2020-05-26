@@ -397,47 +397,48 @@ def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
     """Returns a list of lowercased key:value strings representing the given object."""
     dissections = []
 
-    if isinstance(obj, User):
-        dissections.append(f"user:{escape(obj.name)}")
-        dissections.append(f"user-id:{escape(obj.id)}")
-    
-    elif isinstance(obj, Beatmapset):
-        dissections.append(f"mapset-id:{escape(obj.id)}")
-        dissections.append(f"artist:{escape(obj.artist)}")
-        dissections.append(f"title:{escape(obj.title)}")
-        dissections.append(f"creator:{escape(obj.creator.name)}")
-        dissections.append(f"creator-id:{escape(obj.creator.id)}")
-        for mode in obj.modes:
-            dissections.append(f"mode:{escape(mode)}")
-    
-    elif isinstance(obj, Discussion):
-        dissections.extend(dissect(obj.beatmapset))
-        
-        dissections.append(f"discussion-id:{escape(obj.id)}")
-        dissections.append(f"author:{escape(obj.user.name)}")
-        dissections.append(f"author-id:{escape(obj.user.id)}")
-        dissections.append(f"discussion-content:{escape(obj.content)}")
-    
-    elif isinstance(obj, Event):
-        dissections.append(f"type:{escape(obj.type)}")
-
-        if obj.type in type_variations:
-            for variation in type_variations[obj.type]:
-                dissections.append(f"type:{escape(variation)}")
-
-        # The dissection of the discussion includes the dissection of the beatmapset, if present.
-        if obj.discussion:
-            dissections.extend(dissect(obj.discussion))
-        else:
-            dissections.extend(dissect(obj.beatmapset))
-        
-        if obj.user:
-            dissections.extend(dissect(obj.user))
-        if obj.content:
-            dissections.append(f"content:{escape(obj.content)}")
+    if isinstance(obj, User):         dissections.extend(list(dissect_user(obj)))
+    elif isinstance(obj, Beatmapset): dissections.extend(list(dissect_beatmapset(obj)))
+    elif isinstance(obj, Discussion): dissections.extend(list(dissect_discussion(obj)))
+    elif isinstance(obj, Event):      dissections.extend(list(dissect_event(obj)))
 
     # Lowercase everything for ease-of-access when filtering.
     return list(map(lambda dissection: dissection.lower(), dissections))
+
+def dissect_user(user: User) -> Generator[str, None, None]:
+    yield f"user:{escape(user.name)}"
+    yield f"user-id:{escape(user.id)}"
+
+def dissect_beatmapset(beatmapset: Beatmapset) -> Generator[str, None, None]:
+    yield f"mapset-id:{escape(beatmapset.id)}"
+    yield f"artist:{escape(beatmapset.artist)}"
+    yield f"title:{escape(beatmapset.title)}"
+    yield f"creator:{escape(beatmapset.creator.name)}"
+    yield f"creator-id:{escape(beatmapset.creator.id)}"
+    for mode in beatmapset.modes:
+        yield f"mode:{escape(mode)}"
+    
+def dissect_discussion(discussion: Discussion) -> Generator[str, None, None]:
+    yield from dissect_beatmapset(discussion.beatmapset)
+    
+    yield f"discussion-id:{escape(discussion.id)}"
+    yield f"author:{escape(discussion.user.name)}"
+    yield f"author-id:{escape(discussion.user.id)}"
+    yield f"discussion-content:{escape(discussion.content)}"
+
+def dissect_event(event: Event) -> Generator[str, None, None]:
+    yield f"type:{escape(event.type)}"
+
+    if event.type in type_variations:
+        for variation in type_variations[event.type]:
+            yield f"type:{escape(variation)}"
+
+    # The dissection of the discussion includes the dissection of the beatmapset, if present.
+    if event.discussion: yield from dissect(event.discussion)
+    else:                yield from dissect(event.beatmapset)
+    
+    if event.user:    yield from dissect(event.user)
+    if event.content: yield f"content:{escape(event.content)}"
 
 def passes_filter(_filter: str, dissection: List[str]) -> bool:
     """Returns whether the dissection would pass the filter logically. This is case insensitive.
