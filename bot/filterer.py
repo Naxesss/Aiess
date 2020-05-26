@@ -322,7 +322,7 @@ def double_negation_elimination(string: str) -> str:
 
         matches = []
         for pattern in not_gate_patterns:
-            for match in re.finditer("(?=(?:" +pattern + "))", read):
+            for match in re.finditer("(?=(?:" + pattern + "))", read):
                 if not any(gate in read[match.start(0):] for gate in (and_gates + or_gates + ["(", ")"])):
                     matches.append(match)
 
