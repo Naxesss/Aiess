@@ -21,12 +21,12 @@ class TypeProps():
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-colour_ranked     = Colour.from_rgb(255,200,90)
-colour_qualified  = Colour.from_rgb(255,75,100)
-colour_nominated  = Colour.from_rgb(50,150,255)
-colour_discussion = Colour.from_rgb(65,65,65)
-colour_resolve    = Colour.from_rgb(100,200,100)
-colour_reopen     = Colour.from_rgb(255,160,70)
+colour_ranked     = Colour.from_rgb(255, 200, 90 )
+colour_qualified  = Colour.from_rgb(255, 75,  100)
+colour_nominated  = Colour.from_rgb(50,  150, 255)
+colour_discussion = Colour.from_rgb(65,  65,  65 )
+colour_resolve    = Colour.from_rgb(100, 200, 100)
+colour_reopen     = Colour.from_rgb(255, 160, 70 )
 
 type_props = {
     types.RANK:               TypeProps(":sparkling_heart:",    "Ranked",           colour_ranked,      show_history=True),
