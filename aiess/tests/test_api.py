@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from aiess.objects import Beatmapset, User
 from aiess.web import api
 
 def test_cache():

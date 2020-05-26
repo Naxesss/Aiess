@@ -1,7 +1,6 @@
 import sys
 sys.path.append('..')
 
-from bs4 import BeautifulSoup
 from typing import Generator
 
 from aiess import Discussion, Beatmapset, User

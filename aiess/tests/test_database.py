@@ -1,6 +1,5 @@
 import pytest
-from mysql.connector.errors import ProgrammingError, OperationalError
-from typing import List, Tuple
+from mysql.connector.errors import ProgrammingError
 from datetime import datetime
 
 from aiess.objects import User, Beatmapset, Discussion, Event

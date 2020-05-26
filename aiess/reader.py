@@ -1,11 +1,11 @@
 from typing import Generator, List
-from datetime import datetime, timedelta
+from datetime import datetime
 import itertools
 import asyncio
 import copy
 
 from aiess import Event
-from aiess.database import Database, SCRAPER_DB_NAME
+from aiess.database import Database
 from aiess import timestamp
 from aiess import event_types as types
 

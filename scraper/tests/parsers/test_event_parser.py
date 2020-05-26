@@ -2,7 +2,6 @@ import sys
 sys.path.append('..')
 
 import pytest
-from datetime import datetime
 
 from aiess.errors import ParsingError, DeletedContextError
 from aiess import timestamp

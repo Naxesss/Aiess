@@ -1,8 +1,6 @@
 import sys
 sys.path.append('..')
 
-import pytest
-
 from scraper.requester import get_beatmapset_events
 from scraper.requester import get_discussion_events
 from scraper.requester import get_reply_events

@@ -4,7 +4,7 @@ from typing import List
 import aiess
 from aiess import Event, Beatmapset, User
 from aiess import timestamp
-from aiess.database import Database, SCRAPER_TEST_DB_NAME
+from aiess.database import SCRAPER_TEST_DB_NAME
 from aiess.reader import merge_concurrent
 
 received_events = []

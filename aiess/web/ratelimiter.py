@@ -1,7 +1,6 @@
 import requests
 from requests import Response
-from socket import gaierror
-from typing import Generator, Dict
+from typing import Dict
 from time import sleep
 from datetime import datetime, timedelta
 from collections import defaultdict

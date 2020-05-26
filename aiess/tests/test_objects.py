@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 
 from aiess.objects import User, Beatmapset, Discussion, Usergroup, Event
-from aiess.errors import ParsingError, DeletedContextError
+from aiess.errors import DeletedContextError
 
 from aiess.tests.mocks.api import beatmap as mock_beatmap
 from aiess.tests.mocks.api import old_beatmap as mock_old_beatmap

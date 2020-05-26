@@ -3,7 +3,6 @@ sys.path.append('..')
 
 import discord
 from discord import Message
-import asyncio
 
 import aiess
 from aiess import Event

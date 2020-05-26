@@ -12,7 +12,6 @@ from aiess.database import SCRAPER_TEST_DB_NAME
 from aiess.timestamp import from_string
 from aiess import event_types as types
 
-from scraper.populator import get_discussions_json
 from scraper.populator import get_complete_discussion_info
 from scraper.populator import __complete_discussion_context
 from scraper.populator import __populate_additional_details

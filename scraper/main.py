@@ -1,7 +1,6 @@
 import sys
 sys.path.append('..')
 
-from bs4 import BeautifulSoup
 from datetime import datetime
 from time import sleep
 
