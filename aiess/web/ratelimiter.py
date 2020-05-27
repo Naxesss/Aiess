@@ -10,12 +10,15 @@ from aiess.logger import log_err
 next_request_time: Dict[str, datetime] = defaultdict(lambda: datetime.utcnow())
 failed_attempts: Dict[str, datetime] = defaultdict(int)
 
+def invalid_response(response: Response) -> bool:
+    return response is None or str(response.status_code).startswith('5')
+
 def request_with_rate_limit(request_url: str, rate_limit: float, rate_limit_id: str=None) -> Response:
     """Requests a response object at most once every rate_limit seconds for the same rate_limit_id (default None)."""
     global next_request_time
     
     response = None
-    while not response:
+    while invalid_response(response):
         request_time = next_request_time[rate_limit_id]
         if request_time and request_time > datetime.now():
             sleep((request_time - datetime.now()).total_seconds())
@@ -25,7 +28,7 @@ def request_with_rate_limit(request_url: str, rate_limit: float, rate_limit_id: 
 
         # `try_request` will return None in case of ConnectionErrors or IUAM.
         # In these cases we back off and wait until it's over.
-        if not response:
+        if invalid_response(response):
             back_off(rate_limit_id)
 
     if rate_limit_id in failed_attempts:
