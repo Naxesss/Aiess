@@ -42,7 +42,7 @@ def __get_beatmapset_events_between(start_time: datetime, end_time: datetime) ->
             yield event
 
 def __get_event_generations_between(
-        generator_function: Callable[int, Generator[Event, None, None]],
+        generator_function: Callable[[int], Generator[Event, None, None]],
         start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
     """Returns the same generator as the generation function argument, but within the given time
     frame and across multiple pages rather than just one."""
