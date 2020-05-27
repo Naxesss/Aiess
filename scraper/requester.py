@@ -18,11 +18,7 @@ from scraper.parsers.discussion_parser import discussion_parser
 def request_page(url: str) -> Response:
     """Requests a response object using the page rate limit.
     If cloudflare IUAM (https://blog.cloudflare.com/tag/iuam/) is active we simply wait until it's over."""
-    response = None
-    while response is None or str(response.status_code).startswith('5'):
-        response = request_with_rate_limit(url, PAGE_RATE_LIMIT, "page")
-    
-    return response
+    return request_with_rate_limit(url, PAGE_RATE_LIMIT, "page")
 
 def request_json(url: str) -> object:
     """Requests the page from the url as a json object."""
