@@ -8,11 +8,11 @@ from aiess import Event
 
 from bot import subscriber
 from bot.subscriptions import Subscription
-from bot.database import Database
+from bot.database import Database, BOT_TEST_DB_NAME
 
 @pytest.fixture
 def test_database():
-    database = Database("aiess_bot_test")
+    database = Database(BOT_TEST_DB_NAME)
     # Reset database to state before any tests ran.
     database.clear_table_data("subscriptions")
     return database
