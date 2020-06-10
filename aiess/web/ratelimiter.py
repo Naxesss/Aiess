@@ -7,7 +7,7 @@ from collections import defaultdict
 
 from aiess.logger import log_err
 
-next_request_time: Dict[str, datetime] = defaultdict(lambda: datetime.utcnow())
+next_request_time: Dict[str, datetime] = defaultdict(datetime.utcnow)
 failed_attempts: Dict[str, datetime] = defaultdict(int)
 
 def invalid_response(response: Response) -> bool:
