@@ -13,6 +13,8 @@ class Command():
         self.name = name
         self.args = [arg for arg in args]
         self.context = context
+        
+        self.response = None
     
     def __str__(self) -> str:
         args = [f" {arg}" for arg in self.args]
@@ -40,6 +42,7 @@ class Command():
         
         try:
             await self.context.channel.send(response)
+            self.response = response
             return True
         except Forbidden:
             print(f"Lacking permissions to write \"{response}\" in {self.context.channel}.")
