@@ -83,14 +83,12 @@ class Reader():
         
         Some types of events in this batch are merged together if concurrent
         (e.g. user nominates + system qualifies -> user qualifies)."""
-        pass
 
     async def on_event(self, event: Event) -> None:
         """Called for each new event found in the running loop of the reader.
         
         Some types of events are merged together if concurrent
         (e.g. user nominates + system qualifies -> user qualifies)."""
-        pass
 
 
 
