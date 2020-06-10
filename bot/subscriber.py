@@ -10,12 +10,14 @@ from bot.subscriptions import Subscription
 from bot.database import Database, BOT_DB_NAME
 from bot.filterer import passes_filter, dissect
 
+DEFAULT_DB_NAME = BOT_DB_NAME
+
 cache: List[Subscription] = []
 
 def load(database: Database=None) -> None:
     """Retrieves all subscriptions from the database and appends them to the internal list."""
     if not database:
-        database = Database(BOT_DB_NAME)
+        database = Database(DEFAULT_DB_NAME)
 
     global cache
     cache = []
@@ -33,7 +35,7 @@ def add_subscription(sub: Subscription, database: Database=None) -> None:
     """Inserts a subscription into the subscription table of the database and reloads the cache.
     Causes any new events passing the filter to be sent to the channel."""
     if not database:
-        database = Database(BOT_DB_NAME)
+        database = Database(DEFAULT_DB_NAME)
 
     database.insert_subscription(sub)
     load(database)
@@ -46,7 +48,7 @@ def unsubscribe(channel: TextChannel) -> None:
 def remove_subscription(sub: Subscription, database: Database=None) -> None:
     """Deletes a subscription from the subscription table of the database and reloads the cache."""
     if not database:
-        database = Database(BOT_DB_NAME)
+        database = Database(DEFAULT_DB_NAME)
 
     database.delete_subscription(sub)
     load(database)
