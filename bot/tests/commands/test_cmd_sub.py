@@ -14,6 +14,7 @@ def setup_function():
     Database(BOT_TEST_DB_NAME).clear_table_data("subscriptions")
     # Use the test database by default, so we don't clutter the production one.
     subscriber.DEFAULT_DB_NAME = BOT_TEST_DB_NAME
+    subscriber.cache = []
 
 def test_correct_setup():
     assert not Database(BOT_TEST_DB_NAME).retrieve_table_data("subscriptions")
