@@ -37,9 +37,6 @@ class Command():
     
     async def respond(self, response: str) -> bool:
         """Returns whether a response was successfully sent."""
-        if not self.context:
-            return False  # I.e. called from test modules.
-        
         try:
             await self.context.channel.send(response)
             self.response = response
