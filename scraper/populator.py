@@ -97,11 +97,6 @@ def __complete_discussion_context(discussion: Discussion, db_name: str=SCRAPER_D
     cached_discussion = Database(db_name).retrieve_discussion(f"id={discussion.id}")
     if not cached_discussion:
         return False
-    
-    if cached_discussion.user is None or cached_discussion.content is None:
-        raise ValueError("""
-            Retrieved an incomplete discussion instance. This should not be possible when
-            preventing input of incomplete instances.""")
 
     discussion.user = cached_discussion.user
     discussion.content = cached_discussion.content
