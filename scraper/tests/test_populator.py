@@ -18,6 +18,17 @@ from scraper.populator import __populate_additional_details
 
 from scraper.tests.mocks.discussion_format_json import JSON as mock_discussion_json
 
+def setup_function():
+    database = Database(SCRAPER_TEST_DB_NAME)
+    # Reset database to state before any tests ran.
+    database.clear_table_data("events")
+    database.clear_table_data("discussions")
+
+def test_correct_setup():
+    database = Database(SCRAPER_TEST_DB_NAME)
+    assert not database.retrieve_table_data("events")
+    assert not database.retrieve_table_data("discussions")
+
 def test_old_discussion():
     beatmapset = Beatmapset(41823, beatmapset_json=mock_old_beatmap.JSON)
     discussion = Discussion(1234956, beatmapset)
