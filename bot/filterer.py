@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from typing import Union, List, Generator, Tuple, Match
+from typing import Union, List, Generator, Tuple, Match, Dict, Callable
 import re
 
 from aiess import Event, User, Beatmapset, Discussion
@@ -14,6 +14,8 @@ NOT_GATES = ["not ",  "!", "¬"]
 # Regular expression for cases like "not A and (not B or not C)"
 # Any group captured may be removed.
 NOT_GATE_PATTERNS = ["(?:(?:^|[^A-Za-z0-9_ ])|( ))(not)(?:(?:[^A-Za-z0-9_ ])|( ))", "(!)", "(¬)"]
+
+KEY_VALUE_PATTERN = "(\"[^\"]+.|[^ ]+):(\"[^\"]+.|[^ ]+)"
 
 QUOTE_CHARS = ["\"", "“", "”"]
 
@@ -42,6 +44,49 @@ TYPE_ALIASES: Dict[str, List[str]] = {
     types.KUDOSU_DENY:  ["kudosu deny",  "kudosu denied"],
     types.KUDOSU_ALLOW: ["kudosu allow", "kudosu allowed"]
 }
+
+def escape(obj: str) -> str:
+    """Returns the same object cast to string, but surrounded in quotes if it contains a space."""
+    if " " in str(obj):
+        return f"\"{obj}\""
+    return str(obj)
+
+# The keys and values of `TYPE_ALIASES` together make up all recognized types.
+VALID_TYPES = [escape(key) for key in TYPE_ALIASES]
+VALID_TYPES.extend(escape(alias) for aliases in TYPE_ALIASES.values() for alias in aliases)
+
+def is_int(value: str) -> bool:
+    """Returns whether the given string can be parsed as an integer."""
+    try:
+        int(value)
+        return True
+    except:
+        return False
+
+# Used for checking whether a key-value pair is recognized and valid (e.g. "type:asdf" and
+# "user-id:test" are both invalid; first is an unrecognized type, second is not an id).
+VALID_FILTERS: Dict[str, Callable[[str], bool]] = {
+    # `dissect_user`
+    "user":                 lambda value: True,
+    "user-id":              lambda value: is_int(value),
+    # `dissect_beatmapset`
+    "mapset-id":            lambda value: is_int(value),
+    "artist":               lambda value: True,
+    "title":                lambda value: True,
+    "creator":              lambda value: True,
+    "creator-id":           lambda value: is_int(value),
+    "mode":                 lambda value: value in ["osu", "taiko", "catch", "mania"],
+    # `dissect_discussion`
+    "discussion-id":        lambda value: is_int(value),
+    "author":               lambda value: True,
+    "author-id":            lambda value: is_int(value),
+    "discussion-content":   lambda value: True,
+    # `dissect_event`
+    "type":                 lambda value: value in VALID_TYPES,
+    "content":              lambda value: True
+}
+
+
 
 def expand(string: str) -> str:
     """Converts the given expression into disjunctive normal form.
@@ -127,12 +172,6 @@ def cleanup(string: str) -> str:
         string = string[1:-1]
     
     return string
-
-def escape(obj: str) -> str:
-    """Returns the same object cast to string, but surrounded in quotes if it contains a space."""
-    if " " in str(obj):
-        return f"\"{obj}\""
-    return str(obj)
 
 def parenthesis_equal(string: str) -> bool:
     """Returns whether this string has an equal amount of opening and closing parentheses."""
@@ -461,3 +500,32 @@ def passes_filter(_filter: str, dissection: List[str]) -> bool:
             return True
 
     return False
+
+
+
+def get_key_value_pairs(_filter: str) -> Generator[Tuple[str, str], None, None]:
+    """Returns a generator of key-value pair tuples from the given filter."""
+    expansion = expand(_filter)
+    for match in re.finditer(KEY_VALUE_PATTERN, expansion):
+        yield (match.group(1), match.group(2))
+
+def get_invalid_keys(_filter: str) -> Generator[str, None, None]:
+    """Returns a generator of invalid keys from the given filter."""
+    for key, _ in get_key_value_pairs(_filter):
+        if key.lower() not in VALID_FILTERS:
+            yield key
+
+def get_invalid_filters(_filter: str) -> Generator[str, None, None]:
+    """Returns a generator of invalid key-value pair tuples from the given filter."""
+    for key, value in get_key_value_pairs(_filter):
+        if not VALID_FILTERS[key.lower()](value.lower()):
+            yield (key, value)
+
+def get_invalid_words(_filter: str) -> Generator[str, None, None]:
+    """Returns all space-separated instances of text, which are neither key-value
+    pairs nor logical gates, in the given filter."""
+    for split in expand(_filter).split(" "):
+        is_key_value_pair = re.match(KEY_VALUE_PATTERN, split)
+        is_logical_gate = split.lower() in map(lambda gate: gate.replace(" ", ""), NOT_GATES + AND_GATES + OR_GATES)
+        if not is_key_value_pair and not is_logical_gate:
+            yield split
