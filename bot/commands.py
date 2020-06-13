@@ -8,7 +8,8 @@ from discord import Message
 from discord import Forbidden, HTTPException
 
 class Command():
-    """Represents the values with which a command is called (i.e. name, args, context)."""
+    """Represents the values with which a command is called (i.e. name, args, context),
+    as well as the response from the command, if any."""
     def __init__(self, name: str, *args: str, context: Message=None):
         self.name = name
         self.args = [arg for arg in args]
