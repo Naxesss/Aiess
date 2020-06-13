@@ -71,7 +71,8 @@ def test_delete_incomplete_context():
     discussion = Discussion(99, beatmapset)  # Missing user and content.
     event = Event("test", from_string("2020-01-01 00:00:00"), discussion=discussion)
     
-    __populate_additional_details(event, "", db_name=SCRAPER_TEST_DB_NAME)
+    # The discussions json should not be checked, so we simply set it as None.
+    __populate_additional_details(event, discussions_json=None, db_name=SCRAPER_TEST_DB_NAME)
     assert event.marked_for_deletion
 
 def test_additional_details_dq():
