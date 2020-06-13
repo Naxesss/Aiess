@@ -60,7 +60,7 @@ def is_int(value: str) -> bool:
     try:
         int(value)
         return True
-    except:
+    except ValueError:
         return False
 
 # Used for checking whether a key-value pair is recognized and valid (e.g. "type:asdf" and
