@@ -38,6 +38,6 @@ class MockMessage():
 
 class MockCommand(Command):
     """Represents the values with which a command is called (i.e. name, args, context),
-    as well as output from the command (e.g. response)."""
-    def __init__(self, name: str, *args: str, context: MockMessage=None):
+    as well as the response from the command, if any."""
+    def __init__(self, name: str, *args: str, context: MockMessage):
         super().__init__(name, *args, context=context)
