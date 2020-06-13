@@ -26,6 +26,10 @@ from bot.filterer import surround_nonspace
 from bot.filterer import combined_captured_span
 from bot.filterer import dissect
 from bot.filterer import passes_filter
+from bot.filterer import get_key_value_pairs
+from bot.filterer import get_invalid_keys
+from bot.filterer import get_invalid_filters
+from bot.filterer import get_invalid_words
 
 def test_expand():
     assert expand("type:(nominate or qualify)") == "type:nominate or type:qualify"
@@ -367,3 +371,43 @@ def test_passes_filter_missing_field():
 def test_passes_filter_case_sensitivity():
     assert passes_filter("type:Reply AND mode:OSU", ["mode:osu", "type:reply"])
     assert not passes_filter("TYPE:QUALIFY", ["mode:osu", "type:reply"])
+
+
+
+def test_get_key_value_pairs():
+    assert list(get_key_value_pairs("user:someone and content:test")) == [("user", "someone"), ("content", "test")]
+
+def test_invalid_keys():
+    assert list(get_invalid_keys("content:test or undefined:test and mpaset-id:12389")) == ["undefined", "mpaset-id"]
+
+def test_invalid_filter_freetext():
+    assert list(get_invalid_filters("content:\"askjda kjsfh jgniqweunf\" or user:kjfhakjshd")) == []
+
+def test_invalid_filter_modes():
+    assert list(get_invalid_filters("mode:test or mode:osu or mode:catch")) == [("mode", "test")]
+
+def test_invalid_filter_ids():
+    assert (list(get_invalid_filters("user-id:test or mapset-id:\"test two\" or user-id:12381031"))
+        == [("user-id", "test"), ("mapset-id", "\"test two\"")])
+
+def test_invalid_filter_types():
+    assert list(get_invalid_filters("type:undefined or user:someone or type:qualify")) == [("type", "undefined")]
+
+def test_invalid_filter_types_alias():
+    assert list(get_invalid_filters("type:nom or type:nomnom or type:qual")) == [("type", "nomnom")]
+
+def test_invalid_filter_types_escaped():
+    assert list(get_invalid_filters("type:\"kudosu gain\" or type:\"something else\"")) == [("type", "\"something else\"")]
+
+def test_invalid_filter_types_multiple():
+    assert (list(get_invalid_filters("type:undefined or type:nominate or user:someone and type:\"something else\""))
+        == [("type", "undefined"), ("type", "\"something else\"")])
+
+def test_invalid_words_missed_colon():
+    assert list(get_invalid_words("typequalify or type:nominate")) == ["typequalify"]
+
+def test_invalid_words_typoed_and():
+    assert list(get_invalid_words("user:someone annd type:nominate")) == ["annd"]
+
+def test_invalid_words_unexpanded():
+    assert list(get_invalid_words("user:(someone or sometwo) and type: not (nominate or qualify)")) == []
