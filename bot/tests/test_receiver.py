@@ -2,7 +2,10 @@ import sys
 sys.path.append('..')
 
 from bot.commands import Command
-from bot.receiver import parse_command, receive_command
+
+from bot.receiver import parse_command
+from bot.receiver import receive_command
+from bot.receiver import parse_args
 
 def test_find_command():
     assert parse_command("+test") == Command("test")
@@ -15,3 +18,6 @@ def test_find_command():
 
 def test_receive_command():
     assert receive_command(Command("ping"))
+
+def test_parse_args():
+    assert parse_args(["well", "hello", "there"], 2) == ["well", "hello there"]
