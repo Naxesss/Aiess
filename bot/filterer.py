@@ -67,23 +67,23 @@ def is_int(value: str) -> bool:
 # "user-id:test" are both invalid; first is an unrecognized type, second is not an id).
 VALID_FILTERS: Dict[str, Callable[[str], bool]] = {
     # `dissect_user`
-    "user":                 lambda value: True,
-    "user-id":              lambda value: is_int(value),
+    "user":                 lambda _: True,
+    "user-id":              is_int,
     # `dissect_beatmapset`
-    "mapset-id":            lambda value: is_int(value),
-    "artist":               lambda value: True,
-    "title":                lambda value: True,
-    "creator":              lambda value: True,
-    "creator-id":           lambda value: is_int(value),
+    "mapset-id":            is_int,
+    "artist":               lambda _: True,
+    "title":                lambda _: True,
+    "creator":              lambda _: True,
+    "creator-id":           is_int,
     "mode":                 lambda value: value in ["osu", "taiko", "catch", "mania"],
     # `dissect_discussion`
-    "discussion-id":        lambda value: is_int(value),
-    "author":               lambda value: True,
-    "author-id":            lambda value: is_int(value),
-    "discussion-content":   lambda value: True,
+    "discussion-id":        is_int,
+    "author":               lambda _: True,
+    "author-id":            is_int,
+    "discussion-content":   lambda _: True,
     # `dissect_event`
     "type":                 lambda value: value in VALID_TYPES,
-    "content":              lambda value: True
+    "content":              lambda _: True
 }
 
 
