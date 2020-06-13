@@ -54,7 +54,7 @@ def parse_args(args: List[str], arg_count: int) -> List[str]:
     E.g. `+tell <user> <text>` with "+tell someone hello there" gives <text> = "hello there"."""
     parsed_args = []
     for index, arg in enumerate(args):
-        if index > arg_count:
+        if index >= arg_count:
             parsed_args[-1] += " " + arg
         else:
             parsed_args.append(arg)
