@@ -53,4 +53,4 @@ async def test_unsub_no_sub():
 
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✓")
-    assert "nothing to unsub" in mock_command.response
+    assert "nothing to unsub" in mock_command.response.lower()
