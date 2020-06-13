@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 from collections import defaultdict
-from typing import Callable, TypeVar
+from typing import Callable, TypeVar, List
 
 from discord import Message
 from discord import Forbidden, HTTPException
@@ -51,15 +51,23 @@ class Command():
         
         return False
 
-registered_commands = defaultdict()
+class FunctionWrapper():
+    """Represents a function, and its required and/or optional arguments, if any."""
+    def __init__(self, execute: Callable, required_args: List[str]=[], optional_args: List[str]=[]):
+        self.execute = execute
+        self.required_args = required_args
+        self.optional_args = optional_args
+
+registered_commands = defaultdict(FunctionWrapper)
 
 T = TypeVar("T")
-def register(name: str) -> Callable[[Callable[..., T]], T]:
+def register(name: str, required_args: List[str]=[], optional_args: List[str]=[]) -> Callable[[Callable[..., T]], T]:
     """A decorator which registers the respective function as a command
-    able to be executed by the given name (e.g. "ping" in "+ping")."""
+    able to be executed by the given name (e.g. "ping" in "+ping"), optionally
+    with required and/or optional arguments as well."""
 
-    def wrapper(func: Callable[..., T]) -> T:
-        registered_commands[name] = func
-        return func
+    def wrapper(execute: Callable[..., T]) -> T:
+        registered_commands[name] = FunctionWrapper(execute, required_args, optional_args)
+        return execute
     
     return wrapper
