@@ -31,7 +31,7 @@ async def cmd_sub(command: Command, _filter: str):
     invalid_words = set(get_invalid_words(_filter))
     if invalid_words:
         invalids_formatted = "`" + "`, `".join(invalid_words) + "`"
-        await command.respond(f"✗ Invalid word(s) {invalids_formatted}.") # TODO: Show valid values.
+        await command.respond(f"✗ Invalid word(s) {invalids_formatted}.")
         return
 
     subscribe(command.context.channel, _filter)
