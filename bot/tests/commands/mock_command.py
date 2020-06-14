@@ -5,13 +5,13 @@ from bot.commands import Command
 
 class MockGuild():
     """Represents a guild (i.e. the parent of channels)."""
-    def __init__(self, _id: str=None):
-        self.id = str(_id) if _id is not None else None
+    def __init__(self, _id: int=None):
+        self.id = int(_id) if _id is not None else None
 
 class MockChannel():
     """Represents a channel (e.g. in which a message was sent)."""
-    def __init__(self, _id: str=None, guild: MockGuild=None):
-        self.id = str(_id) if _id is not None else None
+    def __init__(self, _id: int=None, guild: MockGuild=None):
+        self.id = int(_id) if _id is not None else None
         self.guild = guild
         self.messages = []
     
@@ -24,8 +24,8 @@ class MockChannel():
 
 class MockUser():
     """Represents a user (e.g. an author of a sent message)."""
-    def __init__(self, _id: str=None, name: str=None):
-        self.id = str(_id) if _id is not None else None
+    def __init__(self, _id: int=None, name: str=None):
+        self.id = int(_id) if _id is not None else None
         self.name = name
 
 class MockMessage():
