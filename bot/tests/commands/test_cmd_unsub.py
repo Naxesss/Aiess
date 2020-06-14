@@ -40,6 +40,7 @@ async def test_unsub():
     
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✓")
+    assert "unsubscribed" in mock_command.response.lower()
     assert subs[0] not in subscriber.cache
     assert subs[1] in subscriber.cache
     assert subs[2] in subscriber.cache
