@@ -169,7 +169,7 @@ def format_context_field_name(event: Event) -> str:
 
 def format_context_field_value(event: Event) -> str:
     """Returns the content for the discussion context, surrounded in quotes."""
-    return f"\"{escape_markdown(event.discussion.content)}\""
+    return format_preview(escape_markdown(event.discussion.content))
 
 def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Database=None) -> str:
     """Returns the nomination history of this beatmapset (i.e. icons and names of actions and their authors).

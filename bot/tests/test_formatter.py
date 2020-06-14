@@ -171,6 +171,10 @@ def test_context_field_name(kudosu_gain_event):
 def test_context_field_value(kudosu_gain_event):
     assert format_context_field_value(kudosu_gain_event) == "\"hi\\*\""
 
+def test_context_field_value_truncate(kudosu_gain_event):
+    kudosu_gain_event.discussion.content = "a very long piece of text " * 10
+    assert format_context_field_value(kudosu_gain_event) == "\"a very long piece of text a very long piece of text a ver...\""
+
 def test_history(test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
