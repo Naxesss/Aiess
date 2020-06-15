@@ -8,20 +8,6 @@ class MockGuild():
     def __init__(self, _id: int=None):
         self.id = int(_id) if _id is not None else None
 
-class MockChannel():
-    """Represents a channel (e.g. in which a message was sent)."""
-    def __init__(self, _id: int=None, guild: MockGuild=None):
-        self.id = int(_id) if _id is not None else None
-        self.guild = guild
-        self.messages = []
-    
-    async def send(self, content):
-        self.messages.append(
-            MockMessage(
-                content=content,
-                channel=self,
-                user   =MockUser(_id=0, name="Aiess")))
-
 class MockDMChannel():
     """Represents a DM channel (e.g. in which a message was sent).
     Unlike regular channels, DM channels do not contain a guild attribute."""
@@ -35,6 +21,12 @@ class MockDMChannel():
                 content=content,
                 channel=self,
                 user   =MockUser(_id=0, name="Aiess")))
+
+class MockChannel(MockDMChannel):
+    """Represents a guild channel (e.g. in which a message was sent)."""
+    def __init__(self, _id: int=None, guild: MockGuild=None):
+        super().__init__(_id)
+        self.guild = guild
 
 class MockUser():
     """Represents a user (e.g. an author of a sent message)."""
