@@ -28,9 +28,8 @@ async def test_sub():
 
     assert mock_command.response.startswith("✓")
     assert mock_command.response_embed
+    assert "🔔 Subscribed" in mock_command.response_embed.title
     assert mock_command.response_embed.fields
-    assert "🔔" in mock_command.response_embed.fields[0].name
-    assert "sub" in mock_command.response_embed.fields[0].name.lower()
     assert f"`{mock_command.args[0]}`" in mock_command.response_embed.fields[0].value
 
     assert subscriber.cache[0].channel_id == mock_message.channel.id
