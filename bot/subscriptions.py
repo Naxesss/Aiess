@@ -6,7 +6,7 @@ class Subscription():
     This allows for figuring out where to send data, as well as which data to send."""
 
     def __init__(self, guild_id: int, channel_id: int, _filter: str):
-        self.guild_id = int(guild_id)
+        self.guild_id = int(guild_id) if guild_id is not None else None
         self.channel_id = int(channel_id)
         self.filter = _filter
     
