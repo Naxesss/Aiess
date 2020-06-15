@@ -1,6 +1,8 @@
 import sys
 sys.path.append('..')
 
+from discord import Embed, Colour
+
 from bot.commands import Command, register
 from bot.subscriber import subscribe
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
@@ -9,7 +11,7 @@ from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_inva
 async def cmd_sub(command: Command, _filter: str):
 
     try:
-        expand(_filter)
+        expansion = expand(_filter)
     except ValueError as err:
         # E.g. parenthesis inequality.
         await command.respond(f"✗ {str(err)}")
@@ -40,6 +42,16 @@ async def cmd_sub(command: Command, _filter: str):
         return
 
     subscribe(command.context.channel, _filter)
-    
-    # TODO: Improve feedback by ecapsulating our input and its expansion in an embed.
-    await command.respond("✓ Subscribed")
+
+    embed = Embed()
+    embed.colour = Colour.from_rgb(255, 170, 50)
+    embed.add_field(
+        name="🔔 Subscribed",
+        value=f"""
+            `{_filter}`\n
+            (`{expansion}`)
+            """
+    )
+
+    Embed()
+    await command.respond("✓", embed=embed)
