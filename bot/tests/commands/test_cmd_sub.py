@@ -25,7 +25,14 @@ async def test_sub():
     mock_command = MockCommand("sub", "type:nominate", context=mock_message)
 
     assert await receive_command(mock_command)
+
     assert mock_command.response.startswith("✓")
+    assert mock_command.response_embed
+    assert mock_command.response_embed.fields
+    assert "🔔" in mock_command.response_embed.fields[0].name
+    assert "sub" in mock_command.response_embed.fields[0].name.lower()
+    assert f"`{mock_command.args[0]}`" in mock_command.response_embed.fields[0].value
+
     assert subscriber.cache[0].channel_id == mock_message.channel.id
     assert subscriber.cache[0].filter == mock_command.args[0]
 
