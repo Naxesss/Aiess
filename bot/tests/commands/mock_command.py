@@ -1,6 +1,8 @@
 import sys
 sys.path.append('..')
 
+from discord import Embed
+
 from bot.commands import Command
 
 class MockGuild():
@@ -15,12 +17,13 @@ class MockDMChannel():
         self.id = int(_id) if _id is not None else None
         self.messages = []
     
-    async def send(self, content):
+    async def send(self, content, embed: Embed=None):
         self.messages.append(
             MockMessage(
                 content=content,
                 channel=self,
-                user   =MockUser(_id=0, name="Aiess")))
+                user   =MockUser(_id=0, name="Aiess"),
+                embed  =embed))
 
 class MockChannel(MockDMChannel):
     """Represents a guild channel (e.g. in which a message was sent)."""
@@ -37,10 +40,11 @@ class MockUser():
 class MockMessage():
     """Represents the message instance (e.g. from which a command was called). Contains
     the channel from where it was sent, as well as by whom."""
-    def __init__(self, content: str=None, channel: MockChannel=None, user: MockUser=None):
+    def __init__(self, content: str=None, channel: MockChannel=None, user: MockUser=None, embed: Embed=None):
         self.content = str(content) if content is not None else None
         self.channel = channel
         self.user = user
+        self.embed = embed
 
 class MockCommand(Command):
     """Represents the values with which a command is called (i.e. name, args, context),
