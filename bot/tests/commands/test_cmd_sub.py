@@ -4,7 +4,7 @@ sys.path.append('..')
 import pytest
 
 from bot import subscriber
-from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel, MockGuild
+from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel, MockGuild, MockDMChannel
 from bot.cmd_modules import cmd_sub
 from bot.receiver import receive_command
 from bot.database import Database, BOT_TEST_DB_NAME
@@ -28,6 +28,16 @@ async def test_sub():
     assert mock_command.response.startswith("✓")
     assert subscriber.cache[0].channel_id == mock_message.channel.id
     assert subscriber.cache[0].filter == mock_command.args[0]
+
+@pytest.mark.asyncio
+async def test_sub_dm_channel():
+    mock_message = MockMessage(channel=MockDMChannel(_id=6))
+    mock_command = MockCommand("sub", "type:nominate", context=mock_message)
+
+    assert await receive_command(mock_command)
+    assert mock_command.response.startswith("✗")
+    assert "DM channel" in mock_command.response
+    assert not subscriber.cache
 
 @pytest.mark.asyncio
 async def test_sub_no_arg():

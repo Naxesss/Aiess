@@ -45,6 +45,14 @@ def test_add_subscription(test_database: Database):
     assert sub2 not in subscriber.cache
     assert sub3 in subscriber.cache
 
+def test_add_subscription_dm_channel(test_database: Database):
+    sub = Subscription(guild_id=None, channel_id=1, _filter="type:nominate")
+
+    with pytest.raises(ValueError) as err:
+        subscriber.add_subscription(sub, test_database)
+    
+    assert "DM channel" in str(err)
+
 def test_remove_subscription(test_database: Database):
     sub1 = Subscription(guild_id=1, channel_id=1, _filter="type:nominate")
 
