@@ -4,7 +4,7 @@ sys.path.append('..')
 from collections import defaultdict
 from typing import Callable, TypeVar, List
 
-from discord import Message
+from discord import Message, Embed
 from discord import Forbidden, HTTPException
 
 class Command():
@@ -16,6 +16,7 @@ class Command():
         self.context = context
         
         self.response = None
+        self.response_embed = None
     
     def __str__(self) -> str:
         args = [f" {arg}" for arg in self.args]
@@ -36,11 +37,12 @@ class Command():
     def __hash__(self) -> str:
         return hash(self.__key())
     
-    async def respond(self, response: str) -> bool:
+    async def respond(self, response: str, embed: Embed=None) -> bool:
         """Returns whether a response was successfully sent."""
         try:
-            await self.context.channel.send(response)
+            await self.context.channel.send(response, embed=embed)
             self.response = response
+            self.response_embed = embed
             return True
         except Forbidden:
             print(f"Lacking permissions to write \"{response}\" in {self.context.channel}.")
