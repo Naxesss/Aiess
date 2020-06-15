@@ -25,15 +25,24 @@ def load(database: Database=None) -> None:
     for sub in database.retrieve_subscriptions():
         cache.append(sub)
 
+def guild_id_or_none(channel: TextChannel):
+    """Returns the id of the guild this channel belongs in, or None if the channel is a DM channel."""
+    return channel.guild.id if hasattr(channel, "guild") else None
+
 def subscribe(channel: TextChannel, _filter: str) -> None:
     """Inserts a channel and filter into the subscription table of the database and updates the cache.
     Causes any new events passing the filter to be sent to the channel."""
-    sub = Subscription(channel.guild.id, channel.id, _filter)
+    # `channel.guild` is None if `channel` is of tpye `DMChannel`.
+    sub = Subscription(guild_id_or_none(channel), channel.id, _filter)
     add_subscription(sub)
 
 def add_subscription(sub: Subscription, database: Database=None) -> None:
     """Inserts a subscription into the subscription table of the database and reloads the cache.
     Causes any new events passing the filter to be sent to the channel."""
+    if sub.guild_id is None:
+        # Prevents excessive discord rate limiting (5 DMs per second globally).
+        raise ValueError("Cannot subscribe in DM channels.")
+
     if not database:
         database = Database(DEFAULT_DB_NAME)
 
@@ -42,7 +51,7 @@ def add_subscription(sub: Subscription, database: Database=None) -> None:
 
 def unsubscribe(channel: TextChannel) -> None:
     """Deletes a channel and its filter from the subscription table of the database and reloads the cache."""
-    sub = Subscription(channel.guild.id, channel.id, None)
+    sub = Subscription(guild_id_or_none(channel), channel.id, None)
     remove_subscription(sub)
 
 def remove_subscription(sub: Subscription, database: Database=None) -> None:

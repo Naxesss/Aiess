@@ -34,6 +34,11 @@ async def cmd_sub(command: Command, _filter: str):
         await command.respond(f"✗ Invalid word(s) {invalids_formatted}.")
         return
 
+    if not hasattr(command.context.channel, "guild"):
+        # Prevents excessive discord rate limiting (5 DMs per second globally).
+        await command.respond(f"✗ Cannot subscribe in DM channels.")
+        return
+
     subscribe(command.context.channel, _filter)
     
     # TODO: Improve feedback by ecapsulating our input and its expansion in an embed.
