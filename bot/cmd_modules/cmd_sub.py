@@ -45,14 +45,12 @@ async def cmd_sub(command: Command, _filter: str):
 
     embed = Embed()
     embed.colour = Colour.from_rgb(255, 170, 50)
-    embed.title = "🔔 Subscribed"
     embed.add_field(
-        name="Received",
-        value=f"`{_filter}`"
-    )
-    embed.add_field(
-        name="Expanded",
-        value=f"`{expansion}`"
+        name="🔔 Subscribed",
+        value=f"""
+            {_filter}
+            `{expansion}`
+            """
     )
 
     Embed()
