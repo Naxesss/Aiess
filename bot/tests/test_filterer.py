@@ -296,15 +296,6 @@ def test_dissect_discussion():
     beatmapset = Beatmapset(4, artist="yes", title="no", creator=creator, modes=["osu", "catch"])
     discussion = Discussion(3, beatmapset=beatmapset, user=user, content="hello")
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=user, content="hello")
-    assert dissect(beatmapset) == [
-        "mapset-id:4",
-        "artist:yes",
-        "title:no",
-        "creator:\"some two\"",
-        "creator-id:2",
-        "mode:osu",
-        "mode:catch"
-    ]
     assert dissect(discussion) == dissect(beatmapset) + [
         "discussion-id:3",
         "author:\"some one\"",
@@ -320,21 +311,6 @@ def test_dissect_discussion_reply():
     beatmapset = Beatmapset(4, artist="yes", title="no", creator=creator, modes=["osu", "catch"])
     discussion = Discussion(3, beatmapset=beatmapset, user=user, content="hello")
     event = Event(_type="reply", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=replier, content="there")
-    assert dissect(beatmapset) == [
-        "mapset-id:4",
-        "artist:yes",
-        "title:no",
-        "creator:\"some two\"",
-        "creator-id:2",
-        "mode:osu",
-        "mode:catch"
-    ]
-    assert dissect(discussion) == dissect(beatmapset) + [
-        "discussion-id:3",
-        "author:\"some one\"",
-        "author-id:1",
-        "discussion-content:hello"
-    ]
     assert dissect(event) == ["type:reply"] + dissect(discussion) + dissect(replier) + ["content:there"]
 
 def test_dissect_aliases():
