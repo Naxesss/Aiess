@@ -280,7 +280,9 @@ def test_dissect_beatmapset():
     beatmapset = Beatmapset(4, artist="yes", title="no", creator=user, modes=["osu", "catch"])
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset)
     assert dissect(beatmapset) == [
+        "set-id:4",
         "mapset-id:4",
+        "beatmapset-id:4",
         "artist:yes",
         "title:no",
         "creator:\"some two\"",
