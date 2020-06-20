@@ -26,6 +26,7 @@ from bot.filterer import surround_nonspace
 from bot.filterer import combined_captured_span
 from bot.filterer import dissect
 from bot.filterer import passes_filter
+from bot.filterer import get_tag
 from bot.filterer import get_key_value_pairs
 from bot.filterer import get_invalid_keys
 from bot.filterer import get_invalid_filters
@@ -373,6 +374,14 @@ def test_passes_filter_case_sensitivity():
     assert not passes_filter("TYPE:QUALIFY", ["mode:osu", "type:reply"])
 
 
+
+def test_get_tag():
+    assert get_tag("user")
+    assert get_tag("user-id")
+    assert get_tag("set-id")
+
+def test_get_tag_undefined():
+    assert not get_tag("undefined")
 
 def test_get_key_value_pairs():
     assert list(get_key_value_pairs("user:someone and content:test")) == [("user", "someone"), ("content", "test")]
