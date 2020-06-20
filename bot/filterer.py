@@ -55,6 +55,23 @@ def escape(obj: str) -> str:
 VALID_TYPES = [escape(key) for key in TYPE_ALIASES]
 VALID_TYPES.extend(escape(alias) for aliases in TYPE_ALIASES.values() for alias in aliases)
 
+class Validation():
+    """Represents the validation used by a tag to figure out if a value `is_valid`.
+    Also contains `hint`, which gives information about which values are considered valid
+    (e.g. "Accepts integer values")."""
+    def __init__(self, hint: str, is_valid: Callable[[str], bool]):
+        self.hint = hint
+        self.is_valid = is_valid
+
+class Tag():
+    """Represents a possible key-value pair and which conditions it appears in.
+    Can both create a value from a given object (e.g. Event or Beatmapset) (None if N/A),
+    as well as validate that a given value is valid (e.g. `type` will never have a value of `undefined`)."""
+    def __init__(self, description: str, value_func: Callable[[object], str], validation: Validation):
+        self.description = description
+        self.value_func = value_func
+        self.validation = validation
+
 def is_int(value: str) -> bool:
     """Returns whether the given string can be parsed as an integer."""
     try:
@@ -63,27 +80,93 @@ def is_int(value: str) -> bool:
     except ValueError:
         return False
 
-# Used for checking whether a key-value pair is recognized and valid (e.g. "type:asdf" and
-# "user-id:test" are both invalid; first is an unrecognized type, second is not an id).
-VALID_FILTERS: Dict[str, Callable[[str], bool]] = {
-    # `dissect_user`
-    "user":                 lambda _: True,
-    "user-id":              is_int,
-    # `dissect_beatmapset`
-    "mapset-id":            is_int,
-    "artist":               lambda _: True,
-    "title":                lambda _: True,
-    "creator":              lambda _: True,
-    "creator-id":           is_int,
-    "mode":                 lambda value: value in ["osu", "taiko", "catch", "mania"],
-    # `dissect_discussion`
-    "discussion-id":        is_int,
-    "author":               lambda _: True,
-    "author-id":            is_int,
-    "discussion-content":   lambda _: True,
-    # `dissect_event`
-    "type":                 lambda value: value in VALID_TYPES,
-    "content":              lambda _: True
+VALIDATION_ANY = Validation("Accepts any value.", lambda _: True)
+VALIDATION_IDS = Validation("Accepts integer values.", is_int)
+
+def specific_validation(values: List[str]) -> Validation:
+    return Validation(
+        "Accepts specific values: `" + "`, `".join(values) + "`.",
+        lambda value: value in values
+    )
+
+TAGS: Dict[List[str], Tag] = {
+    # User tags:
+    ("user",): Tag(
+        "The name of the user performing the event (e.g. user nominating, replying, or giving kudosu).",
+        lambda obj: [escape(obj.name)] if isinstance(obj, User) else None,
+        VALIDATION_ANY
+    ),
+    ("user-id",) : Tag(
+        "The id of the user performing the event (e.g. id of user nominating, replying, or giving kudosu).",
+        lambda obj: [escape(obj.id)] if isinstance(obj, User) else None,
+        VALIDATION_IDS
+    ),
+    # Beatmapset tags:
+    ("set-id", "mapset-id", "beatmapset-id") : Tag(
+        "The id of the beatmapset where the event occurred (e.g. id of mapset nominated or discussed).",
+        lambda obj: [escape(obj.id)] if isinstance(obj, Beatmapset) else None,
+        VALIDATION_IDS
+    ),
+    ("artist",) : Tag(
+        "The artist field of a beatmapset an event occurred on (e.g. \"LeaF\" in \"Leaf - Doppelganger\").",
+        lambda obj: [escape(obj.artist)] if isinstance(obj, Beatmapset) else None,
+        VALIDATION_ANY
+    ),
+    ("title",) : Tag(
+        "The title field of a beatmapset an event occurred on (e.g. \"Doppelganger\" in \"Leaf - Doppelganger\").",
+        lambda obj: [escape(obj.title)] if isinstance(obj, Beatmapset) else None,
+        VALIDATION_ANY
+    ),
+    ("creator",) : Tag(
+        "The username of the creator of a beatmapset an event occurred on (e.g. \"Shurelia\" for any set hosted by them).",
+        lambda obj: [escape(obj.creator.name)] if isinstance(obj, Beatmapset) else None,
+        VALIDATION_ANY
+    ),
+    ("creator-id",) : Tag(
+        "The id of the creator of a beatmapset an event occurred on (e.g. \"3807986\" for any set hosted by Shurelia).",
+        lambda obj: [escape(obj.creator.id)] if isinstance(obj, Beatmapset) else None,
+        VALIDATION_IDS
+    ),
+    ("mode",) : Tag(
+        "The involved mode of a beatmapset an event occurred on (e.g. \"taiko\" for any set with a taiko map).",
+        lambda obj: [escape(mode) for mode in obj.modes] if isinstance(obj, Beatmapset) else None,
+        specific_validation(["osu", "taiko", "catch", "mania"])
+    ),
+    # Discussion tags:
+    ("discussion-id",) : Tag(
+        "The id of the discussion an event occurred on (e.g. \"1589811\" for that specific discussion).",
+        lambda obj: [escape(obj.id)] if isinstance(obj, Discussion) else None,
+        VALIDATION_IDS
+    ),
+    ("author",) : Tag(
+        "The username of the author of the discussion an event occurred on (e.g. \"Shurelia\" for any discussion started by them).",
+        lambda obj: [escape(obj.user.name)] if isinstance(obj, Discussion) else None,
+        VALIDATION_ANY
+    ),
+    ("author-id",) : Tag(
+        "The id of the author of the discussion an event occurred on (e.g. \"3807986\" for any discussion started by Shurelia).",
+        lambda obj: [escape(obj.user.id)] if isinstance(obj, Discussion) else None,
+        VALIDATION_IDS
+    ),
+    ("discussion-content",) : Tag(
+        "The text content of the discussion an event occurred on (e.g. \"blanket\" for any discussion started containing that).",
+        lambda obj: [escape(obj.content)] if isinstance(obj, Discussion) else None,
+        VALIDATION_ANY
+    ),
+    # Event tags:
+    ("type",) : Tag(
+        "The type of an event (e.g. nominate, kudosu-gain, or suggestion).",
+        lambda obj: (
+            [escape(obj.type)] +
+            ([escape(alias) for alias in TYPE_ALIASES[obj.type]] if obj.type in TYPE_ALIASES else [])
+        ) if isinstance(obj, Event) else None,
+        specific_validation(VALID_TYPES)
+    ),
+    ("content",) : Tag(
+        "The text content associated with an event (e.g. the text of a reply, disqualification, or discussion).",
+        lambda obj: [escape(obj.content)] if isinstance(obj, Event) and obj.content else None,
+        VALIDATION_ANY
+    )
 }
 
 
@@ -434,50 +517,26 @@ def combined_captured_span(match: Match) -> (int, int):
 
 def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
     """Returns a list of lowercased key:value strings representing the given object."""
-    dissections = []
+    dissections = list(dissect_shallow(obj))
 
-    if isinstance(obj, User):         dissections.extend(list(dissect_user(obj)))
-    elif isinstance(obj, Beatmapset): dissections.extend(list(dissect_beatmapset(obj)))
-    elif isinstance(obj, Discussion): dissections.extend(list(dissect_discussion(obj)))
-    elif isinstance(obj, Event):      dissections.extend(list(dissect_event(obj)))
+    if isinstance(obj, Discussion):
+        dissections.extend(dissect(obj.beatmapset))
+    
+    elif isinstance(obj, Event):
+        if obj.user:       dissections.extend(dissect(obj.user))
+        if obj.discussion: dissections.extend(dissect(obj.discussion))
+        else:              dissections.extend(dissect(obj.beatmapset))
 
     # Lowercase everything for ease-of-access when filtering.
     return list(map(lambda dissection: dissection.lower(), dissections))
 
-def dissect_user(user: User) -> Generator[str, None, None]:
-    yield f"user:{escape(user.name)}"
-    yield f"user-id:{escape(user.id)}"
-
-def dissect_beatmapset(beatmapset: Beatmapset) -> Generator[str, None, None]:
-    yield f"mapset-id:{escape(beatmapset.id)}"
-    yield f"artist:{escape(beatmapset.artist)}"
-    yield f"title:{escape(beatmapset.title)}"
-    yield f"creator:{escape(beatmapset.creator.name)}"
-    yield f"creator-id:{escape(beatmapset.creator.id)}"
-    for mode in beatmapset.modes:
-        yield f"mode:{escape(mode)}"
-    
-def dissect_discussion(discussion: Discussion) -> Generator[str, None, None]:
-    yield from dissect_beatmapset(discussion.beatmapset)
-    
-    yield f"discussion-id:{escape(discussion.id)}"
-    yield f"author:{escape(discussion.user.name)}"
-    yield f"author-id:{escape(discussion.user.id)}"
-    yield f"discussion-content:{escape(discussion.content)}"
-
-def dissect_event(event: Event) -> Generator[str, None, None]:
-    yield f"type:{escape(event.type)}"
-
-    if event.type in TYPE_ALIASES:
-        for alias in TYPE_ALIASES[event.type]:
-            yield f"type:{escape(alias)}"
-
-    # The dissection of the discussion includes the dissection of the beatmapset, if present.
-    if event.discussion: yield from dissect(event.discussion)
-    else:                yield from dissect(event.beatmapset)
-    
-    if event.user:    yield from dissect(event.user)
-    if event.content: yield f"content:{escape(event.content)}"
+def dissect_shallow(obj: Union[Event, User, Beatmapset, Discussion]) -> Generator[str, None, None]:
+    """Returns a generator of dissections on the given object without recursion
+    (e.g. if on an event, the user properties are not part of the generator)."""
+    for keys, tag in TAGS.items():
+        for value in (tag.value_func(obj) or []):
+            for key in keys:
+                yield f"{key}:{value}"
 
 def passes_filter(_filter: str, dissection: List[str]) -> bool:
     """Returns whether the dissection would pass the filter logically. This is case insensitive.
@@ -503,6 +562,13 @@ def passes_filter(_filter: str, dissection: List[str]) -> bool:
 
 
 
+def get_tag(tag_key: str) -> Tag:
+    """Returns the tag associated with this key, case insensitive."""
+    for tag_keys, tag in TAGS.items():
+        if tag_key.lower() in map(lambda key: key.lower(), tag_keys):
+            return tag
+    return None
+
 def get_key_value_pairs(_filter: str) -> Generator[Tuple[str, str], None, None]:
     """Returns a generator of key-value pair tuples from the given filter."""
     expansion = expand(_filter)
@@ -512,13 +578,13 @@ def get_key_value_pairs(_filter: str) -> Generator[Tuple[str, str], None, None]:
 def get_invalid_keys(_filter: str) -> Generator[str, None, None]:
     """Returns a generator of invalid keys from the given filter."""
     for key, _ in get_key_value_pairs(_filter):
-        if key.lower() not in VALID_FILTERS:
+        if not get_tag(key):
             yield key
 
 def get_invalid_filters(_filter: str) -> Generator[str, None, None]:
     """Returns a generator of invalid key-value pair tuples from the given filter."""
     for key, value in get_key_value_pairs(_filter):
-        if not VALID_FILTERS[key.lower()](value.lower()):
+        if not get_tag(key).validation.is_valid(value.lower()):
             yield (key, value)
 
 def get_invalid_words(_filter: str) -> Generator[str, None, None]:
