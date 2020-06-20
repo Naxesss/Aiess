@@ -298,13 +298,19 @@ def test_dissect_discussion():
     beatmapset = Beatmapset(4, artist="yes", title="no", creator=creator, modes=["osu", "catch"])
     discussion = Discussion(3, beatmapset=beatmapset, user=user, content="hello")
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=user, content="hello")
-    assert dissect(discussion) == dissect(beatmapset) + [
+
+    dissection = dissect(discussion)
+    for pair in (dissect(beatmapset) + [
         "discussion-id:3",
         "author:\"some one\"",
         "author-id:1",
         "discussion-content:hello"
-    ]
-    assert dissect(event) == ["type:test"] + dissect(discussion) + dissect(user) + ["content:hello"]
+    ]):
+        assert pair in dissection
+
+    event_dissection = dissect(event)
+    for pair in (["type:test"] + dissect(discussion) + dissect(user) + ["content:hello"]):
+        assert pair in event_dissection
 
 def test_dissect_discussion_reply():
     user = User(1, "some one")
@@ -313,7 +319,10 @@ def test_dissect_discussion_reply():
     beatmapset = Beatmapset(4, artist="yes", title="no", creator=creator, modes=["osu", "catch"])
     discussion = Discussion(3, beatmapset=beatmapset, user=user, content="hello")
     event = Event(_type="reply", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=replier, content="there")
-    assert dissect(event) == ["type:reply"] + dissect(discussion) + dissect(replier) + ["content:there"]
+
+    event_dissection = dissect(event)
+    for pair in (["type:reply"] + dissect(discussion) + dissect(replier) + ["content:there"]):
+        assert pair in event_dissection
 
 def test_dissect_aliases():
     event = Event(_type="nominate", time=datetime.utcnow())
