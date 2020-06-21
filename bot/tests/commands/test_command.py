@@ -2,6 +2,7 @@ import sys
 sys.path.append('..')
 
 from bot.commands import Command
+from bot.commands import COMMAND_PREFIX
 
 def test_init_command():
     command = Command("test", "1", "2", "3")
@@ -20,3 +21,7 @@ def test_eq_command_string():
 def test_hash_command():
     command = Command("test")
     assert command.__hash__()
+
+def test_str_command():
+    command = Command("test", "1", "2", "3")
+    assert str(command) == f"{COMMAND_PREFIX}test 1 2 3"
