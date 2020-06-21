@@ -6,6 +6,7 @@ from discord import Embed, Colour
 from bot.commands import Command, register
 from bot.subscriber import subscribe
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
+from bot.formatter import escape_markdown
 
 @register("sub", required_args=["filter"])
 async def cmd_sub(command: Command, _filter: str):
@@ -48,7 +49,7 @@ async def cmd_sub(command: Command, _filter: str):
     embed.add_field(
         name="🔔 Subscribed",
         value=f"""
-            {_filter}
+            {escape_markdown(_filter)}
             `{expansion}`
             """
     )
