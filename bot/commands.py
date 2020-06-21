@@ -52,22 +52,31 @@ class Command():
         return False
 
 class FunctionWrapper():
-    """Represents a function, and its required and/or optional arguments, if any."""
-    def __init__(self, execute: Callable, required_args: List[str]=[], optional_args: List[str]=[]):
+    """Represents a command function, its required and/or optional arguments, if any,
+    as well as information about the command (e.g. name, description, and example args)."""
+    def __init__(
+            self, name: str, execute: Callable,
+            required_args: List[str]=[], optional_args: List[str]=[],
+            description: str=None, example_args: List[str]=[]):
+        self.name = name
         self.execute = execute
         self.required_args = required_args
         self.optional_args = optional_args
+        self.description = description
+        self.example_args = example_args
 
 registered_commands = defaultdict(FunctionWrapper)
 
 T = TypeVar("T")
-def register(name: str, required_args: List[str]=[], optional_args: List[str]=[]) -> Callable[[Callable[..., T]], T]:
+def register(
+        name: str, required_args: List[str]=[], optional_args: List[str]=[],
+        description: str=None, example_args: List[str]=[]) -> Callable[[Callable[..., T]], T]:
     """A decorator which registers the respective function as a command
     able to be executed by the given name (e.g. "ping" in "+ping"), optionally
     with required and/or optional arguments as well."""
 
     def wrapper(execute: Callable[..., T]) -> T:
-        registered_commands[name] = FunctionWrapper(execute, required_args, optional_args)
+        registered_commands[name] = FunctionWrapper(name, execute, required_args, optional_args)
         return execute
     
     return wrapper
