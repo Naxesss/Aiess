@@ -22,7 +22,7 @@ def test_correct_setup():
 @pytest.mark.asyncio
 async def test_sub():
     mock_message = MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=2)))
-    mock_command = MockCommand("sub", "type:nominate", context=mock_message)
+    mock_command = MockCommand("sub", "type:(nominate or qualify)", context=mock_message)
 
     assert await receive_command(mock_command)
 
@@ -30,7 +30,8 @@ async def test_sub():
     assert mock_command.response_embed
     assert mock_command.response_embed.fields
     assert "🔔 Subscribed" in mock_command.response_embed.fields[0].name
-    assert f"`{mock_command.args[0]}`" in mock_command.response_embed.fields[0].value
+    assert f"type:(nominate or qualify)" in mock_command.response_embed.fields[0].value
+    assert f"`type:nominate or type:qualify`" in mock_command.response_embed.fields[0].value
 
     assert subscriber.cache[0].channel_id == mock_message.channel.id
     assert subscriber.cache[0].filter == mock_command.args[0]
