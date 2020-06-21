@@ -46,3 +46,6 @@ def test_help_embed():
     assert wrapper.description in embed.fields[0].value
     for example_args in wrapper.example_args:
         assert f"`{COMMAND_PREFIX}test {example_args}`" in embed.fields[0].value
+
+def test_help_embed_unrecognized_arg():
+    assert not help_embed("unrecognized")
