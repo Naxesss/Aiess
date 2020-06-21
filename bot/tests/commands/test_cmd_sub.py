@@ -37,6 +37,23 @@ async def test_sub():
     assert subscriber.cache[0].filter == mock_command.args[0]
 
 @pytest.mark.asyncio
+async def test_sub_markdown_and_quotes():
+    mock_message = MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=2)))
+    mock_command = MockCommand("sub", "user:\"__don't underline this__\"", context=mock_message)
+
+    assert await receive_command(mock_command)
+
+    assert mock_command.response.startswith("✓")
+    assert mock_command.response_embed
+    assert mock_command.response_embed.fields
+    assert "🔔 Subscribed" in mock_command.response_embed.fields[0].name
+    assert f"user:\"\\_\\_don't underline this\\_\\_\"" in mock_command.response_embed.fields[0].value
+    assert f"`user:\"__don't underline this__\"`" in mock_command.response_embed.fields[0].value
+
+    assert subscriber.cache[0].channel_id == mock_message.channel.id
+    assert subscriber.cache[0].filter == mock_command.args[0]
+
+@pytest.mark.asyncio
 async def test_sub_dm_channel():
     mock_message = MockMessage(channel=MockDMChannel(_id=6))
     mock_command = MockCommand("sub", "type:nominate", context=mock_message)
