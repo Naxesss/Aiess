@@ -407,3 +407,6 @@ def test_invalid_words_typoed_and():
 
 def test_invalid_words_unexpanded():
     assert list(get_invalid_words("user:(someone or sometwo) and type: not (nominate or qualify)")) == []
+
+def test_invalid_words_quotations():
+    assert list(get_invalid_words("user:\"some one else\" or type:\"kudosu given\"")) == []
