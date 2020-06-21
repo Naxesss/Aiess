@@ -25,7 +25,7 @@ class Command():
     def __key(self) -> tuple:
         return (
             self.name,
-            self.args,
+            tuple(self.args),
             self.context
         )
     
