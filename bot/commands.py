@@ -7,6 +7,8 @@ from typing import Callable, TypeVar, List
 from discord import Message, Embed
 from discord import Forbidden, HTTPException
 
+COMMAND_PREFIX = "+"
+
 class Command():
     """Represents the values with which a command is called (i.e. name, args, context),
     as well as the response from the command, if any."""
@@ -20,7 +22,7 @@ class Command():
     
     def __str__(self) -> str:
         args = "".join(f" {arg}" for arg in self.args)
-        return f"+{self.name}{args}"
+        return f"{COMMAND_PREFIX}{self.name}{args}"
     
     def __key(self) -> tuple:
         return (
