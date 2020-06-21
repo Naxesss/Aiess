@@ -66,6 +66,11 @@ class FunctionWrapper():
         self.optional_args = optional_args
         self.description = description
         self.example_args = example_args
+    
+    def __str__(self):
+        required_args_str = (" " + " ".join(map(lambda arg: f"<{arg}>", self.required_args))) if self.required_args else ""
+        optional_args_str = (" " + " ".join(map(lambda arg: f"[{arg}]", self.optional_args))) if self.optional_args else ""
+        return f"`{COMMAND_PREFIX}{self.name}{required_args_str}{optional_args_str}`"
 
 registered_commands = defaultdict(FunctionWrapper)
 
