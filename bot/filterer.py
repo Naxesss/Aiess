@@ -590,7 +590,7 @@ def get_invalid_filters(_filter: str) -> Generator[str, None, None]:
 def get_invalid_words(_filter: str) -> Generator[str, None, None]:
     """Returns all space-separated instances of text, which are neither key-value
     pairs nor logical gates, in the given filter."""
-    for split in expand(_filter).split(" "):
+    for split, _ in split_unescaped(expand(_filter), delimiters=[" "]):
         is_key_value_pair = re.match(KEY_VALUE_PATTERN, split)
         is_logical_gate = split.lower() in map(lambda gate: gate.replace(" ", ""), NOT_GATES + AND_GATES + OR_GATES)
         if not is_key_value_pair and not is_logical_gate:
