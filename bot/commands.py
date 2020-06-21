@@ -19,7 +19,7 @@ class Command():
         self.response_embed = None
     
     def __str__(self) -> str:
-        args = [f" {arg}" for arg in self.args]
+        args = "".join(f" {arg}" for arg in self.args)
         return f"+{self.name}{args}"
     
     def __key(self) -> tuple:
