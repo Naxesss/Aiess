@@ -8,7 +8,15 @@ from bot.subscriber import subscribe
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
 from bot.formatter import escape_markdown
 
-@register("sub", required_args=["filter"])
+@register(
+    name          = "sub",
+    required_args = ["filter"],
+    description   = "Subscribes to events matching `<filter>`.",
+    example_args  = [
+        "type:(rank or love)",
+        "user:\"space in name\"",
+        "(user or creator):someone and not type:reply"
+    ])
 async def cmd_sub(command: Command, _filter: str):
 
     try:
