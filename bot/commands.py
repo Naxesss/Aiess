@@ -87,3 +87,23 @@ def register(
         return execute
     
     return wrapper
+
+def help_embed(name: str) -> Embed:
+    """Returns an embed explaining how to use the command with the given name.
+    Includes e.g. arguments, description, and examples."""
+    name = name.lower()
+    if name not in registered_commands:
+        return None
+    
+    wrapper = registered_commands[name]
+
+    embed = Embed()
+    embed.add_field(
+        name=str(wrapper),
+        value=
+            wrapper.description + "\r\n"
+            "**Example(s)**: " + " ".join(map(lambda ex: f"`{COMMAND_PREFIX}{name} {ex}`", wrapper.example_args)),
+        inline=True
+    )
+
+    return embed
