@@ -12,3 +12,11 @@ def test_init_command_no_args():
     command = Command("test")
     assert command.name == "test"
     assert not command.args
+
+def test_eq_command_string():
+    command = Command("test")
+    assert not command == "some string"
+
+def test_hash_command():
+    command = Command("test")
+    assert command.__hash__()
