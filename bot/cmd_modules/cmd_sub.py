@@ -11,7 +11,7 @@ from bot.formatter import escape_markdown
 @register(
     name          = "sub",
     required_args = ["filter"],
-    description   = "Subscribes to events matching `<filter>`.",
+    description   = "Subscribes this channel to events matching `<filter>`.",
     example_args  = [
         "type:(rank or love)",
         "user:\"space in name\"",
