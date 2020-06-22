@@ -1,6 +1,10 @@
 import sys
 sys.path.append('..')
 
+from enum import Enum
+from datetime import datetime, timedelta
+from functools import total_ordering
+
 from discord import Embed, Colour
 
 from aiess import Event, User, Beatmapset
@@ -225,3 +229,58 @@ def format_recent_praise(user: User, beatmapset: Beatmapset, database: Database=
     if praise_event:
         return praise_event.content
     return None
+
+
+
+# This decorator infers `<=`, `>=`, and `>` from `<` (__lt__) and `==` (__eq__).
+@total_ordering
+class TimeUnit(Enum):
+    MILLISECONDS = 0
+    SECONDS = 1
+    MINUTES = 2
+    HOURS = 3
+    DAYS = 4
+
+    # Comparison is not inherently supported by Enum.
+    # With the help of @total_ordering, we fully support comparison with this.
+    def __lt__(self, other):
+        if isinstance(other, TimeUnit):
+            return self.value < other.value
+        return NotImplemented
+
+def unit_str(unit: TimeUnit):
+    if unit == TimeUnit.DAYS:         return "d"
+    if unit == TimeUnit.HOURS:        return "h"
+    if unit == TimeUnit.MINUTES:      return "min"
+    if unit == TimeUnit.SECONDS:      return "s"
+    if unit == TimeUnit.MILLISECONDS: return "ms"
+
+def format_time(delta_time: timedelta, min_unit: TimeUnit=TimeUnit.SECONDS, max_units: int=2) -> str:
+    """Returns a string representing the difference in time, in the most appropriate units, (e.g. \"2 min 36 s\").
+    
+    `min_unit` : TimeUnit
+        The minimum unit to display (e.g. if seconds, miliseconds will be skipped).
+        Set to None to remove this limit.
+    `max_units` : int
+        The maximum amount of units to display (e.g. if 2, and days and hours are displayed, the rest is skipped).
+        Set to None to remove this limit."""
+    total_ms = delta_time.total_seconds() * 1000
+
+    days,         total_ms = divmod(total_ms, 24*60*60*1000)
+    hours,        total_ms = divmod(total_ms, 60*60*1000)
+    minutes,      total_ms = divmod(total_ms, 60*1000)
+    seconds,      total_ms = divmod(total_ms, 1000)
+    milliseconds, total_ms = divmod(total_ms, 1)
+
+    formatted_units = []
+    def try_add_formatted_unit(size: int, unit: TimeUnit):
+        if size and (min_unit is None or min_unit <= unit) and (max_units is None or len(formatted_units) < max_units):
+            formatted_units.append(f"{int(size)} {unit_str(unit)}")
+
+    try_add_formatted_unit(days,         TimeUnit.DAYS)
+    try_add_formatted_unit(hours,        TimeUnit.HOURS)
+    try_add_formatted_unit(minutes,      TimeUnit.MINUTES)
+    try_add_formatted_unit(seconds,      TimeUnit.SECONDS)
+    try_add_formatted_unit(milliseconds, TimeUnit.MILLISECONDS)
+
+    return " ".join(formatted_units) if formatted_units else f"< 1 {unit_str(min_unit)}"
