@@ -10,6 +10,7 @@ from discord import Embed, Colour
 from aiess import Event, User, Beatmapset
 from aiess import event_types as types
 
+from aiess.database import SCRAPER_DB_NAME
 from bot.database import Database
 
 class TypeProps():
@@ -132,7 +133,7 @@ def format_footer_text(event: Event, database: Database=None) -> str:
         if event.type in [types.NOMINATE, types.QUALIFY]:
             if not database:
                 # Allows tests to use test databases instead of the production one.
-                database = Database("aiess")
+                database = Database(SCRAPER_DB_NAME)
             
             praise_text = format_recent_praise(event.user, event.beatmapset, database)
             if praise_text:
@@ -178,7 +179,7 @@ def format_context_field_value(event: Event) -> str:
 def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Database=None) -> str:
     """Returns the nomination history of this beatmapset (i.e. icons and names of actions and their authors).
     Optionally within a certain length, smartly shortening/truncating the contents if needed."""
-    if not database: database = Database("aiess")  # Using wrapped database to access events.
+    if not database: database = Database(SCRAPER_DB_NAME)  # Using wrapped database to access events.
 
     # Sorted by time ascending; newer events first.
     events = list(filter(
@@ -223,7 +224,7 @@ def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Dat
 
 def format_recent_praise(user: User, beatmapset: Beatmapset, database: Database=None):
     """Obtains the content of the most recent praise from the given user on the given beatmapset."""
-    if not database: database = Database("aiess")
+    if not database: database = Database(SCRAPER_DB_NAME)
 
     praise_event = database.retrieve_last_type(user, beatmapset, where_type_str="type = \"praise\" OR type = \"hype\"")
     if praise_event:
