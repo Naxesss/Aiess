@@ -222,7 +222,7 @@ def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Dat
     
     return f"\n{short_history}"
 
-def format_recent_praise(user: User, beatmapset: Beatmapset, database: Database=None):
+def format_recent_praise(user: User, beatmapset: Beatmapset, database: Database=None) -> str:
     """Obtains the content of the most recent praise from the given user on the given beatmapset."""
     if not database: database = Database(SCRAPER_DB_NAME)
 
