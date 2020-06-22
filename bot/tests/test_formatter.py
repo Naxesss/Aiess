@@ -23,6 +23,8 @@ from bot.formatter import format_context_field_name
 from bot.formatter import format_context_field_value
 from bot.formatter import format_history
 from bot.formatter import format_recent_praise
+from bot.formatter import TimeUnit
+from bot.formatter import format_time
 
 @pytest.fixture
 def suggestion_event():
@@ -241,3 +243,19 @@ def test_recent_praise_none(test_database):
 
     praise = format_recent_praise(nominator, beatmapset, database=test_database)
     assert praise is None
+
+def test_format_time():
+    assert format_time(timedelta(minutes=2, seconds=36)) == "2 min 36 s"
+
+def test_format_time_max_units():
+    assert format_time(timedelta(hours=3, minutes=2, seconds=36), max_units=1) == "3 h"
+    assert format_time(timedelta(hours=3, minutes=2, seconds=36), max_units=2) == "3 h 2 min"
+    assert format_time(timedelta(hours=3, minutes=2, seconds=36), max_units=3) == "3 h 2 min 36 s"
+    assert format_time(timedelta(hours=3, minutes=2, seconds=36), max_units=None) == "3 h 2 min 36 s"
+
+def test_format_time_min_unit():
+    assert format_time(timedelta(hours=3, minutes=2, seconds=36), min_unit=TimeUnit.DAYS, max_units=None) == "< 1 d"
+    assert format_time(timedelta(hours=3, minutes=2, seconds=36), min_unit=TimeUnit.HOURS, max_units=None) == "3 h"
+    assert format_time(timedelta(hours=3, minutes=2, seconds=36), min_unit=TimeUnit.MINUTES, max_units=None) == "3 h 2 min"
+    assert format_time(timedelta(hours=3, minutes=2, seconds=36), min_unit=TimeUnit.SECONDS, max_units=None) == "3 h 2 min 36 s"
+    assert format_time(timedelta(hours=3, minutes=2, seconds=36), min_unit=None, max_units=None) == "3 h 2 min 36 s"
