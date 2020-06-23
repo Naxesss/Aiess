@@ -39,7 +39,7 @@ async def receive_command(command: Command) -> bool:
     if len(func_wrapper.required_args) > len(command.args):
         missing_args = func_wrapper.required_args[len(command.args):]
         missing_arg_str = "`<" + "`>, <`".join(missing_args) + ">`"
-        await command.respond(f"✗ Missing required argument(s) {missing_arg_str}.")
+        await command.respond_err(f"Missing required argument(s) {missing_arg_str}.")
         return False
 
     parsed_args = parse_args(command.args, arg_count=len(func_wrapper.required_args) + len(func_wrapper.optional_args))
