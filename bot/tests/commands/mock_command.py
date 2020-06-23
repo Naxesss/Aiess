@@ -27,10 +27,12 @@ class MockDMChannel():
     async def send(self, content, embed: Embed=None):
         self.messages.append(
             MockMessage(
-                content=content,
-                channel=self,
-                user   =MockUser(_id=0, name="Aiess"),
-                embed  =embed))
+                content = content,
+                channel = self,
+                author  = MockUser(_id=0, name="Aiess"),
+                embed   = embed
+            )
+        )
 
 class MockChannel(MockDMChannel):
     """Represents a guild channel (e.g. in which a message was sent)."""
