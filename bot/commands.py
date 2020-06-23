@@ -113,11 +113,14 @@ def help_embed(name: str) -> Embed:
 
     embed = Embed()
     embed.add_field(
-        name=str(wrapper),
-        value=
-            wrapper.description + "\r\n"
-            "**Example(s)**: " + " ".join(map(lambda ex: f"`{COMMAND_PREFIX}{name} {ex}`", wrapper.example_args)),
-        inline=True
+        name   = f"**{str(wrapper)}**",
+        value  = wrapper.description,
+        inline = True
+    )
+    embed.add_field(
+        name   = "Example(s)",
+        value  = "".join(map(lambda ex: f"\r\n∙ `{COMMAND_PREFIX}{name} {ex}`", wrapper.example_args)),
+        inline = True
     )
 
     return embed
