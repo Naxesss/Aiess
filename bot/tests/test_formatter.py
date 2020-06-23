@@ -259,3 +259,6 @@ def test_format_time_min_unit():
     assert format_time(timedelta(hours=3, minutes=2, seconds=36), min_unit=TimeUnit.MINUTES, max_units=None) == "3 h 2 min"
     assert format_time(timedelta(hours=3, minutes=2, seconds=36), min_unit=TimeUnit.SECONDS, max_units=None) == "3 h 2 min 36 s"
     assert format_time(timedelta(hours=3, minutes=2, seconds=36), min_unit=None, max_units=None) == "3 h 2 min 36 s"
+
+def test_format_time_numeric_deltatime():
+    assert format_time(10956, min_unit=None, max_units=None) == "3 h 2 min 36 s"
