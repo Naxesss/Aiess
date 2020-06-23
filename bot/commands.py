@@ -85,7 +85,9 @@ def register(
     with required and/or optional arguments as well."""
 
     def wrapper(execute: Callable[..., T]) -> T:
-        registered_commands[name] = FunctionWrapper(name, execute, required_args, optional_args)
+        registered_commands[name] = FunctionWrapper(
+            name, execute, required_args, optional_args, description, example_args
+        )
         return execute
     
     return wrapper
