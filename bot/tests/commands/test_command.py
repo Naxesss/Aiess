@@ -104,3 +104,16 @@ def test_help_embed():
 
 def test_help_embed_unrecognized_arg():
     assert not help_embed("unrecognized")
+
+def test_command_help_embed():
+    wrapper = FunctionWrapper(
+        name="test", execute=None, required_args=["one", "two"], optional_args=["three"],
+        description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
+        example_args=["one two", "1 2 3", "\"o n e\" two three"])
+    registered_commands["test"] = wrapper
+
+    embed1 = Command("test").help_embed()
+    embed2 = help_embed("test")
+
+    assert embed1.fields[0].name == embed2.fields[0].name
+    assert embed1.fields[0].value == embed2.fields[0].value
