@@ -67,6 +67,24 @@ async def test_command_respond_embed():
     assert mock_channel.messages[0].content == ""
     assert mock_channel.messages[0].embed == embed
 
+@pytest.mark.asyncio
+async def test_command_respond_err():
+    wrapper = FunctionWrapper(
+        name="test", execute=None, required_args=["one", "two"], optional_args=["three"],
+        description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
+        example_args=["one two", "1 2 3", "\"o n e\" two three"])
+    registered_commands["test"] = wrapper
+    embed = help_embed("test")
+
+    mock_channel = MockChannel()
+    mock_message = MockMessage("+test 1 2 3", channel=mock_channel)
+    command = Command("test", "1", "2", "3", context=mock_message)
+
+    assert await command.respond_err("error")
+    assert command.response == "✗ error"
+    assert command.response_embed.fields[0].name == embed.fields[0].name
+    assert command.response_embed.fields[0].value == embed.fields[0].value
+
 
 
 def test_help_embed():
