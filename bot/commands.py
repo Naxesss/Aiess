@@ -4,7 +4,7 @@ sys.path.append('..')
 from collections import defaultdict
 from typing import Callable, TypeVar, List
 
-from discord import Message, Embed
+from discord import Message, Embed, Client
 from discord import Forbidden, HTTPException
 
 COMMAND_PREFIX = "+"
@@ -12,10 +12,11 @@ COMMAND_PREFIX = "+"
 class Command():
     """Represents the values with which a command is called (i.e. name, args, context),
     as well as the response from the command, if any."""
-    def __init__(self, name: str, *args: str, context: Message=None):
+    def __init__(self, name: str, *args: str, context: Message=None, client: Client=None):
         self.name = name
         self.args = [arg for arg in args]
         self.context = context
+        self.client = client
         
         self.response = None
         self.response_embed = None

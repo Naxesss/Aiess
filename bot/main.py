@@ -31,7 +31,7 @@ class Client(discord.Client):
             await self.reader.run()
 
     async def on_message(self, message: Message) -> None:
-        await receiver.receive(message)
+        await receiver.receive(message, client=self)
     
     async def send_event(self, event: Event, subscription: Subscription):
         channel = self.get_channel(subscription.channel_id)
