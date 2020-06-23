@@ -41,7 +41,8 @@ class Command():
         return hash(self.__key())
     
     async def respond(self, response: str, embed: Embed=None) -> bool:
-        """Returns whether a response was successfully sent."""
+        """Sends a message in the channel where the command was called, with the given response text and embed, if any.
+        Handles Forbidden and HTTPException errors by logging. Returns whether a response was successfully sent."""
         try:
             await self.context.channel.send(response, embed=embed)
             self.response = response
