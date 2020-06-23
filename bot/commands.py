@@ -59,6 +59,12 @@ class Command():
         
         return False
 
+    async def respond_err(self, response: str) -> bool:
+        """Sends \"✗ `response`\", with a help embed attached, in the channel where the command was called. The
+        help embed explains how the command is used. Handles Forbidden and HTTPException errors by logging.
+        Returns whether a response was successfully sent."""
+        return await self.respond(f"✗ {response}", embed=help_embed(self.name))
+
 class FunctionWrapper():
     """Represents a command function, its required and/or optional arguments, if any,
     as well as information about the command (e.g. name, description, and example args)."""
