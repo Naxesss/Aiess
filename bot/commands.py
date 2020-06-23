@@ -40,6 +40,10 @@ class Command():
     def __hash__(self) -> str:
         return hash(self.__key())
     
+    def help_embed(self) -> Embed:
+        """Returns an embed explaining how this command is used."""
+        return help_embed(self.name)
+    
     async def respond(self, response: str, embed: Embed=None) -> bool:
         """Sends a message in the channel where the command was called, with the given response text and embed, if any.
         Handles Forbidden and HTTPException errors by logging. Returns whether a response was successfully sent."""
