@@ -1,9 +1,16 @@
 import sys
 sys.path.append('..')
 
+from datetime import datetime
+
 from discord import Embed
 
 from bot.commands import Command
+
+class MockClient():
+    """Represents a bot client instance."""
+    def __init__(self, latency: float=0):
+        self.latency = latency
 
 class MockGuild():
     """Represents a guild (i.e. the parent of channels)."""
@@ -49,5 +56,5 @@ class MockMessage():
 class MockCommand(Command):
     """Represents the values with which a command is called (i.e. name, args, context),
     as well as the response from the command, if any."""
-    def __init__(self, name: str, *args: str, context: MockMessage):
-        super().__init__(name, *args, context=context)
+    def __init__(self, name: str, *args: str, context: MockMessage, client: MockClient=None):
+        super().__init__(name, *args, context=context, client=client)
