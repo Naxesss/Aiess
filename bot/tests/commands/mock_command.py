@@ -47,10 +47,11 @@ class MockUser():
 class MockMessage():
     """Represents the message instance (e.g. from which a command was called). Contains
     the channel from where it was sent, as well as by whom."""
-    def __init__(self, content: str=None, channel: MockChannel=None, user: MockUser=None, embed: Embed=None):
+    def __init__(self, content: str=None, channel: MockChannel=None, author: MockUser=None, embed: Embed=None):
         self.content = str(content) if content is not None else None
         self.channel = channel
-        self.user = user
+        self.guild = channel.guild if channel is not None else None
+        self.author = author
         self.embed = embed
 
 class MockCommand(Command):
