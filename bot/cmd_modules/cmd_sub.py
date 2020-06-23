@@ -4,6 +4,7 @@ sys.path.append('..')
 from discord import Embed, Colour
 
 from bot.commands import Command, register
+from bot.commands import COMMAND_PREFIX
 from bot.subscriber import subscribe
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
 from bot.formatter import escape_markdown
@@ -11,7 +12,11 @@ from bot.formatter import escape_markdown
 @register(
     name          = "sub",
     required_args = ["filter"],
-    description   = "Subscribes this channel to events matching `<filter>`.",
+    description   = f"""
+        Subscribes this channel to events matching `<filter>`.
+
+        See also `{COMMAND_PREFIX}unsub`.
+        """,
     example_args  = [
         "type:(rank or love)",
         "user:\"space in name\"",
