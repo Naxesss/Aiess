@@ -61,6 +61,8 @@ async def test_sub_dm_channel():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "DM channel" in mock_command.response
+    assert mock_command.response_embed.fields[0].name == mock_command.help_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == mock_command.help_embed().fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -71,6 +73,8 @@ async def test_sub_no_arg():
     assert not await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "argument" in mock_command.response.lower()
+    assert mock_command.response_embed.fields[0].name == mock_command.help_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == mock_command.help_embed().fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -81,6 +85,8 @@ async def test_sub_parenthesis_inequality():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "parenthes" in mock_command.response.lower()
+    assert mock_command.response_embed.fields[0].name == mock_command.help_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == mock_command.help_embed().fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -91,6 +97,8 @@ async def test_sub_undefined_type():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "`type:undefined`" in mock_command.response.lower()
+    assert mock_command.response_embed.fields[0].name == mock_command.help_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == mock_command.help_embed().fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -101,6 +109,8 @@ async def test_sub_undefined_type_duplicates():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert mock_command.response.lower().count("`type:undefined`") == 1
+    assert mock_command.response_embed.fields[0].name == mock_command.help_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == mock_command.help_embed().fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -111,6 +121,8 @@ async def test_sub_undefined_key():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert mock_command.response.lower().count("`undefined`") == 1
+    assert mock_command.response_embed.fields[0].name == mock_command.help_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == mock_command.help_embed().fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -121,6 +133,8 @@ async def test_sub_forgotten_colon():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "`typequalify`" in mock_command.response
+    assert mock_command.response_embed.fields[0].name == mock_command.help_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == mock_command.help_embed().fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -131,6 +145,8 @@ async def test_sub_typoed_and():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "`annd`" in mock_command.response
+    assert mock_command.response_embed.fields[0].name == mock_command.help_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == mock_command.help_embed().fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -141,4 +157,6 @@ async def test_sub_exclamation_in_value():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "`!mode`" in mock_command.response
+    assert mock_command.response_embed.fields[0].name == mock_command.help_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == mock_command.help_embed().fields[0].value
     assert not subscriber.cache
