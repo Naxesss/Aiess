@@ -4,6 +4,7 @@ sys.path.append('..')
 from enum import Enum
 from datetime import datetime, timedelta
 from functools import total_ordering
+from typing import Union
 
 from discord import Embed, Colour
 
@@ -256,16 +257,22 @@ def unit_str(unit: TimeUnit):
     if unit == TimeUnit.SECONDS:      return "s"
     if unit == TimeUnit.MILLISECONDS: return "ms"
 
-def format_time(delta_time: timedelta, min_unit: TimeUnit=TimeUnit.SECONDS, max_units: int=2) -> str:
+def format_time(delta_time: Union[timedelta, float], min_unit: TimeUnit=TimeUnit.SECONDS, max_units: int=2) -> str:
     """Returns a string representing the difference in time, in the most appropriate units, (e.g. \"2 min 36 s\").
     
+    `delta_time` : Union[timedelta, float]
+        The time difference to format. Can be either a timedelta or a float second representation.
+        The numeric argument can include decimals for subsecond accuracy.
     `min_unit` : TimeUnit
         The minimum unit to display (e.g. if seconds, miliseconds will be skipped).
         Set to None to remove this limit.
     `max_units` : int
         The maximum amount of units to display (e.g. if 2, and days and hours are displayed, the rest is skipped).
         Set to None to remove this limit."""
-    total_ms = delta_time.total_seconds() * 1000
+    if isinstance(delta_time, timedelta):
+        total_ms = delta_time.total_seconds() * 1000
+    else:
+        total_ms = delta_time * 1000
 
     days,         total_ms = divmod(total_ms, 24*60*60*1000)
     hours,        total_ms = divmod(total_ms, 60*60*1000)
@@ -274,7 +281,7 @@ def format_time(delta_time: timedelta, min_unit: TimeUnit=TimeUnit.SECONDS, max_
     milliseconds, total_ms = divmod(total_ms, 1)
 
     formatted_units = []
-    def try_add_formatted_unit(size: int, unit: TimeUnit):
+    def try_add_formatted_unit(size: float, unit: TimeUnit):
         if size and (min_unit is None or min_unit <= unit) and (max_units is None or len(formatted_units) < max_units):
             formatted_units.append(f"{int(size)} {unit_str(unit)}")
 
