@@ -148,6 +148,9 @@ def test_format_footer_text_nominate_praise(test_database):
 
     assert format_footer_text(nom_event, database=test_database) == "sometwo \"nice\""
 
+def test_format_preview_empty_no_surrounding_quotes():
+    assert format_preview("") == ""
+
 def test_format_preview_long():
     text = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"
     assert format_preview(text) == "\"04:25:218 (3,4) - the guitar is really strong here so map...\""
