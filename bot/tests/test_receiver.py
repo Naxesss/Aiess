@@ -12,8 +12,12 @@ from bot.receiver import receive
 from bot.receiver import receive_command
 from bot.receiver import parse_args
 
-def setup_function():
-    registered_commands.clear()
+def setup_module():
+    wrapper = FunctionWrapper(
+        name    = "test",
+        execute = lambda command: command.respond("hi")
+    )
+    registered_commands["test"] = wrapper
 
 def test_find_command():
     assert parse_command("+test") == Command("test")
@@ -26,12 +30,6 @@ def test_find_command():
 
 @pytest.mark.asyncio
 async def test_receive():
-    wrapper = FunctionWrapper(
-        name    = "test",
-        execute = lambda command: command.respond("hi")
-    )
-    registered_commands["test"] = wrapper
-
     mock_channel = MockChannel()
     mock_message = MockMessage("+test", channel=mock_channel)
     await receive(mock_message, client=None)
@@ -39,12 +37,6 @@ async def test_receive():
 
 @pytest.mark.asyncio
 async def test_receive_command():
-    wrapper = FunctionWrapper(
-        name    = "test",
-        execute = lambda command: command.respond("hi")
-    )
-    registered_commands["test"] = wrapper
-
     mock_channel = MockChannel()
     mock_message = MockMessage("+test", channel=mock_channel)
     assert await receive_command(Command("test", context=mock_message))
