@@ -89,7 +89,7 @@ def test_retrieve_beatmapset_events_cache(scraper_test_database):
     
     scraper_test_database.retrieve_beatmapset_events(beatmapset)
     qual_event.user = nom2_event.user
-    assert db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME]["3"] == [qual_event, nom_event]
+    assert db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME][3] == [qual_event, nom_event]
 
     db_module.clear_cache(SCRAPER_TEST_DB_NAME)
     assert not db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME]

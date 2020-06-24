@@ -44,7 +44,7 @@ def test_parse_json():
     assert len(generated_events) == 5
     assert generated_events[0].type == "suggestion"
     assert generated_events[0].time == timestamp.from_string("2020-03-07T20:42:58+00:00")
-    assert generated_events[2].user.id == "2597417"
+    assert generated_events[2].user.id == 2597417
     assert generated_events[2].user.name == "Jaltzu"
 
 @pytest.fixture(scope="module")
@@ -57,19 +57,19 @@ def test_event_attr(discussion_event):
     assert discussion_event.content == problem.CONTENT
 
 def test_user_attr(discussion_event):
-    assert discussion_event.user.id == "197805"
+    assert discussion_event.user.id == 197805
     assert discussion_event.user.name == "Niva"
 
 def test_beatmapset_attr(discussion_event):
-    assert discussion_event.beatmapset.id == "1074596"
+    assert discussion_event.beatmapset.id == 1074596
     assert discussion_event.beatmapset.artist == "Camellia"
     assert discussion_event.beatmapset.title == "werewolf howls. [\"Growling\" Long ver.]"
-    assert discussion_event.beatmapset.creator.id == "419954"
+    assert discussion_event.beatmapset.creator.id == 419954
     assert discussion_event.beatmapset.creator.name == "Regou"
     assert discussion_event.beatmapset.modes == ["osu"]
 
 def test_discussion_attr(discussion_event):
-    assert discussion_event.discussion.id == "1295203"
+    assert discussion_event.discussion.id == 1295203
     assert discussion_event.discussion.beatmapset == discussion_event.beatmapset
 
 
@@ -84,12 +84,12 @@ def test_reply_event_attr(reply_event):
     assert reply_event.content == reply.CONTENT
 
 def test_reply_user_attr(reply_event):
-    assert reply_event.user.id == "6751666"
+    assert reply_event.user.id == 6751666
     assert reply_event.user.name == "Tailsdk"
 
 def test_reply_discussion_attr(reply_event):
-    assert reply_event.discussion.id == "1396395"
+    assert reply_event.discussion.id == 1396395
     populator.populate_event(reply_event)
-    assert reply_event.discussion.user.id == "9555243"
+    assert reply_event.discussion.user.id == 9555243
     assert reply_event.discussion.user.name == "Dubstek"
     assert reply_event.discussion.content == "If you want to express 00:27:528 (27528|1) - this clap sound with LN, I think 00:33:046 (33046|2) - this NM also should be changed into LN for consistency."

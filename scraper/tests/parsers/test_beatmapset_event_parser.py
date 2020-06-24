@@ -51,7 +51,7 @@ def test_parse_json():
     
     assert len(generated_events) == 5
     assert generated_events[0].type == "kudosu-gain"
-    assert generated_events[0].beatmapset.id == "534054"
+    assert generated_events[0].beatmapset.id == 534054
     assert generated_events[0].beatmapset.creator.name == "SkyFlame"
     assert generated_events[4].type == "issue-resolve"
 
@@ -72,14 +72,14 @@ def test_event_attr(beatmapset_event):
     assert beatmapset_event.content is None
 
 def test_user_attr(beatmapset_event):
-    assert beatmapset_event.user.id == "1653229"
+    assert beatmapset_event.user.id == 1653229
     assert beatmapset_event.user.name == "_Stan"
 
 def test_beatmapset_attr(beatmapset_event):
-    assert beatmapset_event.beatmapset.id == "1013400"
+    assert beatmapset_event.beatmapset.id == 1013400
     assert beatmapset_event.beatmapset.artist == "Nekomata Gekidan"
     assert beatmapset_event.beatmapset.title == "AsiaN distractive"
-    assert beatmapset_event.beatmapset.creator.id == "6089608"
+    assert beatmapset_event.beatmapset.creator.id == 6089608
     assert beatmapset_event.beatmapset.creator.name == "Tofu1222"
     assert beatmapset_event.beatmapset.modes == ["mania"]
 

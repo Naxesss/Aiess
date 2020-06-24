@@ -6,8 +6,8 @@ from aiess.errors import DeletedContextError
 
 class User:
     """Contains the user data either requested from the api or directly supplied (i.e. id, name)."""
-    def __init__(self, _id: str, name: str=None):
-        self.id = str(_id)
+    def __init__(self, _id: int, name: str=None):
+        self.id = int(_id)
         if name is not None:
             # Cast for ease-of-use, e.g. with names consisting of just digits.
             self.name = str(name)
@@ -46,7 +46,7 @@ class Beatmapset:
     }
 
     def __init__(
-            self, _id: str, artist: str=None, title: str=None, creator: User=None,
+            self, _id: int, artist: str=None, title: str=None, creator: User=None,
             modes: List[str]=None, beatmapset_json: object=None):
         if _id is None:
             raise ValueError("Beatmapset id should not be None.")
@@ -61,7 +61,7 @@ class Beatmapset:
                 raise DeletedContextError(f"No beatmapset with id {_id} exists.")
             beatmap_json = beatmapset_json[0]  # Assumes metadata is the same across the entire set.
 
-        self.id = str(_id)
+        self.id = int(_id)
         self.artist = str(artist) if artist is not None else beatmap_json["artist"]
         self.title = str(title) if title is not None else beatmap_json["title"]
         self.creator = creator if creator is not None else User(
@@ -108,8 +108,8 @@ class Beatmapset:
 
 class Discussion:
     """Contains the discussion data either supplied or further scraped (latter in case of e.g. disqualify or nomination_reset events)."""
-    def __init__(self, _id: str, beatmapset: Beatmapset, user: User=None, content: str=None):
-        self.id = str(_id)
+    def __init__(self, _id: int, beatmapset: Beatmapset, user: User=None, content: str=None):
+        self.id = int(_id)
         self.beatmapset = beatmapset
         self.user = user if user is not None else None
         self.content = str(content) if content is not None else None
@@ -133,20 +133,20 @@ class Discussion:
 class Usergroup:
     """Contains the usergroup data (i.e id, name). Name is implied from id if not supplied."""
     GROUP_NAMES = {
-        "4": "Global Moderation Team",
-        "7": "Nomination Assessment Team",
-        "11": "Development Team",
-        "16": "Alumni",
-        "22": "Support Team",
-        "28": "Beatmap Nominators",
-        "32": "Beatmap Nominators (Probationary)"
+        4: "Global Moderation Team",
+        7: "Nomination Assessment Team",
+        11: "Development Team",
+        16: "Alumni",
+        22: "Support Team",
+        28: "Beatmap Nominators",
+        32: "Beatmap Nominators (Probationary)"
     }
 
-    def __init__(self, _id: str, name: str=None):
-        self.id = str(_id)
-        self.name = name if name is not None else self.__get_name(str(_id))
+    def __init__(self, _id: int, name: str=None):
+        self.id = int(_id)
+        self.name = name if name is not None else self.__get_name(int(_id))
 
-    def __get_name(self, _id: str) -> str:
+    def __get_name(self, _id: int) -> str:
         """Returns the name of the given group id, or None if unrecognized."""
         return self.GROUP_NAMES[_id] if _id in self.GROUP_NAMES else None
     

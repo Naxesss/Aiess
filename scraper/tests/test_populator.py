@@ -45,7 +45,7 @@ def test_discussion():
     # (e.g. discussion jsons, prior database entires, scraping)
     discussion = get_complete_discussion_info(discussion, beatmapset, db_name=SCRAPER_TEST_DB_NAME)
 
-    assert discussion.user.id == "4967662"
+    assert discussion.user.id == 4967662
     assert discussion.user.name == "greenhue"
     assert discussion.content == "since it ranks soon gonna just dq for fierys discussion https://osu.ppy.sh/beatmapsets/1001546/discussion/-/generalAll#/1228459 plus thought about points i brought up privately in dms."
 
