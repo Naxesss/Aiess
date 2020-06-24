@@ -247,6 +247,19 @@ def test_recent_praise_none(test_database):
     praise = format_recent_praise(nominator, beatmapset, database=test_database)
     assert praise is None
 
+def test_time_unit_comparison():
+    assert TimeUnit.MILLISECONDS < TimeUnit.SECONDS
+
+def test_time_unit_comparison_inferred():
+    assert TimeUnit.HOURS >= TimeUnit.HOURS
+    assert TimeUnit.HOURS >= TimeUnit.MINUTES
+
+def test_time_unit_comparison_not_implemented():
+    with pytest.raises(TypeError) as err:
+        TimeUnit.HOURS >= 0
+    
+    assert "'>=' not supported between instances of 'TimeUnit' and 'int'" in str(err)
+
 def test_format_time():
     assert format_time(timedelta(minutes=2, seconds=36)) == "2 min 36 s"
 
