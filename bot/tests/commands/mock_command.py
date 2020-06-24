@@ -52,7 +52,7 @@ class MockMessage():
     def __init__(self, content: str=None, channel: MockChannel=None, author: MockUser=None, embed: Embed=None):
         self.content = str(content) if content is not None else None
         self.channel = channel
-        self.guild = channel.guild if channel is not None else None
+        self.guild = channel.guild if channel is not None and hasattr(channel, "guild") else None
         self.author = author
         self.embed = embed
 
