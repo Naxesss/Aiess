@@ -40,6 +40,21 @@ class MockChannel(MockDMChannel):
         super().__init__(_id)
         self.guild = guild
 
+class MockResponse():
+    """Represents an http response object (e.g. the 403 response given when a Forbidden error occurs)."""
+    def __init__(self, status: int, reason: str):
+        self.status = status
+        self.reason = reason
+
+class MockErrorChannel(MockChannel):
+    """Represents a guild channel (e.g. in which a message was sent)."""
+    def __init__(self, raise_on_send: Exception, _id: int=None, guild: MockGuild=None):
+        super().__init__(_id, guild)
+        self.raise_on_send = raise_on_send
+
+    async def send(self, content, embed: Embed=None):
+        raise self.raise_on_send
+
 class MockUser():
     """Represents a user (e.g. an author of a sent message)."""
     def __init__(self, _id: int=None, name: str=None):
