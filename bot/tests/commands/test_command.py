@@ -4,8 +4,9 @@ sys.path.append('..')
 import pytest
 
 from discord import Embed
+from discord import Forbidden, HTTPException
 
-from bot.tests.commands.mock_command import MockChannel, MockMessage
+from bot.tests.commands.mock_command import MockChannel, MockMessage, MockErrorChannel, MockResponse
 
 from bot.commands import COMMAND_PREFIX
 from bot.commands import registered_commands
@@ -84,6 +85,30 @@ async def test_command_respond_err():
     assert command.response == "✗ error"
     assert command.response_embed.fields[0].name == embed.fields[0].name
     assert command.response_embed.fields[0].value == embed.fields[0].value
+
+@pytest.mark.asyncio
+async def test_command_respond_forbidden():
+    mock_error = Forbidden(MockResponse(status=403, reason="forbidden"), "lacking permissions")
+    mock_channel = MockErrorChannel(raise_on_send=mock_error)
+    mock_message = MockMessage("+test 1 2 3", channel=mock_channel)
+    command = Command("test", "1", "2", "3", context=mock_message)
+
+    assert not await command.respond("e.g. lacking send message permissions in the channel")
+    assert command.response is None
+    assert command.response_embed is None
+    assert not mock_channel.messages
+
+@pytest.mark.asyncio
+async def test_command_respond_httpexception():
+    mock_error = HTTPException(MockResponse(status=404, reason="not found"), "e.g. some channel doesn't exist")
+    mock_channel = MockErrorChannel(raise_on_send=mock_error)
+    mock_message = MockMessage("+test 1 2 3", channel=mock_channel)
+    command = Command("test", "1", "2", "3", context=mock_message)
+
+    assert not await command.respond("e.g. API did not respond with 200: OK")
+    assert command.response is None
+    assert command.response_embed is None
+    assert not mock_channel.messages
 
 
 
