@@ -67,5 +67,4 @@ async def cmd_sub(command: Command, _filter: str):
             """
     )
 
-    Embed()
     await command.respond("✓", embed=embed)
