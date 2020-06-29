@@ -73,7 +73,7 @@ class Reader():
         """Called for each new event found in the running loop of the reader."""
 
 def merge_concurrent(events: Iterable[Event]) -> List[Event]:
-    """Returns a list of events where certain types of events are combined if they happened together
+    """Returns a list of events where certain concurrent events are merged
     (e.g. user nominates + system qualifies -> user qualifies)."""
     # `dict.fromkeys` removes duplicates in the db, as keys in a dictonary are unique. We essentially merge same events.
     # This is copied such that any modification we make to this list won't affect the original references.
