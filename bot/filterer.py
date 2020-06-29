@@ -598,3 +598,12 @@ def get_invalid_words(_filter: str) -> Generator[str, None, None]:
         is_logical_gate = split.lower() in map(lambda gate: gate.replace(" ", ""), NOT_GATES + AND_GATES + OR_GATES)
         if not is_key_value_pair and not is_logical_gate:
             yield split
+
+def is_valid(_filter: str) -> bool:
+    if (
+        list(get_invalid_keys(_filter)) or
+        list(get_invalid_filters(_filter)) or
+        list(get_invalid_words(_filter))
+    ):
+        return False
+    return True

@@ -31,6 +31,7 @@ from bot.filterer import get_key_value_pairs
 from bot.filterer import get_invalid_keys
 from bot.filterer import get_invalid_filters
 from bot.filterer import get_invalid_words
+from bot.filterer import is_valid
 
 def test_expand():
     assert expand("type:(nominate or qualify)") == "type:nominate or type:qualify"
@@ -413,3 +414,15 @@ def test_invalid_words_unexpanded():
 
 def test_invalid_words_quotations():
     assert list(get_invalid_words("user:\"some one else\" or type:\"kudosu given\"")) == []
+
+def test_valid_keys():
+    assert is_valid("type:nominate")
+    assert not is_valid("undefined:nominate")
+
+def test_valid_values():
+    assert is_valid("type:nominate")
+    assert not is_valid("type:undefined")
+
+def test_valid_words():
+    assert is_valid("type:nominate and user:someone")
+    assert not is_valid("type:nominate annd user:someone")
