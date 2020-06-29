@@ -141,19 +141,6 @@ def test_format_footer_text_kudosu_denied(kudosu_gain_event):
     kudosu_gain_event.user = None
     assert format_footer_text(kudosu_gain_event) == Embed.Empty
 
-def test_format_footer_text_nominate_praise(test_database):
-    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
-    nominator = User(2, "sometwo")
-    discussion = Discussion(7, beatmapset, user=nominator, content="nice")
-
-    praise_event = Event("praise", from_string("2020-01-01 04:56:00"), beatmapset, discussion, user=nominator, content=discussion.content)
-    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=nominator)
-
-    test_database.insert_event(praise_event)
-    test_database.insert_event(nom_event)
-
-    assert format_footer_text(nom_event, database=test_database) == "sometwo \"nice\""
-
 def test_format_preview_empty_no_surrounding_quotes():
     assert format_preview("") == ""
 
