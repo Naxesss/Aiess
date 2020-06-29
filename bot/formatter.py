@@ -237,11 +237,15 @@ def format_recent_praise(user: User, beatmapset: Beatmapset, database: Database=
 # This decorator infers `<=`, `>=`, and `>` from `<` (__lt__) and `==` (__eq__).
 @total_ordering
 class TimeUnit(Enum):
-    MILLISECONDS = 0
-    SECONDS = 1
-    MINUTES = 2
-    HOURS = 3
-    DAYS = 4
+    MICROSECONDS = 0
+    MILLISECONDS = 1
+    SECONDS = 2
+    MINUTES = 3
+    HOURS = 4
+    DAYS = 5
+    WEEKS = 6
+    MONTHS = 7
+    YEARS = 8
 
     # Comparison is not inherently supported by Enum.
     # With the help of @total_ordering, we fully support comparison with this.
@@ -250,14 +254,24 @@ class TimeUnit(Enum):
             return self.value < other.value
         return NotImplemented
 
-def unit_str(unit: TimeUnit):
-    if unit == TimeUnit.DAYS:         return "d"
-    if unit == TimeUnit.HOURS:        return "h"
-    if unit == TimeUnit.MINUTES:      return "min"
-    if unit == TimeUnit.SECONDS:      return "s"
-    if unit == TimeUnit.MILLISECONDS: return "ms"
+def unit_str(unit: TimeUnit, long: bool=False, size: int=None):
+    """Returns the string representation of the time unit. By default as "d/h/min/etc", but
+    becomes "days/hours/minutes/etc" if `long`. `size` only needs to be supplied if `long` is
+    True, and enables plural adaptation (e.g. "1 day", not "1 days")."""
+    s_if_plural = "s" if size and size != 1 else ""
+    if unit == TimeUnit.YEARS:        return ("year"        + s_if_plural) if long else "y"
+    if unit == TimeUnit.MONTHS:       return ("month"       + s_if_plural) if long else "M"
+    if unit == TimeUnit.WEEKS:        return ("week"        + s_if_plural) if long else "w"
+    if unit == TimeUnit.DAYS:         return ("day"         + s_if_plural) if long else "d"
+    if unit == TimeUnit.HOURS:        return ("hour"        + s_if_plural) if long else "h"
+    if unit == TimeUnit.MINUTES:      return ("minute"      + s_if_plural) if long else "min"
+    if unit == TimeUnit.SECONDS:      return ("second"      + s_if_plural) if long else "s"
+    if unit == TimeUnit.MILLISECONDS: return ("millisecond" + s_if_plural) if long else "ms"
+    if unit == TimeUnit.MICROSECONDS: return ("microsecond" + s_if_plural) if long else "μs"
 
-def format_time(delta_time: Union[timedelta, float], min_unit: TimeUnit=TimeUnit.SECONDS, max_units: int=2) -> str:
+def format_time(
+    delta_time: Union[timedelta, float], min_unit: TimeUnit=TimeUnit.SECONDS, max_units: int=2,
+    long: bool=False) -> str:
     """Returns a string representing the difference in time, in the most appropriate units, (e.g. \"2 min 36 s\").
     
     `delta_time` : Union[timedelta, float]
@@ -268,27 +282,38 @@ def format_time(delta_time: Union[timedelta, float], min_unit: TimeUnit=TimeUnit
         Set to None to remove this limit.
     `max_units` : int
         The maximum amount of units to display (e.g. if 2, and days and hours are displayed, the rest is skipped).
-        Set to None to remove this limit."""
+        Set to None to remove this limit.
+    `long` : bool
+        Whether to display units as "days/hours/minutes/etc" instead of "d/h/min/etc". False by default.
+        Adapts to plurality (e.g. if 1 day, it'll display "1 day" and not "1 days")."""
     if isinstance(delta_time, timedelta):
         total_ms = delta_time.total_seconds() * 1000
     else:
         total_ms = delta_time * 1000
 
+    years,        total_ms = divmod(total_ms, 365*24*60*60*1000)
+    months,       total_ms = divmod(total_ms, 30*24*60*60*1000)   # Assuming all months are 30 days long.
+    weeks,        total_ms = divmod(total_ms, 7*24*60*60*1000)
     days,         total_ms = divmod(total_ms, 24*60*60*1000)
     hours,        total_ms = divmod(total_ms, 60*60*1000)
     minutes,      total_ms = divmod(total_ms, 60*1000)
     seconds,      total_ms = divmod(total_ms, 1000)
     milliseconds, total_ms = divmod(total_ms, 1)
+    microseconds, total_ms = divmod(total_ms, 0.001)
 
     formatted_units = []
     def try_add_formatted_unit(size: float, unit: TimeUnit):
         if size and (min_unit is None or min_unit <= unit) and (max_units is None or len(formatted_units) < max_units):
-            formatted_units.append(f"{int(size)} {unit_str(unit)}")
+            formatted_units.append(f"{int(size)} {unit_str(unit, long=long, size=int(size))}")
 
+    try_add_formatted_unit(years,        TimeUnit.YEARS)
+    try_add_formatted_unit(months,       TimeUnit.MONTHS)
+    try_add_formatted_unit(weeks,        TimeUnit.WEEKS)
     try_add_formatted_unit(days,         TimeUnit.DAYS)
     try_add_formatted_unit(hours,        TimeUnit.HOURS)
     try_add_formatted_unit(minutes,      TimeUnit.MINUTES)
     try_add_formatted_unit(seconds,      TimeUnit.SECONDS)
     try_add_formatted_unit(milliseconds, TimeUnit.MILLISECONDS)
+    try_add_formatted_unit(microseconds, TimeUnit.MICROSECONDS)
 
-    return " ".join(formatted_units) if formatted_units else f"< 1 {unit_str(min_unit)}"
+    return " ".join(formatted_units) if formatted_units else f"< 1 {unit_str(min_unit, long=long, size=1)}"
