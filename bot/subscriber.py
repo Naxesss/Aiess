@@ -9,7 +9,7 @@ from aiess import Event
 
 from bot.subscriptions import Subscription
 from bot.database import Database, BOT_DB_NAME
-from bot.filterer import passes_filter, dissect
+from bot.filterer import passes_filter
 
 DEFAULT_DB_NAME = BOT_DB_NAME
 
@@ -66,5 +66,5 @@ def remove_subscription(sub: Subscription, database: Database=None) -> None:
 async def forward(event: Event, client: discord.Client) -> None:
     """Attempts to forward an event through all subscription filters."""
     for sub in cache:
-        if passes_filter(sub.filter, dissect(event)):
+        if passes_filter(sub.filter, event):
             await client.send_event(event, sub)
