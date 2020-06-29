@@ -74,8 +74,9 @@ def test_format_link_no_beatmapset():
 
 
 
-def test_format_embed(suggestion_event):
-    embed: Embed = format_embed(suggestion_event)
+@pytest.mark.asyncio
+async def test_format_embed(suggestion_event):
+    embed: Embed = await format_embed(suggestion_event)
     
     assert embed.fields[0].name.startswith(":yellow_circle: Suggestion (**")
     assert embed.fields[0].name.endswith("** ago)")
@@ -88,8 +89,9 @@ def test_format_embed(suggestion_event):
     assert embed.colour.to_rgb() == (65, 65, 65)
     assert embed.thumbnail.url == "https://b.ppy.sh/thumb/3l.jpg"
 
-def test_format_embed_context(kudosu_gain_event):
-    embed: Embed = format_embed(kudosu_gain_event)
+@pytest.mark.asyncio
+async def test_format_embed_context(kudosu_gain_event):
+    embed: Embed = await format_embed(kudosu_gain_event)
     
     assert len(embed.fields) == 2
     assert embed.fields[1].name == format_context_field_name(kudosu_gain_event)
@@ -103,15 +105,17 @@ def test_format_field_name_qualify(qualify_event):
     assert format_field_name(qualify_event).startswith(":heart: Qualified (**")
     assert format_field_name(qualify_event).endswith("** ago)")
 
-def test_format_field_value(suggestion_event):
+@pytest.mark.asyncio
+async def test_format_field_value(suggestion_event):
     assert (
-        format_field_value(suggestion_event) ==
+        await format_field_value(suggestion_event) ==
         "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]"
     )
 
-def test_format_field_value_markdown(qualify_event):
+@pytest.mark.asyncio
+async def test_format_field_value_markdown(qualify_event):
     assert (
-        format_field_value(qualify_event) ==
+        await format_field_value(qualify_event) ==
         "[**artist\\_with\\*strange\\~symbols\\` - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [\\_sometwo\\_](https://osu.ppy.sh/users/2) [**osu**]"
     )
 
@@ -182,7 +186,8 @@ def test_context_field_value_truncate(kudosu_gain_event):
     kudosu_gain_event.discussion.content = "a very long piece of text " * 10
     assert format_context_field_value(kudosu_gain_event) == "\"a very long piece of text a very long piece of text a ver...\""
 
-def test_history(test_database):
+@pytest.mark.asyncio
+async def test_history(test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
@@ -190,10 +195,11 @@ def test_history(test_database):
     test_database.insert_event(nom_event)
     test_database.insert_event(qual_event)
 
-    history = format_history(beatmapset, database=test_database)
+    history = await format_history(beatmapset, database=test_database)
     assert history == "\n:thought_balloon: [someone](https://osu.ppy.sh/users/1) :heart: [sometwo](https://osu.ppy.sh/users/2)"
 
-def test_history_filtering(test_database):
+@pytest.mark.asyncio
+async def test_history_filtering(test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
@@ -204,10 +210,11 @@ def test_history_filtering(test_database):
     test_database.insert_event(suggestion_event)
 
     # The suggestion event should not appear in the history.
-    history = format_history(beatmapset, database=test_database)
+    history = await format_history(beatmapset, database=test_database)
     assert history == "\n:thought_balloon: [someone](https://osu.ppy.sh/users/1) :heart: [sometwo](https://osu.ppy.sh/users/2)"
 
-def test_history_truncated(test_database):
+@pytest.mark.asyncio
+async def test_history_truncated(test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
@@ -217,7 +224,7 @@ def test_history_truncated(test_database):
         nom_event.time += timedelta(seconds=15)
     test_database.insert_event(qual_event)
 
-    history = format_history(beatmapset, length_limit=200, database=test_database)
+    history = await format_history(beatmapset, length_limit=200, database=test_database)
     expected_history = "\n..."
     for _ in range(10):
         expected_history += ":thought_balloon: "
