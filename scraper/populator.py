@@ -73,20 +73,20 @@ def __populate_additional_details(event: Event, discussions_json: object, db_nam
         same_type = event.type == page_event["type"].replace("_", "-")  # Json uses _ instead of -.
         if same_time and same_type:
 
-            # Event content should reflect discussion content.
             if event.type in [types.DISQUALIFY, types.RESET]:
+                # Event content should reflect discussion content.
                 if event.discussion:  # Discussion may have been deleted.
                     event.content = event.discussion.content
 
-            # Event user should be whoever resolved or reopened, rather than the discussion author.
             if event.type in [types.RESOLVE, types.REOPEN]:
+                # Event user should be whoever resolved or reopened, rather than the discussion author.
                 post_author = discussion_parser.parse_discussion_post_author(
                     page_event["comment"]["beatmap_discussion_post_id"],
                     beatmapset_json)
                 event.user = post_author
             
-            # Event user should be whoever gave or removed the kudosu, not the discssion author.
             if event.type in [types.KUDOSU_GAIN, types.KUDOSU_LOSS]:
+                # Event user should be whoever gave or removed the kudosu, not the discssion author.
                 kudosu_author = discussion_parser.parse_user(
                     page_event["comment"]["new_vote"]["user_id"],
                     beatmapset_json)
