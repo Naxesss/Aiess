@@ -18,7 +18,7 @@ class DiscussionParser():
         """Returns a discussion from the given discussion json. The beatmapset json is also included for efficient username querying."""
         _id = discussion_json["id"]
         user = self.parse_user(discussion_json["user_id"], beatmapset_json)
-        content = discussion_json["posts"][0]["message"]
+        content = discussion_json["posts"][0]["message"] if discussion_json["posts"] else None
         return Discussion(_id, beatmapset, user, content)
 
     def parse_user(self, _id: str, beatmapset_json: object) -> User:
