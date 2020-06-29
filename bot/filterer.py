@@ -389,8 +389,11 @@ def de_morgans_law(string: str) -> str:
     if not needs_negating:
         return string
     
-    # Excludes the found NOT gate.
-    prefix = string[:not_gate_start] + string[not_gate_end:needs_negating_index - len("(")]
+    # Excludes the found NOT gate. Adds a space where the not gate existed if necessary to separate either side.
+    preprefix = string[:not_gate_start]
+    postprefix = string[not_gate_end:needs_negating_index - len("(")]
+    separator = "" if not preprefix or not postprefix or preprefix.endswith(" ") or postprefix.startswith(" ") else " "
+    prefix = preprefix + separator + postprefix
     postfix = string[needs_negating_index + len(needs_negating) + len(")"):]
 
     negated_part = negate(needs_negating, not_gate=found_not_gate)
