@@ -2,6 +2,7 @@ import pytest
 from mysql.connector.errors import ProgrammingError
 from datetime import datetime
 
+from aiess.timestamp import from_string
 from aiess.objects import User, Beatmapset, Discussion, Event
 from aiess.database import Database, SCRAPER_TEST_DB_NAME
 from aiess.common import anext
@@ -223,3 +224,90 @@ async def test_insert_retrieve_multiple_events(test_database):
     retrieved_events = test_database.retrieve_events(where="beatmapset_id=%s", where_values=(beatmapset.id,))
     assert await anext(retrieved_events, None) == event1
     assert await anext(retrieved_events, None) == event2
+
+@pytest.mark.asyncio
+async def test_retrieve_last_type(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+    discussion = Discussion(7, beatmapset, nominator, "nice")
+
+    praise_event = Event("praise", from_string("2020-01-01 04:56:00"), beatmapset, discussion, user=User(2, "sometwo"))
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+
+    test_database.insert_event(praise_event)
+    test_database.insert_event(nom_event)
+
+    retrieved_event = await test_database.retrieve_last_type(
+        user         = nominator,
+        beatmapset   = beatmapset,
+        where        = "type=%s",
+        where_values = ("praise",)
+    )
+    assert retrieved_event == praise_event
+
+@pytest.mark.asyncio
+async def test_retrieve_last_type_none(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+
+    test_database.insert_event(nom_event)
+
+    retrieved_event = await test_database.retrieve_last_type(
+        user         = nominator,
+        beatmapset   = beatmapset,
+        where        = "type=%s",
+        where_values = ("praise",)
+    )
+    assert not retrieved_event
+
+@pytest.mark.asyncio
+async def test_retrieve_last_type_or_priority(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    other_beatmapset = Beatmapset(2, "other artist", "other title", User(5, "other mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+    discussion = Discussion(7, beatmapset, nominator, "nice")
+
+    praise_event = Event("praise", from_string("2020-01-01 04:50:00"), beatmapset, discussion, user=User(2, "sometwo"))
+    hype_event = Event("hype", from_string("2020-01-01 04:56:00"), other_beatmapset, discussion, user=User(2, "sometwo"))
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
+
+    test_database.insert_event(praise_event)
+    test_database.insert_event(hype_event)
+    test_database.insert_event(nom_event)
+    
+    retrieved_event = await test_database.retrieve_last_type(
+        user         = nominator,
+        beatmapset   = beatmapset,
+        where        = "type=%s OR type=%s",
+        where_values = ("praise", "hype")
+    )
+    assert retrieved_event == praise_event
+
+@pytest.mark.asyncio
+async def test_nomination_comment(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+    discussion = Discussion(7, beatmapset, user=nominator, content="nice")
+
+    praise_event = Event("praise", from_string("2020-01-01 04:56:00"), beatmapset, discussion, user=nominator, content=discussion.content)
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=nominator)
+
+    test_database.insert_event(praise_event)
+    test_database.insert_event(nom_event)
+
+    praise = await test_database.retrieve_nomination_comment(nominator, beatmapset)
+    assert praise == "nice"
+
+@pytest.mark.asyncio
+async def test_nomination_comment_none(test_database):
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    nominator = User(2, "sometwo")
+
+    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=nominator)
+
+    test_database.insert_event(nom_event)
+
+    praise = await test_database.retrieve_nomination_comment(nominator, beatmapset)
+    assert praise is None

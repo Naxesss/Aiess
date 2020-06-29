@@ -77,6 +77,10 @@ def __populate_additional_details(event: Event, discussions_json: object, db_nam
                 # Event content should reflect discussion content.
                 if event.discussion:  # Discussion may have been deleted.
                     event.content = event.discussion.content
+            
+            if event.type in [types.NOMINATE, types.QUALIFY]:
+                # Event content should reflect recent praise/hype/note content.
+                event.content = Database(SCRAPER_DB_NAME).retrieve_nomination_comment(event.user, event.beatmapset)
 
             if event.type in [types.RESOLVE, types.REOPEN]:
                 # Event user should be whoever resolved or reopened, rather than the discussion author.
