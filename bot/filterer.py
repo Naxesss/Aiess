@@ -52,8 +52,8 @@ def escape(obj: str) -> str:
     return str(obj)
 
 # The keys and values of `TYPE_ALIASES` together make up all recognized types.
-VALID_TYPES = [escape(key) for key in TYPE_ALIASES]
-VALID_TYPES.extend(escape(alias) for aliases in TYPE_ALIASES.values() for alias in aliases)
+VALID_TYPES = [key for key in TYPE_ALIASES]
+VALID_TYPES.extend(alias for aliases in TYPE_ALIASES.values() for alias in aliases)
 
 class Validation():
     """Represents the validation used by a tag to figure out if a value `is_valid`.
@@ -576,7 +576,7 @@ def get_key_value_pairs(_filter: str) -> Generator[Tuple[str, str], None, None]:
     """Returns a generator of key-value pair tuples from the given filter."""
     expansion = expand(_filter)
     for match in re.finditer(KEY_VALUE_PATTERN, expansion):
-        yield (match.group(1), match.group(2))
+        yield (match.group(1), match.group(2).strip("\""))
 
 def get_invalid_keys(_filter: str) -> Generator[str, None, None]:
     """Returns a generator of invalid keys from the given filter."""
