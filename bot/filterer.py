@@ -166,7 +166,7 @@ TAGS: Dict[List[str], Tag] = {
     ("content",) : Tag(
         "The text content associated with an event (e.g. the text of a reply, disqualification, or discussion).",
         lambda obj: [escape(obj.content)] if isinstance(obj, Event) and obj.content else None,
-        VALIDATION_ANY, sql_format="content LIKE %s"
+        VALIDATION_ANY, sql_format="events.content LIKE %s"
     )
 }
 
