@@ -10,7 +10,7 @@ from aiess import timestamp
 from aiess import event_types as types
 
 # The former element takes the type of the second, which is removed.
-mergable_types = [
+MERGABLE_TYPES = [
     (types.NOMINATE, types.QUALIFY),
     (types.PROBLEM,  types.RESET),
     (types.PROBLEM,  types.DISQUALIFY),
@@ -87,7 +87,7 @@ def merge_concurrent(events: List[Event]) -> List[Event]:
         if event.beatmapset != other_event.beatmapset:
             continue
 
-        if (event.type, other_event.type) in mergable_types:
+        if (event.type, other_event.type) in MERGABLE_TYPES:
             # Former event has all properties the second does and more,
             # and is represented better having the type of the latter.
             event.type = other_event.type
