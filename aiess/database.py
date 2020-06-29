@@ -1,6 +1,6 @@
 import mysql.connector
 from mysql.connector.errors import Error, OperationalError
-from typing import List, Tuple, Generator
+from typing import List, Generator
 from enum import Enum
 from datetime import datetime
 
@@ -57,7 +57,7 @@ class Database:
             self.connection.cursor().close()
             self.connection.close()
     
-    def __fetch(self, cursor: object) -> List[Tuple]:
+    def __fetch(self, cursor: object) -> List[tuple]:
         """Attempts to return fetch all from a cursor object. Does not throw if nothing to fetch.
         Returns the fetched result sets as a list of tuples, or None if no result."""
         try:
@@ -68,9 +68,9 @@ class Database:
                 return None  # Reached end of result set, not an issue.
             raise
 
-    def __execute(self, query: str, **values: str) -> List[Tuple]:
-        """Executes the given SQL query with the given argument values, if any. Use like "%(name)s" in query
-        and name=name in values. Returns the fetched result sets as a list of tuples, or None if no result."""
+    def __execute(self, query: str, values: tuple=None) -> List[tuple]:
+        """Executes the given SQL query with the given argument values, if any. Use like "%s" in query
+        and ("name",) in values. Returns the fetched result sets as a list of tuples, or None if no result."""
         cursor = self.__get_cursor()
         cursor.nextset()
         cursor.execute(query, values)
@@ -79,7 +79,12 @@ class Database:
         self.connection.commit()
         return fetch
     
-    def __executemany(self, query: str, values: List[Tuple]) -> List[Tuple]:
+    def __execute_dict(self, query: str, **values: object) -> List[tuple]:
+        """Executes the given SQL query with the given argument values, if any. Use like "%(name)s" in query
+        and name=name in values. Returns the fetched result sets as a list of tuples, or None if no result."""
+        return self.__execute(query, values)
+    
+    def __executemany(self, query: str, values: List[tuple]) -> List[tuple]:
         """Executes the given SQL query over multiple values (e.g. list or array of tuples).
         Use like "%s, %s" in query and array of (id, name) in values.
         Returns the fetched result sets as a list of tuples, or None of no result."""
@@ -97,7 +102,7 @@ class Database:
             into the database to prevent partial information from being outdated or missing.
             """)
 
-    def insert_table_data(self, table: str, new_column_dict: dict) -> List[Tuple]:
+    def insert_table_data(self, table: str, new_column_dict: dict) -> List[tuple]:
         """Inserts the dictionary into the table, or if already present, updates the columns.
         Keys in the dictionary are column names, values are their respective value to assign.
         Returns the result from the query."""
@@ -118,43 +123,48 @@ class Database:
                 key_format_string=key_format_string,
                 keyword_format_string=keyword_format_string)
 
-        return self.__execute(query, **new_column_dict)
+        return self.__execute_dict(query, **new_column_dict)
 
-    def retrieve_table_data(self, table: str, where_str: str=None, selection: str="*") -> List[Tuple]:
-        """Returns all rows from the table where the dictionary conditions apply (e.g. dict(type="nominate")),
-        if specified, otherwise any data present in the table."""
+    def retrieve_table_data(self, table: str, where: str=None, where_values: tuple=None, selection: str="*") -> List[tuple]:
+        """Returns all rows from the table where the WHERE clause applies (e.g. `where` as "type=%s AND id=%s" and 
+        `where_values` as ("nominate", 5)), if specified, otherwise any data present in the table."""
         return self.__execute("""
             SELECT %(selection)s FROM %(db_name)s.%(table)s
-            WHERE %(where_str)s
+            WHERE %(where)s
             """ % InterpolationDict(
                 selection=selection,
                 db_name=self.db_name,
                 table=table,
-                where_str=where_str if where_str else "TRUE"))
+                where=where if where else "TRUE"),
+            where_values)
     
-    def fetchone_table_data(self, table: str, where_str: str, selection: str="*") -> List[Tuple]:
-        """Returns the first row from the table where the dictionary conditions apply (e.g. dict(id=1))."""
+    def fetchone_table_data(self, table: str, where: str, where_values: tuple=None, selection: str="*") -> List[tuple]:
+        """Returns the first row from the table where the WHERE clause applies (e.g. `where` as "type=%s AND id=%s" and 
+        `where_values` as ("nominate", 5)), if specified, otherwise the first row in the table."""
         return self.__execute("""
             SELECT %(selection)s FROM %(db_name)s.%(table)s
-            WHERE %(where_str)s
+            WHERE %(where)s
             LIMIT 1
             """ % InterpolationDict(
                 selection=selection,
                 db_name=self.db_name,
                 table=table,
-                where_str=where_str if where_str else "TRUE"))
+                where=where if where else "TRUE"),
+            where_values)
 
-    def delete_table_data(self, table: str, where_str: str, ignore_exception: bool=False) -> List[Tuple]:
-        """Deletes all rows from the table where the dictionary conditions apply (e.g. dict(type="kudosu-deny")).
-        Can optionally allow failure by ignoring any thrown exception from the query. Returns the result of the query."""
+    def delete_table_data(self, table: str, where: str, where_values: tuple=None, ignore_exception: bool=False) -> List[tuple]:
+        """Deletes all rows from the table where the WHERE clause applies (e.g. `where` as "type=%s AND id=%s" and 
+        `where_values` as ("nominate", 5)). Can optionally allow failure by ignoring any thrown exception from the query.
+        Returns the result of the query."""
         return self.__execute("""
             DELETE %(ignore)sFROM %(db_name)s.%(table)s
-            WHERE %(where_str)s
+            WHERE %(where)s
             """ % InterpolationDict(
                 ignore="IGNORE " if ignore_exception else "",
                 db_name=self.db_name,
                 table=table,
-                where_str=where_str))
+                where=where),
+            where_values)
     
     def clear_table_data(self, table: str) -> None:
         """Deletes all rows from the table. Ignores the foreign key check, meaning this
@@ -247,78 +257,97 @@ class Database:
                 user_id=event.user.id if event.user is not None else None,
                 content=event.content if event.content is not None else None))
     
-    def retrieve_user(self, where_str: str) -> User:
+    def retrieve_user(self, where: str, where_values: tuple=None) -> User:
         """Returns the first user from the database matching the given WHERE clause, or None if no such user is stored."""
-        return next(self.retrieve_users(where_str), None)
+        return next(self.retrieve_users(where, where_values), None)
     
-    def retrieve_users(self, where_str: str) -> Generator[User, None, None]:
+    def retrieve_users(self, where: str, where_values: tuple=None) -> Generator[User, None, None]:
         """Returns a generator of all users from the database matching the given WHERE clause."""
-        fetched_rows = self.retrieve_table_data("users", where_str, selection="id, name")
+        fetched_rows = self.retrieve_table_data(
+            table        = "users",
+            where        = where,
+            where_values = where_values,
+            selection    = "id, name"
+        )
         for row in (fetched_rows or []):
             _id = row[0]
             name = row[1]
             yield User(_id, name)
     
-    def retrieve_beatmapset_modes(self, beatmapset_id: str) -> List[str]:
+    def retrieve_beatmapset_modes(self, beatmapset_id: int) -> List[str]:
         """Returns an array of modes corresponding to the given beatmapset id.
         Returned array is empty when no such beatmapset is stored."""
-        if not beatmapset_id:
-            return None
-
         fetched_rows = self.retrieve_table_data(
-            "beatmapset_modes", f"beatmapset_id={beatmapset_id}", selection="mode")
+            table        = "beatmapset_modes",
+            where        = "beatmapset_id=%s",
+            where_values = (beatmapset_id,),
+            selection    = "mode"
+        )
         modes = []
         for row in (fetched_rows or []):
             modes.append(row[0])
         return modes
     
-    def retrieve_beatmapset(self, where_str: str) -> Beatmapset:
+    def retrieve_beatmapset(self, where: str, where_values: tuple=None) -> Beatmapset:
         """Returns the first beatmapset from the database matching the given WHERE clause, or None if no such beatmapset is stored."""
-        return next(self.retrieve_beatmapsets(where_str), None)
+        return next(self.retrieve_beatmapsets(where, where_values), None)
     
-    def retrieve_beatmapsets(self, where_str: str) -> Generator[Beatmapset, None, None]:
+    def retrieve_beatmapsets(self, where: str, where_values: tuple=None) -> Generator[Beatmapset, None, None]:
         """Returns a generator of all beatmapsets from the database matching the given WHERE clause."""
-        fetched_rows = self.retrieve_table_data("beatmapsets", where_str, selection="id, title, artist, creator_id")
+        fetched_rows = self.retrieve_table_data(
+            table        = "beatmapsets",
+            where        = where,
+            where_values = where_values,
+            selection    = "id, title, artist, creator_id"
+        )
         for row in (fetched_rows or []):
             _id = row[0]
             title = row[1]
             artist = row[2]
-            creator = self.retrieve_user(f"id={row[3]}")
+            creator = self.retrieve_user("id=%s", (row[3],))
             modes = self.retrieve_beatmapset_modes(_id)
             yield Beatmapset(_id, artist, title, creator, modes)
 
-    def retrieve_discussion(self, where_str: str, beatmapset: Beatmapset=None) -> Discussion:
+    def retrieve_discussion(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Discussion:
         """Returns the first discussion from the database matching the given WHERE clause, or None if no such discussion is stored.
         Also retrieves the associated beatmapset from the database if not supplied."""
-        return next(self.retrieve_discussions(where_str), None)
+        return next(self.retrieve_discussions(where, where_values), None)
     
-    def retrieve_discussions(self, where_str: str, beatmapset: Beatmapset=None) -> Generator[Discussion, None, None]:
+    def retrieve_discussions(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Generator[Discussion, None, None]:
         """Returns a generator of all discussions from the database matching the given WHERE clause.
         Also retrieves the associated beatmapset from the database if not supplied."""
         fetched_rows = self.retrieve_table_data(
-            "discussions", where_str, selection="id, beatmapset_id, user_id, content")
+            table        = "discussions", 
+            where        = where,
+            where_values = where_values,
+            selection    = "id, beatmapset_id, user_id, content"
+        )
         for row in (fetched_rows or []):
             _id = row[0]
             if not beatmapset:
-                beatmapset = self.retrieve_beatmapset(f"id={row[1]}")
-            user = self.retrieve_user(f"id={row[2]}")
+                beatmapset = self.retrieve_beatmapset("id=%s", (row[1],))
+            user = self.retrieve_user("id=%s", (row[2],))
             content = row[3]
 
             yield Discussion(_id, beatmapset, user, content)
     
-    def retrieve_event(self, where_str: str) -> Event:
+    def retrieve_event(self, where: str, where_values: tuple=None) -> Event:
         """Returns the first event from the database matching the given WHERE clause, or None if no such event is stored."""
-        return next(self.retrieve_events(where_str), None)
+        return next(self.retrieve_events(where, where_values), None)
     
-    def retrieve_events(self, where_str: str) -> Generator[Event, None, None]:
+    def retrieve_events(self, where: str, where_values: tuple=None) -> Generator[Event, None, None]:
         """Returns a generator of all events from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
-            "events", where_str, selection="type, time, beatmapset_id, discussion_id, user_id, content")
+            table        = "events",
+            where        = where,
+            where_values = where_values,
+            selection    = "type, time, beatmapset_id, discussion_id, user_id, content"
+        )
         for row in (fetched_rows or []):
             _type = row[0]
             time = row[1]
-            beatmapset = self.retrieve_beatmapset(f"id={row[2]}" if row[2] else None)
-            discussion = self.retrieve_discussion(f"id={row[3]}" if row[3] else None)
-            user = self.retrieve_user(f"id={row[4]}" if row[4] else None)
+            beatmapset = self.retrieve_beatmapset("id=%s", (row[2],)) if row[2] else None
+            discussion = self.retrieve_discussion("id=%s", (row[3],)) if row[3] else None
+            user = self.retrieve_user("id=%s", (row[4],)) if row[4] else None
             content = row[5]
             yield Event(_type, time, beatmapset, discussion, user, content=content)
