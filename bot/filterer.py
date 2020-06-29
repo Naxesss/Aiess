@@ -541,10 +541,21 @@ def dissect_shallow(obj: Union[Event, User, Beatmapset, Discussion]) -> Generato
             for key in keys:
                 yield f"{key}:{value}"
 
-def passes_filter(_filter: str, dissection: List[str]) -> bool:
-    """Returns whether the dissection would pass the filter logically. This is case insensitive.
+def passes_filter(_filter: str, dissection_or_object: Union[List[str], Event, User, Beatmapset, Discussion]) -> bool:
+    """Returns whether the given dissection (or dissection of the given Event/Beatmapset/Discussion/etc.)
+    would pass the filter logically. This is case insensitive.
 
     That is, if all AND within any OR evaluate to True, in the expanded filter."""
+    if (
+        isinstance(dissection_or_object, Event) or
+        isinstance(dissection_or_object, User) or
+        isinstance(dissection_or_object, Beatmapset) or
+        isinstance(dissection_or_object, Discussion)
+    ):
+        dissection = dissect(dissection_or_object)
+    else:
+        dissection = dissection_or_object
+
     _filter = _filter.lower()
     for or_split, _ in split_unescaped(expand(_filter), OR_GATES):
         

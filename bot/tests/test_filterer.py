@@ -364,6 +364,13 @@ def test_passes_filter_case_sensitivity():
     assert passes_filter("type:Reply AND mode:OSU", ["mode:osu", "type:reply"])
     assert not passes_filter("TYPE:QUALIFY", ["mode:osu", "type:reply"])
 
+def test_passes_filter_event_object():
+    beatmapset = Beatmapset(3, "artist", "title", creator=User(1, "someone"), modes=["osu"])
+    event = Event(_type="nominate", time=datetime.utcnow(), beatmapset=beatmapset, user=User(2, "sometwo"))
+
+    assert passes_filter("type:nominate and user:sometwo", event)
+    assert not passes_filter("type:reply", event)
+
 
 
 def test_get_tag():
