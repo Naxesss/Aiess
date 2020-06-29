@@ -45,11 +45,12 @@ class Database(aiess.Database):
         
         The filter of the given subscription does not matter, as there is only one in each channel anyway."""
         self.delete_table_data(
-            "subscriptions",
-            where_str=f"guild_id={sub.guild_id} AND channel_id={sub.channel_id}"
+            table        = "subscriptions",
+            where        = "guild_id=%s AND channel_id=%s",
+            where_values = (sub.guild_id, sub.channel_id)
         )
     
-    def retrieve_beatmapset_events(self, beatmapset: Beatmapset) -> List[Event]:
+    async def retrieve_beatmapset_events(self, beatmapset: Beatmapset) -> List[Event]:
         """Retrieves all events which have the given beatmapset id associated in descending
         order (i.e. newer events first), from the database, then stores the result in a cache
         used for any consecutive call. Concurrent events are merged together using the same
@@ -59,25 +60,27 @@ class Database(aiess.Database):
         if beatmapset.id not in beatmapset_event_cache[self.db_name]:
             # Retriving events from the database will give us non-merged events (e.g.
             # user nominates -> system qualifies, instead of user qualifies), hence merge.
-            raw_events = list(self.retrieve_events(f"beatmapset_id = {beatmapset.id} ORDER BY time DESC"))
+            raw_event_generator = self.retrieve_events(where="beatmapset_id=%s ORDER BY time DESC", where_values=(beatmapset.id,))
+            raw_events = [event async for event in raw_event_generator]
             beatmapset_event_cache[self.db_name][beatmapset.id] = merge_concurrent(raw_events)
 
         return beatmapset_event_cache[self.db_name][beatmapset.id]
     
-    def retrieve_last_type(self, user: User, beatmapset: Beatmapset, where_type_str: str) -> Event:
+    async def retrieve_last_type(self, user: User, beatmapset: Beatmapset, where: str, where_values: tuple) -> Event:
         """Retrieves the last event made by the given user on the given beatmapset, satisfying the
         additional where clause for types (e.g. `type = \"praise\" OR type = \"hype\"`). This is
         first done from the database, and then from a cache for any consecutive call.
         
         The cache must be cleared before new information can be obtained, see `clear_cache`."""
-        args_id = f"{user.id}-{beatmapset.id}-{where_type_str}"
+        args_id = f"{user.id}-{beatmapset.id}-{where}-{where_values}"
         if args_id not in last_type_cache[self.db_name]:
-            event = self.retrieve_event(f"""
-                beatmapset_id = {beatmapset.id} AND
-                user_id = {user.id} AND
-                ({where_type_str})
+            event = await self.retrieve_event(where=f"""
+                beatmapset_id=%s AND
+                user_id=%s AND
+                ({where})
                 ORDER BY time DESC
-                LIMIT 1""")
+                LIMIT 1""",
+                where_values=(beatmapset.id, user.id, *where_values))
             last_type_cache[self.db_name][args_id] = event
 
         return last_type_cache[self.db_name][args_id]
