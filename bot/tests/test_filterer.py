@@ -459,7 +459,7 @@ def test_filter_to_sql_invalid_words():
     assert "invalid" in str(err)
 
 def test_filter_to_sql_content_wildcards():
-    assert filter_to_sql("content:\"%hello there%\"") == ("content LIKE %s", ("%hello there%",))
+    assert filter_to_sql("content:\"%hello there%\"") == ("events.content LIKE %s", ("%hello there%",))
 
 def test_filter_to_sql_malicious():
     # Database drivers should take care of escaping anything within the second portion of the tuple, so
