@@ -67,10 +67,11 @@ class Tag():
     """Represents a possible key-value pair and which conditions it appears in.
     Can both create a value from a given object (e.g. Event or Beatmapset) (None if N/A),
     as well as validate that a given value is valid (e.g. `type` will never have a value of `undefined`)."""
-    def __init__(self, description: str, value_func: Callable[[object], str], validation: Validation):
+    def __init__(self, description: str, value_func: Callable[[object], str], validation: Validation, sql_format: str):
         self.description = description
         self.value_func = value_func
         self.validation = validation
+        self.sql_format = sql_format
 
 def is_int(value: str) -> bool:
     """Returns whether the given string can be parsed as an integer."""
@@ -94,64 +95,64 @@ TAGS: Dict[List[str], Tag] = {
     ("user",): Tag(
         "The name of the user performing the event (e.g. user nominating, replying, or giving kudosu).",
         lambda obj: [escape(obj.name)] if isinstance(obj, User) else None,
-        VALIDATION_ANY
+        VALIDATION_ANY, sql_format="user.name=%s"
     ),
     ("user-id",) : Tag(
         "The id of the user performing the event (e.g. id of user nominating, replying, or giving kudosu).",
         lambda obj: [escape(obj.id)] if isinstance(obj, User) else None,
-        VALIDATION_IDS
+        VALIDATION_IDS, sql_format="user.id=%s"
     ),
     # Beatmapset tags:
     ("set-id", "mapset-id", "beatmapset-id") : Tag(
         "The id of the beatmapset where the event occurred (e.g. id of mapset nominated or discussed).",
         lambda obj: [escape(obj.id)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_IDS
+        VALIDATION_IDS, sql_format="beatmapset.id=%s"
     ),
     ("artist",) : Tag(
         "The artist field of a beatmapset an event occurred on (e.g. \"LeaF\" in \"Leaf - Doppelganger\").",
         lambda obj: [escape(obj.artist)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_ANY
+        VALIDATION_ANY, sql_format="beatmapset.artist=%s"
     ),
     ("title",) : Tag(
         "The title field of a beatmapset an event occurred on (e.g. \"Doppelganger\" in \"Leaf - Doppelganger\").",
         lambda obj: [escape(obj.title)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_ANY
+        VALIDATION_ANY, sql_format="beatmapset.title=%s"
     ),
     ("creator",) : Tag(
         "The username of the creator of a beatmapset an event occurred on (e.g. \"Shurelia\" for any set hosted by them).",
         lambda obj: [escape(obj.creator.name)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_ANY
+        VALIDATION_ANY, sql_format="creator.name=%s"
     ),
     ("creator-id",) : Tag(
         "The id of the creator of a beatmapset an event occurred on (e.g. \"3807986\" for any set hosted by Shurelia).",
         lambda obj: [escape(obj.creator.id)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_IDS
+        VALIDATION_IDS, sql_format="creator.id=%s"
     ),
     ("mode",) : Tag(
         "The involved mode of a beatmapset an event occurred on (e.g. \"taiko\" for any set with a taiko map).",
         lambda obj: [escape(mode) for mode in obj.modes] if isinstance(obj, Beatmapset) else None,
-        specific_validation(["osu", "taiko", "catch", "mania"])
+        specific_validation(["osu", "taiko", "catch", "mania"]), sql_format="mode=%s"
     ),
     # Discussion tags:
     ("discussion-id",) : Tag(
         "The id of the discussion an event occurred on (e.g. \"1589811\" for that specific discussion).",
         lambda obj: [escape(obj.id)] if isinstance(obj, Discussion) else None,
-        VALIDATION_IDS
+        VALIDATION_IDS, sql_format="discussion.id=%s"
     ),
     ("author",) : Tag(
         "The username of the author of the discussion an event occurred on (e.g. \"Shurelia\" for any discussion started by them).",
         lambda obj: [escape(obj.user.name)] if isinstance(obj, Discussion) else None,
-        VALIDATION_ANY
+        VALIDATION_ANY, sql_format="author.name=%s"
     ),
     ("author-id",) : Tag(
         "The id of the author of the discussion an event occurred on (e.g. \"3807986\" for any discussion started by Shurelia).",
         lambda obj: [escape(obj.user.id)] if isinstance(obj, Discussion) else None,
-        VALIDATION_IDS
+        VALIDATION_IDS, sql_format="author.id=%s"
     ),
     ("discussion-content",) : Tag(
         "The text content of the discussion an event occurred on (e.g. \"blanket\" for any discussion started containing that).",
         lambda obj: [escape(obj.content)] if isinstance(obj, Discussion) else None,
-        VALIDATION_ANY
+        VALIDATION_ANY, sql_format="discussion.content LIKE %s"
     ),
     # Event tags:
     ("type",) : Tag(
@@ -160,12 +161,12 @@ TAGS: Dict[List[str], Tag] = {
             [escape(obj.type)] +
             ([escape(alias) for alias in TYPE_ALIASES[obj.type]] if obj.type in TYPE_ALIASES else [])
         ) if isinstance(obj, Event) else None,
-        specific_validation(VALID_TYPES)
+        specific_validation(VALID_TYPES), sql_format="type=%s"
     ),
     ("content",) : Tag(
         "The text content associated with an event (e.g. the text of a reply, disqualification, or discussion).",
         lambda obj: [escape(obj.content)] if isinstance(obj, Event) and obj.content else None,
-        VALIDATION_ANY
+        VALIDATION_ANY, sql_format="content LIKE %s"
     )
 }
 
@@ -618,3 +619,42 @@ def is_valid(_filter: str) -> bool:
     ):
         return False
     return True
+
+
+
+def filter_to_sql(_filter: str) -> (str, tuple):
+    """Returns a tuple of the filter converted to an SQL WHERE clause and the inputs to the
+    WHERE clause (e.g. ("type=%s", ("nominate",)) ), for use with the scraper database."""
+    if not _filter:
+        # Without a filter, we simply let everything through.
+        return ("TRUE", ())
+
+    if not is_valid(_filter):
+        raise ValueError("Received an invalid filter; cannot convert to sql.")
+
+    converted_words = []
+    converted_values = []
+    for word, _ in split_unescaped(expand(_filter), delimiters=[" "]):
+        # Convert gate symbols in the filter (e.g. "&", "!", "and", "|") to "AND", "OR", and "NOT".
+        if any(map(lambda gate: word.lower() == gate.strip().lower(), AND_GATES)): word = "AND"
+        if any(map(lambda gate: word.lower() == gate.strip().lower(), OR_GATES)):  word = "OR"
+        if any(map(lambda gate: word.lower() == gate.strip().lower(), NOT_GATES)): word = "NOT"
+        if word in ["AND", "OR", "NOT"]:
+            converted_words.append(word)
+            continue
+
+        key, value = next(get_key_value_pairs(word))
+        tag = get_tag(key)
+        if not tag:
+            continue
+
+        # Support type aliases (e.g. "resolve" should be converted to "issue-resolve").
+        if key.lower() == "type":
+            for _type in TYPE_ALIASES:
+                if value.lower() in TYPE_ALIASES[_type]:
+                    value = _type
+
+        converted_words.append(tag.sql_format)
+        converted_values.append(value)
+    
+    return (" ".join(converted_words), tuple(converted_values))

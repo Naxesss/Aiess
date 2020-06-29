@@ -32,6 +32,7 @@ from bot.filterer import get_invalid_keys
 from bot.filterer import get_invalid_filters
 from bot.filterer import get_invalid_words
 from bot.filterer import is_valid
+from bot.filterer import filter_to_sql
 
 def test_expand():
     assert expand("type:(nominate or qualify)") == "type:nominate or type:qualify"
@@ -433,3 +434,37 @@ def test_valid_values():
 def test_valid_words():
     assert is_valid("type:nominate and user:someone")
     assert not is_valid("type:nominate annd user:someone")
+
+
+
+def test_filter_to_sql():
+    assert filter_to_sql("type:nominate and not user:someone") == ("type=%s AND NOT user.name=%s", ("nominate", "someone"))
+
+def test_filter_to_sql_quotations():
+    assert filter_to_sql("user:\"space in name\"") == ("user.name=%s", ("space in name",))
+
+def test_filter_to_sql_invalid_key():
+    with pytest.raises(ValueError) as err:
+        filter_to_sql("user:someone and undefined:nominate")
+    assert "invalid" in str(err)
+
+def test_filter_to_sql_invalid_value():
+    with pytest.raises(ValueError) as err:
+        filter_to_sql("user:someone and type:undefined")
+    assert "invalid" in str(err)
+
+def test_filter_to_sql_invalid_words():
+    with pytest.raises(ValueError) as err:
+        filter_to_sql("user:someone and nothing else")
+    assert "invalid" in str(err)
+
+def test_filter_to_sql_content_wildcards():
+    assert filter_to_sql("content:\"%hello there%\"") == ("content LIKE %s", ("%hello there%",))
+
+def test_filter_to_sql_malicious():
+    # Database drivers should take care of escaping anything within the second portion of the tuple, so
+    # that's where we want the attacking string.
+    assert filter_to_sql("user:\"%s; DROP TABLE events; \"\"=\"\"") == ("user.name=%s", ("%s; DROP TABLE events; ",))
+
+def test_filter_to_sql_none():
+    assert filter_to_sql(None) == ("TRUE", ())
