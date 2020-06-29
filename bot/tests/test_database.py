@@ -30,12 +30,10 @@ def bot_test_database():
 def test_correct_bot_db_setup(bot_test_database):
     assert not bot_test_database.retrieve_table_data("subscriptions")
     assert not db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME]
-    assert not db_module.last_type_cache[SCRAPER_TEST_DB_NAME]
 
 def test_correct_scraper_db_setup(scraper_test_database):
     assert not scraper_test_database.retrieve_table_data("events")
     assert not db_module.beatmapset_event_cache[BOT_TEST_DB_NAME]
-    assert not db_module.last_type_cache[BOT_TEST_DB_NAME]
 
 def test_insert_retrieve_channel_sub(bot_test_database):
     sub1 = Subscription(guild_id=3, channel_id=1, _filter="type:problem and state:qualified")
