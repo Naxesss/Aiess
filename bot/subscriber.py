@@ -2,6 +2,7 @@ import sys
 sys.path.append('..')
 
 from typing import List
+import discord
 from discord import TextChannel
 
 from aiess import Event
@@ -62,7 +63,7 @@ def remove_subscription(sub: Subscription, database: Database=None) -> None:
     database.delete_subscription(sub)
     load(database)
 
-async def forward(event: Event, client) -> None:
+async def forward(event: Event, client: discord.Client) -> None:
     """Attempts to forward an event through all subscription filters."""
     for sub in cache:
         if passes_filter(sub.filter, dissect(event)):
