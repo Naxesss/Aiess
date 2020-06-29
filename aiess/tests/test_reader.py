@@ -6,6 +6,7 @@ from aiess import Event, Beatmapset, User
 from aiess import timestamp
 from aiess.database import SCRAPER_TEST_DB_NAME
 from aiess.reader import merge_concurrent
+from aiess.common import anext
 
 received_events = []
 received_event_batches = []
@@ -14,8 +15,8 @@ class Reader(aiess.Reader):
     def __init__(self, reader_id: str):
         super().__init__(reader_id, db_name=SCRAPER_TEST_DB_NAME)
     
-    async def on_events(self, events: List[Event]):
-        received_event_batches.append(events)
+    async def on_event_batch(self):
+        received_event_batches.append(True)
     
     async def on_event(self, event: Event):
         received_events.append(event)
@@ -39,7 +40,8 @@ async def test_file_created(reader):
     assert "test" in expected_id
     assert timestamp.exists(expected_id)
 
-def test_events_between(reader):
+@pytest.mark.asyncio
+async def test_events_between(reader):
     event1 = Event(_type="test", time=timestamp.from_string("2020-01-01 05:00:00"))
     event2 = Event(_type="test", time=timestamp.from_string("2020-01-01 07:00:00"))
     event3 = Event(_type="test", time=timestamp.from_string("2020-01-02 03:00:00"))
@@ -48,18 +50,19 @@ def test_events_between(reader):
     reader.database.insert_event(event2)
     reader.database.insert_event(event3)
 
-    all_events = reader.events_between(timestamp.from_string("2020-01-01 00:00:00"), timestamp.from_string("2020-01-03 00:00:00"))
-    assert next(all_events, None) == event1
-    assert next(all_events, None) == event2
-    assert next(all_events, None) == event3
-    assert next(all_events, None) is None
+    all_events = await reader.events_between(timestamp.from_string("2020-01-01 00:00:00"), timestamp.from_string("2020-01-03 00:00:00"))
+    assert await anext(all_events, None) == event1
+    assert await anext(all_events, None) == event2
+    assert await anext(all_events, None) == event3
+    assert await anext(all_events, None) is None
 
-    latter_events = reader.events_between(timestamp.from_string("2020-01-01 06:00:00"), timestamp.from_string("2020-01-03 00:00:00"))
-    assert next(latter_events, None) == event2
-    assert next(latter_events, None) == event3
-    assert next(latter_events, None) is None
+    latter_events = await reader.events_between(timestamp.from_string("2020-01-01 06:00:00"), timestamp.from_string("2020-01-03 00:00:00"))
+    assert await anext(latter_events, None) == event2
+    assert await anext(latter_events, None) == event3
+    assert await anext(latter_events, None) is None
 
-def test_events_between_greater_than(reader):
+@pytest.mark.asyncio
+async def test_events_between_greater_than(reader):
     event1 = Event(_type="test", time=timestamp.from_string("2020-01-01 05:00:00"))
     event2 = Event(_type="test", time=timestamp.from_string("2020-01-01 07:00:00"))
 
@@ -67,9 +70,9 @@ def test_events_between_greater_than(reader):
     reader.database.insert_event(event2)
 
     # If we resume at 05:00:00, the event at exactly 05:00:00 should be ignored.
-    events = reader.events_between(timestamp.from_string("2020-01-01 05:00:00"), timestamp.from_string("2020-01-01 07:00:00"))
-    assert next(events, None) == event2
-    assert next(events, None) is None
+    events = await reader.events_between(timestamp.from_string("2020-01-01 05:00:00"), timestamp.from_string("2020-01-01 07:00:00"))
+    assert await anext(events, None) == event2
+    assert await anext(events, None) is None
 
 @pytest.mark.asyncio
 async def test_on_events(reader):
@@ -92,8 +95,6 @@ async def test_on_events(reader):
     await reader._Reader__push_events_between(middle, end)
 
     assert len(received_event_batches) == 2
-    assert received_event_batches[0] == [event1, event2]
-    assert received_event_batches[1] == [event3, event4, event5]
 
 @pytest.mark.asyncio
 async def test_on_event(reader):
