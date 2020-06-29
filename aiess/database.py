@@ -253,9 +253,6 @@ class Database:
     
     def retrieve_users(self, where_str: str) -> Generator[User, None, None]:
         """Returns a generator of all users from the database matching the given WHERE clause."""
-        if not where_str:
-            return
-
         fetched_rows = self.retrieve_table_data("users", where_str, selection="id, name")
         for row in (fetched_rows or []):
             _id = row[0]
@@ -281,9 +278,6 @@ class Database:
     
     def retrieve_beatmapsets(self, where_str: str) -> Generator[Beatmapset, None, None]:
         """Returns a generator of all beatmapsets from the database matching the given WHERE clause."""
-        if not where_str:
-            return
-
         fetched_rows = self.retrieve_table_data("beatmapsets", where_str, selection="id, title, artist, creator_id")
         for row in (fetched_rows or []):
             _id = row[0]
@@ -301,9 +295,6 @@ class Database:
     def retrieve_discussions(self, where_str: str, beatmapset: Beatmapset=None) -> Generator[Discussion, None, None]:
         """Returns a generator of all discussions from the database matching the given WHERE clause.
         Also retrieves the associated beatmapset from the database if not supplied."""
-        if not where_str:
-            return
-
         fetched_rows = self.retrieve_table_data(
             "discussions", where_str, selection="id, beatmapset_id, user_id, content")
         for row in (fetched_rows or []):
@@ -321,9 +312,6 @@ class Database:
     
     def retrieve_events(self, where_str: str) -> Generator[Event, None, None]:
         """Returns a generator of all events from the database matching the given WHERE clause."""
-        if not where_str:
-            return
-
         fetched_rows = self.retrieve_table_data(
             "events", where_str, selection="type, time, beatmapset_id, discussion_id, user_id, content")
         for row in (fetched_rows or []):
