@@ -57,7 +57,8 @@ def test_insert_retrieve_channel_sub_no_filter(bot_test_database):
     
     assert "cannot be null" in str(err)
 
-def test_retrieve_beatmapset_events(scraper_test_database):
+@pytest.mark.asyncio
+async def test_retrieve_beatmapset_events(scraper_test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "creator"), ["osu"])
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     nom2_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
@@ -69,13 +70,14 @@ def test_retrieve_beatmapset_events(scraper_test_database):
     scraper_test_database.insert_event(nom2_event)
     scraper_test_database.insert_event(qual_event)
     
-    events = scraper_test_database.retrieve_beatmapset_events(beatmapset)
+    events = await scraper_test_database.retrieve_beatmapset_events(beatmapset)
     qual_event.user = nom2_event.user
     assert nom_event in events
     assert qual_event in events
     assert suggestion_event in events
 
-def test_retrieve_beatmapset_events_cache(scraper_test_database):
+@pytest.mark.asyncio
+async def test_retrieve_beatmapset_events_cache(scraper_test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "creator"), ["osu"])
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     nom2_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
@@ -85,7 +87,7 @@ def test_retrieve_beatmapset_events_cache(scraper_test_database):
     scraper_test_database.insert_event(nom2_event)
     scraper_test_database.insert_event(qual_event)
     
-    scraper_test_database.retrieve_beatmapset_events(beatmapset)
+    await scraper_test_database.retrieve_beatmapset_events(beatmapset)
     qual_event.user = nom2_event.user
     assert db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME][3] == [qual_event, nom_event]
 
