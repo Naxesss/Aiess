@@ -78,7 +78,8 @@ def test_format_link_no_beatmapset():
 def test_format_embed(suggestion_event):
     embed: Embed = format_embed(suggestion_event)
     
-    assert embed.fields[0].name == ":yellow_circle: Suggestion"
+    assert embed.fields[0].name.startswith(":yellow_circle: Suggestion (**")
+    assert embed.fields[0].name.endswith("** ago)")
     assert (
         embed.fields[0].value ==
         "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]"
@@ -96,10 +97,12 @@ def test_format_embed_context(kudosu_gain_event):
     assert embed.fields[1].value == format_context_field_value(kudosu_gain_event)
 
 def test_format_field_name(suggestion_event):
-    assert format_field_name(suggestion_event) == ":yellow_circle: Suggestion"
+    assert format_field_name(suggestion_event).startswith(":yellow_circle: Suggestion (**")
+    assert format_field_name(suggestion_event).endswith("** ago)")
 
 def test_format_field_name_qualify(qualify_event):
-    assert format_field_name(qualify_event) == ":heart: Qualified"
+    assert format_field_name(qualify_event).startswith(":heart: Qualified (**")
+    assert format_field_name(qualify_event).endswith("** ago)")
 
 def test_format_field_value(suggestion_event):
     assert (

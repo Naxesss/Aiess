@@ -104,7 +104,7 @@ def escape_markdown(obj: str) -> str:
 
 def format_field_name(event: Event) -> str:
     """Returns the embed title of the given event (e.g. :heart: Qualified)."""
-    return f"{type_props[event.type].emoji} {type_props[event.type].title}"
+    return f"{type_props[event.type].emoji} {type_props[event.type].title} ({format_timeago(event.time)})"
 
 async def format_field_value(event: Event) -> str:
     """Returns the embed contents of the given event (i.e. the \"artist - title, mapped by creator [modes]\" part)."""
