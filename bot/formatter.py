@@ -130,19 +130,10 @@ def format_footer_text(event: Event, database: Database=None) -> str:
     if not event.user:
         return Embed.Empty
     
-    if not event.content:
-        if event.type in [types.NOMINATE, types.QUALIFY]:
-            if not database:
-                # Allows tests to use test databases instead of the production one.
-                database = Database(SCRAPER_DB_NAME)
-            
-            praise_text = format_recent_praise(event.user, event.beatmapset, database)
-            if praise_text:
-                return f"{event.user} {format_preview(praise_text)}"
-        
-        return str(event.user)
-
-    return f"{event.user} {format_preview(event.content)}"
+    if event.content:
+        return f"{event.user} {format_preview(event.content)}"
+    
+    return str(event.user)
 
 def format_preview(content: str, length: int=60, split_newline: bool=True) -> str:
     """Returns a string of the user with the truncated content in quotes, if any,
@@ -222,15 +213,6 @@ def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Dat
             break
     
     return f"\n{short_history}"
-
-def format_recent_praise(user: User, beatmapset: Beatmapset, database: Database=None) -> str:
-    """Obtains the content of the most recent praise from the given user on the given beatmapset."""
-    if not database: database = Database(SCRAPER_DB_NAME)
-
-    praise_event = database.retrieve_last_type(user, beatmapset, where_type_str="type = \"praise\" OR type = \"hype\"")
-    if praise_event:
-        return praise_event.content
-    return None
 
 
 

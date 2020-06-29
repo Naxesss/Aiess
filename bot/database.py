@@ -14,7 +14,6 @@ BOT_DB_NAME      = "aiess_bot"
 BOT_TEST_DB_NAME = "aiess_bot_test"
 
 beatmapset_event_cache: Dict[str, Dict[int, List[Event]]] = defaultdict(dict)  # [db_name][beatmapset_id]
-last_type_cache:        Dict[str, Dict[str, Event]]       = defaultdict(dict)  # [db_name][{user.id}-{beatmapset.id}-{where_type_str}]
 
 class Database(aiess.Database):
     """Creates an aiess_bot database connection, with methods to insert and retrieve subscriptions."""
@@ -65,28 +64,9 @@ class Database(aiess.Database):
             beatmapset_event_cache[self.db_name][beatmapset.id] = merge_concurrent(raw_events)
 
         return beatmapset_event_cache[self.db_name][beatmapset.id]
-    
-    async def retrieve_last_type(self, user: User, beatmapset: Beatmapset, where: str, where_values: tuple) -> Event:
-        """Retrieves the last event made by the given user on the given beatmapset, satisfying the
-        additional where clause for types (e.g. `type = \"praise\" OR type = \"hype\"`). This is
-        first done from the database, and then from a cache for any consecutive call.
-        
-        The cache must be cleared before new information can be obtained, see `clear_cache`."""
-        args_id = f"{user.id}-{beatmapset.id}-{where}-{where_values}"
-        if args_id not in last_type_cache[self.db_name]:
-            event = await self.retrieve_event(where=f"""
-                beatmapset_id=%s AND
-                user_id=%s AND
-                ({where})
-                ORDER BY time DESC
-                LIMIT 1""",
-                where_values=(beatmapset.id, user.id, *where_values))
-            last_type_cache[self.db_name][args_id] = event
 
-        return last_type_cache[self.db_name][args_id]
 
 def clear_cache(db_name: str) -> None:
     """Clears any cache the database may be using, allowing new info to be obtained
     (e.g. for retrieving all events related to a beatmapset)."""
     beatmapset_event_cache[db_name].clear()
-    last_type_cache[db_name].clear()
