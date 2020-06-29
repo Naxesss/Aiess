@@ -4,6 +4,7 @@ from datetime import datetime
 
 from aiess.objects import User, Beatmapset, Discussion, Event
 from aiess.database import Database, SCRAPER_TEST_DB_NAME
+from aiess.common import anext
 
 @pytest.fixture
 def test_database():
@@ -42,7 +43,8 @@ def test_missing_table(test_database):
         test_database.insert_table_data("missing_table", dict(id=1, name="test"))
     assert "Table 'aiess_test.missing_table' doesn't exist" in str(error.value)
 
-def test_insert_retrieve_event(test_database):
+@pytest.mark.asyncio
+async def test_insert_retrieve_event(test_database):
     time = datetime.utcnow()
 
     user = User(1, name="test")
@@ -52,7 +54,7 @@ def test_insert_retrieve_event(test_database):
 
     test_database.insert_event(event)
 
-    retrieved_event = test_database.retrieve_event("type=\"test\"")
+    retrieved_event = await test_database.retrieve_event("type=\"test\"")
     assert retrieved_event.type == event.type
     assert retrieved_event.time == event.time
     assert retrieved_event.beatmapset == event.beatmapset
@@ -61,11 +63,12 @@ def test_insert_retrieve_event(test_database):
     assert retrieved_event.content == event.content
     assert retrieved_event == event
 
-def test_insert_retrieve_small_event(test_database):
+@pytest.mark.asyncio
+async def test_insert_retrieve_small_event(test_database):
     event = Event(_type="test", time=datetime.utcnow())
     test_database.insert_event(event)
 
-    retrieved_event = test_database.retrieve_event("type=\"test\"")
+    retrieved_event = await test_database.retrieve_event(where="type=%s", where_values=("test",))
     assert retrieved_event.type == event.type
     assert retrieved_event.time == event.time
     assert retrieved_event.beatmapset == event.beatmapset
@@ -74,14 +77,15 @@ def test_insert_retrieve_small_event(test_database):
     assert retrieved_event.content == event.content
     assert retrieved_event == event
 
-def test_insert_retrieve_event_digit_properties(test_database):
+@pytest.mark.asyncio
+async def test_insert_retrieve_event_digit_properties(test_database):
     user = User(1, "497")
     beatmapset = Beatmapset(3, artist="5", title="2", creator=user, modes=["osu"])
     discussion = Discussion(2, beatmapset, user, content="8")
     event = Event(_type="test", time=datetime.utcnow(), user=user, beatmapset=beatmapset, discussion=discussion, content="4")
     test_database.insert_event(event)
 
-    retrieved_event = test_database.retrieve_event("type=\"test\"")
+    retrieved_event = await test_database.retrieve_event(where="type=%s", where_values=("test",))
     # Ensures the database field retrieval retains the `str` type, rather than reinterpreting as `int`.
     assert retrieved_event.content == "4"
     assert retrieved_event.user.name == "497"
@@ -93,7 +97,7 @@ def test_insert_retrieve_user(test_database):
     user = User(1, name="test")
     test_database.insert_user(user)
 
-    retrieved_user = test_database.retrieve_user("id=1")
+    retrieved_user = test_database.retrieve_user(where="id=%s", where_values=(1,))
     assert retrieved_user.id == user.id
     assert retrieved_user.name == user.name
     assert retrieved_user == user
@@ -112,7 +116,7 @@ def test_insert_retrieve_beatmapset(test_database):
     beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
     test_database.insert_beatmapset(beatmapset)
 
-    retrieved_beatmapset = test_database.retrieve_beatmapset("id=1")
+    retrieved_beatmapset = test_database.retrieve_beatmapset(where="id=%s", where_values=(1,))
     assert retrieved_beatmapset.id == beatmapset.id
     assert retrieved_beatmapset.artist == beatmapset.artist
     assert retrieved_beatmapset.title == beatmapset.title
@@ -126,7 +130,7 @@ def test_insert_retrieve_discussion(test_database):
     discussion = Discussion(1, beatmapset=beatmapset, user=user, content="testing")
     test_database.insert_discussion(discussion)
 
-    retrieved_discussion = test_database.retrieve_discussion("id=1")
+    retrieved_discussion = test_database.retrieve_discussion(where="id=%s", where_values=(1,))
     assert retrieved_discussion.id == discussion.id
     assert retrieved_discussion.beatmapset == discussion.beatmapset
     assert retrieved_discussion.user == discussion.user
@@ -159,9 +163,9 @@ def test_insert_retrieve_discussion_and_replies(test_database):
     test_database.insert_event(event_reply1)
     test_database.insert_event(event_reply2)
 
-    retrieved_problem = test_database.retrieve_event("type=\"problem\"")
-    retrieved_reply1 = test_database.retrieve_event(f"type=\"reply\" and user_id={user_replier.id}")
-    retrieved_reply2 = test_database.retrieve_event(f"type=\"reply\" and user_id={user_author.id}")
+    retrieved_problem = test_database.retrieve_event(where="type=%s", where_values=("problem",))
+    retrieved_reply1 = test_database.retrieve_event(where="type=%s AND user_id=%s", where_values=("reply", user_replier.id))
+    retrieved_reply2 = test_database.retrieve_event(where="type=%s AND user_id=%s", where_values=("reply", user_author.id))
 
     assert retrieved_problem
     assert retrieved_reply1
@@ -174,7 +178,7 @@ def test_insert_retrieve_multiple_users(test_database):
     test_database.insert_user(user1)
     test_database.insert_user(user2)
 
-    retrieved_users = test_database.retrieve_users(f"name=\"{user1.name}\"")
+    retrieved_users = test_database.retrieve_users(where="name=%s", where_values=(user1.name,))
     assert next(retrieved_users, None) == user1
     assert next(retrieved_users, None) == user2
 
@@ -186,7 +190,7 @@ def test_insert_retrieve_multiple_beatmapsets(test_database):
     test_database.insert_beatmapset(beatmapset1)
     test_database.insert_beatmapset(beatmapset2)
 
-    retrieved_beatmapsets = test_database.retrieve_beatmapsets(f"creator_id={user.id}")
+    retrieved_beatmapsets = test_database.retrieve_beatmapsets(where="creator_id=%s", where_values=(user.id,))
     assert next(retrieved_beatmapsets, None) == beatmapset1
     assert next(retrieved_beatmapsets, None) == beatmapset2
 
@@ -199,11 +203,12 @@ def test_insert_retrieve_multiple_discussions(test_database):
     test_database.insert_discussion(discussion1)
     test_database.insert_discussion(discussion2)
 
-    retrieved_discussions = test_database.retrieve_discussions(f"beatmapset_id={beatmapset.id}")
+    retrieved_discussions = test_database.retrieve_discussions(where="beatmapset_id=%s", where_values=(beatmapset.id,))
     assert next(retrieved_discussions, None) == discussion1
     assert next(retrieved_discussions, None) == discussion2
 
-def test_insert_retrieve_multiple_events(test_database):
+@pytest.mark.asyncio
+async def test_insert_retrieve_multiple_events(test_database):
     time = datetime.utcnow()
 
     user = User(1, name="test")
@@ -215,6 +220,6 @@ def test_insert_retrieve_multiple_events(test_database):
     test_database.insert_event(event1)
     test_database.insert_event(event2)
 
-    retrieved_events = test_database.retrieve_events(f"beatmapset_id={beatmapset.id}")
-    assert next(retrieved_events, None) == event1
-    assert next(retrieved_events, None) == event2
+    retrieved_events = test_database.retrieve_events(where="beatmapset_id=%s", where_values=(beatmapset.id,))
+    assert await anext(retrieved_events, None) == event1
+    assert await anext(retrieved_events, None) == event2
