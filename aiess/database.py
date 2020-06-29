@@ -1,3 +1,4 @@
+import asyncio
 import mysql.connector
 from mysql.connector.errors import Error, OperationalError
 from typing import List, Generator
@@ -7,6 +8,7 @@ from datetime import datetime
 from aiess.objects import User, Beatmapset, Discussion, Event
 from aiess.settings import DB_CONFIG
 from aiess.logger import log
+from aiess.common import anext
 
 SCRAPER_DB_NAME      = "aiess"
 SCRAPER_TEST_DB_NAME = "aiess_test"
@@ -331,12 +333,12 @@ class Database:
 
             yield Discussion(_id, beatmapset, user, content)
     
-    def retrieve_event(self, where: str, where_values: tuple=None) -> Event:
+    async def retrieve_event(self, where: str, where_values: tuple=None) -> Event:
         """Returns the first event from the database matching the given WHERE clause, or None if no such event is stored."""
-        return next(self.retrieve_events(where, where_values), None)
+        return await anext(self.retrieve_events(where, where_values), None)
     
-    def retrieve_events(self, where: str, where_values: tuple=None) -> Generator[Event, None, None]:
-        """Returns a generator of all events from the database matching the given WHERE clause."""
+    async def retrieve_events(self, where: str, where_values: tuple=None) -> Generator[Event, None, None]:
+        """Returns an asynchronous generator of all events from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
             table        = "events",
             where        = where,
@@ -344,6 +346,7 @@ class Database:
             selection    = "type, time, beatmapset_id, discussion_id, user_id, content"
         )
         for row in (fetched_rows or []):
+            await asyncio.sleep(0) # Return control back to the event loop, granting other tasks a window to start/resume.
             _type = row[0]
             time = row[1]
             beatmapset = self.retrieve_beatmapset("id=%s", (row[2],)) if row[2] else None

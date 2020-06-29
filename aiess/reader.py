@@ -45,52 +45,32 @@ class Reader():
 
     async def __push_new_events(self) -> None:
         """Triggers the on_event method for each new event since the last stored datetime.
-        Updates the last stored datetime to the current time afterwards."""
+        Updates the last stored datetime after each on_event call."""
         last_time = timestamp.get_last(self.__time_id())
-
-        current_time = await self.__push_events_between(last_time, datetime.utcnow())
-        
-        if current_time:
-            timestamp.set_last(current_time, self.__time_id())
+        await self.__push_events_between(last_time, datetime.utcnow())
     
     async def __push_events_between(self, last_time: datetime, current_time: datetime) -> datetime:
-        """Triggers the on_event method for each event between the two datetimes.
-        Returns the last event's datetime, if any, otherwise None."""
-        events = list(self.events_between(last_time, current_time))
-        if not events:
-            return None
-
-        merged_events = merge_concurrent(events)
-        await self.on_events(merged_events)
-        for event in merged_events:
+        """Triggers the on_event method for each event between the two datetimes."""
+        await self.on_event_batch()
+        async for event in await self.events_between(last_time, current_time):
             await self.on_event(event)
-
-        last_event = merged_events[-1]
-        return last_event.time if last_event else None
+            timestamp.set_last(event.time, self.__time_id())
 
     def __time_id(self):
         """Returns the identifier of the file the reader creates to keep track of the last time.
         This is based on the identifier supplied to the reader on initialization."""
         return f"reader-{self.reader_id}"
 
-    def events_between(self, _from: datetime, to: datetime) -> Generator[Event, None, None]:
+    async def events_between(self, _from: datetime, to: datetime) -> Generator[Event, None, None]:
         """Yields each event found in the database, from (excluding) the first time to (including) the second time."""
-        return self.database.retrieve_events(f"time > \"{_from}\" AND time <= \"{to}\"")
+        return self.database.retrieve_events(where="time > %s AND time <= %s", where_values=(_from, to))
 
-    async def on_events(self, events: List[Event]) -> None:
+    async def on_event_batch(self) -> None:
         """Called for each new event batch found in the running loop of the reader.
-        This happens before on_event is called for each event.
-        
-        Some types of events in this batch are merged together if concurrent
-        (e.g. user nominates + system qualifies -> user qualifies)."""
+        This happens before on_event is called for each event."""
 
     async def on_event(self, event: Event) -> None:
-        """Called for each new event found in the running loop of the reader.
-        
-        Some types of events are merged together if concurrent
-        (e.g. user nominates + system qualifies -> user qualifies)."""
-
-
+        """Called for each new event found in the running loop of the reader."""
 
 def merge_concurrent(events: List[Event]) -> List[Event]:
     """Returns a list of events where certain types of events are combined if they happened together
