@@ -22,7 +22,6 @@ from bot.formatter import format_thumbnail_url
 from bot.formatter import format_context_field_name
 from bot.formatter import format_context_field_value
 from bot.formatter import format_history
-from bot.formatter import format_recent_praise
 from bot.formatter import TimeUnit
 from bot.formatter import format_time
 
@@ -224,31 +223,6 @@ def test_history_truncated(test_database):
         expected_history += ":thought_balloon: "
     assert history == expected_history + ":heart:"
     assert len(history) <= 200
-
-def test_recent_praise(test_database):
-    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
-    nominator = User(2, "sometwo")
-    discussion = Discussion(7, beatmapset, user=nominator, content="nice")
-
-    praise_event = Event("praise", from_string("2020-01-01 04:56:00"), beatmapset, discussion, user=nominator, content=discussion.content)
-    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=nominator)
-
-    test_database.insert_event(praise_event)
-    test_database.insert_event(nom_event)
-
-    praise = format_recent_praise(nominator, beatmapset, database=test_database)
-    assert praise == "nice"
-
-def test_recent_praise_none(test_database):
-    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
-    nominator = User(2, "sometwo")
-
-    nom_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=nominator)
-
-    test_database.insert_event(nom_event)
-
-    praise = format_recent_praise(nominator, beatmapset, database=test_database)
-    assert praise is None
 
 def test_time_unit_comparison():
     assert TimeUnit.MILLISECONDS < TimeUnit.SECONDS
