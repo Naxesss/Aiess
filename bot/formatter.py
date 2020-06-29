@@ -76,10 +76,10 @@ def format_link(event: Event) -> str:
     
     raise ValueError("Cannot format a link of an event missing a beatmapset.")
 
-def format_embed(event: Event) -> str:
+async def format_embed(event: Event) -> str:
     """Returns an embed which represents the given event."""
     embed = Embed()
-    embed.add_field(name=format_field_name(event), value=format_field_value(event), inline=False)
+    embed.add_field(name=format_field_name(event), value=await format_field_value(event), inline=False)
     embed.set_footer(text=format_footer_text(event), icon_url=format_footer_icon_url(event))
     embed.colour = type_props[event.type].colour
     embed.set_thumbnail(url=format_thumbnail_url(event))
@@ -106,7 +106,7 @@ def format_field_name(event: Event) -> str:
     """Returns the embed title of the given event (e.g. :heart: Qualified)."""
     return f"{type_props[event.type].emoji} {type_props[event.type].title}"
 
-def format_field_value(event: Event) -> str:
+async def format_field_value(event: Event) -> str:
     """Returns the embed contents of the given event (i.e. the \"artist - title, mapped by creator [modes]\" part)."""
     artist_title_str = escape_markdown(f"{event.beatmapset.artist} - {event.beatmapset.title}")
     creator_str = escape_markdown(event.beatmapset.creator)
@@ -120,7 +120,7 @@ def format_field_value(event: Event) -> str:
     if type_props[event.type].show_history:
         # Give how much room the function has to work with, allowing it to smartly shorten/truncate if needed.
         # This is to account for the embed field value character limit of 1024.
-        result += format_history(event.beatmapset, length_limit=1024-len(result))
+        result += await format_history(event.beatmapset, length_limit=1024-len(result))
 
     return result
 
@@ -168,7 +168,7 @@ def format_context_field_value(event: Event) -> str:
     """Returns the content for the discussion context, surrounded in quotes."""
     return format_preview(escape_markdown(event.discussion.content))
 
-def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Database=None) -> str:
+async def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Database=None) -> str:
     """Returns the nomination history of this beatmapset (i.e. icons and names of actions and their authors).
     Optionally within a certain length, smartly shortening/truncating the contents if needed."""
     if not database: database = Database(SCRAPER_DB_NAME)  # Using wrapped database to access events.
@@ -176,7 +176,7 @@ def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Dat
     # Sorted by time ascending; newer events first.
     events = list(filter(
         lambda event: type_props[event.type].show_in_history,
-        database.retrieve_beatmapset_events(beatmapset)))
+        await database.retrieve_beatmapset_events(beatmapset)))
 
     long_history = ""
     for event in events:
