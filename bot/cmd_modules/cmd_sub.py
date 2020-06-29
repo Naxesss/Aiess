@@ -25,7 +25,7 @@ from bot.formatter import escape_markdown
     ])
 async def cmd_sub(command: Command, _filter: str):
 
-    if not validate_filter(command, _filter):
+    if not await validate_filter(command, _filter):
         return  # `validate_filter` will respond for us.
 
     subscribe(command.context.channel, _filter)

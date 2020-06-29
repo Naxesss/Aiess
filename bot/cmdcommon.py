@@ -4,7 +4,7 @@ sys.path.append('..')
 from bot.commands import Command
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
 
-def validate_filter(command: Command, _filter: str):
+async def validate_filter(command: Command, _filter: str):
     """Returns whether the filter was considered valid. If invalid, an appropriate response is sent
     where the command was called."""
     try:
