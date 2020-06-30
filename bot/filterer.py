@@ -365,6 +365,7 @@ def de_morgans_law(string: str) -> str:
     not_gate_start, not_gate_end = (None, None)
     needs_negating = None
     needs_negating_index = -1
+    not_gate_substitution = ""
     read = ""
     for index, char in enumerate(string):
         read += char
@@ -382,6 +383,10 @@ def de_morgans_law(string: str) -> str:
 
                     needs_negating = forwards_leveled(string[index + 1:])
                     needs_negating_index = index + 1
+
+                    if found_not_gate == "not " and string[:not_gate_start]:
+                        # Retain the space to not unintentionally merge the two sides of the gate.
+                        not_gate_substitution = " "
                     break
         
         if found_not_gate:
@@ -390,11 +395,8 @@ def de_morgans_law(string: str) -> str:
     if not needs_negating:
         return string
     
-    # Excludes the found NOT gate. Adds a space where the not gate existed if necessary to separate either side.
-    preprefix = string[:not_gate_start]
-    postprefix = string[not_gate_end:needs_negating_index - len("(")]
-    separator = "" if not preprefix or not postprefix or preprefix.endswith(" ") or postprefix.startswith(" ") else " "
-    prefix = preprefix + separator + postprefix
+    # Excludes the found NOT gate.
+    prefix = string[:not_gate_start] + not_gate_substitution + string[not_gate_end:needs_negating_index - len("(")]
     postfix = string[needs_negating_index + len(needs_negating) + len(")"):]
 
     negated_part = negate(needs_negating, not_gate=found_not_gate)
