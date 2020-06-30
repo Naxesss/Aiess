@@ -170,6 +170,11 @@ def test_de_morgans_law_negated_word():
 def test_de_morgans_law_negated_word_with_gate():
     assert de_morgans_law("user:someone and not type:(nominate or qualify)") == "user:someone and type:(not nominate and not qualify)"
 
+def test_de_morgans_law_negated_key_with_gate():
+    a = de_morgans_law("content:hi and not (user or author or creator):someone")
+    assert (a ==
+        "content:hi and (not user and not author and not creator):someone")
+
 def test_negate():
     assert negate("A | B & C") == "!A & (!B | !C)"
 
