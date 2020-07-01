@@ -53,13 +53,13 @@ def __get_event_generations_between(
     while current_time > end_time:
         event_generator = generator_function(page)
         yielded = False
-        any_exists = False
+        new_exists = False
         
         for event in event_generator:
-            any_exists = True
             if event.time > current_time:
                 continue
 
+            new_exists = True
             current_time = event.time
             if current_time <= end_time:
                 # Since events are sorted, any remaining element time is also <= `end_time`.
@@ -68,8 +68,9 @@ def __get_event_generations_between(
             yielded = True
             yield event
         
-        # In case the generator for some reason is empty (e.g. site changed routes or class names).
-        if not yielded and any_exists:
+        # In case the generator for some reason is empty (e.g. site changed routes, class names, or end time is later than events
+        # were logged for).
+        if not yielded and new_exists:
             noYieldTries += 1
             if noYieldTries >= 10:
                 raise ValueError("""
