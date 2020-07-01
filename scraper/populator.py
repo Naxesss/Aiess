@@ -98,7 +98,7 @@ async def __populate_additional_details(event: Event, discussions_json: object, 
 
 def __complete_discussion_context(discussion: Discussion, db_name: str=SCRAPER_DB_NAME) -> bool:
     """Completes the context of the discussion from prior database entries, if present. Returns true if succeeded."""
-    cached_discussion = Database(db_name).retrieve_discussion(f"id={discussion.id}")
+    cached_discussion = Database(db_name).retrieve_discussion("id=%s", (discussion.id,))
     if not cached_discussion:
         return False
 
