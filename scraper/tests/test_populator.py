@@ -66,16 +66,18 @@ def test_complete_context():
     assert incomplete_discussion.user
     assert incomplete_discussion.content
 
-def test_delete_incomplete_context():
+@pytest.mark.asyncio
+async def test_delete_incomplete_context():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
     discussion = Discussion(99, beatmapset)  # Missing user and content.
     event = Event("test", from_string("2020-01-01 00:00:00"), discussion=discussion)
     
     # The discussions json should not be checked, so we simply set it as None.
-    __populate_additional_details(event, discussions_json=None, db_name=SCRAPER_TEST_DB_NAME)
+    await __populate_additional_details(event, discussions_json=None, db_name=SCRAPER_TEST_DB_NAME)
     assert event.marked_for_deletion
 
-def test_additional_details_dq():
+@pytest.mark.asyncio
+async def test_additional_details_dq():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
     discussion = Discussion(
         1234956, beatmapset, user=User(4967662, "greenhue"),
@@ -85,11 +87,12 @@ def test_additional_details_dq():
     dq_event = Event(types.DISQUALIFY, from_string("2019-10-27T04:23:20+00:00"), beatmapset, discussion)
     
     discussion_json = json.loads(mock_discussion_json)
-    __populate_additional_details(dq_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
+    await __populate_additional_details(dq_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
 
     assert dq_event.content == dq_event.discussion.content
 
-def test_additional_details_resolve():
+@pytest.mark.asyncio
+async def test_additional_details_resolve():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
     discussion = Discussion(
         1234956, beatmapset, user=User(4967662, "greenhue"),
@@ -99,11 +102,12 @@ def test_additional_details_resolve():
     resolve_event = Event(types.RESOLVE, from_string("2019-10-27T09:00:00+00:00"), beatmapset, discussion)
     
     discussion_json = json.loads(mock_discussion_json)
-    __populate_additional_details(resolve_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
+    await __populate_additional_details(resolve_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
 
     assert resolve_event.user == User(7342798, "_Epreus")
 
-def test_additional_details_kudosu():
+@pytest.mark.asyncio
+async def test_additional_details_kudosu():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
     discussion = Discussion(
         1182017, beatmapset, user=User(9590557, "Firika"),
@@ -113,6 +117,6 @@ def test_additional_details_kudosu():
     kudosu_event = Event(types.KUDOSU_GAIN, from_string("2019-10-04T11:50:40+00:00"), beatmapset, discussion)
     
     discussion_json = json.loads(mock_discussion_json)
-    __populate_additional_details(kudosu_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
+    await __populate_additional_details(kudosu_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
 
     assert kudosu_event.user == User(7342798, "_Epreus")

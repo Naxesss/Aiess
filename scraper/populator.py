@@ -12,7 +12,7 @@ from scraper.parsers.discussion_parser import discussion_parser
 
 cached_discussions_json = {}
 
-def populate_event(event: Event) -> None:
+async def populate_event(event: Event) -> None:
     """Populates the given event using the beatmapset discussion json
     (e.g. missing discussion info and additional details like who did votes)."""
     discussions_json = get_discussions_json(event.beatmapset)
@@ -56,7 +56,7 @@ def get_complete_discussion_info(
         if other_discussion.id == discussion.id:
             return other_discussion
 
-def __populate_additional_details(event: Event, discussions_json: object, db_name: str=SCRAPER_DB_NAME) -> None:
+async def __populate_additional_details(event: Event, discussions_json: object, db_name: str=SCRAPER_DB_NAME) -> None:
     """Populates additional details in the given event from the beatmapset discussion json (e.g. who voted)."""
     if event.discussion and (not event.discussion.user or not event.discussion.content):
         if not __complete_discussion_context(event.discussion, db_name=db_name):
@@ -80,7 +80,7 @@ def __populate_additional_details(event: Event, discussions_json: object, db_nam
             
             if event.type in [types.NOMINATE, types.QUALIFY]:
                 # Event content should reflect recent praise/hype/note content.
-                event.content = Database(SCRAPER_DB_NAME).retrieve_nomination_comment(event.user, event.beatmapset)
+                event.content = await Database(SCRAPER_DB_NAME).retrieve_nomination_comment(event.user, event.beatmapset)
 
             if event.type in [types.RESOLVE, types.REOPEN]:
                 # Event user should be whoever resolved or reopened, rather than the discussion author.
