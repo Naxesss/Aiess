@@ -66,7 +66,7 @@ async def __populate_additional_details(event: Event, discussions_json: object, 
             return
 
     beatmapset_json = discussions_json["beatmapset"]
-    for page_event in get_map_page_event_jsons(event, discussions_json):
+    for page_event in get_map_page_event_jsons(event.beatmapset, discussions_json):
         # Likelihood that two same type of events happen in the same second is very unlikely,
         # so this'll work as identification (we have no access to actual event ids on scraping side, so can't use that).
         same_time = event.time == timestamp.from_string(page_event["created_at"])
