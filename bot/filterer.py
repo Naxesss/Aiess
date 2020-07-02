@@ -45,15 +45,27 @@ TYPE_ALIASES: Dict[str, List[str]] = {
     types.KUDOSU_ALLOW: ["kudosu allow", "kudosu allowed"]
 }
 
+def get_all_type_aliases() -> List[str]:
+    VALID_TYPES = [key for key in TYPE_ALIASES]
+    VALID_TYPES.extend(alias for aliases in TYPE_ALIASES.values() for alias in aliases)
+    # Accept "-" and "_" as substitutions of whitespace.
+    VALID_TYPES.extend(alias.replace(" ", "-") for aliases in TYPE_ALIASES.values() for alias in aliases)
+    VALID_TYPES.extend(alias.replace(" ", "_") for aliases in TYPE_ALIASES.values() for alias in aliases)
+    return VALID_TYPES
+
+def get_type_aliases(key: str) -> List[str]:
+    VALID_TYPES = [key] + TYPE_ALIASES[key]
+    VALID_TYPES.extend(alias for alias in TYPE_ALIASES[key])
+    # Accept "-" and "_" as substitutions of whitespace.
+    VALID_TYPES.extend(alias.replace(" ", "-") for alias in TYPE_ALIASES[key])
+    VALID_TYPES.extend(alias.replace(" ", "_") for alias in TYPE_ALIASES[key])
+    return VALID_TYPES
+
 def escape(obj: str) -> str:
     """Returns the same object cast to string, but surrounded in quotes if it contains a space."""
     if " " in str(obj):
         return f"\"{obj}\""
     return str(obj)
-
-# The keys and values of `TYPE_ALIASES` together make up all recognized types.
-VALID_TYPES = [key for key in TYPE_ALIASES]
-VALID_TYPES.extend(alias for aliases in TYPE_ALIASES.values() for alias in aliases)
 
 class Validation():
     """Represents the validation used by a tag to figure out if a value `is_valid`.
@@ -159,9 +171,9 @@ TAGS: Dict[List[str], Tag] = {
         "The type of an event (e.g. nominate, kudosu-gain, or suggestion).",
         lambda obj: (
             [escape(obj.type)] +
-            ([escape(alias) for alias in TYPE_ALIASES[obj.type]] if obj.type in TYPE_ALIASES else [])
+            ([escape(alias) for alias in get_type_aliases(obj.type)] if obj.type in TYPE_ALIASES else [])
         ) if isinstance(obj, Event) else None,
-        specific_validation(VALID_TYPES), sql_format="type=%s"
+        specific_validation(get_all_type_aliases()), sql_format="type=%s"
     ),
     ("content",) : Tag(
         "The text content associated with an event (e.g. the text of a reply, disqualification, or discussion).",
