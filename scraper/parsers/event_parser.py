@@ -18,7 +18,8 @@ class EventParser():
         if event_tag:
             for class_name in event_tag.attrs["class"]:
                 if class_name.startswith(class_prefix):
-                    event_type = class_name[len(class_prefix):]
+                    # CSS class types use -, whereas json types use _, we should standardize this.
+                    event_type = class_name[len(class_prefix):].replace("-", "_")
                     break
         
         # Failure to parse event type should be met with an exception, as this is abnormal and will likely cause further issues if silent.
