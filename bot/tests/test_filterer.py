@@ -342,6 +342,13 @@ def test_dissect_aliases():
     assert "type:nominated" in dissect(event)
     assert "type:bubbled" in dissect(event)
 
+def test_dissect_aliases_whitespace_substitution():
+    event = Event(_type="kudosu_gain", time=datetime.utcnow())
+
+    assert "type:kudosu_gain" in dissect(event)
+    assert "type:\"kudosu gain\"" in dissect(event)
+    assert "type:kudosu-gain" in dissect(event)
+
 def test_passes_filter():
     assert passes_filter("type:reply", ["mode:osu", "type:reply"])
     assert not passes_filter("type:qualify", ["mode:osu", "type:reply"])
