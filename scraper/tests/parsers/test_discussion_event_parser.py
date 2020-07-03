@@ -7,7 +7,7 @@ from aiess import timestamp
 
 from scraper.tests.mocks.events import problem, reply
 from scraper.tests.mocks.events.faulty import discussion_events
-from scraper.tests.mocks import discussions_json
+from scraper.tests.mocks import discussion_events_json
 from scraper.parsers.discussion_event_parser import discussion_event_parser
 from scraper import populator
 
@@ -34,7 +34,7 @@ def test_parse():
     assert generated_events[0].type == "suggestion"
 
 def test_parse_json():
-    generator = discussion_event_parser.parse(discussions_json.soup)
+    generator = discussion_event_parser.parse(discussion_events_json.soup)
 
     generated_events = []
     for event in generator:

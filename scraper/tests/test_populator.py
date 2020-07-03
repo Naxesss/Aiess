@@ -16,7 +16,7 @@ from scraper.populator import get_complete_discussion_info
 from scraper.populator import __complete_discussion_context
 from scraper.populator import __populate_additional_details
 
-from scraper.tests.mocks.discussion_format_json import JSON as mock_discussion_json
+from scraper.tests.mocks.discussion_jsons.additional_details import JSON as mock_discussion_json
 
 def setup_function():
     database = Database(SCRAPER_TEST_DB_NAME)
