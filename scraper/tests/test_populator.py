@@ -142,3 +142,33 @@ async def test_additional_details_nomination_comment_none():
     await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
 
     assert nominate_event.content == None
+
+@pytest.mark.asyncio
+async def test_additional_details_nomination_comment_from_note():
+    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), modes=["osu"])
+    nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(5312547, "Lafayla"))
+    
+    discussion_json = json.loads(mock_discussion_json_nom_comment_2)
+    await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
+
+    assert nominate_event.content == "02:31:783 - 02:34:783 - should be fine being snapped to 1/16, the piano does weird pick ups for these, same thing applies to  09:51:845 - i don't think its problematic"
+
+@pytest.mark.asyncio
+async def test_additional_details_nomination_comment_praise_then_suggestions():
+    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), modes=["osu"])
+    nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(896613, "Lasse"))
+    
+    discussion_json = json.loads(mock_discussion_json_nom_comment_2)
+    await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
+
+    assert nominate_event.content == None
+
+@pytest.mark.asyncio
+async def test_additional_details_nomination_from_praise():
+    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), modes=["osu"])
+    nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(4, "mock user"))
+    
+    discussion_json = json.loads(mock_discussion_json_nom_comment_2)
+    await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
+
+    assert nominate_event.content == "nice"
