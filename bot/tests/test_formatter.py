@@ -47,7 +47,7 @@ def kudosu_gain_event():
     beatmapset = Beatmapset(3, "artist", "title", mapper, ["osu"])
     user = User(1, "_someone_")
     discussion = Discussion(5, beatmapset, user, content="hi*")
-    event = Event("kudosu-gain", from_string("2020-04-11 20:00:00"), beatmapset, discussion, mapper)
+    event = Event("kudosu_gain", from_string("2020-04-11 20:00:00"), beatmapset, discussion, mapper)
 
     return event
 

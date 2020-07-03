@@ -13,7 +13,7 @@ from scraper.parsers.discussion_event_parser import discussion_event_parser
 
 def test_parse_event_type():
     tests = [
-        [beatmapset_event_parser.parse_event_type(issue_resolve.tag), "issue-resolve"],
+        [beatmapset_event_parser.parse_event_type(issue_resolve.tag), "issue_resolve"],
         [beatmapset_event_parser.parse_event_type(nominate.tag), "nominate"],
         [discussion_event_parser.parse_event_type(problem.tag), "problem"]
     ]
