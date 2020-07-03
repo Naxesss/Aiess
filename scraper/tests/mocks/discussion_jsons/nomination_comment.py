@@ -6084,53 +6084,6 @@ JSON1 = r"""
             "down": []
           }
         }
-      },
-      {
-        "id": 1684787,
-        "beatmapset_id": 1112303,
-        "beatmap_id": null,
-        "user_id": 2204515,
-        "deleted_by_id": null,
-        "message_type": "mapper_note",
-        "parent_id": null,
-        "timestamp": null,
-        "resolved": false,
-        "can_be_resolved": false,
-        "can_grant_kudosu": false,
-        "created_at": "2020-06-29T14:58:51+00:00",
-        "updated_at": "2020-06-29T14:58:51+00:00",
-        "deleted_at": null,
-        "last_post_at": "2020-06-29T14:58:51+00:00",
-        "kudosu_denied": false,
-        "posts": [
-          {
-            "id": 4732071,
-            "beatmap_discussion_id": 1684787,
-            "user_id": 2204515,
-            "last_editor_id": null,
-            "deleted_by_id": null,
-            "system": false,
-            "message": "Metadata\nArtist: Fox Stevenson\nTitle: Take You Down\nSource: https://www.youtube.com/watch?v=uJp2LV4FHXc (official channel)",
-            "created_at": "2020-06-29T14:58:51+00:00",
-            "updated_at": "2020-06-29T14:58:51+00:00",
-            "deleted_at": null
-          }
-        ],
-        "current_user_attributes": {
-          "vote_score": 0,
-          "can_moderate_kudosu": true,
-          "can_resolve": true,
-          "can_reopen": true,
-          "can_destroy": true
-        },
-        "votes": {
-          "up": 0,
-          "down": 0,
-          "voters": {
-            "up": [],
-            "down": []
-          }
-        }
       }
     ],
     "events": [
