@@ -17,6 +17,7 @@ from scraper.populator import __complete_discussion_context
 from scraper.populator import __populate_additional_details
 
 from scraper.tests.mocks.discussion_jsons.additional_details import JSON as mock_discussion_json
+from scraper.tests.mocks.discussion_jsons.nomination_comment import JSON as mock_discussion_json_nom_comment
 
 def setup_function():
     database = Database(SCRAPER_TEST_DB_NAME)
@@ -120,3 +121,23 @@ async def test_additional_details_kudosu():
     await __populate_additional_details(kudosu_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
 
     assert kudosu_event.user == User(7342798, "_Epreus")
+
+@pytest.mark.asyncio
+async def test_additional_details_nomination_comment_from_hype():
+    beatmapset = Beatmapset(1112303, artist="Fox Stevenson", title="Take You Down", creator=User(5745865, "Altai"), modes=["osu"])
+    nominate_event = Event(types.NOMINATE, from_string("2020-07-01T20:48:57+00:00"), beatmapset, user=User(2204515, "Mao"))
+    
+    discussion_json = json.loads(mock_discussion_json_nom_comment)
+    await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
+
+    assert nominate_event.content == "<3"
+
+@pytest.mark.asyncio
+async def test_additional_details_nomination_comment_none():
+    beatmapset = Beatmapset(1112303, artist="Fox Stevenson", title="Take You Down", creator=User(5745865, "Altai"), modes=["osu"])
+    nominate_event = Event(types.NOMINATE, from_string("2020-07-01T20:48:47+00:00"), beatmapset, user=User(8623835, "Peter"))
+    
+    discussion_json = json.loads(mock_discussion_json_nom_comment)
+    await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
+
+    assert nominate_event.content == None
