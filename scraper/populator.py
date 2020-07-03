@@ -107,7 +107,7 @@ def __complete_discussion_context(discussion: Discussion, db_name: str=SCRAPER_D
     return True
 
 def get_nomination_comment(event: Event, discussions_json: object) -> str:
-    """Returns the text of the last discussion by the user if it is a praise,
+    """Returns the text of the last discussion by the user if it is a praise or mapper note,
     otherwise any hype prior to the event by the user, if any, else None."""
     latest_discussion_json = None
     latest_hype_discussion_json = None
@@ -119,7 +119,7 @@ def get_nomination_comment(event: Event, discussions_json: object) -> str:
             if discussion_json["message_type"] == types.HYPE:
                 latest_hype_discussion_json = discussion_json
     
-    if latest_discussion_json["message_type"] == types.PRAISE:
+    if latest_discussion_json and latest_discussion_json["message_type"] in [types.PRAISE, types.NOTE]:
         return latest_discussion_json["posts"][0]["message"]
     
     if latest_hype_discussion_json:
