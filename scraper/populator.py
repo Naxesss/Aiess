@@ -4,7 +4,7 @@ sys.path.append('..')
 from aiess.objects import Discussion, Beatmapset, Event
 from aiess.errors import ParsingError
 from aiess.database import Database, SCRAPER_DB_NAME
-from aiess import timestamp
+from aiess.timestamp import from_string
 from aiess import event_types as types
 
 from scraper.requester import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons, get_map_page_discussion_jsons
@@ -69,7 +69,7 @@ async def __populate_additional_details(event: Event, discussions_json: object, 
     for page_event in get_map_page_event_jsons(event.beatmapset, discussions_json):
         # Likelihood that two same type of events happen in the same second is very unlikely,
         # so this'll work as identification (we have no access to actual event ids on scraping side, so can't use that).
-        same_time = event.time == timestamp.from_string(page_event["created_at"])
+        same_time = event.time == from_string(page_event["created_at"])
         same_type = event.type == page_event["type"]
         if same_time and same_type:
 
