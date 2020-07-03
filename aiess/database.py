@@ -355,39 +355,3 @@ class Database:
             user = self.retrieve_user("id=%s", (row[4],)) if row[4] else None
             content = row[5]
             yield Event(_type, time, beatmapset, discussion, user, content=content)
-    
-    async def retrieve_last_type(self, user: User, beatmapset: Beatmapset, where: str, where_values: tuple) -> Event:
-        """Retrieves the last event made by the given user on the given beatmapset, satisfying the
-        additional where clause for types (e.g. `type=%s OR type=%s` with values `("hype", "praise")`)."""
-        return await self.retrieve_event(where=f"""
-            beatmapset_id=%s AND
-            user_id=%s AND
-            ({where})
-            ORDER BY time DESC
-            LIMIT 1""",
-            where_values=(beatmapset.id, user.id, *where_values))
-
-    async def retrieve_nomination_comment(self, user: User, beatmapset: Beatmapset) -> str:
-        """Retrieves the most recent discussion event from the user. If it is a hype, praise, or note, return it, otherwise
-        retrieve and return the most recent hype event from the user. If that doesn't exist either, None is returned."""
-        recent_discussion_event = await self.retrieve_last_type(
-            user         = user,
-            beatmapset   = beatmapset,
-            where        = "user_id=%s AND (type=%s OR type=%s OR type=%s OR type=%s OR type=%s)",
-            where_values = (user.id, "suggestion", "problem", "hype", "praise", "mapper_note")
-        )
-
-        if recent_discussion_event and recent_discussion_event.type in ["hype", "praise", "mapper_note"]:
-            return recent_discussion_event.content
-
-        hype_event = await self.retrieve_last_type(
-            user         = user,
-            beatmapset   = beatmapset,
-            where        = "type=%s",
-            where_values = ("hype",)
-        )
-
-        if hype_event:
-            return hype_event.content
-        
-        return None

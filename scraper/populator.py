@@ -7,7 +7,7 @@ from aiess.database import Database, SCRAPER_DB_NAME
 from aiess import timestamp
 from aiess import event_types as types
 
-from scraper.requester import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons
+from scraper.requester import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons, get_map_page_discussion_jsons
 from scraper.parsers.discussion_parser import discussion_parser
 
 cached_discussions_json = {}
@@ -80,7 +80,7 @@ async def __populate_additional_details(event: Event, discussions_json: object, 
             
             if event.type in [types.NOMINATE, types.QUALIFY]:
                 # Event content should reflect recent praise/hype/note content.
-                event.content = await Database(SCRAPER_DB_NAME).retrieve_nomination_comment(event.user, event.beatmapset)
+                event.content = get_nomination_comment(event, discussions_json)
 
             if event.type in [types.RESOLVE, types.REOPEN]:
                 # Event user should be whoever resolved or reopened, rather than the discussion author.
@@ -105,3 +105,24 @@ def __complete_discussion_context(discussion: Discussion, db_name: str=SCRAPER_D
     discussion.user = cached_discussion.user
     discussion.content = cached_discussion.content
     return True
+
+def get_nomination_comment(event: Event, discussions_json: object) -> str:
+    """Returns the text of the last discussion by the user if it is a praise,
+    otherwise any hype prior to the event by the user, if any, else None."""
+    latest_discussion_json = None
+    latest_hype_discussion_json = None
+    for discussion_json in get_map_page_discussion_jsons(event.beatmapset, discussions_json):
+        same_user = discussion_json["user_id"] == event.user.id
+        before_nomination = timestamp.from_string(discussion_json["created_at"]) < event.time
+        if same_user and before_nomination:
+            latest_discussion_json = discussion_json
+            if discussion_json["message_type"] == types.HYPE:
+                latest_hype_discussion_json = discussion_json
+    
+    if latest_discussion_json["message_type"] == types.PRAISE:
+        return latest_discussion_json["posts"][0]["message"]
+    
+    if latest_hype_discussion_json:
+        return latest_hype_discussion_json["posts"][0]["message"]
+    
+    return None

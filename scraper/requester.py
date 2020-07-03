@@ -98,3 +98,8 @@ def get_map_page_event_jsons(beatmapset: Beatmapset, discussions_json: object=No
     """Returns a generator of event json objects from the beatmapset discussion page json. If not supplied it is scraped."""
     discussions_json = request_discussions_json(beatmapset) if discussions_json is None else discussions_json
     return discussions_json["beatmapset"]["events"]
+
+def get_map_page_discussion_jsons(beatmapset: Beatmapset, discussions_json: object=None) -> Generator[object, None, None]:
+    """Returns a generator of event json objects from the beatmapset discussion page json. If not supplied it is scraped."""
+    discussions_json = request_discussions_json(beatmapset) if discussions_json is None else discussions_json
+    return discussions_json["beatmapset"]["discussions"]
