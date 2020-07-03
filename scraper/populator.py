@@ -112,9 +112,14 @@ def get_nomination_comment(event: Event, discussions_json: object) -> str:
     latest_discussion_json = None
     latest_hype_discussion_json = None
     for discussion_json in get_map_page_discussion_jsons(event.beatmapset, discussions_json):
-        same_user = discussion_json["user_id"] == event.user.id
-        before_nomination = timestamp.from_string(discussion_json["created_at"]) < event.time
-        if same_user and before_nomination:
+        latest_time = from_string(latest_discussion_json["created_at"]) if latest_discussion_json else None
+        current_time = from_string(discussion_json["created_at"])
+
+        if (
+            discussion_json["user_id"] == event.user.id and
+            current_time < event.time and
+            (not latest_time or current_time > latest_time)
+        ):
             latest_discussion_json = discussion_json
             if discussion_json["message_type"] == types.HYPE:
                 latest_hype_discussion_json = discussion_json
