@@ -74,13 +74,13 @@ class Database(aiess.Database):
         Includes the properties of objects (e.g. beatmapset artist/title and username)."""
         fetched_rows = self.retrieve_table_data(
             # `LEFT JOIN`s allow for querying e.g. usernames and beatmapset artists/titles.
-            table        = """events
-                LEFT JOIN aiess.discussions AS discussion ON events.discussion_id=discussion.id
-                LEFT JOIN aiess.beatmapsets AS beatmapset ON events.beatmapset_id=beatmapset.id
-                LEFT JOIN aiess.users AS author ON discussion.user_id=author.id
-                LEFT JOIN aiess.users AS creator ON beatmapset.creator_id=creator.id
-                LEFT JOIN aiess.users AS user ON events.user_id=user.id
-                LEFT JOIN aiess.beatmapset_modes AS modes ON beatmapset.id=modes.beatmapset_id""",
+            table        = f"""events
+                LEFT JOIN {self.db_name}.discussions AS discussion ON events.discussion_id=discussion.id
+                LEFT JOIN {self.db_name}.beatmapsets AS beatmapset ON events.beatmapset_id=beatmapset.id
+                LEFT JOIN {self.db_name}.users AS author ON discussion.user_id=author.id
+                LEFT JOIN {self.db_name}.users AS creator ON beatmapset.creator_id=creator.id
+                LEFT JOIN {self.db_name}.users AS user ON events.user_id=user.id
+                LEFT JOIN {self.db_name}.beatmapset_modes AS modes ON beatmapset.id=modes.beatmapset_id""",
             where        = where,
             where_values = where_values,
             selection    = "events.type, events.time, events.beatmapset_id, events.discussion_id, events.user_id, events.content"
