@@ -20,7 +20,7 @@ async def populate_event(event: Event) -> None:
         raise ValueError("Could not get a discussion.")
 
     event.discussion = get_complete_discussion_info(event.discussion, event.beatmapset, discussions_json)
-    __populate_additional_details(event, discussions_json)
+    await __populate_additional_details(event, discussions_json)
 
 def get_discussions_json(beatmapset: Beatmapset) -> object:
     """Returns the beatmapset discussions json, containing all of the discussion information for the mapset,
