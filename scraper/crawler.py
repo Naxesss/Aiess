@@ -52,32 +52,20 @@ def __get_event_generations_between(
 
     while current_time > end_time:
         event_generator = generator_function(page)
-        yielded = False
-        new_exists = False
         
         for event in event_generator:
             if event.time > current_time:
                 continue
 
-            new_exists = True
             current_time = event.time
             if current_time <= end_time:
                 # Since events are sorted, any remaining element time is also <= `end_time`.
                 break
             
-            yielded = True
             yield event
         
-        # In case the generator for some reason is empty (e.g. site changed routes, class names, or end time is later than events
-        # were logged for).
-        if not yielded and new_exists:
-            noYieldTries += 1
-            if noYieldTries >= 10:
-                raise ValueError("""
-                    No events were returned from the generator. Are we parsing the events properly? Are we looking too far back in time?""")
-        else:
-            page += 1
-            if page > 500:
-                # Assuming 60 s / page, this would take 8 hours to hit, but that's within acceptable bounds for this purpose.
-                raise ValueError("""
-                    The page index has exceeded 500, we're probably stuck in a loop.""")
+        page += 1
+        if page > 500:
+            # Assuming 60 s / page, this would take 8 hours to hit, but that's within acceptable bounds for this purpose.
+            raise ValueError("""
+                The page index has exceeded 500, we're probably stuck in a loop.""")
