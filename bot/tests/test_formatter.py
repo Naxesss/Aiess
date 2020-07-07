@@ -78,7 +78,7 @@ def test_format_link_no_beatmapset():
 async def test_format_embed(suggestion_event):
     embed: Embed = await format_embed(suggestion_event)
     
-    assert embed.fields[0].name.startswith(":yellow_circle: Suggestion (**")
+    assert embed.fields[0].name.startswith(":yellow_circle:\u2000Suggestion (**")
     assert embed.fields[0].name.endswith("** ago)")
     assert (
         embed.fields[0].value ==
@@ -98,11 +98,11 @@ async def test_format_embed_context(kudosu_gain_event):
     assert embed.fields[1].value == format_context_field_value(kudosu_gain_event)
 
 def test_format_field_name(suggestion_event):
-    assert format_field_name(suggestion_event).startswith(":yellow_circle: Suggestion (**")
+    assert format_field_name(suggestion_event).startswith(":yellow_circle:\u2000Suggestion (**")
     assert format_field_name(suggestion_event).endswith("** ago)")
 
 def test_format_field_name_qualify(qualify_event):
-    assert format_field_name(qualify_event).startswith(":heart: Qualified (**")
+    assert format_field_name(qualify_event).startswith(":heart:\u2000Qualified (**")
     assert format_field_name(qualify_event).endswith("** ago)")
 
 @pytest.mark.asyncio
@@ -183,7 +183,7 @@ async def test_history(test_database):
     test_database.insert_event(qual_event)
 
     history = await format_history(beatmapset, database=test_database)
-    assert history == "\n:thought_balloon: [someone](https://osu.ppy.sh/users/1) :heart: [sometwo](https://osu.ppy.sh/users/2)"
+    assert history == "\n:thought_balloon: [someone](https://osu.ppy.sh/users/1)\u2000:heart: [sometwo](https://osu.ppy.sh/users/2)"
 
 @pytest.mark.asyncio
 async def test_history_filtering(test_database):
@@ -198,7 +198,7 @@ async def test_history_filtering(test_database):
 
     # The suggestion event should not appear in the history.
     history = await format_history(beatmapset, database=test_database)
-    assert history == "\n:thought_balloon: [someone](https://osu.ppy.sh/users/1) :heart: [sometwo](https://osu.ppy.sh/users/2)"
+    assert history == "\n:thought_balloon: [someone](https://osu.ppy.sh/users/1)\u2000:heart: [sometwo](https://osu.ppy.sh/users/2)"
 
 @pytest.mark.asyncio
 async def test_history_truncated(test_database):

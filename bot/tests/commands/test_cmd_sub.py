@@ -29,7 +29,7 @@ async def test_sub():
     assert mock_command.response.startswith("✓")
     assert mock_command.response_embed
     assert mock_command.response_embed.fields
-    assert "🔔 Subscribed" in mock_command.response_embed.fields[0].name
+    assert "🔔\u2000Subscribed" in mock_command.response_embed.fields[0].name
     assert f"type:(nominate or qualify)" in mock_command.response_embed.fields[0].value
     assert f"`type:nominate or type:qualify`" in mock_command.response_embed.fields[0].value
 
@@ -46,7 +46,7 @@ async def test_sub_markdown_and_quotes():
     assert mock_command.response.startswith("✓")
     assert mock_command.response_embed
     assert mock_command.response_embed.fields
-    assert "🔔 Subscribed" in mock_command.response_embed.fields[0].name
+    assert "🔔\u2000Subscribed" in mock_command.response_embed.fields[0].name
     assert f"user:\"\\_\\_don't underline this\\_\\_\"" in mock_command.response_embed.fields[0].value
     assert f"`user:\"__don't underline this__\"`" in mock_command.response_embed.fields[0].value
 

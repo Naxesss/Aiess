@@ -104,7 +104,7 @@ def escape_markdown(obj: str) -> str:
 
 def format_field_name(event: Event) -> str:
     """Returns the embed title of the given event (e.g. :heart: Qualified)."""
-    return f"{type_props[event.type].emoji} {type_props[event.type].title} ({format_timeago(event.time)})"
+    return f"{type_props[event.type].emoji}\u2000{type_props[event.type].title} ({format_timeago(event.time)})"
 
 async def format_field_value(event: Event) -> str:
     """Returns the embed contents of the given event (i.e. the \"artist - title, mapped by creator [modes]\" part)."""
@@ -189,7 +189,7 @@ async def format_history(beatmapset: Beatmapset, length_limit: int=None, databas
 
         long_history = (
             f"{type_props[event.type].emoji} [{event.user}](https://osu.ppy.sh/users/{event.user.id})" +
-            (" " if long_history else "") +
+            ("\u2000" if long_history else "") +
             long_history
         )
 
