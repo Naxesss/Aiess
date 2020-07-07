@@ -19,7 +19,6 @@ from scraper.populator import __populate_additional_details
 from scraper.tests.mocks.discussion_jsons.additional_details import JSON as mock_discussion_json
 from scraper.tests.mocks.discussion_jsons.nomination_comment import JSON1 as mock_discussion_json_nom_comment_1
 from scraper.tests.mocks.discussion_jsons.nomination_comment import JSON2 as mock_discussion_json_nom_comment_2
-from scraper.tests.mocks.discussion_jsons.nomination_comment import JSON3 as mock_discussion_json_nom_comment_3
 
 def setup_function():
     database = Database(SCRAPER_TEST_DB_NAME)
@@ -133,15 +132,6 @@ async def test_nom_comment_from_hype():
     await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
 
     assert nominate_event.content == "<3"
-
-@pytest.mark.asyncio
-async def test_qual_comment_from_hype():
-    nominate_event = Event(types.QUALIFY, from_string("2020-07-03T16:26:31+00:00"), beatmapset=None, user=User(2841009, "Mirash"))
-    
-    discussion_json = json.loads(mock_discussion_json_nom_comment_3)
-    await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
-
-    assert nominate_event.content == "OK delis"
 
 @pytest.mark.asyncio
 async def test_nom_comment_none():
