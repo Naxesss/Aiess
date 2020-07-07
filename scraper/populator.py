@@ -65,6 +65,15 @@ async def __populate_additional_details(event: Event, discussions_json: object, 
             event.marked_for_deletion = True
             return
 
+    if event.type in [types.NOMINATE]:
+        # Nominate/qualify content should reflect recent praise/hype/note content.
+        event.content = get_nomination_comment(event, discussions_json)
+    
+    if event.type in [types.DISQUALIFY, types.RESET]:
+        # Event content should reflect discussion content.
+        if event.discussion:  # Discussion may have been deleted.
+            event.content = event.discussion.content
+
     beatmapset_json = discussions_json["beatmapset"]
     for page_event in get_map_page_event_jsons(event.beatmapset, discussions_json):
         # Likelihood that two same type of events happen in the same second is very unlikely,
@@ -72,16 +81,6 @@ async def __populate_additional_details(event: Event, discussions_json: object, 
         same_time = event.time == from_string(page_event["created_at"])
         same_type = event.type == page_event["type"]
         if same_time and same_type:
-
-            if event.type in [types.DISQUALIFY, types.RESET]:
-                # Event content should reflect discussion content.
-                if event.discussion:  # Discussion may have been deleted.
-                    event.content = event.discussion.content
-            
-            if event.type in [types.NOMINATE, types.QUALIFY]:
-                # Event content should reflect recent praise/hype/note content.
-                event.content = get_nomination_comment(event, discussions_json)
-
             if event.type in [types.RESOLVE, types.REOPEN]:
                 # Event user should be whoever resolved or reopened, rather than the discussion author.
                 post_author = discussion_parser.parse_discussion_post_author(
