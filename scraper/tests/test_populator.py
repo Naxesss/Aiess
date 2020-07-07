@@ -19,6 +19,7 @@ from scraper.populator import __populate_additional_details
 from scraper.tests.mocks.discussion_jsons.additional_details import JSON as mock_discussion_json
 from scraper.tests.mocks.discussion_jsons.nomination_comment import JSON1 as mock_discussion_json_nom_comment_1
 from scraper.tests.mocks.discussion_jsons.nomination_comment import JSON2 as mock_discussion_json_nom_comment_2
+from scraper.tests.mocks.discussion_jsons.nomination_comment import JSON3 as mock_discussion_json_nom_comment_3
 
 def setup_function():
     database = Database(SCRAPER_TEST_DB_NAME)
@@ -124,7 +125,7 @@ async def test_additional_details_kudosu():
     assert kudosu_event.user == User(7342798, "_Epreus")
 
 @pytest.mark.asyncio
-async def test_additional_details_nomination_comment_from_hype():
+async def test_nom_comment_from_hype():
     beatmapset = Beatmapset(1112303, artist="Fox Stevenson", title="Take You Down", creator=User(5745865, "Altai"), modes=["osu"])
     nominate_event = Event(types.NOMINATE, from_string("2020-07-01T20:48:57+00:00"), beatmapset, user=User(2204515, "Mao"))
     
@@ -134,7 +135,16 @@ async def test_additional_details_nomination_comment_from_hype():
     assert nominate_event.content == "<3"
 
 @pytest.mark.asyncio
-async def test_additional_details_nomination_comment_none():
+async def test_qual_comment_from_hype():
+    nominate_event = Event(types.QUALIFY, from_string("2020-07-03T16:26:31+00:00"), beatmapset=None, user=User(2841009, "Mirash"))
+    
+    discussion_json = json.loads(mock_discussion_json_nom_comment_3)
+    await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
+
+    assert nominate_event.content == "OK delis"
+
+@pytest.mark.asyncio
+async def test_nom_comment_none():
     beatmapset = Beatmapset(1112303, artist="Fox Stevenson", title="Take You Down", creator=User(5745865, "Altai"), modes=["osu"])
     nominate_event = Event(types.NOMINATE, from_string("2020-07-01T20:48:47+00:00"), beatmapset, user=User(8623835, "Peter"))
     
@@ -144,7 +154,7 @@ async def test_additional_details_nomination_comment_none():
     assert nominate_event.content == None
 
 @pytest.mark.asyncio
-async def test_additional_details_nomination_comment_from_note():
+async def test_nom_comment_from_note():
     beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), modes=["osu"])
     nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(5312547, "Lafayla"))
     
@@ -154,7 +164,7 @@ async def test_additional_details_nomination_comment_from_note():
     assert nominate_event.content == "02:31:783 - 02:34:783 - should be fine being snapped to 1/16, the piano does weird pick ups for these, same thing applies to  09:51:845 - i don't think its problematic"
 
 @pytest.mark.asyncio
-async def test_additional_details_nomination_comment_praise_then_suggestions():
+async def test_nom_comment_praise_then_suggestions():
     beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), modes=["osu"])
     nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(896613, "Lasse"))
     
@@ -164,7 +174,7 @@ async def test_additional_details_nomination_comment_praise_then_suggestions():
     assert nominate_event.content == None
 
 @pytest.mark.asyncio
-async def test_additional_details_nomination_from_praise():
+async def test_nom_comment_from_praise():
     beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), modes=["osu"])
     nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(4, "mock user"))
     
