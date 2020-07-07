@@ -112,6 +112,7 @@ def get_nomination_comment(event: Event, discussions_json: object) -> str:
     latest_discussion_json = None
     latest_hype_discussion_json = None
     for discussion_json in get_map_page_discussion_jsons(event.beatmapset, discussions_json):
+        if discussion_json is None: continue
         latest_time = from_string(latest_discussion_json["created_at"]) if latest_discussion_json else None
         current_time = from_string(discussion_json["created_at"])
 
