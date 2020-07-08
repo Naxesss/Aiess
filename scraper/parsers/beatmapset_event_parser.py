@@ -84,7 +84,7 @@ class BeatmapsetEventParser(EventParser):
         
         try:
             # Scrape object data
-            _type = event_json["type"].replace("_", "-")
+            _type = event_json["type"]
             time = timestamp.from_string(event_json["created_at"])
 
             if "beatmapset" not in event_json or not event_json["beatmapset"]:
