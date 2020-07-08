@@ -48,7 +48,6 @@ def __get_event_generations_between(
     frame and across multiple pages rather than just one."""
     current_time = start_time
     page = 1
-    noYieldTries = 0
 
     while current_time > end_time:
         event_generator = generator_function(page)
