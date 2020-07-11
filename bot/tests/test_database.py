@@ -42,6 +42,16 @@ def test_insert_retrieve_channel_sub(bot_test_database):
     bot_test_database.insert_subscription(sub1)
     bot_test_database.insert_subscription(sub2)
 
+    retrieved_sub = bot_test_database.retrieve_subscription("guild_id=%s AND channel_id=%s", (3, 1))
+    assert retrieved_sub == sub1
+
+def test_insert_retrieve_channel_subs(bot_test_database):
+    sub1 = Subscription(guild_id=3, channel_id=1, _filter="type:problem and state:qualified")
+    sub2 = Subscription(guild_id=3, channel_id=2, _filter="type:ranked")
+
+    bot_test_database.insert_subscription(sub1)
+    bot_test_database.insert_subscription(sub2)
+
     retrieved_subs = bot_test_database.retrieve_subscriptions()
     assert next(retrieved_subs, None) == sub1
     assert next(retrieved_subs, None) == sub2
