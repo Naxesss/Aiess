@@ -15,15 +15,12 @@ DEFAULT_DB_NAME = BOT_DB_NAME
 
 cache: List[Subscription] = []
 
-def load(database: Database=None) -> None:
+def load() -> None:
     """Retrieves all subscriptions from the database and appends them to the internal list."""
-    if not database:
-        database = Database(DEFAULT_DB_NAME)
-
     global cache
     cache = []
 
-    for sub in database.retrieve_subscriptions():
+    for sub in Database(DEFAULT_DB_NAME).retrieve_subscriptions():
         cache.append(sub)
 
 def guild_id_or_none(channel: TextChannel):
@@ -37,31 +34,26 @@ def subscribe(channel: TextChannel, _filter: str) -> None:
     sub = Subscription(guild_id_or_none(channel), channel.id, _filter)
     add_subscription(sub)
 
-def add_subscription(sub: Subscription, database: Database=None) -> None:
+def add_subscription(sub: Subscription) -> None:
     """Inserts a subscription into the subscription table of the database and reloads the cache.
     Causes any new events passing the filter to be sent to the channel."""
     if sub.guild_id is None:
         # Prevents excessive discord rate limiting (5 DMs per second globally).
         raise ValueError("Cannot subscribe in DM channels.")
 
-    if not database:
-        database = Database(DEFAULT_DB_NAME)
-
-    database.insert_subscription(sub)
-    load(database)
+    Database(DEFAULT_DB_NAME).insert_subscription(sub)
+    load()
 
 def unsubscribe(channel: TextChannel) -> None:
     """Deletes a channel and its filter from the subscription table of the database and reloads the cache."""
     sub = Subscription(guild_id_or_none(channel), channel.id, None)
     remove_subscription(sub)
 
-def remove_subscription(sub: Subscription, database: Database=None) -> None:
+def remove_subscription(sub: Subscription) -> None:
     """Deletes a subscription from the subscription table of the database and reloads the cache."""
-    if not database:
-        database = Database(DEFAULT_DB_NAME)
+    Database(DEFAULT_DB_NAME).delete_subscription(sub)
+    load()
 
-    database.delete_subscription(sub)
-    load(database)
 
 async def forward(event: Event, client: discord.Client) -> None:
     """Attempts to forward an event through all subscription filters."""

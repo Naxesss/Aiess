@@ -10,56 +10,55 @@ from bot import subscriber
 from bot.subscriptions import Subscription
 from bot.database import Database, BOT_TEST_DB_NAME
 
-@pytest.fixture
-def test_database():
-    database = Database(BOT_TEST_DB_NAME)
+def setup_function():
+    subscriber.DEFAULT_DB_NAME = BOT_TEST_DB_NAME
     # Reset database to state before any tests ran.
-    database.clear_table_data("subscriptions")
-    return database
+    Database(BOT_TEST_DB_NAME).clear_table_data("subscriptions")
 
-def test_correct_setup(test_database: Database):
-    assert not test_database.retrieve_table_data("subscriptions")
+def test_correct_setup():
+    assert not Database(BOT_TEST_DB_NAME).retrieve_table_data("subscriptions")
 
-def test_load(test_database: Database):
+def test_load():
     sub1 = Subscription(guild_id=1, channel_id=1, _filter="type:nominate")
     sub2 = Subscription(guild_id=1, channel_id=2, _filter="type:ranked")
 
-    test_database.insert_subscription(sub1)
-    test_database.insert_subscription(sub2)
+    database = Database(BOT_TEST_DB_NAME)
+    database.insert_subscription(sub1)
+    database.insert_subscription(sub2)
 
-    subscriber.load(test_database)
+    subscriber.load()
 
     assert sub1 in subscriber.cache
     assert sub2 in subscriber.cache
 
-def test_add_subscription(test_database: Database):
+def test_add_subscription():
     sub1 = Subscription(guild_id=1, channel_id=1, _filter="type:nominate")
     sub2 = Subscription(guild_id=1, channel_id=2, _filter="type:ranked")
     sub3 = Subscription(guild_id=1, channel_id=2, _filter="type:qualify")
 
-    subscriber.add_subscription(sub1, test_database)
-    subscriber.add_subscription(sub2, test_database)
-    subscriber.add_subscription(sub3, test_database)
+    subscriber.add_subscription(sub1)
+    subscriber.add_subscription(sub2)
+    subscriber.add_subscription(sub3)
 
     assert sub1 in subscriber.cache
     assert sub2 not in subscriber.cache
     assert sub3 in subscriber.cache
 
-def test_add_subscription_dm_channel(test_database: Database):
+def test_add_subscription_dm_channel():
     sub = Subscription(guild_id=None, channel_id=1, _filter="type:nominate")
 
     with pytest.raises(ValueError) as err:
-        subscriber.add_subscription(sub, test_database)
+        subscriber.add_subscription(sub)
     
     assert "DM channel" in str(err)
 
-def test_remove_subscription(test_database: Database):
+def test_remove_subscription():
     sub1 = Subscription(guild_id=1, channel_id=1, _filter="type:nominate")
 
-    subscriber.add_subscription(sub1, test_database)
+    subscriber.add_subscription(sub1)
     assert sub1 in subscriber.cache
 
-    subscriber.remove_subscription(sub1, test_database)
+    subscriber.remove_subscription(sub1)
     assert sub1 not in subscriber.cache
 
 class MockClient():
@@ -70,12 +69,12 @@ class MockClient():
         self.event_sub_pairs.append((sub, event))
 
 @pytest.mark.asyncio
-async def test_forward(test_database: Database):
+async def test_forward():
     sub_both = Subscription(guild_id=1, channel_id=2, _filter="type:test1 or type:test2")
     sub_one = Subscription(guild_id=1, channel_id=1, _filter="type:test1")
 
-    subscriber.add_subscription(sub_both, test_database)
-    subscriber.add_subscription(sub_one, test_database)
+    subscriber.add_subscription(sub_both)
+    subscriber.add_subscription(sub_one)
 
     event1 = Event(_type="test1", time=datetime.utcnow())
     event2 = Event(_type="test2", time=datetime.utcnow())
