@@ -8,6 +8,7 @@ from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChanne
 from bot.cmd_modules import cmd_sub
 from bot.receiver import receive_command
 from bot.database import Database, BOT_TEST_DB_NAME
+from bot.subscriptions import Subscription
 
 def setup_function():
     # Reset database to state before any tests ran.
@@ -67,15 +68,16 @@ async def test_sub_dm_channel():
 
 @pytest.mark.asyncio
 async def test_sub_no_arg():
+    subscriber.add_subscription(Subscription(guild_id=2, channel_id=6, _filter="type:(nominate or qualify)"))
+
     mock_message = MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=2)))
     mock_command = MockCommand("sub", context=mock_message)
 
-    assert not await receive_command(mock_command)
-    assert mock_command.response.startswith("✗")
-    assert "argument" in mock_command.response.lower()
-    assert mock_command.response_embed.fields[0].name == mock_command.help_embed().fields[0].name
-    assert mock_command.response_embed.fields[0].value == mock_command.help_embed().fields[0].value
-    assert not subscriber.cache
+    assert await receive_command(mock_command)
+    assert len(mock_command.response) == 0
+    assert "🔔\u2000Current Subscription" in mock_command.response_embed.fields[0].name
+    assert f"type:(nominate or qualify)" in mock_command.response_embed.fields[0].value
+    assert f"`type:nominate or type:qualify`" in mock_command.response_embed.fields[0].value
 
 @pytest.mark.asyncio
 async def test_sub_parenthesis_inequality():
