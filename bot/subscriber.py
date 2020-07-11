@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from typing import List
+from typing import List, Union
 import discord
 from discord import TextChannel
 
@@ -43,9 +43,12 @@ def add_subscription(sub: Subscription) -> None:
     Database(DEFAULT_DB_NAME).insert_subscription(sub)
     load()
 
-def unsubscribe(channel: TextChannel) -> None:
+def unsubscribe(channel_or_subscription: Union[TextChannel, Subscription]) -> None:
     """Deletes a channel and its filter from the subscription table of the database and reloads the cache."""
-    sub = Subscription(guild_id_or_none(channel), channel.id, None)
+    sub = channel_or_subscription
+    if isinstance(channel_or_subscription, TextChannel):
+        channel = channel_or_subscription
+        sub = Subscription(guild_id_or_none(channel), channel.id, None)
     remove_subscription(sub)
 
 def remove_subscription(sub: Subscription) -> None:
