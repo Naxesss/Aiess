@@ -10,9 +10,10 @@ from bot.subscriber import unsubscribe
     description  = "Unsubscribes this channel from any events."
 )
 async def cmd_unsub(command: Command):
-    if not any(sub.channel_id == command.context.channel.id for sub in subscriber.cache):
+    subscription = subscriber.get_subscription(command.context.channel)
+    if not subscription:
         await command.respond_err("Nothing to unsubscribe")
         return
 
-    unsubscribe(command.context.channel)
+    unsubscribe(subscription)
     await command.respond("✓ Unsubscribed")
