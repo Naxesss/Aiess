@@ -5,6 +5,7 @@ import pytest
 
 from bot import subscriber
 from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel, MockGuild, MockDMChannel
+from bot.commands import COMMAND_PREFIX
 from bot.cmd_modules import cmd_sub
 from bot.receiver import receive_command
 from bot.database import Database, BOT_TEST_DB_NAME
@@ -74,7 +75,8 @@ async def test_sub_no_arg():
     mock_command = MockCommand("sub", context=mock_message)
 
     assert await receive_command(mock_command)
-    assert len(mock_command.response) == 0
+    assert f"`{COMMAND_PREFIX}sub`" in mock_command.response  # Should suggest these for if the user intended something else.
+    assert f"`{COMMAND_PREFIX}unsub`" in mock_command.response
     assert "🔔\u2000Current Subscription" in mock_command.response_embed.fields[0].name
     assert f"type:(nominate or qualify)" in mock_command.response_embed.fields[0].value
     assert f"`type:nominate or type:qualify`" in mock_command.response_embed.fields[0].value
