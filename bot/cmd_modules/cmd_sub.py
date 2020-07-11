@@ -17,7 +17,7 @@ from bot.formatter import escape_markdown
     description   = f"""
         Subscribes this channel to events matching `[filter]`, if specified, otherwise shows the current channel subscription.
 
-        See also `{COMMAND_PREFIX}unsub`.
+        See also `{COMMAND_PREFIX}unsub` and `{COMMAND_PREFIX}recent`.
         """,
     example_args  = [
         "type:(rank or love)",
