@@ -50,10 +50,10 @@ def test_parse_json():
         generated_events.append(event)
     
     assert len(generated_events) == 5
-    assert generated_events[0].type == "kudosu-gain"
+    assert generated_events[0].type == "kudosu_gain"
     assert generated_events[0].beatmapset.id == 534054
     assert generated_events[0].beatmapset.creator.name == "SkyFlame"
-    assert generated_events[4].type == "issue-resolve"
+    assert generated_events[4].type == "issue_resolve"
 
 def test_parse_json_deleted_beatmapset():
     generated_events = []

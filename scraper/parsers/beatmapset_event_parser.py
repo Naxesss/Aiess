@@ -124,7 +124,7 @@ class BeatmapsetEventParser(EventParser):
         return None
 
     def parse_event_type(self, event: Tag) -> str:
-        """Returns the type of the given event (e.g. nominate", "issue-resolve", "disqualify")."""
+        """Returns the type of the given event (e.g. nominate", "issue_resolve", "disqualify")."""
         return super().parse_event_type(
             event,
             event_class="beatmapset-event__icon",
