@@ -9,6 +9,7 @@ from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChanne
 from bot.cmd_modules import cmd_unsub
 from bot.receiver import receive_command
 from bot.database import Database, BOT_TEST_DB_NAME
+from bot.commands import help_embed
 
 def setup_function():
     database = Database(BOT_TEST_DB_NAME)
@@ -56,5 +57,7 @@ async def test_unsub_no_sub():
     assert not subscriber.cache
 
     assert await receive_command(mock_command)
-    assert mock_command.response.startswith("✓")
+    assert mock_command.response.startswith("✗")
     assert "nothing to unsub" in mock_command.response.lower()
+    assert mock_command.response_embed.fields[0].name == help_embed("unsub").fields[0].name
+    assert mock_command.response_embed.fields[0].value == help_embed("unsub").fields[0].value
