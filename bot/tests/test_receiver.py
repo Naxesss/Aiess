@@ -12,12 +12,23 @@ from bot.receiver import receive
 from bot.receiver import receive_command
 from bot.receiver import parse_args
 
+async def greet(command: Command, name: str, comment: str=None) -> None:
+    await command.respond(f"hi {name}" + (f", {comment}" if comment else ""))
+
 def setup_module():
-    wrapper = FunctionWrapper(
+    test_wrapper = FunctionWrapper(
         name    = "test",
         execute = lambda command: command.respond("hi")
     )
-    registered_commands["test"] = wrapper
+    greet_wrapper = FunctionWrapper(
+        name          = "greet",
+        required_args = ["name"],
+        optional_args = ["comment"],
+        execute       = greet
+    )
+
+    registered_commands["test"] = test_wrapper
+    registered_commands["greet"] = greet_wrapper
 
 def test_find_command():
     assert parse_command("+test") == Command("test")
@@ -45,6 +56,32 @@ async def test_receive_command():
 @pytest.mark.asyncio
 async def test_receive_command_unrecognized():
     assert not await receive_command(Command("undefined"))
+
+@pytest.mark.asyncio
+async def test_receive_command_missing_arg():
+    mock_channel = MockChannel()
+    mock_message = MockMessage("+greet", channel=mock_channel)
+
+    assert not await receive_command(Command("greet", context=mock_message))
+    assert mock_channel.messages[0].content.startswith("✗")
+    assert "missing required argument" in mock_channel.messages[0].content.lower()
+    assert "`<name>`" in mock_channel.messages[0].content.lower()
+
+@pytest.mark.asyncio
+async def test_receive_command_without_optional_arg():
+    mock_channel = MockChannel()
+    mock_message = MockMessage("+greet someone", channel=mock_channel)
+
+    assert await receive_command(Command("greet", "someone", context=mock_message))
+    assert mock_channel.messages[0].content == "hi someone"
+
+@pytest.mark.asyncio
+async def test_receive_command_with_optional_arg():
+    mock_channel = MockChannel()
+    mock_message = MockMessage("+greet someone how are you doing?", channel=mock_channel)
+
+    assert await receive_command(Command("greet", "someone", "how are you doing?", context=mock_message))
+    assert mock_channel.messages[0].content == "hi someone, how are you doing?"
 
 def test_parse_args():
     assert parse_args(["well", "hello", "there"], 2) == ["well", "hello there"]
