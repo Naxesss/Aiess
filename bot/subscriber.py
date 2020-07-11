@@ -30,7 +30,6 @@ def guild_id_or_none(channel: TextChannel):
 def subscribe(channel: TextChannel, _filter: str) -> None:
     """Inserts a channel and filter into the subscription table of the database and updates the cache.
     Causes any new events passing the filter to be sent to the channel."""
-    # `channel.guild` is None if `channel` is of tpye `DMChannel`.
     sub = Subscription(guild_id_or_none(channel), channel.id, _filter)
     add_subscription(sub)
 
