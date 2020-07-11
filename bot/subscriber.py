@@ -56,6 +56,9 @@ def remove_subscription(sub: Subscription) -> None:
     Database(DEFAULT_DB_NAME).delete_subscription(sub)
     load()
 
+def get_subscription(channel: TextChannel) -> Subscription:
+    """Returns the subscription associated with the given channel, if any, otherwise None."""
+    return Database(DEFAULT_DB_NAME).retrieve_subscription("guild_id=%s AND channel_id=%s", (guild_id_or_none(channel), channel.id))
 
 async def forward(event: Event, client: discord.Client) -> None:
     """Attempts to forward an event through all subscription filters."""

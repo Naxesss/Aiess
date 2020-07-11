@@ -30,9 +30,18 @@ class Database(aiess.Database):
                 channel_id=subscription.channel_id,
                 filter=subscription.filter))
     
-    def retrieve_subscriptions(self, where_str: str=None) -> Generator[Subscription, None, None]:
+    def retrieve_subscription(self, where: str=None, where_values: tuple=None) -> Subscription:
+        """Returns the first subscription matching the given WHERE clause, if any, otherwise None."""
+        return next(self.retrieve_subscriptions(where, where_values), None)
+
+    def retrieve_subscriptions(self, where: str=None, where_values: tuple=None) -> Generator[Subscription, None, None]:
         """Returns a generator of all subscriptions from the database matching the given WHERE clause."""
-        fetched_rows = self.retrieve_table_data("subscriptions", where_str, selection="guild_id, channel_id, filter")
+        fetched_rows = self.retrieve_table_data(
+            table        = "subscriptions",
+            where        = where,
+            where_values = where_values,
+            selection    = "guild_id, channel_id, filter"
+        )
         for row in (fetched_rows or []):
             guild_id = row[0]
             channel_id = row[1]
