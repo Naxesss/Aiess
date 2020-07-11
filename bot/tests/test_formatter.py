@@ -257,13 +257,13 @@ def test_format_timeago():
     with mock.patch("bot.formatter.datetime") as mock_datetime:
         # Mock `datetime.utcnow`, but retain the original datetime class functionality through the `side_effect` attribute.
         mock_datetime.utcnow.return_value = from_string("2020-01-01 05:30:06")
-        mock_datetime.side_effect = lambda *args, **kwargs: datetime(*args, **kwargs)
+        mock_datetime.side_effect = datetime
 
         assert format_timeago(from_string("2020-01-01 00:00:00")) == "**5 hours** ago"
 
 def test_format_timeago_not_bold():
     with mock.patch("bot.formatter.datetime") as mock_datetime:
         mock_datetime.utcnow.return_value = from_string("2020-01-01 05:30:06")
-        mock_datetime.side_effect = lambda *args, **kwargs: datetime(*args, **kwargs)
+        mock_datetime.side_effect = datetime
 
         assert format_timeago(from_string("2020-01-01 00:00:00"), bold=False) == "5 hours ago"
