@@ -75,7 +75,7 @@ async def test_sub_no_arg():
     mock_command = MockCommand("sub", context=mock_message)
 
     assert await receive_command(mock_command)
-    assert f"`{COMMAND_PREFIX}sub`" in mock_command.response  # Should suggest these for if the user intended something else.
+    assert f"`{COMMAND_PREFIX}sub <filter>`" in mock_command.response  # Should suggest these for if the user intended something else.
     assert f"`{COMMAND_PREFIX}unsub`" in mock_command.response
     assert "🔔\u2000Current Subscription" in mock_command.response_embed.fields[0].name
     assert f"type:(nominate or qualify)" in mock_command.response_embed.fields[0].value
