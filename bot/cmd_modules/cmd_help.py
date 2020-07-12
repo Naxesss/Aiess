@@ -23,4 +23,8 @@ async def cmd_help(command: Command, name: str=None):
         embed = general_help_embed()
         content = f"Type `{COMMAND_PREFIX}help <command>` for usage."
 
+    if not embed:
+        await command.respond_err(f"No command `{name}` exists.")
+        return
+    
     await command.respond(content, embed=embed)
