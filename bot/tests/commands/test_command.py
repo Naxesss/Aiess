@@ -11,7 +11,7 @@ from bot.tests.commands.mock_command import MockChannel, MockMessage, MockErrorC
 from bot.commands import COMMAND_PREFIX
 from bot.commands import registered_commands
 from bot.commands import Command, FunctionWrapper
-from bot.commands import help_embed
+from bot.commands import help_embed, general_help_embed
 
 def test_init_command():
     command = Command("test", "1", "2", "3")
@@ -142,3 +142,19 @@ def test_command_help_embed():
 
     assert embed1.fields[0].name == embed2.fields[0].name
     assert embed1.fields[0].value == embed2.fields[0].value
+
+def test_general_help_embed():
+    wrapper = FunctionWrapper(
+        name="test", execute=None, required_args=["one", "two"], optional_args=["three"],
+        description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
+        example_args=["one two", "1 2 3", "\"o n e\" two three"])
+    registered_commands["test"] = wrapper
+    registered_commands["test2"] = FunctionWrapper(name="test2", execute=None)
+    embed = general_help_embed()
+
+    assert embed
+    assert embed.fields
+    assert "Commands" in embed.fields[0].name
+    assert "<>" in embed.fields[0].value  # Should show what these denote; required/optional args.
+    assert "[]" in embed.fields[0].value
+    assert f"**`{COMMAND_PREFIX}test <one> <two> [three]`**\u2000**`{COMMAND_PREFIX}test2`**" in embed.fields[0].value
