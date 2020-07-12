@@ -38,7 +38,7 @@ async def cmd_sub(command: Command, _filter: str=None):
                 """
         )
 
-        content = f"Use `{COMMAND_PREFIX}sub <filter>` to change subscription, or `{COMMAND_PREFIX}unsub` to unsubscribe."
+        content = f"Type `{COMMAND_PREFIX}sub <filter>` to change subscription, or `{COMMAND_PREFIX}unsub` to unsubscribe."
         await command.respond(content, embed=embed)
         return
 
