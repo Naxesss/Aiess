@@ -9,7 +9,7 @@ from bot.commands import help_embed, general_help_embed
 @register(
     name          = "help",
     optional_args = ["command"],
-    description   = "Returns a list of commands, optionally the usage of `[command]`."
+    description   = "Returns a list of commands, or optionally the usage of `[command]`.",
 )
 async def cmd_help(command: Command, name: str=None):
     if name:
