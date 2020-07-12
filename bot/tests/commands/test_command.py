@@ -144,6 +144,7 @@ def test_command_help_embed():
     assert embed1.fields[0].value == embed2.fields[0].value
 
 def test_general_help_embed():
+    registered_commands.clear()
     wrapper = FunctionWrapper(
         name="test", execute=None, required_args=["one", "two"], optional_args=["three"],
         description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
