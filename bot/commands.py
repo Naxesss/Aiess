@@ -117,11 +117,12 @@ def help_embed(name: str) -> Embed:
         value  = wrapper.description,
         inline = True
     )
-    embed.add_field(
-        name   = "Example(s)",
-        value  = "\r\n".join(f"∙ `{COMMAND_PREFIX}{name} {args}`" for args in wrapper.example_args),
-        inline = True
-    )
+    if wrapper.example_args:
+        embed.add_field(
+            name   = "Example(s)",
+            value  = "\r\n".join(f"∙ `{COMMAND_PREFIX}{name} {args}`" for args in wrapper.example_args),
+            inline = True
+        )
 
     return embed
 
