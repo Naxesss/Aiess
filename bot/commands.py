@@ -130,8 +130,10 @@ def general_help_embed() -> Embed:
     """Returns an embed showing a list of all registered commands."""
     embed = Embed()
     embed.add_field(
-        name   = f"**Commands**",
-        value  = "\r\n".join(f"∙ {str(registered_commands[name])}" for name in registered_commands),
+        name   = f"Commands",
+        value  =
+            "<> denotes required arguments. [] denotes optional arguments.\r\n\r\n" +
+            "\u2000".join(f"**{str(registered_commands[name])}**" for name in registered_commands),
         inline = True
     )
     return embed
