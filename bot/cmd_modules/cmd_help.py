@@ -10,6 +10,7 @@ from bot.commands import help_embed, general_help_embed
     name          = "help",
     optional_args = ["command"],
     description   = "Returns a list of commands, or optionally the usage of `[command]`.",
+    example_args  = ["help"]
 )
 async def cmd_help(command: Command, name: str=None):
     if name:
