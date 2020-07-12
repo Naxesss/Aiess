@@ -14,6 +14,9 @@ from bot.commands import help_embed, general_help_embed
 )
 async def cmd_help(command: Command, name: str=None):
     if name:
+        # Clean up the argument so that `+help +ping` works, as the user would expect.
+        name = name.replace("+", "")
+
         embed = help_embed(name)
         content = f"Type `{COMMAND_PREFIX}help` for a list of commands."
     else:
