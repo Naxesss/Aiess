@@ -98,7 +98,7 @@ VALIDATION_IDS = Validation("Accepts integer values.", is_int)
 
 def specific_validation(values: List[str]) -> Validation:
     return Validation(
-        "Accepts specific values: `" + "`, `".join(values) + "`.",
+        "\u2000".join(f"`{value}`" for value in values),
         lambda value: value in values
     )
 
