@@ -105,7 +105,7 @@ def specific_validation(values: List[str]) -> Validation:
 TAGS: Dict[List[str], Tag] = {
     # User tags:
     ("user",): Tag(
-        "The name of the user performing the event (e.g. user nominating, replying, or giving kudosu).",
+        "The username of the user performing the event (e.g. user nominating, replying, or giving kudosu).",
         lambda obj: [escape(obj.name)] if isinstance(obj, User) else None,
         VALIDATION_ANY, sql_format="user.name=%s"
     ),
