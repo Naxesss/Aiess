@@ -79,11 +79,14 @@ class Tag():
     """Represents a possible key-value pair and which conditions it appears in.
     Can both create a value from a given object (e.g. Event or Beatmapset) (None if N/A),
     as well as validate that a given value is valid (e.g. `type` will never have a value of `undefined`)."""
-    def __init__(self, description: str, value_func: Callable[[object], str], validation: Validation, sql_format: str):
+    def __init__(
+            self, description: str, value_func: Callable[[object], str], validation: Validation,
+            sql_format: str, example_values: List[str]=[]):
         self.description = description
         self.value_func = value_func
         self.validation = validation
         self.sql_format = sql_format
+        self.example_values = example_values
 
 def is_int(value: str) -> bool:
     """Returns whether the given string can be parsed as an integer."""
@@ -107,68 +110,80 @@ TAGS: Dict[List[str], Tag] = {
     ("user",): Tag(
         "The username of the user performing the event (e.g. user nominating, replying, or giving kudosu).",
         lambda obj: [escape(obj.name)] if isinstance(obj, User) else None,
-        VALIDATION_ANY, sql_format="user.name=%s"
+        VALIDATION_ANY, sql_format="user.name=%s",
+        example_values=["lasse", "\"seto kousuke\""]
     ),
     ("user-id",) : Tag(
         "The id of the user performing the event (e.g. id of user nominating, replying, or giving kudosu).",
         lambda obj: [escape(obj.id)] if isinstance(obj, User) else None,
-        VALIDATION_IDS, sql_format="user.id=%s"
+        VALIDATION_IDS, sql_format="user.id=%s",
+        example_values=["896613"]
     ),
     # Beatmapset tags:
     ("set-id", "mapset-id", "beatmapset-id") : Tag(
         "The id of the beatmapset where the event occurred (e.g. id of mapset nominated or discussed).",
         lambda obj: [escape(obj.id)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_IDS, sql_format="beatmapset.id=%s"
+        VALIDATION_IDS, sql_format="beatmapset.id=%s",
+        example_values=["41823"]
     ),
     ("artist",) : Tag(
         "The artist field of a beatmapset an event occurred on (e.g. \"LeaF\" in \"Leaf - Doppelganger\").",
         lambda obj: [escape(obj.artist)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_ANY, sql_format="beatmapset.artist=%s"
+        VALIDATION_ANY, sql_format="beatmapset.artist=%s",
+        example_values=["nhato", "\"the quick brown fox\""]
     ),
     ("title",) : Tag(
         "The title field of a beatmapset an event occurred on (e.g. \"Doppelganger\" in \"Leaf - Doppelganger\").",
         lambda obj: [escape(obj.title)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_ANY, sql_format="beatmapset.title=%s"
+        VALIDATION_ANY, sql_format="beatmapset.title=%s",
+        example_values=["uta", "\"miss you\""]
     ),
     ("creator",) : Tag(
         "The username of the creator of a beatmapset an event occurred on (e.g. \"Shurelia\" for any set hosted by them).",
         lambda obj: [escape(obj.creator.name)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_ANY, sql_format="creator.name=%s"
+        VALIDATION_ANY, sql_format="creator.name=%s",
+        example_values=["lasse", "\"seto kousuke\""]
     ),
     ("creator-id",) : Tag(
         "The id of the creator of a beatmapset an event occurred on (e.g. \"3807986\" for any set hosted by Shurelia).",
         lambda obj: [escape(obj.creator.id)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_IDS, sql_format="creator.id=%s"
+        VALIDATION_IDS, sql_format="creator.id=%s",
+        example_values=["896613"]
     ),
     ("mode",) : Tag(
         "The involved mode of a beatmapset an event occurred on (e.g. \"taiko\" for any set with a taiko map).",
         lambda obj: [escape(mode) for mode in obj.modes] if isinstance(obj, Beatmapset) else None,
-        specific_validation(["osu", "taiko", "catch", "mania"]), sql_format="mode=%s"
+        specific_validation(["osu", "taiko", "catch", "mania"]), sql_format="mode=%s",
+        example_values=["osu"]
     ),
     # Discussion tags:
     ("discussion-id",) : Tag(
         "The id of the discussion an event occurred on (e.g. \"1589811\" for that specific discussion).",
         lambda obj: [escape(obj.id)] if isinstance(obj, Discussion) else None,
-        VALIDATION_IDS, sql_format="discussion.id=%s"
+        VALIDATION_IDS, sql_format="discussion.id=%s",
+        example_values=["1687831"]
     ),
     ("author",) : Tag(
         "The username of the author of the discussion an event occurred on (e.g. \"Shurelia\" for any discussion started by them).",
         lambda obj: [escape(obj.user.name)] if isinstance(obj, Discussion) else None,
-        VALIDATION_ANY, sql_format="author.name=%s"
+        VALIDATION_ANY, sql_format="author.name=%s",
+        example_values=["lasse", "\"seto kousuke\""]
     ),
     ("author-id",) : Tag(
         "The id of the author of the discussion an event occurred on (e.g. \"3807986\" for any discussion started by Shurelia).",
         lambda obj: [escape(obj.user.id)] if isinstance(obj, Discussion) else None,
-        VALIDATION_IDS, sql_format="author.id=%s"
+        VALIDATION_IDS, sql_format="author.id=%s",
+        example_values=["896613"]
     ),
     ("discussion-content",) : Tag(
         "The text content of the discussion an event occurred on (e.g. \"blanket\" for any discussion started containing that).",
         lambda obj: [escape(obj.content)] if isinstance(obj, Discussion) else None,
-        VALIDATION_ANY, sql_format="discussion.content LIKE %s"
+        VALIDATION_ANY, sql_format="discussion.content LIKE %s",
+        example_values=["nice", "\"very cool\""]
     ),
     # Event tags:
     ("type",) : Tag(
-        "The type of an event (e.g. nominate, kudosu-gain, or suggestion).",
+        "The type of an event (e.g. nominate, kudosu_gain, or suggestion). Spaces, dashes, and underscores are interchangable.",
         lambda obj: (
             [escape(obj.type)] +
             ([escape(alias) for alias in get_type_aliases(obj.type)] if obj.type in TYPE_ALIASES else [])
@@ -176,12 +191,14 @@ TAGS: Dict[List[str], Tag] = {
         Validation(
             "\u2000".join(f"`{alias}`" for alias in TYPE_ALIASES) + "\u2000(+lots of aliases)",  # Becomes too long otherwise.
             lambda value: value in get_all_type_aliases()
-        ), sql_format="type=%s"
+        ), sql_format="type=%s",
+        example_values=["reset", "nomination-reset", "\"nomination reset\""]
     ),
     ("content",) : Tag(
         "The text content associated with an event (e.g. the text of a reply, disqualification, or discussion).",
         lambda obj: [escape(obj.content)] if isinstance(obj, Event) and obj.content else None,
-        VALIDATION_ANY, sql_format="events.content LIKE %s"
+        VALIDATION_ANY, sql_format="events.content LIKE %s",
+        example_values=["nice", "\"very cool\""]
     )
 }
 
