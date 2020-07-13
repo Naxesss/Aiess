@@ -618,6 +618,13 @@ def get_tag(tag_key: str) -> Tag:
             return tag
     return None
 
+def get_tag_keys(tag_key: str) -> List[str]:
+    """Returns all keys associated with this key, case insensitive."""
+    for tag_keys, tag in TAGS.items():
+        if tag_key.lower() in map(lambda key: key.lower(), tag_keys):
+            return tag_keys
+    return None
+
 def get_key_value_pairs(_filter: str) -> Generator[Tuple[str, str], None, None]:
     """Returns a generator of key-value pair tuples from the given filter."""
     expansion = expand(_filter)

@@ -27,6 +27,7 @@ from bot.filterer import combined_captured_span
 from bot.filterer import dissect
 from bot.filterer import passes_filter
 from bot.filterer import get_tag
+from bot.filterer import get_tag_keys
 from bot.filterer import get_key_value_pairs
 from bot.filterer import get_invalid_keys
 from bot.filterer import get_invalid_filters
@@ -390,6 +391,10 @@ def test_get_tag():
     assert get_tag("user")
     assert get_tag("user-id")
     assert get_tag("set-id")
+
+def test_get_tag_keys():
+    assert get_tag_keys("user") == ("user",)
+    assert get_tag_keys("set-id") == ("set-id", "mapset-id", "beatmapset-id")
 
 def test_get_tag_undefined():
     assert not get_tag("undefined")
