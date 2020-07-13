@@ -18,6 +18,7 @@ from bot.formatter import format_embed
 from bot.formatter import format_field_name
 from bot.formatter import format_field_value
 from bot.formatter import format_footer_text
+from bot.formatter import truncate
 from bot.formatter import format_preview
 from bot.formatter import format_footer_icon_url
 from bot.formatter import format_thumbnail_url
@@ -146,6 +147,11 @@ def test_format_footer_text_kudosu_denied(kudosu_gain_event):
 
 def test_format_preview_empty_no_surrounding_quotes():
     assert format_preview("") == ""
+
+def test_truncate():
+    text = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"
+    assert truncate(text, length=75) == "04:25:218 (3,4) - the guitar is really strong here so mappin... [truncated]"
+    assert truncate(text, length=200) == text
 
 def test_format_preview_long():
     text = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"

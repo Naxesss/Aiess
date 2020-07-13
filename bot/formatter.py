@@ -135,6 +135,11 @@ def format_footer_text(event: Event, database: Database=None) -> str:
     
     return str(event.user)
 
+def truncate(content: str, length: int, indicator: str="... [truncated]") -> str:
+    """Returns a string as per normal, unless it exceeds the length, at which point
+    it is truncated with the indicator appended."""
+    return content if len(content) <= length else content[:length-len(indicator)] + indicator
+
 def format_preview(content: str, length: int=60, split_newline: bool=True) -> str:
     """Returns a string of the user with the truncated content in quotes, if any,
     else just the user, again if any, otherwise None."""
@@ -144,10 +149,9 @@ def format_preview(content: str, length: int=60, split_newline: bool=True) -> st
     preview = content
     if split_newline:
         preview = content.partition("\n")[0]
-    preview = preview if len(preview) <= length else preview[:length-3] + "..."
 
     # Markdown does not function in footer text; trying to escape it here would lead to visible '\'.
-    return f"\"{preview}\""
+    return "\"" + truncate(preview, length=length, indicator="...") + "\""
 
 def format_footer_icon_url(event: Event) -> str:
     """Returns the footer icon url of the event (i.e. the image url of the user's avatar),
