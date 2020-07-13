@@ -104,8 +104,10 @@ async def test_command_respond_httpexception():
     mock_channel = MockErrorChannel(raise_on_send=mock_error)
     mock_message = MockMessage("+test 1 2 3", channel=mock_channel)
     command = Command("test", "1", "2", "3", context=mock_message)
-
-    assert not await command.respond("e.g. API did not respond with 200: OK")
+    
+    with pytest.raises(HTTPException):
+        await command.respond("e.g. API did not respond with 200: OK")
+    
     assert command.response is None
     assert command.response_embed is None
     assert not mock_channel.messages
