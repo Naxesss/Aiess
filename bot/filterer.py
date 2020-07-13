@@ -173,7 +173,10 @@ TAGS: Dict[List[str], Tag] = {
             [escape(obj.type)] +
             ([escape(alias) for alias in get_type_aliases(obj.type)] if obj.type in TYPE_ALIASES else [])
         ) if isinstance(obj, Event) else None,
-        specific_validation(get_all_type_aliases()), sql_format="type=%s"
+        Validation(
+            "\u2000".join(f"`{alias}`" for alias in TYPE_ALIASES) + "\u2000(+lots of aliases)",  # Becomes too long otherwise.
+            lambda value: value in get_all_type_aliases()
+        ), sql_format="type=%s"
     ),
     ("content",) : Tag(
         "The text content associated with an event (e.g. the text of a reply, disqualification, or discussion).",
