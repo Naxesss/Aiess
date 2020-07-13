@@ -1,8 +1,6 @@
 import sys
 sys.path.append('..')
 
-from bot.formatter import TimeUnit
-from bot.formatter import format_time
 from bot.commands import Command, register, COMMAND_PREFIX
 from bot.commands import help_embed, general_help_embed
 
