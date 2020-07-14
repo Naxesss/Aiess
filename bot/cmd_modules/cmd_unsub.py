@@ -12,8 +12,8 @@ from bot.formatter import escape_markdown
 from bot.filterer import expand
 
 @register(
-    name         = "unsub",
-    description  = f"""
+    name        = "unsub",
+    description = f"""
         Unsubscribes this channel from any event subscriptions.
 
         See also `{COMMAND_PREFIX}sub`.
