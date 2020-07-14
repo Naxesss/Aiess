@@ -3,14 +3,14 @@ sys.path.append('..')
 
 from discord import Embed
 
+from aiess.database import SCRAPER_DB_NAME
+
 from bot.commands import Command, register
 from bot.commands import COMMAND_PREFIX
 from bot.filterer import passes_filter, filter_to_sql
 from bot.cmdcommon import validate_filter
 from bot.formatter import format_link, format_embed, format_timeago
-
 from bot.database import Database
-from aiess.database import SCRAPER_DB_NAME
 
 @register(
     name          = "recent",
