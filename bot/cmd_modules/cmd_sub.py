@@ -10,8 +10,10 @@ from bot.subscriber import get_subscription
 from bot.subscriber import subscribe
 from bot.filterer import expand
 from bot.formatter import escape_markdown
+from bot.commands import EVENTS_CATEGORY
 
 @register(
+    category      = EVENTS_CATEGORY,
     name          = "sub",
     optional_args = ["filter"],
     description   = f"""

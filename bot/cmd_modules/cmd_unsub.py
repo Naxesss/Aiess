@@ -10,8 +10,10 @@ from bot import subscriber
 from bot.subscriber import unsubscribe
 from bot.formatter import escape_markdown
 from bot.filterer import expand
+from bot.commands import EVENTS_CATEGORY
 
 @register(
+    category    = EVENTS_CATEGORY,
     name        = "unsub",
     description = f"""
         Unsubscribes this channel from any event subscriptions.

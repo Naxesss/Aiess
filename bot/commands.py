@@ -67,9 +67,10 @@ class FunctionWrapper():
     """Represents a command function, its required and/or optional arguments, if any,
     as well as information about the command (e.g. name, description, and example args)."""
     def __init__(
-            self, name: str, execute: Callable,
+            self, category: str, name: str, execute: Callable,
             required_args: List[str]=[], optional_args: List[str]=[],
             description: str=None, example_args: List[str]=[]):
+        self.category = category
         self.name = name
         self.execute = execute
         self.required_args = required_args
@@ -83,18 +84,23 @@ class FunctionWrapper():
         return f"`{COMMAND_PREFIX}{self.name}{required_args_str}{optional_args_str}`"
 
 registered_commands = defaultdict(FunctionWrapper)
+registered_categories = defaultdict(list)
+
+GENERAL_CATEGORY = "General"
+EVENTS_CATEGORY = "Events"
 
 T = TypeVar("T")
 def register(
-        name: str, required_args: List[str]=[], optional_args: List[str]=[],
+        category: str, name: str, required_args: List[str]=[], optional_args: List[str]=[],
         description: str=None, example_args: List[str]=[]) -> Callable[[Callable[..., T]], T]:
     """A decorator which registers the respective function as a command
     able to be executed by the given name (e.g. "ping" in "+ping"), optionally
     with required and/or optional arguments as well."""
 
     def wrapper(execute: Callable[..., T]) -> T:
+        registered_categories[category].append(name)
         registered_commands[name] = FunctionWrapper(
-            name, execute, required_args, optional_args, description, example_args
+            category, name, execute, required_args, optional_args, description, example_args
         )
         return execute
     
@@ -127,11 +133,14 @@ def help_embed(name: str) -> Embed:
 def general_help_embed() -> Embed:
     """Returns an embed showing a list of all registered commands."""
     embed = Embed()
-    embed.add_field(
-        name   = f"Commands",
-        value  =
-            "<> denotes required arguments. [] denotes optional arguments.\r\n\r\n" +
-            "\u2000".join(f"**{str(registered_commands[name])}**" for name in registered_commands),
-        inline = True
-    )
+    embed.title = "Commands"
+    embed.description = "<> denotes required arguments. [] denotes optional arguments."
+
+    for category in registered_categories:
+        embed.add_field(
+            name   = category,
+            value  = "\u2000".join(f"**{str(registered_commands[name])}**" for name in registered_categories[category]),
+            inline = True
+        )
+    
     return embed

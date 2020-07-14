@@ -3,8 +3,10 @@ sys.path.append('..')
 
 from bot.commands import Command, register, COMMAND_PREFIX
 from bot.commands import help_embed, general_help_embed
+from bot.commands import GENERAL_CATEGORY
 
 @register(
+    category      = GENERAL_CATEGORY,
     name          = "help",
     optional_args = ["command"],
     description   = "Returns a list of commands, or optionally the usage of `[command]`.",

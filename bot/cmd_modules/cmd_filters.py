@@ -7,8 +7,10 @@ from bot.commands import Command, register, COMMAND_PREFIX
 from bot.filterer import AND_GATES, OR_GATES, NOT_GATES, TAGS
 from bot.filterer import get_tag, get_tag_keys
 from bot.formatter import truncate
+from bot.commands import EVENTS_CATEGORY
 
 @register(
+    category      = EVENTS_CATEGORY,
     name          = "filters",
     optional_args = ["key"],
     description   = "Returns a list of filter keys and gates, or optionally the usage of `[key]`.",

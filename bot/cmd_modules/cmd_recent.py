@@ -11,8 +11,10 @@ from bot.filterer import passes_filter, filter_to_sql
 from bot.cmdcommon import validate_filter
 from bot.formatter import format_link, format_embed, format_timeago
 from bot.database import Database
+from bot.commands import EVENTS_CATEGORY
 
 @register(
+    category      = EVENTS_CATEGORY,
     name          = "recent",
     optional_args = ["filter"],
     description   = f"""
