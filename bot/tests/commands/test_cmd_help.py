@@ -8,19 +8,18 @@ from time import sleep
 from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel, MockClient
 from bot.cmd_modules import cmd_help
 from bot.receiver import receive_command
-from bot.commands import COMMAND_PREFIX, FunctionWrapper, registered_commands
+from bot.commands import COMMAND_PREFIX, FunctionWrapper, register
 from bot.commands import help_embed, general_help_embed
 
 def setup_module():
-    wrapper = FunctionWrapper(
+    register(
+        category      = "category",
         name          = "name",
-        execute       = None,
         required_args = ["required"],
         optional_args = ["optional"],
         description   = "description",
         example_args  = ["example1", "example2"]
-    )
-    registered_commands["name"] = wrapper
+    )(None)
 
 @pytest.mark.asyncio
 async def test_help():

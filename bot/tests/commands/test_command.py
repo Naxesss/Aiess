@@ -9,7 +9,7 @@ from discord import Forbidden, HTTPException
 from bot.tests.commands.mock_command import MockChannel, MockMessage, MockErrorChannel, MockResponse
 
 from bot.commands import COMMAND_PREFIX
-from bot.commands import registered_commands
+from bot.commands import register, registered_commands, registered_categories
 from bot.commands import Command, FunctionWrapper
 from bot.commands import help_embed, general_help_embed
 
@@ -36,7 +36,7 @@ def test_str_command():
     assert str(command) == f"{COMMAND_PREFIX}test 1 2 3"
 
 def test_str_wrapper():
-    wrapper = FunctionWrapper(name="test", execute=None, required_args=["one", "two"], optional_args=["three"])
+    wrapper = FunctionWrapper(category=None, name="test", execute=None, required_args=["one", "two"], optional_args=["three"])
     assert str(wrapper) == f"`{COMMAND_PREFIX}test <one> <two> [three]`"
 
 
@@ -70,11 +70,11 @@ async def test_command_respond_embed():
 
 @pytest.mark.asyncio
 async def test_command_respond_err():
-    wrapper = FunctionWrapper(
-        name="test", execute=None, required_args=["one", "two"], optional_args=["three"],
+    register(
+        category="Some Category", name="test", required_args=["one", "two"], optional_args=["three"],
         description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
-        example_args=["one two", "1 2 3", "\"o n e\" two three"])
-    registered_commands["test"] = wrapper
+        example_args=["one two", "1 2 3", "\"o n e\" two three"]
+    )(None)
     embed = help_embed("test")
 
     mock_channel = MockChannel()
@@ -115,29 +115,29 @@ async def test_command_respond_httpexception():
 
 
 def test_help_embed():
-    wrapper = FunctionWrapper(
-        name="test", execute=None, required_args=["one", "two"], optional_args=["three"],
+    register(
+        category="Some Category", name="test", required_args=["one", "two"], optional_args=["three"],
         description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
-        example_args=["one two", "1 2 3", "\"o n e\" two three"])
-    registered_commands["test"] = wrapper
+        example_args=["one two", "1 2 3", "\"o n e\" two three"]
+    )(None)
     embed = help_embed("test")
 
     assert embed
     assert embed.fields
     assert embed.fields[0].name == f"**`{COMMAND_PREFIX}test <one> <two> [three]`**"
-    assert wrapper.description in embed.fields[0].value
-    for example_args in wrapper.example_args:
+    assert "A command that uses `<one>`, `<two>`, and `[three]` to do stuff." in embed.fields[0].value
+    for example_args in ["one two", "1 2 3", "\"o n e\" two three"]:
         assert f"`{COMMAND_PREFIX}test {example_args}`" in embed.fields[1].value
 
 def test_help_embed_unrecognized_arg():
     assert not help_embed("unrecognized")
 
 def test_command_help_embed():
-    wrapper = FunctionWrapper(
-        name="test", execute=None, required_args=["one", "two"], optional_args=["three"],
+    register(
+        category="Some Category", name="test", required_args=["one", "two"], optional_args=["three"],
         description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
-        example_args=["one two", "1 2 3", "\"o n e\" two three"])
-    registered_commands["test"] = wrapper
+        example_args=["one two", "1 2 3", "\"o n e\" two three"]
+    )(None)
 
     embed1 = Command("test").help_embed()
     embed2 = help_embed("test")
@@ -147,17 +147,23 @@ def test_command_help_embed():
 
 def test_general_help_embed():
     registered_commands.clear()
-    wrapper = FunctionWrapper(
-        name="test", execute=None, required_args=["one", "two"], optional_args=["three"],
+    registered_categories.clear()
+
+    register(
+        category="A Test Category", name="test", required_args=["one", "two"], optional_args=["three"],
         description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
-        example_args=["one two", "1 2 3", "\"o n e\" two three"])
-    registered_commands["test"] = wrapper
-    registered_commands["test2"] = FunctionWrapper(name="test2", execute=None)
+        example_args=["one two", "1 2 3", "\"o n e\" two three"]
+    )(None)
+    register(category="Other Test Category", name="test2")(None)
+    
     embed = general_help_embed()
 
     assert embed
+    assert "Commands" in embed.title
+    assert "<>" in embed.description  # Should show what these denote; required/optional args.
+    assert "[]" in embed.description
     assert embed.fields
-    assert "Commands" in embed.fields[0].name
-    assert "<>" in embed.fields[0].value  # Should show what these denote; required/optional args.
-    assert "[]" in embed.fields[0].value
-    assert f"**`{COMMAND_PREFIX}test <one> <two> [three]`**\u2000**`{COMMAND_PREFIX}test2`**" in embed.fields[0].value
+    assert embed.fields[0].name == "A Test Category"
+    assert embed.fields[1].name == "Other Test Category"
+    assert f"**`{COMMAND_PREFIX}test <one> <two> [three]`**" in embed.fields[0].value
+    assert f"**`{COMMAND_PREFIX}test2`**" in embed.fields[1].value

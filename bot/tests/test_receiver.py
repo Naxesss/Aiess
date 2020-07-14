@@ -5,7 +5,7 @@ import pytest
 
 from bot.tests.commands.mock_command import MockMessage, MockChannel
 from bot.commands import Command, FunctionWrapper
-from bot.commands import registered_commands
+from bot.commands import register
 
 from bot.receiver import parse_command
 from bot.receiver import receive
@@ -16,19 +16,16 @@ async def greet(command: Command, name: str, comment: str=None) -> None:
     await command.respond(f"hi {name}" + (f", {comment}" if comment else ""))
 
 def setup_module():
-    test_wrapper = FunctionWrapper(
-        name    = "test",
-        execute = lambda command: command.respond("hi")
-    )
-    greet_wrapper = FunctionWrapper(
+    register(
+        category      = "category",
+        name          = "test"
+    )(lambda command: command.respond("hi"))
+    register(
+        category      = "category",
         name          = "greet",
         required_args = ["name"],
-        optional_args = ["comment"],
-        execute       = greet
-    )
-
-    registered_commands["test"] = test_wrapper
-    registered_commands["greet"] = greet_wrapper
+        optional_args = ["comment"]
+    )(greet)
 
 def test_find_command():
     assert parse_command("+test") == Command("test")
