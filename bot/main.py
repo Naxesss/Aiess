@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 import discord
-from discord import Message
+from discord import Message, Game
 
 import aiess
 from aiess import Event
@@ -15,6 +15,7 @@ from bot.subscriptions import Subscription
 from bot import database
 from bot.formatter import format_link, format_embed
 from bot.cmd_modules import *
+from bot.commands import COMMAND_PREFIX
 
 subscriber.load()
 
@@ -26,6 +27,7 @@ class Client(discord.Client):
 
     async def on_ready(self) -> None:
         print(f"Logged on as {self.user}!")
+        await self.change_presence(activity=Game(f"{COMMAND_PREFIX}help"))
 
         if not self.reader.running:
             await self.reader.run()
