@@ -21,20 +21,33 @@ async def validate_filter(command: Command, _filter: str):
     invalid_keys = set(get_invalid_keys(_filter))
     if invalid_keys:
         invalids_formatted = "`" + "`, `".join(invalid_keys) + "`"
-        await command.respond_err(f"Invalid key(s) {invalids_formatted} in expansion `{expansion}`.")
+        await command.respond_err(
+            response = f"Invalid key(s) {invalids_formatted} in expansion `{expansion}`.",
+            embed    = filters_embed()
+        )
         return False
 
     invalid_filters = set(get_invalid_filters(_filter))
     if invalid_filters:
-        invalids_strs = (f"{key}:{value}" for key, value in invalid_filters)
+        keys = []
+        invalids_strs = []
+        for key, value in invalid_filters:
+            invalids_strs.append(f"{key}:{value}")
+            keys.append(key)
         invalids_formatted = "`" + "`, `".join(invalids_strs) + "`"
-        await command.respond_err(f"Invalid value(s) for key(s) {invalids_formatted} in expansion `{expansion}`.") # TODO: Show valid values.
+        await command.respond_err(
+            response = f"Invalid value(s) for key(s) {invalids_formatted} in expansion `{expansion}`.",
+            embed    = filter_embed(keys[0])  # `keys` will have at least one element, else `invalid_filters` would be falsy.
+        )
         return False
 
     invalid_words = set(get_invalid_words(_filter))
     if invalid_words:
         invalids_formatted = "`" + "`, `".join(invalid_words) + "`"
-        await command.respond_err(f"Invalid word(s) {invalids_formatted} in expansion `{expansion}`.")
+        await command.respond_err(
+            response = f"Invalid word(s) {invalids_formatted} in expansion `{expansion}`.",
+            embed    = filters_embed()
+        )
         return False
 
     if not hasattr(command.context.channel, "guild"):
