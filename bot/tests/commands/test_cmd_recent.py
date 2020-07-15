@@ -15,6 +15,7 @@ from bot.cmd_modules import cmd_recent
 from bot.receiver import receive_command
 from bot.database import Database
 from bot.commands import help_embed
+from bot.cmdcommon import filters_embed, filter_embed
 
 def setup_function():
     database = Database(SCRAPER_TEST_DB_NAME)
@@ -95,8 +96,8 @@ async def test_recent_invalid_key():
 
     assert mock_command.response.startswith("✗")
     assert "invalid key" in mock_command.response.lower()
-    assert mock_command.response_embed.fields[0].name == help_embed("recent").fields[0].name
-    assert mock_command.response_embed.fields[0].value == help_embed("recent").fields[0].value
+    assert mock_command.response_embed.fields[0].name == filters_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == filters_embed().fields[0].value
 
 @pytest.mark.asyncio
 @mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
@@ -108,8 +109,8 @@ async def test_recent_invalid_value():
 
     assert mock_command.response.startswith("✗")
     assert "invalid value" in mock_command.response.lower()
-    assert mock_command.response_embed.fields[0].name == help_embed("recent").fields[0].name
-    assert mock_command.response_embed.fields[0].value == help_embed("recent").fields[0].value
+    assert mock_command.response_embed.fields[0].name == filter_embed("type").fields[0].name
+    assert mock_command.response_embed.fields[0].value == filter_embed("type").fields[0].value
 
 @pytest.mark.asyncio
 @mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
@@ -121,5 +122,5 @@ async def test_recent_invalid_word():
 
     assert mock_command.response.startswith("✗")
     assert "invalid word" in mock_command.response.lower()
-    assert mock_command.response_embed.fields[0].name == help_embed("recent").fields[0].name
-    assert mock_command.response_embed.fields[0].value == help_embed("recent").fields[0].value
+    assert mock_command.response_embed.fields[0].name == filters_embed().fields[0].name
+    assert mock_command.response_embed.fields[0].value == filters_embed().fields[0].value
