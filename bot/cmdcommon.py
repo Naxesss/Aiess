@@ -1,8 +1,12 @@
 import sys
 sys.path.append('..')
 
+from discord import Embed
+
 from bot.commands import Command
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
+from bot.filterer import get_tag, get_tag_keys
+from bot.filterer import TAGS, AND_GATES, OR_GATES, NOT_GATES
 
 async def validate_filter(command: Command, _filter: str):
     """Returns whether the filter was considered valid. If invalid, an appropriate response is sent
@@ -39,3 +43,49 @@ async def validate_filter(command: Command, _filter: str):
         return False
     
     return True
+
+def filters_embed():
+    embed = Embed()
+    embed.title = "The **`<filter>`** Argument"
+    embed.description = """
+            A string of key:value pairs (e.g. `type:(nominate or qualify) and user:lasse`).
+            Keys and values are always case insensitive.
+            """
+    embed.add_field(
+        name = "Keys (`/` denotes aliases)",
+        value = "\u2000".join("/".join(f"**`{key}`**" for key in keys) for keys in TAGS.keys()),
+        inline = True
+    )
+    embed.add_field(
+        name = "Gates",
+        value = (
+            "**AND**\u2000" + "\u2000".join(f"**`{gate.strip()}`**" for gate in AND_GATES) + "\r\n" +
+            "**OR**\u2000"  + "\u2000".join(f"**`{gate.strip()}`**" for gate in OR_GATES)  + "\r\n" +
+            "**NOT**\u2000" + "\u2000".join(f"**`{gate.strip()}`**" for gate in NOT_GATES)
+        ),
+        inline = True
+    )
+    return embed
+
+def filter_embed(key: str):
+    key = key.lower().strip()
+    tag = get_tag(key)
+    keys = get_tag_keys(key)
+
+    embed = Embed()
+    embed.add_field(
+        name = "/".join(f"**`{key}`**" for key in keys),
+        value = tag.description,
+        inline = True
+    )
+    embed.add_field(
+        name = "Value(s)",
+        value = tag.validation.hint,
+        inline = True
+    )
+    embed.add_field(
+        name = "Example(s)",
+        value = "\r\n".join(f"∙ `{key}:{value}`" for value in tag.example_values),
+        inline = True
+    )
+    return embed

@@ -8,6 +8,7 @@ from bot.filterer import AND_GATES, OR_GATES, NOT_GATES, TAGS
 from bot.filterer import get_tag, get_tag_keys
 from bot.formatter import truncate
 from bot.commands import EVENTS_CATEGORY
+from bot.cmdcommon import filters_embed, filter_embed
 
 @register(
     category      = EVENTS_CATEGORY,
@@ -26,45 +27,7 @@ async def cmd_filters(command: Command, key: str=None):
             await command.respond_err(f"No filter key `{key}` exists.")
             return
 
-        embed = Embed()
-        embed.add_field(
-            name = "/".join(f"**`{key}`**" for key in keys),
-            value = tag.description,
-            inline = True
-        )
-        embed.add_field(
-            name = "Value(s)",
-            value = tag.validation.hint,
-            inline = True
-        )
-        embed.add_field(
-            name = "Example(s)",
-            value = "\r\n".join(f"∙ `{key}:{value}`" for value in tag.example_values),
-            inline = True
-        )
-
-        await command.respond(f"Type `{COMMAND_PREFIX}filters` for a list of keys and gates.", embed=embed)
+        await command.respond(f"Type `{COMMAND_PREFIX}filters` for a list of keys and gates.", embed=filter_embed(key))
         return
 
-    embed = Embed()
-    embed.title = "The **`<filter>`** Argument"
-    embed.description = """
-            A string of key:value pairs (e.g. `type:(nominate or qualify) and user:lasse`).
-            Keys and values are always case insensitive.
-            """
-    embed.add_field(
-        name = "Keys (`/` denotes aliases)",
-        value = "\u2000".join("/".join(f"**`{key}`**" for key in keys) for keys in TAGS.keys()),
-        inline = True
-    )
-    embed.add_field(
-        name = "Gates",
-        value = (
-            "**AND**\u2000" + "\u2000".join(f"**`{gate.strip()}`**" for gate in AND_GATES) + "\r\n" +
-            "**OR**\u2000"  + "\u2000".join(f"**`{gate.strip()}`**" for gate in OR_GATES)  + "\r\n" +
-            "**NOT**\u2000" + "\u2000".join(f"**`{gate.strip()}`**" for gate in NOT_GATES)
-        ),
-        inline = True
-    )
-
-    await command.respond(f"Type `{COMMAND_PREFIX}filters <key>` for usage.", embed=embed)
+    await command.respond(f"Type `{COMMAND_PREFIX}filters <key>` for usage.", embed=filters_embed())
