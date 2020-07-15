@@ -195,10 +195,10 @@ TAGS: Dict[List[str], Tag] = {
         example_values=["reset", "nomination-reset", "\"nomination reset\""]
     ),
     ("content",) : Tag(
-        "The text content associated with an event (e.g. the text of a reply, disqualification, or discussion).",
+        "The text content associated with an event (e.g. the text of a reply, disqualification, or discussion). `%` is a wildcard.",
         lambda obj: [escape(obj.content)] if isinstance(obj, Event) and obj.content else None,
         VALIDATION_ANY, sql_format="events.content LIKE %s",
-        example_values=["nice", "\"very cool\""]
+        example_values=["nice", "\"very cool\"", "\"%contains this%\""]
     )
 }
 
