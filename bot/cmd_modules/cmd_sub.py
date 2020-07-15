@@ -37,10 +37,14 @@ async def cmd_sub(command: Command, _filter: str=None):
             value=f"""
                 {escape_markdown(subscription.filter)}
                 `{expand(subscription.filter)}`
-                """
+                """ if subscription else "None"
         )
 
-        content = f"Type `{COMMAND_PREFIX}sub <filter>` to change subscription, or `{COMMAND_PREFIX}unsub` to unsubscribe."
+        content = (
+            f"Type `{COMMAND_PREFIX}sub <filter>` to change subscription" +
+            (f", or `{COMMAND_PREFIX}unsub` to unsubscribe" if subscription else "") +
+            "."
+        )
         await command.respond(content, embed=embed)
         return
 

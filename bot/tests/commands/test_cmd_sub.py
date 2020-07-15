@@ -82,6 +82,17 @@ async def test_sub_no_arg():
     assert f"`type:nominate or type:qualify`" in mock_command.response_embed.fields[0].value
 
 @pytest.mark.asyncio
+async def test_sub_no_arg_no_sub():
+    mock_message = MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=2)))
+    mock_command = MockCommand("sub", context=mock_message)
+
+    assert await receive_command(mock_command)
+    assert f"`{COMMAND_PREFIX}sub <filter>`" in mock_command.response  # Should suggest these for if the user intended something else.
+    assert f"`{COMMAND_PREFIX}unsub`" not in mock_command.response  # Don't need to suggest unsubscribing if we don't have a sub.
+    assert "🔔\u2000Current Subscription" in mock_command.response_embed.fields[0].name
+    assert f"None" in mock_command.response_embed.fields[0].value
+
+@pytest.mark.asyncio
 async def test_sub_parenthesis_inequality():
     mock_message = MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=2)))
     mock_command = MockCommand("sub", "type:(nominate", context=mock_message)
