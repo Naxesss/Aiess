@@ -8,7 +8,7 @@ from bot.commands import GENERAL_CATEGORY
 
 @register(
     category    = GENERAL_CATEGORY,
-    name        = "ping",
+    names       = ["ping"],
     description = "Returns the bot latency (e.g. \"134 ms\")."
 )
 async def cmd_ping(command: Command):

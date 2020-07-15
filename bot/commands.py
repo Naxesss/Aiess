@@ -67,11 +67,11 @@ class FunctionWrapper():
     """Represents a command function, its required and/or optional arguments, if any,
     as well as information about the command (e.g. name, description, and example args)."""
     def __init__(
-            self, category: str, name: str, execute: Callable,
+            self, category: str, names: str, execute: Callable,
             required_args: List[str]=[], optional_args: List[str]=[],
             description: str=None, example_args: List[str]=[]):
         self.category = category
-        self.name = name
+        self.names = names
         self.execute = execute
         self.required_args = required_args
         self.optional_args = optional_args
@@ -79,10 +79,12 @@ class FunctionWrapper():
         self.example_args = example_args
     
     def __str__(self):
+        names = "/".join(f"{COMMAND_PREFIX}{name}" for name in self.names)
         required_args_str = (" " + " ".join(map(lambda arg: f"<{arg}>", self.required_args))) if self.required_args else ""
         optional_args_str = (" " + " ".join(map(lambda arg: f"[{arg}]", self.optional_args))) if self.optional_args else ""
-        return f"`{COMMAND_PREFIX}{self.name}{required_args_str}{optional_args_str}`"
+        return f"`{names}{required_args_str}{optional_args_str}`"
 
+registered_aliases = defaultdict(str)
 registered_commands = defaultdict(FunctionWrapper)
 registered_categories = defaultdict(list)
 
@@ -91,16 +93,18 @@ EVENTS_CATEGORY = "Events"
 
 T = TypeVar("T")
 def register(
-        category: str, name: str, required_args: List[str]=[], optional_args: List[str]=[],
+        category: str, names: str, required_args: List[str]=[], optional_args: List[str]=[],
         description: str=None, example_args: List[str]=[]) -> Callable[[Callable[..., T]], T]:
     """A decorator which registers the respective function as a command
-    able to be executed by the given name (e.g. "ping" in "+ping"), optionally
+    able to be executed by the given names (e.g. "ping" in "+ping"), optionally
     with required and/or optional arguments as well."""
 
     def wrapper(execute: Callable[..., T]) -> T:
-        registered_categories[category].append(name)
-        registered_commands[name] = FunctionWrapper(
-            category, name, execute, required_args, optional_args, description, example_args
+        for name in names:
+            registered_aliases[name] = names[0]
+        registered_categories[category].append(names[0])
+        registered_commands[names[0]] = FunctionWrapper(
+            category, names, execute, required_args, optional_args, description, example_args
         )
         return execute
     
@@ -110,9 +114,9 @@ def help_embed(name: str) -> Embed:
     """Returns an embed explaining how to use the command with the given name.
     Includes e.g. arguments, description, and examples."""
     name = name.lower()
-    if name not in registered_commands:
+    if name not in registered_aliases:
         return None
-    
+    name = registered_aliases[name]
     wrapper = registered_commands[name]
 
     embed = Embed()
@@ -134,7 +138,7 @@ def general_help_embed() -> Embed:
     """Returns an embed showing a list of all registered commands."""
     embed = Embed()
     embed.title = "Commands"
-    embed.description = "<> denotes required arguments. [] denotes optional arguments."
+    embed.description = "`<>` : required args, `[]` : optional args, `/` : aliases."
 
     for category in registered_categories:
         embed.add_field(

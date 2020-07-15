@@ -36,7 +36,7 @@ def test_str_command():
     assert str(command) == f"{COMMAND_PREFIX}test 1 2 3"
 
 def test_str_wrapper():
-    wrapper = FunctionWrapper(category=None, name="test", execute=None, required_args=["one", "two"], optional_args=["three"])
+    wrapper = FunctionWrapper(category=None, names=["test"], execute=None, required_args=["one", "two"], optional_args=["three"])
     assert str(wrapper) == f"`{COMMAND_PREFIX}test <one> <two> [three]`"
 
 
@@ -71,7 +71,7 @@ async def test_command_respond_embed():
 @pytest.mark.asyncio
 async def test_command_respond_err():
     register(
-        category="Some Category", name="test", required_args=["one", "two"], optional_args=["three"],
+        category="Some Category", names=["test"], required_args=["one", "two"], optional_args=["three"],
         description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
         example_args=["one two", "1 2 3", "\"o n e\" two three"]
     )(None)
@@ -116,7 +116,7 @@ async def test_command_respond_httpexception():
 
 def test_help_embed():
     register(
-        category="Some Category", name="test", required_args=["one", "two"], optional_args=["three"],
+        category="Some Category", names=["test"], required_args=["one", "two"], optional_args=["three"],
         description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
         example_args=["one two", "1 2 3", "\"o n e\" two three"]
     )(None)
@@ -134,7 +134,7 @@ def test_help_embed_unrecognized_arg():
 
 def test_command_help_embed():
     register(
-        category="Some Category", name="test", required_args=["one", "two"], optional_args=["three"],
+        category="Some Category", names=["test"], required_args=["one", "two"], optional_args=["three"],
         description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
         example_args=["one two", "1 2 3", "\"o n e\" two three"]
     )(None)
@@ -150,20 +150,21 @@ def test_general_help_embed():
     registered_categories.clear()
 
     register(
-        category="A Test Category", name="test", required_args=["one", "two"], optional_args=["three"],
+        category="A Test Category", names=["test", "alias"], required_args=["one", "two"], optional_args=["three"],
         description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
         example_args=["one two", "1 2 3", "\"o n e\" two three"]
     )(None)
-    register(category="Other Test Category", name="test2")(None)
+    register(category="Other Test Category", names=["test2"])(None)
     
     embed = general_help_embed()
 
     assert embed
     assert "Commands" in embed.title
-    assert "<>" in embed.description  # Should show what these denote; required/optional args.
+    assert "/" in embed.description  # Should explain that this denotes aliases.
+    assert "<>" in embed.description  # Should explain that these two denote required/optional args.
     assert "[]" in embed.description
     assert embed.fields
     assert embed.fields[0].name == "A Test Category"
     assert embed.fields[1].name == "Other Test Category"
-    assert f"**`{COMMAND_PREFIX}test <one> <two> [three]`**" in embed.fields[0].value
+    assert f"**`{COMMAND_PREFIX}test/{COMMAND_PREFIX}alias <one> <two> [three]`**" in embed.fields[0].value
     assert f"**`{COMMAND_PREFIX}test2`**" in embed.fields[1].value

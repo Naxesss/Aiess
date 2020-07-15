@@ -15,7 +15,7 @@ from bot.commands import EVENTS_CATEGORY
 
 @register(
     category      = EVENTS_CATEGORY,
-    name          = "recent",
+    names         = ["recent", "r"],
     optional_args = ["filter"],
     description   = f"""
         Returns the most recent event gathered, optionally matching `[filter]`.

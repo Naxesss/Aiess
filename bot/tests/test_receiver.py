@@ -18,11 +18,11 @@ async def greet(command: Command, name: str, comment: str=None) -> None:
 def setup_module():
     register(
         category      = "category",
-        name          = "test"
+        names         = ["test", "alias"]
     )(lambda command: command.respond("hi"))
     register(
         category      = "category",
-        name          = "greet",
+        names         = ["greet"],
         required_args = ["name"],
         optional_args = ["comment"]
     )(greet)
@@ -48,6 +48,13 @@ async def test_receive_command():
     mock_channel = MockChannel()
     mock_message = MockMessage("+test", channel=mock_channel)
     assert await receive_command(Command("test", context=mock_message))
+    assert mock_channel.messages[0].content == "hi"
+
+@pytest.mark.asyncio
+async def test_receive_command_alias():
+    mock_channel = MockChannel()
+    mock_message = MockMessage("+alias", channel=mock_channel)
+    assert await receive_command(Command("alias", context=mock_message))
     assert mock_channel.messages[0].content == "hi"
 
 @pytest.mark.asyncio

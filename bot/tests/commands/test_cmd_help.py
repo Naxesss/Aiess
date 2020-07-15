@@ -14,7 +14,7 @@ from bot.commands import help_embed, general_help_embed
 def setup_module():
     register(
         category      = "category",
-        name          = "name",
+        names         = ["name", "alias"],
         required_args = ["required"],
         optional_args = ["optional"],
         description   = "description",

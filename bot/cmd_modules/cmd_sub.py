@@ -14,7 +14,7 @@ from bot.commands import EVENTS_CATEGORY
 
 @register(
     category      = EVENTS_CATEGORY,
-    name          = "sub",
+    names         = ["sub", "subscribe"],
     optional_args = ["filter"],
     description   = f"""
         Subscribes this channel to events matching `[filter]`, if specified, otherwise shows the current channel subscription.

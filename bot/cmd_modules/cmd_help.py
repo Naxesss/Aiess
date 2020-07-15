@@ -7,7 +7,7 @@ from bot.commands import GENERAL_CATEGORY
 
 @register(
     category      = GENERAL_CATEGORY,
-    name          = "help",
+    names         = ["help", "commands"],
     optional_args = ["command"],
     description   = "Returns a list of commands, or optionally the usage of `[command]`.",
     example_args  = [None, "help"]

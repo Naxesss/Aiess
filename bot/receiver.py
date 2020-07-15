@@ -7,7 +7,7 @@ from discord import Message, Client
 from typing import List
 
 from bot.commands import Command, FunctionWrapper
-from bot.commands import registered_commands
+from bot.commands import registered_commands, registered_aliases
 
 async def receive(message: Message, client: Client) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
@@ -31,10 +31,10 @@ def parse_command(content: str, context: Message=None, client: Client=None) -> C
 
 async def receive_command(command: Command) -> bool:
     """Returns whether the received command was recognized and executed."""
-    if command.name not in registered_commands:
+    if command.name not in registered_aliases:
         return False
-    
-    func_wrapper = registered_commands[command.name]
+    name = registered_aliases[command.name]
+    func_wrapper = registered_commands[name]
     
     if len(func_wrapper.required_args) > len(command.args):
         missing_args = func_wrapper.required_args[len(command.args):]
