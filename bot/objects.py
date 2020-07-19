@@ -27,3 +27,23 @@ class Subscription():
     
     def __hash__(self) -> str:
         return hash(self.__key())
+
+class Prefix():
+    """Represents a command prefix object, including which guild it is associated with and the prefix string itself."""
+    def __init__(self, guild_id: int, prefix: str):
+        self.guild_id = int(guild_id)
+        self.prefix = prefix
+    
+    def __key(self) -> tuple:
+        return (
+            self.guild_id,
+            self.prefix
+        )
+    
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Prefix):
+            return False
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())
