@@ -76,8 +76,8 @@ async def test_sub_no_arg():
     mock_command = MockCommand("sub", context=mock_message)
 
     assert await receive_command(mock_command)
-    assert f"`{DEFAULT_COMMAND_PREFIX}sub <filter>`" in mock_command.response  # Should suggest these for if the user intended something else.
-    assert f"`{DEFAULT_COMMAND_PREFIX}unsub`" in mock_command.response
+    assert f"`{DEFAULT_PREFIX}sub <filter>`" in mock_command.response  # Should suggest these for if the user intended something else.
+    assert f"`{DEFAULT_PREFIX}unsub`" in mock_command.response
     assert "🔔\u2000Current Subscription" in mock_command.response_embed.fields[0].name
     assert f"type:(nominate or qualify)" in mock_command.response_embed.fields[0].value
     assert f"`type:nominate or type:qualify`" in mock_command.response_embed.fields[0].value
@@ -88,8 +88,8 @@ async def test_sub_no_arg_no_sub():
     mock_command = MockCommand("sub", context=mock_message)
 
     assert await receive_command(mock_command)
-    assert f"`{DEFAULT_COMMAND_PREFIX}sub <filter>`" in mock_command.response  # Should suggest these for if the user intended something else.
-    assert f"`{DEFAULT_COMMAND_PREFIX}unsub`" not in mock_command.response  # Don't need to suggest unsubscribing if we don't have a sub.
+    assert f"`{DEFAULT_PREFIX}sub <filter>`" in mock_command.response  # Should suggest these for if the user intended something else.
+    assert f"`{DEFAULT_PREFIX}unsub`" not in mock_command.response  # Don't need to suggest unsubscribing if we don't have a sub.
     assert "🔔\u2000Current Subscription" in mock_command.response_embed.fields[0].name
     assert f"None" in mock_command.response_embed.fields[0].value
 
