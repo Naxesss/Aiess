@@ -10,7 +10,7 @@ from aiess.database import SCRAPER_TEST_DB_NAME
 
 from bot import database as db_module
 from bot.database import Database, BOT_TEST_DB_NAME
-from bot.objects import Subscription
+from bot.objects import Subscription, Prefix
 
 @pytest.fixture
 def scraper_test_database():
@@ -24,11 +24,13 @@ def scraper_test_database():
 def bot_test_database():
     database = Database(BOT_TEST_DB_NAME)
     database.clear_table_data("subscriptions")
+    database.clear_table_data("prefixes")
     db_module.clear_cache(BOT_TEST_DB_NAME)
     return database
 
 def test_correct_bot_db_setup(bot_test_database):
     assert not bot_test_database.retrieve_table_data("subscriptions")
+    assert not bot_test_database.retrieve_table_data("prefixes")
     assert not db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME]
 
 def test_correct_scraper_db_setup(scraper_test_database):
@@ -66,6 +68,28 @@ def test_insert_retrieve_channel_sub_no_filter(bot_test_database):
         bot_test_database.insert_subscription(sub)
     
     assert "cannot be null" in str(err)
+
+def test_insert_retrieve_prefix(bot_test_database):
+    prefix1 = Prefix(guild_id=3, prefix="&")
+    prefix2 = Prefix(guild_id=4, prefix="%")
+
+    bot_test_database.insert_prefix(prefix1)
+    bot_test_database.insert_prefix(prefix2)
+
+    retrieved_prefix = bot_test_database.retrieve_prefix("guild_id=%s", (3,))
+    assert retrieved_prefix == prefix1
+
+def test_insert_retrieve_prefixes(bot_test_database):
+    prefix1 = Prefix(guild_id=3, prefix="&")
+    prefix2 = Prefix(guild_id=4, prefix="%")
+
+    bot_test_database.insert_prefix(prefix1)
+    bot_test_database.insert_prefix(prefix2)
+
+    retrieved_prefixes = bot_test_database.retrieve_prefixes()
+    assert next(retrieved_prefixes, None) == prefix1
+    assert next(retrieved_prefixes, None) == prefix2
+    assert next(retrieved_prefixes, None) is None
 
 @pytest.mark.asyncio
 async def test_retrieve_beatmapset_events(scraper_test_database):
