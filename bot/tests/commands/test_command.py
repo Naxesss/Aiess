@@ -6,9 +6,10 @@ import pytest
 from discord import Embed
 from discord import Forbidden, HTTPException
 
-from bot.tests.commands.mock_command import MockChannel, MockMessage, MockErrorChannel, MockResponse
+from bot.tests.commands.mock_command import MockChannel, MockDMChannel, MockGuild, MockMessage, MockErrorChannel, MockResponse
 
 from bot.prefixes import DEFAULT_PREFIX
+from bot.prefixes import set_prefix
 from bot.commands import register, registered_commands, registered_categories
 from bot.commands import Command, FunctionWrapper
 from bot.commands import help_embed, general_help_embed
@@ -33,11 +34,32 @@ def test_hash_command():
 
 def test_str_command():
     command = Command("test", "1", "2", "3")
-    assert str(command) == f"{COMMAND_PREFIX}test 1 2 3"
+    assert str(command) == f"{DEFAULT_PREFIX}test 1 2 3"
 
 def test_str_wrapper():
     wrapper = FunctionWrapper(category=None, names=["test"], execute=None, required_args=["one", "two"], optional_args=["three"])
-    assert str(wrapper) == f"`{COMMAND_PREFIX}test <one> <two> [three]`"
+    assert str(wrapper) == "`{0}test <one> <two> [three]`"
+
+def test_prefix_no_context():
+    command = Command("test")
+    assert command.prefix() == DEFAULT_PREFIX
+
+def test_prefix_no_guild():
+    command = Command("test", context=MockMessage(channel=MockDMChannel(_id=6)))
+    assert command.prefix() == DEFAULT_PREFIX
+
+def test_prefix_default():
+    command = Command("test", context=MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=7))))
+    assert command.prefix() == DEFAULT_PREFIX
+
+def test_prefix_custom():
+    command = Command("test", context=MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=7))))
+
+    set_prefix(guild_id=7, prefix="&")
+    assert command.prefix() == "&"
+
+    set_prefix(guild_id=7, prefix=None)
+    assert command.prefix() == DEFAULT_PREFIX
 
 
 
@@ -124,10 +146,23 @@ def test_help_embed():
 
     assert embed
     assert embed.fields
-    assert embed.fields[0].name == f"**`{COMMAND_PREFIX}test <one> <two> [three]`**"
+    assert embed.fields[0].name == f"**`{DEFAULT_PREFIX}test <one> <two> [three]`**"
     assert "A command that uses `<one>`, `<two>`, and `[three]` to do stuff." in embed.fields[0].value
     for example_args in ["one two", "1 2 3", "\"o n e\" two three"]:
-        assert f"`{COMMAND_PREFIX}test {example_args}`" in embed.fields[1].value
+        assert f"`{DEFAULT_PREFIX}test {example_args}`" in embed.fields[1].value
+
+def test_help_embed_custom_prefix():
+    register(
+        category="Some Category", names=["test"], required_args=["one", "two"], optional_args=["three"],
+        description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
+        example_args=["one two", "1 2 3", "\"o n e\" two three"]
+    )(None)
+    embed = help_embed("test", prefix="&")
+
+    assert embed.fields[0].name == f"**`&test <one> <two> [three]`**"
+    assert "A command that uses `<one>`, `<two>`, and `[three]` to do stuff." in embed.fields[0].value
+    for example_args in ["one two", "1 2 3", "\"o n e\" two three"]:
+        assert f"`&test {example_args}`" in embed.fields[1].value
 
 def test_help_embed_unrecognized_arg():
     assert not help_embed("unrecognized")
@@ -166,5 +201,21 @@ def test_general_help_embed():
     assert embed.fields
     assert embed.fields[0].name == "A Test Category"
     assert embed.fields[1].name == "Other Test Category"
-    assert f"**`{COMMAND_PREFIX}test/{COMMAND_PREFIX}alias <one> <two> [three]`**" in embed.fields[0].value
-    assert f"**`{COMMAND_PREFIX}test2`**" in embed.fields[1].value
+    assert f"**`{DEFAULT_PREFIX}test/{DEFAULT_PREFIX}alias <one> <two> [three]`**" in embed.fields[0].value
+    assert f"**`{DEFAULT_PREFIX}test2`**" in embed.fields[1].value
+
+def test_general_help_embed_custom_prefix():
+    registered_commands.clear()
+    registered_categories.clear()
+
+    register(
+        category="A Test Category", names=["test", "alias"], required_args=["one", "two"], optional_args=["three"],
+        description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
+        example_args=["one two", "1 2 3", "\"o n e\" two three"]
+    )(None)
+    register(category="Other Test Category", names=["test2"])(None)
+    
+    embed = general_help_embed(prefix="&")
+
+    assert f"**`&test/&alias <one> <two> [three]`**" in embed.fields[0].value
+    assert f"**`&test2`**" in embed.fields[1].value
