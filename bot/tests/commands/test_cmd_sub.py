@@ -9,7 +9,7 @@ from bot.commands import COMMAND_PREFIX
 from bot.cmd_modules import cmd_sub
 from bot.receiver import receive_command
 from bot.database import Database, BOT_TEST_DB_NAME
-from bot.subscriptions import Subscription
+from bot.objects import Subscription
 from bot.cmdcommon import filters_embed, filter_embed
 
 def setup_function():

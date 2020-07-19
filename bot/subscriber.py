@@ -7,7 +7,7 @@ from discord import TextChannel
 
 from aiess import Event
 
-from bot.subscriptions import Subscription
+from bot.objects import Subscription
 from bot.database import Database, BOT_DB_NAME
 from bot.filterer import passes_filter
 

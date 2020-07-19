@@ -10,7 +10,7 @@ from aiess.database import SCRAPER_TEST_DB_NAME
 
 from bot import database as db_module
 from bot.database import Database, BOT_TEST_DB_NAME
-from bot.subscriptions import Subscription
+from bot.objects import Subscription
 
 @pytest.fixture
 def scraper_test_database():

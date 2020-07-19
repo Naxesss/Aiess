@@ -11,7 +11,7 @@ from aiess.database import SCRAPER_DB_NAME
 
 from bot.settings import API_KEY
 from bot import receiver, subscriber
-from bot.subscriptions import Subscription
+from bot.objects import Subscription
 from bot import database
 from bot.formatter import format_link, format_embed
 from bot.cmd_modules import *

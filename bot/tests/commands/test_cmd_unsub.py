@@ -4,7 +4,7 @@ sys.path.append('..')
 import pytest
 
 from bot import subscriber
-from bot.subscriptions import Subscription
+from bot.objects import Subscription
 from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel, MockGuild
 from bot.cmd_modules import cmd_unsub
 from bot.receiver import receive_command

@@ -8,7 +8,7 @@ import aiess
 from aiess import Event, Beatmapset, User
 from aiess.reader import merge_concurrent
 
-from bot.subscriptions import Subscription
+from bot.objects import Subscription
 
 BOT_DB_NAME      = "aiess_bot"
 BOT_TEST_DB_NAME = "aiess_bot_test"

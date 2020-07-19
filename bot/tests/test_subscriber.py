@@ -7,7 +7,7 @@ from datetime import datetime
 from aiess import Event
 
 from bot import subscriber
-from bot.subscriptions import Subscription
+from bot.objects import Subscription
 from bot.database import Database, BOT_TEST_DB_NAME
 
 def setup_function():
