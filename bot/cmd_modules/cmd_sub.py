@@ -4,7 +4,6 @@ sys.path.append('..')
 from discord import Embed, Colour
 
 from bot.commands import Command, register
-from bot.commands import COMMAND_PREFIX
 from bot.cmdcommon import validate_filter
 from bot.subscriber import get_subscription
 from bot.subscriber import subscribe
@@ -16,10 +15,10 @@ from bot.commands import EVENTS_CATEGORY
     category      = EVENTS_CATEGORY,
     names         = ["sub", "subscribe"],
     optional_args = ["filter"],
-    description   = f"""
+    description   = """
         Subscribes this channel to events matching `[filter]`, if specified, otherwise shows the current channel subscription.
 
-        See also `{COMMAND_PREFIX}unsub` and `{COMMAND_PREFIX}recent`.
+        See also `{0}unsub` and `{0}recent`.
         """,
     example_args  = [
         "type:(rank or love)",
@@ -41,8 +40,8 @@ async def cmd_sub(command: Command, _filter: str=None):
         )
 
         content = (
-            f"Type `{COMMAND_PREFIX}sub <filter>` to change subscription" +
-            (f", or `{COMMAND_PREFIX}unsub` to unsubscribe" if subscription else "") +
+            f"Type `{command.prefix()}sub <filter>` to change subscription" +
+            (f", or `{command.prefix()}unsub` to unsubscribe" if subscription else "") +
             "."
         )
         await command.respond(content, embed=embed)

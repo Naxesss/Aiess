@@ -8,7 +8,7 @@ from discord import Forbidden, HTTPException
 
 from bot.tests.commands.mock_command import MockChannel, MockMessage, MockErrorChannel, MockResponse
 
-from bot.commands import COMMAND_PREFIX
+from bot.prefixes import DEFAULT_PREFIX
 from bot.commands import register, registered_commands, registered_categories
 from bot.commands import Command, FunctionWrapper
 from bot.commands import help_embed, general_help_embed

@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from bot.commands import Command, register, COMMAND_PREFIX
+from bot.commands import Command, register
 from bot.commands import help_embed, general_help_embed
 from bot.commands import GENERAL_CATEGORY
 
@@ -17,11 +17,11 @@ async def cmd_help(command: Command, name: str=None):
         # Clean up the argument so that `+help +ping` works, as the user would expect.
         name = name.replace("+", "")
 
-        embed = help_embed(name)
-        content = f"Type `{COMMAND_PREFIX}help` for a list of commands."
+        embed = help_embed(name, prefix=command.prefix())
+        content = f"Type `{command.prefix()}help` for a list of commands."
     else:
-        embed = general_help_embed()
-        content = f"Type `{COMMAND_PREFIX}help <command>` for usage."
+        embed = general_help_embed(prefix=command.prefix())
+        content = f"Type `{command.prefix()}help <command>` for usage."
 
     if not embed:
         await command.respond_err(f"No command `{name}` exists.")

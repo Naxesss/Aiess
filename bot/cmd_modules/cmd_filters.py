@@ -3,7 +3,7 @@ sys.path.append('..')
 
 from discord import Embed
 
-from bot.commands import Command, register, COMMAND_PREFIX
+from bot.commands import Command, register
 from bot.filterer import AND_GATES, OR_GATES, NOT_GATES, TAGS
 from bot.filterer import get_tag, get_tag_keys
 from bot.formatter import truncate
@@ -27,7 +27,7 @@ async def cmd_filters(command: Command, key: str=None):
             await command.respond_err(f"No filter key `{key}` exists.")
             return
 
-        await command.respond(f"Type `{COMMAND_PREFIX}filters` for a list of keys and gates.", embed=filter_embed(key))
+        await command.respond(f"Type `{command.prefix()}filters` for a list of keys and gates.", embed=filter_embed(key))
         return
 
-    await command.respond(f"Type `{COMMAND_PREFIX}filters <key>` for usage.", embed=filters_embed())
+    await command.respond(f"Type `{command.prefix()}filters <key>` for usage.", embed=filters_embed())

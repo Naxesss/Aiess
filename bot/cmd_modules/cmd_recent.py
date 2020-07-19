@@ -6,7 +6,6 @@ from discord import Embed
 from aiess.database import SCRAPER_DB_NAME
 
 from bot.commands import Command, register
-from bot.commands import COMMAND_PREFIX
 from bot.filterer import passes_filter, filter_to_sql
 from bot.cmdcommon import validate_filter
 from bot.formatter import format_link, format_embed, format_timeago
@@ -17,10 +16,10 @@ from bot.commands import EVENTS_CATEGORY
     category      = EVENTS_CATEGORY,
     names         = ["recent", "r"],
     optional_args = ["filter"],
-    description   = f"""
+    description   = """
         Returns the most recent event gathered, optionally matching `[filter]`.
         
-        See also `{COMMAND_PREFIX}sub`.
+        See also `{0}sub`.
         """,
     example_args  = [
         "type:(rank or love)",

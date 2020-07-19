@@ -7,7 +7,8 @@ from typing import Callable, TypeVar, List
 from discord import Message, Embed, Client
 from discord import Forbidden, HTTPException
 
-COMMAND_PREFIX = "+"
+from bot.prefixes import get_prefix
+from bot.prefixes import DEFAULT_PREFIX
 
 class Command():
     """Represents the values with which a command is called (i.e. name, args, context),
@@ -23,7 +24,7 @@ class Command():
     
     def __str__(self) -> str:
         args = "".join(f" {arg}" for arg in self.args)
-        return f"{COMMAND_PREFIX}{self.name}{args}"
+        return f"{self.prefix()}{self.name}{args}"
     
     def __key(self) -> tuple:
         return (
@@ -42,7 +43,13 @@ class Command():
     
     def help_embed(self) -> Embed:
         """Returns an embed explaining how this command is used."""
-        return help_embed(self.name)
+        return help_embed(self.name, self.prefix())
+    
+    def prefix(self) -> str:
+        """Returns the command prefix that should be used in this context."""
+        if not self.context or not hasattr(self.context, "guild") or not hasattr(self.context.guild, "id"):
+            return DEFAULT_PREFIX
+        return get_prefix(guild_id=self.context.guild.id)
     
     async def respond(self, response: str, embed: Embed=None) -> bool:
         """Sends a message in the channel where the command was called, with the given response text and embed, if any.
@@ -80,7 +87,7 @@ class FunctionWrapper():
         self.example_args = example_args
     
     def __str__(self):
-        names = "/".join(f"{COMMAND_PREFIX}{name}" for name in self.names)
+        names = "/".join(f"{{0}}{name}" for name in self.names)
         required_args_str = (" " + " ".join(map(lambda arg: f"<{arg}>", self.required_args))) if self.required_args else ""
         optional_args_str = (" " + " ".join(map(lambda arg: f"[{arg}]", self.optional_args))) if self.optional_args else ""
         return f"`{names}{required_args_str}{optional_args_str}`"
@@ -111,7 +118,7 @@ def register(
     
     return wrapper
 
-def help_embed(name: str) -> Embed:
+def help_embed(name: str, prefix: str=DEFAULT_PREFIX) -> Embed:
     """Returns an embed explaining how to use the command with the given name.
     Includes e.g. arguments, description, and examples."""
     name = name.lower()
@@ -122,20 +129,20 @@ def help_embed(name: str) -> Embed:
 
     embed = Embed()
     embed.add_field(
-        name   = f"**{str(wrapper)}**",
-        value  = wrapper.description,
+        name   = f"**{str(wrapper)}**".replace("{0}", prefix),
+        value  = wrapper.description.replace("{0}", prefix) if wrapper.description else "Description missing.",
         inline = True
     )
     if wrapper.example_args:
         embed.add_field(
             name   = "Example(s)",
-            value  = "\r\n".join(f"∙ `{COMMAND_PREFIX}{name}" + (f" {args}" if args else "") + "`" for args in wrapper.example_args),
+            value  = "\r\n".join(f"∙ `{prefix}{name}" + (f" {args}" if args else "") + "`" for args in wrapper.example_args),
             inline = True
         )
 
     return embed
 
-def general_help_embed() -> Embed:
+def general_help_embed(prefix: str=DEFAULT_PREFIX) -> Embed:
     """Returns an embed showing a list of all registered commands."""
     embed = Embed()
     embed.title = "Commands"
@@ -144,7 +151,10 @@ def general_help_embed() -> Embed:
     for category in registered_categories:
         embed.add_field(
             name   = category,
-            value  = "\u2000".join(f"**{str(registered_commands[name])}**" for name in registered_categories[category]),
+            value  = "\u2000".join(
+                f"**{str(registered_commands[name])}**".replace("{0}", prefix)
+                for name in registered_categories[category]
+            ),
             inline = True
         )
     

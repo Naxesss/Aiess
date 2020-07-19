@@ -5,7 +5,6 @@ from discord import Embed
 from discord import Colour
 
 from bot.commands import Command, register
-from bot.commands import COMMAND_PREFIX
 from bot import subscriber
 from bot.subscriber import unsubscribe
 from bot.formatter import escape_markdown
@@ -15,10 +14,10 @@ from bot.commands import EVENTS_CATEGORY
 @register(
     category    = EVENTS_CATEGORY,
     names       = ["unsub", "unsubscribe"],
-    description = f"""
+    description = """
         Unsubscribes this channel from any event subscriptions.
 
-        See also `{COMMAND_PREFIX}sub`.
+        See also `{0}sub`.
         """
 )
 async def cmd_unsub(command: Command):

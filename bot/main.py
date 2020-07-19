@@ -15,7 +15,7 @@ from bot.objects import Subscription
 from bot import database
 from bot.formatter import format_link, format_embed
 from bot.cmd_modules import *
-from bot.commands import COMMAND_PREFIX
+from bot.prefixes import DEFAULT_PREFIX
 
 subscriber.load()
 
@@ -27,7 +27,7 @@ class Client(discord.Client):
 
     async def on_ready(self) -> None:
         print(f"Logged on as {self.user}!")
-        await self.change_presence(activity=Game(f"{COMMAND_PREFIX}help"))
+        await self.change_presence(activity=Game(f"{DEFAULT_PREFIX}help"))
 
         if not self.reader.running:
             await self.reader.run()
