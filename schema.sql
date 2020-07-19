@@ -1,5 +1,5 @@
--- Subscription database
-CREATE DATABASE  IF NOT EXISTS `aiess_bot_test`;
+-- Bot database
+CREATE DATABASE IF NOT EXISTS `aiess_bot_test`;
 USE `aiess_bot_test`;
 
 DROP TABLE IF EXISTS `subscriptions`;
@@ -11,8 +11,8 @@ CREATE TABLE `subscriptions` (
   UNIQUE KEY `UNIQUE` (`channel_id`,`guild_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Event database
-CREATE DATABASE  IF NOT EXISTS `aiess_test`;
+-- Scraper database
+CREATE DATABASE IF NOT EXISTS `aiess_test`;
 USE `aiess_test`;
 
 DROP TABLE IF EXISTS `beatmapset_modes`;
