@@ -2,6 +2,13 @@
 CREATE DATABASE IF NOT EXISTS `aiess_bot_test`;
 USE `aiess_bot_test`;
 
+DROP TABLE IF EXISTS `prefixes`;
+CREATE TABLE `prefixes` (
+  `guild_id` bigint(20) unsigned NOT NULL,
+  `prefix` mediumtext,
+  PRIMARY KEY (`guild_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 DROP TABLE IF EXISTS `subscriptions`;
 CREATE TABLE `subscriptions` (
   `guild_id` bigint(20) unsigned NOT NULL,
