@@ -8,7 +8,7 @@ import aiess
 from aiess import Event, Beatmapset, User
 from aiess.reader import merge_concurrent
 
-from bot.objects import Subscription
+from bot.objects import Subscription, Prefix
 
 BOT_DB_NAME      = "aiess_bot"
 BOT_TEST_DB_NAME = "aiess_bot_test"
@@ -56,6 +56,39 @@ class Database(aiess.Database):
             table        = "subscriptions",
             where        = "guild_id=%s AND channel_id=%s",
             where_values = (sub.guild_id, sub.channel_id)
+        )
+    
+    def insert_prefix(self, prefix: Prefix):
+        """Inserts/updates the given command prefix into the prefixes table."""
+        self.insert_table_data(
+            "prefixes",
+            dict(
+                guild_id=prefix.guild_id,
+                prefix=prefix.prefix))
+    
+    def retrieve_prefix(self, where: str=None, where_values: tuple=None) -> Prefix:
+        """Returns the first command prefix matching the given WHERE clause, if any, otherwise None."""
+        return next(self.retrieve_prefixes(where, where_values), None)
+
+    def retrieve_prefixes(self, where: str=None, where_values: tuple=None) -> Generator[Prefix, None, None]:
+        """Returns a generator of all command prefixes from the database matching the given WHERE clause."""
+        fetched_rows = self.retrieve_table_data(
+            table        = "prefixes",
+            where        = where,
+            where_values = where_values,
+            selection    = "guild_id, prefix"
+        )
+        for row in (fetched_rows or []):
+            guild_id = row[0]
+            prefix = row[1]
+            yield Prefix(guild_id, prefix)
+    
+    def delete_prefix(self, guild_id: int) -> None:
+        """Deletes the prefix of the given guild id from the prefixes table."""
+        self.delete_table_data(
+            table        = "prefixes",
+            where        = "guild_id=%s",
+            where_values = (guild_id,)
         )
     
     async def retrieve_beatmapset_events(self, beatmapset: Beatmapset) -> List[Event]:
