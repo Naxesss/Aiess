@@ -23,6 +23,8 @@ class Database(aiess.Database):
     
     def insert_subscription(self, subscription: Subscription):
         """Inserts/updates the given subscription into the subscriptions table."""
+        if not subscription.filter:
+            raise ValueError("Subscription filter cannot be falsy.")
         self.insert_table_data(
             "subscriptions",
             dict(

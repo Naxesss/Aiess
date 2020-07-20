@@ -2,7 +2,6 @@ import sys
 sys.path.append('..')
 
 import pytest
-from mysql.connector.errors import IntegrityError
 
 from aiess import Event, User, Beatmapset, Discussion
 from aiess.timestamp import from_string
@@ -64,10 +63,10 @@ def test_insert_retrieve_channel_sub_no_filter(bot_test_database):
 
     # A subscription should always have an explicit filter to prevent
     # the creation of an unfiltered subscription unintentionally.
-    with pytest.raises(IntegrityError) as err:
+    with pytest.raises(ValueError) as err:
         bot_test_database.insert_subscription(sub)
     
-    assert "cannot be null" in str(err)
+    assert "filter cannot be falsy" in str(err).lower()
 
 def test_insert_retrieve_prefix(bot_test_database):
     prefix1 = Prefix(guild_id=3, prefix="&")
