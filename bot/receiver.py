@@ -8,6 +8,7 @@ from typing import List
 
 from bot.commands import Command, FunctionWrapper
 from bot.commands import registered_commands, registered_aliases
+from bot.prefixes import get_prefix
 
 async def receive(message: Message, client: Client) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
@@ -19,7 +20,7 @@ async def receive(message: Message, client: Client) -> None:
 
 def parse_command(content: str, context: Message=None, client: Client=None) -> Command:
     """Returns the given content string as a command, optionally with the given message as context."""
-    match = regex.search(r"^\+([A-Za-z]+) ?(.+)?", content)
+    match = regex.search(r"^" + regex.escape(get_prefix(context)) + r"([A-Za-z]+) ?(.+)?", content)
     if match:
         name = match.group(1)
         args = match.group(2)
