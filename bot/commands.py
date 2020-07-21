@@ -47,9 +47,7 @@ class Command():
     
     def prefix(self) -> str:
         """Returns the command prefix that should be used in this context."""
-        if not self.context or not hasattr(self.context, "guild") or not hasattr(self.context.guild, "id"):
-            return DEFAULT_PREFIX
-        return get_prefix(guild_id=self.context.guild.id)
+        return get_prefix(self.context)
     
     async def respond(self, response: str, embed: Embed=None) -> bool:
         """Sends a message in the channel where the command was called, with the given response text and embed, if any.
