@@ -68,7 +68,7 @@ class Command():
         """Sends \"✗ `response`\", with a help embed attached, in the channel where the command was called. The
         help embed explains how the command is used. Can optionally override the help embed with another.
         Handles Forbidden and HTTPException errors by logging. Returns whether a response was successfully sent."""
-        embed = help_embed(self.name) if not embed else embed
+        embed = self.help_embed() if not embed else embed
         return await self.respond(f"✗ {response}", embed=embed)
 
 class FunctionWrapper():
