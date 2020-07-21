@@ -6,6 +6,7 @@ from bot import prefixes
 from bot.objects import Prefix
 from bot.prefixes import set_prefix, get_prefix
 from bot.prefixes import DEFAULT_PREFIX
+from bot.tests.commands.mock_command import MockMessage, MockChannel, MockGuild
 
 def setup_function():
     prefixes.DEFAULT_DB_NAME = BOT_TEST_DB_NAME
@@ -42,3 +43,8 @@ def test_get_prefix_default():
     assert Database(BOT_TEST_DB_NAME).retrieve_prefix("guild_id=%s", (3,)) == None
     assert not prefixes.cache
     assert get_prefix(3) == DEFAULT_PREFIX
+
+def test_get_prefix_context():
+    set_prefix(3, "&")
+    mock_message = MockMessage(channel=MockChannel(guild=MockGuild(_id=3)))
+    assert get_prefix(mock_message) == "&"
