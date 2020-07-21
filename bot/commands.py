@@ -45,6 +45,10 @@ class Command():
         """Returns an embed explaining how this command is used."""
         return help_embed(self.name, self.prefix())
     
+    def guild_id(self) -> bool:
+        """Returns the id of the guild where the command was called, if any, otherwise None (e.g. DMChannel)."""
+        return self.context.guild.id if self.context and hasattr(self.context, "guild") and hasattr(self.context.guild, "id") else None
+
     def prefix(self) -> str:
         """Returns the command prefix that should be used in this context."""
         return get_prefix(self.context)

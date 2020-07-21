@@ -61,6 +61,14 @@ def test_prefix_custom():
     set_prefix(guild_id=7, prefix=None)
     assert command.prefix() == DEFAULT_PREFIX
 
+def test_guild_id():
+    command = Command("test", context=MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=7))))
+    assert command.guild_id() == 7
+
+def test_guild_id_dm_channel():
+    command = Command("test", context=MockMessage(channel=MockDMChannel()))
+    assert command.guild_id() is None
+
 
 
 @pytest.mark.asyncio
