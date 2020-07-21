@@ -3,9 +3,10 @@ sys.path.append('..')
 
 import pytest
 
-from bot.tests.commands.mock_command import MockMessage, MockChannel
+from bot.tests.commands.mock_command import MockMessage, MockChannel, MockGuild
 from bot.commands import Command, FunctionWrapper
 from bot.commands import register
+from bot.prefixes import set_prefix
 
 from bot.receiver import parse_command
 from bot.receiver import receive
@@ -27,7 +28,7 @@ def setup_module():
         optional_args = ["comment"]
     )(greet)
 
-def test_find_command():
+def test_parse_command():
     assert parse_command("+test") == Command("test")
     assert parse_command("+test 123") == Command("test", "123")
     assert parse_command("+test 1 2 3") == Command("test", "1", "2", "3")
@@ -35,6 +36,19 @@ def test_find_command():
     assert not parse_command("+ test")
     assert not parse_command("++test")
     assert not parse_command("123 +test")
+
+def test_parse_command_custom_prefix():
+    context = MockMessage(channel=MockChannel(guild=MockGuild(_id=3)))
+    set_prefix(guild_id=3, prefix="&")
+
+    assert not parse_command("+test", context=context)
+    assert parse_command("&test", context=context) == Command("test", context=context)
+    assert parse_command("&test 123", context=context) == Command("test", "123", context=context)
+    assert parse_command("&test 1 2 3", context=context) == Command("test", "1", "2", "3", context=context)
+    assert not parse_command("123", context=context)
+    assert not parse_command("& test", context=context)
+    assert not parse_command("&&test", context=context)
+    assert not parse_command("123 &test", context=context)
 
 @pytest.mark.asyncio
 async def test_receive():
