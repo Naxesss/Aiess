@@ -10,7 +10,7 @@ from aiess.logger import log
 from aiess.database import SCRAPER_DB_NAME
 
 from bot.settings import API_KEY
-from bot import receiver, subscriber
+from bot import receiver, subscriber, prefixes
 from bot.objects import Subscription
 from bot import database
 from bot.formatter import format_link, format_embed
@@ -18,6 +18,7 @@ from bot.cmd_modules import *
 from bot.prefixes import DEFAULT_PREFIX
 
 subscriber.load()
+prefixes.load()
 
 class Client(discord.Client):
     def __init__(self, reader):
