@@ -179,18 +179,50 @@ class Usergroup:
             return self.name
         return "group " + self.id
 
+class NewsPost:
+    """Contains news post data (e.g. title, preview, author, and image url)."""
+    def __init__(self, _id: int, title: str, preview: str, author: User, slug: str, image_url: str):
+        self.id = int(_id)
+        self.title = str(title)
+        self.preview = str(preview)
+        self.author = author
+        self.slug = str(slug)
+        self.image_url = str(image_url)
+
+    def __key(self) -> tuple:
+        return (
+            self.id,
+            self.title,
+            self.preview,
+            self.author,
+            self.slug,
+            self.image_url
+        )
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, NewsPost):
+            return False
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())
+    
+    def __str__(self) -> str:
+        return self.title
+
 class Event:
     """Contains the event data (i.e. type, time, mapset, discussion, user, group, content).
     Some of these properties will be None depending on type."""
     def __init__(
             self, _type: str, time: datetime, beatmapset: Beatmapset=None, discussion: Discussion=None,
-            user: User=None, group: Usergroup=None, content: str=None):
+            user: User=None, group: Usergroup=None, newspost: NewsPost=None, content: str=None):
         self.type = _type
         self.time = time.replace(microsecond=0)  # Simplify precision to database-level
         self.beatmapset = beatmapset
         self.discussion = discussion
         self.user = user
         self.group = group
+        self.newspost = newspost
         self.content = str(content) if content is not None else None
 
         # Occurs in cases where the event should not be logged.
@@ -202,6 +234,7 @@ class Event:
         string += f" ({self.user})" if self.user else ""
         string += f" on {self.beatmapset}" if self.beatmapset else ""
         string += f" to/from {self.group}" if self.group else ""
+        string += f" posted {self.newspost}" if self.newspost else ""
         string += f" \"{self.content}\"" if self.content else ""
         
         return string
