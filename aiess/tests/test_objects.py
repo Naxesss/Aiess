@@ -130,5 +130,4 @@ def test_usergroup_str():
 
 def test_event_int_content():
     event = Event(_type="test", time=datetime.utcnow(), content=4)
-
     assert event.content == "4"
