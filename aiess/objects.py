@@ -173,6 +173,11 @@ class Usergroup:
     
     def __hash__(self) -> str:
         return hash(self.__key())
+    
+    def __str__(self) -> str:
+        if self.name:
+            return self.name
+        return "group " + self.id
 
 class Event:
     """Contains the event data (i.e. type, time, mapset, discussion, user, group, content).

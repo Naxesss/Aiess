@@ -110,6 +110,10 @@ def test_usergroup_str_id():
     assert usergroup.id == 4
     assert usergroup.name == "Global Moderation Team"
 
+def test_usergroup_str():
+    usergroup = Usergroup(4)
+    assert str(usergroup) == "Global Moderation Team"
+
 def test_event_int_content():
     event = Event(_type="test", time=datetime.utcnow(), content=4)
 
