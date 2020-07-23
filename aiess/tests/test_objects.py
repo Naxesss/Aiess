@@ -110,6 +110,20 @@ def test_usergroup_str_id():
     assert usergroup.id == 4
     assert usergroup.name == "Global Moderation Team"
 
+def test_usergroup_eq():
+    usergroup1 = Usergroup(4)
+    usergroup2 = Usergroup(4)
+    usergroup3 = Usergroup(7)
+
+    assert usergroup1 == usergroup2
+    assert usergroup1 != usergroup3
+
+def test_usergroup_eq_different_types():
+    assert Usergroup(4) != "string"
+
+def test_usergroup_hash():
+    assert hash(Usergroup(4))
+
 def test_usergroup_str():
     usergroup = Usergroup(4)
     assert str(usergroup) == "Global Moderation Team"
