@@ -16,17 +16,33 @@ def test_user():
 
 def test_user_get_name_from_api():
     user = User(2)
+    
+    assert user.id == 2
+    assert user.name == "peppy"
+
+def test_user_get_id_from_api():
+    user = User(name="peppy")
 
     assert user.id == 2
     assert user.name == "peppy"
-    assert str(user) == "peppy"
 
-def test_user_restricted():
+def test_user_no_args():
+    with pytest.raises(ValueError) as err:
+        User()
+    assert "neither id nor name provided" in str(err)
+
+def test_user_get_name_restricted():
     user = User(1)
 
     assert user.id == 1
     assert user.name is None
     assert str(user) == "1"
+
+def test_user_get_id_restricted():
+    user = User(name="a")
+    
+    assert user.id == None
+    assert user.name == "a"
 
 def test_user_int_name():
     user = User(3, 487)

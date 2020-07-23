@@ -6,18 +6,28 @@ from aiess.errors import DeletedContextError
 
 class User:
     """Contains the user data either requested from the api or directly supplied (i.e. id, name)."""
-    def __init__(self, _id: int, name: str=None):
-        self.id = int(_id)
-        if name is not None:
-            # Cast for ease-of-use, e.g. with names consisting of just digits.
-            self.name = str(name)
-        else:
+    def __init__(self, _id: int=None, name: str=None):
+        if _id is None and name is None:
+            raise ValueError("Cannot create a User object with neither id nor name provided.")
+
+        self.id = int(_id) if _id is not None else None
+        self.name = str(name) if name is not None else None
+
+        if name is None:
             user_json = api.request_user(_id)
             if user_json is not None:
                 self.name = str(user_json["username"])
             else:
                 # User doesn't exist, likely restricted.
                 self.name = None
+        
+        if _id is None:
+            user_json = api.request_user(name)
+            if user_json is not None:
+                self.id = int(user_json["user_id"])
+            else:
+                # User doesn't exist, either restricted or renamed a long time ago.
+                self.id = None
     
     def __str__(self) -> str:
         return self.name if self.name is not None else str(self.id)
