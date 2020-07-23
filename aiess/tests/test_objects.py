@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
 
-from aiess.objects import User, Beatmapset, Discussion, Usergroup, Event
+from aiess.objects import User, Beatmapset, Discussion, Usergroup, NewsPost, Event
 from aiess.errors import DeletedContextError
 
 from aiess.tests.mocks.api import beatmap as mock_beatmap
@@ -127,6 +127,37 @@ def test_usergroup_hash():
 def test_usergroup_str():
     usergroup = Usergroup(4)
     assert str(usergroup) == "Global Moderation Team"
+
+def test_newspost():
+    newspost = NewsPost(_id=1, title="title", preview="hello there", author=User(1, "someone"), slug="newspost-1", image_url="/image")
+
+    assert newspost.id == 1
+    assert newspost.title == "title"
+    assert newspost.preview == "hello there"
+    assert newspost.author.id == 1
+    assert newspost.author.name == "someone"
+    assert newspost.slug == "newspost-1"
+    assert newspost.image_url == "/image"
+
+def test_newspost_str_id():
+    newspost = NewsPost(_id="1", title="title", preview="hello there", author=User(1, "someone"), slug="newspost-1", image_url="/image")
+    assert newspost.id == 1
+
+def test_newspost_eq():
+    newspost1 = NewsPost(_id="1", title="title", preview="hello there", author=User(1, "someone"), slug="newspost-1", image_url="/image")
+    newspost2 = NewsPost(_id="1", title="title", preview="hello there", author=User(1, "someone"), slug="newspost-1", image_url="/image")
+    newspost3 = NewsPost(_id="1", title="title2", preview="hello there", author=User(1, "someone"), slug="newspost-1", image_url="/image")
+
+    assert newspost1 == newspost2
+    assert newspost1 != newspost3
+
+def test_newspost_eq_different_types():
+    newspost = NewsPost(_id="1", title="title", preview="hello there", author=User(1, "someone"), slug="newspost-1", image_url="/image")
+    assert newspost != "string"
+
+def test_newspost_hash():
+    newspost = NewsPost(_id="1", title="title", preview="hello there", author=User(1, "someone"), slug="newspost-1", image_url="/image")
+    assert hash(newspost)
 
 def test_event_int_content():
     event = Event(_type="test", time=datetime.utcnow(), content=4)
