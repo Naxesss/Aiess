@@ -7,7 +7,7 @@ from discord import Embed
 from datetime import timedelta
 from datetime import datetime
 
-from aiess import Event, User, Beatmapset, Discussion
+from aiess import Event, User, Beatmapset, Discussion, NewsPost
 from aiess.timestamp import from_string
 from aiess.database import SCRAPER_TEST_DB_NAME
 
@@ -22,6 +22,7 @@ from bot.formatter import truncate
 from bot.formatter import format_preview
 from bot.formatter import format_footer_icon_url
 from bot.formatter import format_thumbnail_url
+from bot.formatter import format_image_url
 from bot.formatter import format_context_field_name
 from bot.formatter import format_context_field_value
 from bot.formatter import format_history
@@ -52,6 +53,14 @@ def kudosu_gain_event():
     user = User(1, "_someone_")
     discussion = Discussion(5, beatmapset, user, content="hi*")
     event = Event("kudosu_gain", from_string("2020-04-11 20:00:00"), beatmapset, discussion, mapper)
+
+    return event
+
+@pytest.fixture
+def newspost_event():
+    author = User(2, "sometwo")
+    newspost = NewsPost(_id=3, title="title", preview="preview", author=author, slug="slug", image_url="image_url")
+    event = Event("news", from_string("2020-07-24 20:00:00"), newspost=newspost, user=author, content="preview")
 
     return event
 
@@ -109,12 +118,20 @@ def test_format_field_name_qualify(qualify_event):
     assert format_field_name(qualify_event).startswith(":heart:\u2000Qualified (**")
     assert format_field_name(qualify_event).endswith("** ago)")
 
+def test_format_field_name_newspost(newspost_event):
+    assert format_field_name(newspost_event).startswith("title (**")
+    assert format_field_name(newspost_event).endswith("** ago)")
+
 @pytest.mark.asyncio
 async def test_format_field_value(suggestion_event):
     assert (
         await format_field_value(suggestion_event) ==
         "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]"
     )
+
+@pytest.mark.asyncio
+async def test_format_field_value_newspost(newspost_event):
+    assert await format_field_value(newspost_event) == "preview"
 
 @pytest.mark.asyncio
 async def test_format_field_value_markdown(qualify_event):
@@ -171,6 +188,12 @@ def test_format_footer_icon_url_no_user(qualify_event):
 
 def test_format_thumbnail_url(suggestion_event):
     assert format_thumbnail_url(suggestion_event) == "https://b.ppy.sh/thumb/3l.jpg"
+
+def test_format_image_url(newspost_event):
+    assert format_image_url(newspost_event) == "image_url"
+
+def test_format_image_url_non_applicable(suggestion_event):
+    assert format_image_url(suggestion_event) == Embed.Empty
 
 def test_context_field_name(kudosu_gain_event):
     assert format_context_field_name(kudosu_gain_event) == "\\_someone\\_"
