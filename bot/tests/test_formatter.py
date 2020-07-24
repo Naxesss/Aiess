@@ -106,6 +106,21 @@ async def test_format_embed(suggestion_event):
     assert embed.thumbnail.url == "https://b.ppy.sh/thumb/3l.jpg"
 
 @pytest.mark.asyncio
+async def test_format_embed_newspost(newspost_event):
+    embed: Embed = await format_embed(newspost_event)
+    
+    assert embed.fields[0].name.startswith("title (**")
+    assert embed.fields[0].name.endswith("** ago)")
+    assert (
+        embed.fields[0].value ==
+        "preview"
+    )
+    assert embed.footer.text == "sometwo \"preview\""
+    assert embed.footer.icon_url == "https://a.ppy.sh/2"
+    assert embed.colour.to_rgb() == (255, 160, 200)
+    assert embed.image.url == "image_url"
+
+@pytest.mark.asyncio
 async def test_format_embed_context(kudosu_gain_event):
     embed: Embed = await format_embed(kudosu_gain_event)
     
