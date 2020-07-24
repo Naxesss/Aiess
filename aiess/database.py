@@ -23,19 +23,19 @@ class Database:
     class Table(Enum):
         # External code should be able to refer to specific tables,
         # while not breaking if we change anything in the actual database.
-        EVENTS = "events"
-        BEATMAPSETS = "beatmapsets"
-        DISCUSSIONS = "discussions"
+        EVENTS             = "events"
+        BEATMAPSETS        = "beatmapsets"
+        DISCUSSIONS        = "discussions"
         DISCUSSION_REPLIES = "discussion_replies"
-        USERS = "users"
+        USERS              = "users"
 
     def __init__(self, _db_name: str):
         self.db_name = _db_name
         db_config = {
-            "host": DB_CONFIG["host"],
-            "port": int(DB_CONFIG["port"]),
+            "host":     DB_CONFIG["host"],
+            "port":     int(DB_CONFIG["port"]),
             "database": self.db_name,
-            "user": DB_CONFIG["user"],
+            "user":     DB_CONFIG["user"],
             "password": DB_CONFIG["password"]
         }
         
@@ -120,11 +120,12 @@ class Database:
             ON DUPLICATE KEY
             UPDATE %(keyword_format_string)s
             """ % InterpolationDict(
-                db_name=self.db_name,
-                table=table,
-                key_string=key_string,
-                key_format_string=key_format_string,
-                keyword_format_string=keyword_format_string)
+                db_name               = self.db_name,
+                table                 = table,
+                key_string            = key_string,
+                key_format_string     = key_format_string,
+                keyword_format_string = keyword_format_string
+            )
 
         return self.__execute_dict(query, **new_column_dict)
 
@@ -135,11 +136,13 @@ class Database:
             SELECT %(selection)s FROM %(db_name)s.%(table)s
             WHERE %(where)s
             """ % InterpolationDict(
-                selection=selection,
-                db_name=self.db_name,
-                table=table,
-                where=where if where else "TRUE"),
-            where_values)
+                selection = selection,
+                db_name   = self.db_name,
+                table     = table,
+                where     = where if where else "TRUE"
+            ),
+            where_values
+        )
     
     def fetchone_table_data(self, table: str, where: str, where_values: tuple=None, selection: str="*") -> List[tuple]:
         """Returns the first row from the table where the WHERE clause applies (e.g. `where` as "type=%s AND id=%s" and 
@@ -149,11 +152,13 @@ class Database:
             WHERE %(where)s
             LIMIT 1
             """ % InterpolationDict(
-                selection=selection,
-                db_name=self.db_name,
-                table=table,
-                where=where if where else "TRUE"),
-            where_values)
+                selection = selection,
+                db_name   = self.db_name,
+                table     = table,
+                where     = where if where else "TRUE"
+            ),
+            where_values
+        )
 
     def delete_table_data(self, table: str, where: str, where_values: tuple=None, ignore_exception: bool=False) -> List[tuple]:
         """Deletes all rows from the table where the WHERE clause applies (e.g. `where` as "type=%s AND id=%s" and 
@@ -163,11 +168,13 @@ class Database:
             DELETE %(ignore)sFROM %(db_name)s.%(table)s
             WHERE %(where)s
             """ % InterpolationDict(
-                ignore="IGNORE " if ignore_exception else "",
-                db_name=self.db_name,
-                table=table,
-                where=where),
-            where_values)
+                ignore  = "IGNORE " if ignore_exception else "",
+                db_name = self.db_name,
+                table   = table,
+                where   = where
+            ),
+            where_values
+        )
     
     def clear_table_data(self, table: str) -> None:
         """Deletes all rows from the table. Ignores the foreign key check, meaning this
@@ -176,8 +183,10 @@ class Database:
         self.__execute("""
             TRUNCATE %(db_name)s.%(table)s
             """ % InterpolationDict(
-                db_name=self.db_name,
-                table=table))
+                db_name = self.db_name,
+                table   = table
+            )
+        )
         self.__execute("SET FOREIGN_KEY_CHECKS = 1")
 
     def insert_user(self, user: User) -> None:
@@ -185,8 +194,10 @@ class Database:
         self.insert_table_data(
             "users",
             dict(
-                id=user.id,
-                name=user.name))
+                id   = user.id,
+                name = user.name
+            )
+        )
     
     def insert_beatmapset_modes(self, beatmapset: Beatmapset) -> None:
         """Inserts/updates the beatmapset-modes relation of the given beatmapset.
@@ -202,13 +213,15 @@ class Database:
             DELETE IGNORE FROM {db_name}.beatmapset_modes
             WHERE beatmapset_id=%s
             """.format(db_name=self.db_name),
-            beatmapset_ids)
+            beatmapset_ids
+        )
         
         self.__executemany("""
             INSERT IGNORE INTO {db_name}.beatmapset_modes (beatmapset_id, mode)
             VALUES (%s, %s)
             """.format(db_name=self.db_name),
-            beatmapset_mode_pairs)
+            beatmapset_mode_pairs
+        )
     
     def insert_beatmapset(self, beatmapset: Beatmapset) -> None:
         """Inserts/updates the given beatmapset object into the beatmapsets table and modes into the beatmapset_modes table.
@@ -218,10 +231,12 @@ class Database:
         self.insert_table_data(
             "beatmapsets",
             dict(
-                id=beatmapset.id,
-                title=beatmapset.title,
-                artist=beatmapset.artist,
-                creator_id=beatmapset.creator.id))
+                id         = beatmapset.id,
+                title      = beatmapset.title,
+                artist     = beatmapset.artist,
+                creator_id = beatmapset.creator.id
+            )
+        )
     
     def insert_discussion(self, discussion: Discussion) -> None:
         """Inserts/updates the given discussion into the discussions table.
@@ -238,27 +253,31 @@ class Database:
         self.insert_table_data(
             "discussions",
             dict(
-                id=discussion.id,
-                beatmapset_id=discussion.beatmapset.id,
-                user_id=discussion.user.id,
-                content=discussion.content))
+                id            = discussion.id,
+                beatmapset_id = discussion.beatmapset.id,
+                user_id       = discussion.user.id,
+                content       = discussion.content
+            )
+        )
     
     def insert_event(self, event: Event) -> None:
         """Inserts/updates the given event into the events table, along with any other values
         (e.g. beatmapset, discussion, user) into their respective tables."""
         if event.beatmapset: self.insert_beatmapset(event.beatmapset)
-        if event.user: self.insert_user(event.user)
+        if event.user:       self.insert_user(event.user)
         if event.discussion: self.insert_discussion(event.discussion)
         self.insert_table_data(
             "events",
             dict(
-                insert_time=datetime.utcnow(),
-                time=event.time,
-                type=event.type,
-                beatmapset_id=event.beatmapset.id if event.beatmapset is not None else None,
-                discussion_id=event.discussion.id if event.discussion is not None else None,
-                user_id=event.user.id if event.user is not None else None,
-                content=event.content if event.content is not None else None))
+                insert_time   = datetime.utcnow(),
+                time          = event.time,
+                type          = event.type,
+                beatmapset_id = event.beatmapset.id if event.beatmapset is not None else None,
+                discussion_id = event.discussion.id if event.discussion is not None else None,
+                user_id       = event.user.id if event.user is not None else None,
+                content       = event.content if event.content is not None else None
+            )
+        )
     
     def retrieve_user(self, where: str, where_values: tuple=None) -> User:
         """Returns the first user from the database matching the given WHERE clause, or None if no such user is stored."""
