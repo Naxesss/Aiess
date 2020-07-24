@@ -161,6 +161,10 @@ async def test_format_field_value_markdown(qualify_event):
 def test_format_footer_text(suggestion_event):
     assert format_footer_text(suggestion_event) == "someone \"hi\""
 
+def test_format_footer_text_newspost(newspost_event):
+    # Newsposts already include their preview in the post itself, so we skip this.
+    assert format_footer_text(newspost_event) == "sometwo"
+
 def test_format_footer_text_no_user(qualify_event):
     assert format_footer_text(qualify_event) == Embed.Empty
 

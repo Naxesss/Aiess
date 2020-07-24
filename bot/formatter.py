@@ -148,7 +148,7 @@ def format_footer_text(event: Event, database: Database=None) -> str:
     if not event.user:
         return Embed.Empty
     
-    if event.content:
+    if event.content and not event.newspost:
         return f"{event.user} {format_preview(event.content)}"
     
     return str(event.user)
