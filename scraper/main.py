@@ -22,8 +22,6 @@ async def gather_loop() -> None:
         # We only need to check newsposts between exact hours, as this is when they're posted.
         if timestamp.get_last(_id="news").hour != datetime.utcnow().hour:
             await gather_news()
-        
-        await asyncio.sleep(60)
 
 async def gather_new_events() -> None:
     """Gathers any new beatmapset/discussion/reply events."""
