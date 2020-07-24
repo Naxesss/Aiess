@@ -189,6 +189,9 @@ def test_format_footer_icon_url_no_user(qualify_event):
 def test_format_thumbnail_url(suggestion_event):
     assert format_thumbnail_url(suggestion_event) == "https://b.ppy.sh/thumb/3l.jpg"
 
+def test_format_thumbnail_url_non_applicable(newspost_event):
+    assert format_thumbnail_url(newspost_event) == Embed.Empty
+
 def test_format_image_url(newspost_event):
     assert format_image_url(newspost_event) == "image_url"
 
