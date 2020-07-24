@@ -557,13 +557,10 @@ def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
     """Returns a list of lowercased key:value strings representing the given object."""
     dissections = list(dissect_shallow(obj))
 
-    if isinstance(obj, Discussion):
-        dissections.extend(dissect(obj.beatmapset))
-    
-    elif isinstance(obj, Event):
+    if isinstance(obj, Event):
         if obj.user:       dissections.extend(dissect(obj.user))
         if obj.discussion: dissections.extend(dissect(obj.discussion))
-        else:              dissections.extend(dissect(obj.beatmapset))
+        if obj.beatmapset: dissections.extend(dissect(obj.beatmapset))
 
     # Lowercase everything for ease-of-access when filtering.
     return list(map(lambda dissection: dissection.lower(), dissections))

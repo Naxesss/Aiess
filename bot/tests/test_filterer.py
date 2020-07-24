@@ -311,12 +311,12 @@ def test_dissect_discussion():
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=user, content="hello")
 
     dissection = dissect(discussion)
-    for pair in (dissect(beatmapset) + [
+    for pair in [
         "discussion-id:3",
         "author:\"some one\"",
         "author-id:1",
         "discussion-content:hello"
-    ]):
+    ]:
         assert pair in dissection
 
     event_dissection = dissect(event)
