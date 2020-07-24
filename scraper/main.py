@@ -11,19 +11,27 @@ from aiess.logger import log, colors, fmt
 from aiess.database import Database, SCRAPER_DB_NAME
 from aiess.reader import merge_concurrent
 
-from scraper.crawler import get_all_events_between
+from scraper.crawler import get_all_events_between, get_news_between
 
 init_time_str = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 
 async def gather_loop() -> None:
-    """Gathers new events every 60 seconds."""
+    """Gathers new events in an infinite loop."""
     while(True):
         await gather_new_events()
+        # We only need to check newsposts between exact hours, as this is when they're posted.
+        if timestamp.get_last(_id="news").hour != datetime.utcnow().hour:
+            await gather_news()
+        
         await asyncio.sleep(60)
 
 async def gather_new_events() -> None:
     """Gathers any new beatmapset/discussion/reply events."""
     await gather(get_all_events_between, "events")
+
+async def gather_news() -> None:
+    """Gathers any new newsposts."""
+    await gather(get_news_between, "news")
 
 async def gather(async_event_generator, _id: str) -> None:
     """Iterates over new events since the last time, inserts them into the database, and then updates the last time."""
