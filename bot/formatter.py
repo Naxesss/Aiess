@@ -82,7 +82,10 @@ async def format_embed(event: Event) -> str:
     embed.add_field(name=format_field_name(event), value=await format_field_value(event), inline=False)
     embed.set_footer(text=format_footer_text(event), icon_url=format_footer_icon_url(event))
     embed.colour = type_props[event.type].colour
-    embed.set_thumbnail(url=format_thumbnail_url(event))
+    
+    # Unlike `set_footer`, providing `Embed.Empty` to thumbnail and image urls will cause a 400 Bad Request error.
+    if format_thumbnail_url(event) != Embed.Empty: embed.set_thumbnail(url=format_thumbnail_url(event))
+    if format_image_url(event) != Embed.Empty:     embed.set_image(url=format_image_url(event))
 
     if type_props[event.type].show_context and event.discussion:
         embed.add_field(name=format_context_field_name(event), value=format_context_field_value(event))
@@ -104,10 +107,18 @@ def escape_markdown(obj: str) -> str:
 
 def format_field_name(event: Event) -> str:
     """Returns the embed title of the given event (e.g. :heart: Qualified)."""
-    return f"{type_props[event.type].emoji}\u2000{type_props[event.type].title} ({format_timeago(event.time)})"
+    if event.newspost:
+        title = event.newspost.title
+    else:
+        title = f"{type_props[event.type].emoji}\u2000{type_props[event.type].title}"
+    
+    return f"{title} ({format_timeago(event.time)})"
 
 async def format_field_value(event: Event) -> str:
     """Returns the embed contents of the given event (i.e. the \"artist - title, mapped by creator [modes]\" part)."""
+    if event.newspost:
+        return event.newspost.preview
+
     artist_title_str = escape_markdown(f"{event.beatmapset.artist} - {event.beatmapset.title}")
     creator_str = escape_markdown(event.beatmapset.creator)
 
@@ -161,8 +172,16 @@ def format_footer_icon_url(event: Event) -> str:
     return Embed.Empty
 
 def format_thumbnail_url(event: Event) -> str:
-    """Returns the thumbnail url for the event (e.g. beatmapset thumbnail)."""
-    return f"https://b.ppy.sh/thumb/{event.beatmapset.id}l.jpg"
+    """Returns the thumbnail url for the event (e.g. beatmapset thumbnail), if applicable, else None."""
+    if event.beatmapset:
+        return f"https://b.ppy.sh/thumb/{event.beatmapset.id}l.jpg"
+    return Embed.Empty
+
+def format_image_url(event: Event) -> str:
+    """Returns the image url for the event (e.g. newspost banner), if applicable, else None."""
+    if event.newspost:
+        return event.newspost.image_url
+    return Embed.Empty
 
 def format_context_field_name(event: Event) -> str:
     """Returns the title for the discussion context; the name of the discussion author."""
