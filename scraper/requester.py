@@ -1,6 +1,7 @@
 import sys
 sys.path.append('..')
 
+from datetime import datetime
 from bs4 import BeautifulSoup
 from requests import Response
 from typing import Generator
@@ -10,10 +11,12 @@ from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.objects import Event, Beatmapset, Discussion
 from aiess.settings import PAGE_RATE_LIMIT
 from aiess import event_types as types
+from aiess.timestamp import to_string
 
 from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
 from scraper.parsers.discussion_event_parser import discussion_event_parser
 from scraper.parsers.discussion_parser import discussion_parser
+from scraper.parsers import news_parser
 
 def request_page(url: str) -> Response:
     """Requests a response object using the page rate limit.
@@ -65,6 +68,11 @@ def request_reply_events(page: int=1, limit: int=50) -> BeautifulSoup:
     """Requests the discussion reply events page as a BeautifulSoup object."""
     return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussion-posts?page={page}&limit={limit}")
 
+def request_news(_from: datetime, limit: int=20) -> BeautifulSoup:
+    """Requests the news home page as a BeautifulSoup object with the newest post being from the given datetime."""
+    # The `id` attribute doesn't seem to matter.
+    return request_soup(f"https://osu.ppy.sh/home/news?cursor[id]=0&cursor[published_at]={to_string(_from)}&limit={limit}")
+
 
 
 def get_beatmapset_events(page: int=1, limit: int=50) -> Generator[Event, None, None]:
@@ -78,6 +86,10 @@ def get_discussion_events(page: int=1, limit: int=50) -> Generator[Event, None, 
 def get_reply_events(page: int=1, limit: int=50) -> Generator[Event, None, None]:
     """Returns a generator of Event objects from the discussion reply events page. Newer events are yielded first."""
     return discussion_event_parser.parse(request_reply_events(page, limit))
+
+def get_news_events(_from: datetime, limit: int=20) -> Generator[Event, None, None]:
+    """Returns a generator of Event objects from the news home page. Newer events are yielded first."""
+    return news_parser.parse(request_news(_from, limit))
 
 
 
