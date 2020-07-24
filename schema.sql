@@ -62,6 +62,20 @@ CREATE TABLE `discussions` (
   CONSTRAINT `discussionsfk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+DROP TABLE IF EXISTS `newsposts`;
+CREATE TABLE `newsposts` (
+  `id` bigint(20) unsigned NOT NULL,
+  `title` mediumtext NOT NULL,
+  `preview` mediumtext NOT NULL,
+  `author_id` bigint(20) unsigned NOT NULL,
+  `slug` mediumtext NOT NULL,
+  `image_url` mediumtext NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  KEY `newsposts_author_id_fk_idx` (`author_id`),
+  CONSTRAINT `newsposts_author_id_fk` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 DROP TABLE IF EXISTS `events`;
 CREATE TABLE `events` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
