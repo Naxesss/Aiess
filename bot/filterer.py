@@ -4,7 +4,7 @@ sys.path.append('..')
 from typing import Union, List, Generator, Tuple, Match, Dict, Callable
 import re
 
-from aiess import Event, User, Beatmapset, Discussion
+from aiess import Event, User, Beatmapset, Discussion, NewsPost
 from aiess import event_types as types
 
 AND_GATES = [" and ", "&", "∧"]
@@ -180,6 +180,37 @@ TAGS: Dict[List[str], Tag] = {
         lambda obj: [escape(obj.content)] if isinstance(obj, Discussion) else None,
         VALIDATION_ANY, sql_format="discussion.content LIKE %s",
         example_values=["nice", "\"very cool\""]
+    ),
+    # NewsPost tags:
+    ("news-id",) : Tag(
+        "The id of the newspost (e.g. \"1000\" for the 1000th newspost).",
+        lambda obj: [escape(obj.id)] if isinstance(obj, NewsPost) else None,
+        VALIDATION_IDS, sql_format="news_id=%s",
+        example_values=["1000"]
+    ),
+    ("news-title",) : Tag(
+        "The title of the newspost (e.g. \"%featured artist%\" for FA news).",
+        lambda obj: [escape(obj.title)] if isinstance(obj, NewsPost) else None,
+        VALIDATION_ANY, sql_format="news.title LIKE %s",
+        example_values=["\"New Featured Artist: DragonForce\"", "\"%title contains this%\""]
+    ),
+    ("news-content", "news-preview") : Tag(
+        "The preview of the newspost (e.g. \"We're excited to welcome Lasse as our newest featured artist!\").",
+        lambda obj: [escape(obj.preview)] if isinstance(obj, NewsPost) else None,
+        VALIDATION_ANY, sql_format="news.preview LIKE %s",
+        example_values=["\"preview is exactly this\"", "\"%preview contains this%\""]
+    ),
+    ("news-author",) : Tag(
+        "The username of the author of the newspost (e.g. \"Ephemeral\").",
+        lambda obj: [escape(obj.author.name)] if isinstance(obj, NewsPost) else None,
+        VALIDATION_ANY, sql_format="newsauthor.name=%s",
+        example_values=["Ephemeral", "\"Seto Kousuke\""]
+    ),
+    ("news-author-id",) : Tag(
+        "The id of the author of the newspost (e.g. \"102335\" for Ephemeral).",
+        lambda obj: [escape(obj.author.id)] if isinstance(obj, NewsPost) else None,
+        VALIDATION_IDS, sql_format="newsauthor.id=%s",
+        example_values=["102335"]
     ),
     # Event tags:
     ("type",) : Tag(
@@ -561,6 +592,7 @@ def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
         if obj.user:       dissections.extend(dissect(obj.user))
         if obj.discussion: dissections.extend(dissect(obj.discussion))
         if obj.beatmapset: dissections.extend(dissect(obj.beatmapset))
+        if obj.newspost:   dissections.extend(dissect(obj.newspost))
 
     # Lowercase everything for ease-of-access when filtering.
     return list(map(lambda dissection: dissection.lower(), dissections))
@@ -582,7 +614,8 @@ def passes_filter(_filter: str, dissection_or_object: Union[List[str], Event, Us
         isinstance(dissection_or_object, Event) or
         isinstance(dissection_or_object, User) or
         isinstance(dissection_or_object, Beatmapset) or
-        isinstance(dissection_or_object, Discussion)
+        isinstance(dissection_or_object, Discussion) or
+        isinstance(dissection_or_object, NewsPost)
     ):
         dissection = dissect(dissection_or_object)
     else:
