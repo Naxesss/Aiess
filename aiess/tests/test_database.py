@@ -3,7 +3,7 @@ from mysql.connector.errors import ProgrammingError
 from datetime import datetime
 
 from aiess.timestamp import from_string
-from aiess.objects import User, Beatmapset, Discussion, Event
+from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost
 from aiess.database import Database, SCRAPER_TEST_DB_NAME
 from aiess.common import anext
 
@@ -15,6 +15,7 @@ def test_database():
     database.clear_table_data("discussions")
     database.clear_table_data("beatmapsets")
     database.clear_table_data("beatmapset_modes")
+    database.clear_table_data("newsposts")
     database.clear_table_data("users")
 
     return database
@@ -24,6 +25,7 @@ def test_correct_setup(test_database):
     assert not test_database.retrieve_table_data("discussions")
     assert not test_database.retrieve_table_data("beatmapsets")
     assert not test_database.retrieve_table_data("beatmapset_modes")
+    assert not test_database.retrieve_table_data("newsposts")
     assert not test_database.retrieve_table_data("users")
 
 def test_insert_delete(test_database):
@@ -60,6 +62,24 @@ async def test_insert_retrieve_event(test_database):
     assert retrieved_event.time == event.time
     assert retrieved_event.beatmapset == event.beatmapset
     assert retrieved_event.discussion == event.discussion
+    assert retrieved_event.user == event.user
+    assert retrieved_event.content == event.content
+    assert retrieved_event == event
+
+@pytest.mark.asyncio
+async def test_insert_retrieve_event_with_newspost(test_database):
+    time = datetime.utcnow()
+
+    author = User(1, name="test")
+    newspost = NewsPost(_id=3, title="title", preview="preview", author=author, slug="slug", image_url="image_url")
+    event = Event(_type="news", time=time, newspost=newspost, user=author)
+
+    test_database.insert_event(event)
+
+    retrieved_event = await test_database.retrieve_event("type=%s", ("news",))
+    assert retrieved_event.type == event.type
+    assert retrieved_event.time == event.time
+    assert retrieved_event.newspost == event.newspost
     assert retrieved_event.user == event.user
     assert retrieved_event.content == event.content
     assert retrieved_event == event
@@ -172,6 +192,21 @@ def test_insert_retrieve_discussion_and_replies(test_database):
     assert retrieved_reply1
     assert retrieved_reply2
 
+def test_insert_retrieve_newspost(test_database):
+    author = User(1, name="test")
+    newspost = NewsPost(_id=3, title="title", preview="preview", author=author, slug="slug", image_url="image_url")
+    test_database.insert_newspost(newspost)
+
+    retrieved_newspost = test_database.retrieve_newspost(where="id=%s", where_values=(3,))
+    assert retrieved_newspost.id == newspost.id
+    assert retrieved_newspost.title == newspost.title
+    assert retrieved_newspost.preview == newspost.preview
+    assert retrieved_newspost.author.id == newspost.author.id
+    assert retrieved_newspost.author.name == newspost.author.name
+    assert retrieved_newspost.slug == newspost.slug
+    assert retrieved_newspost.image_url == newspost.image_url
+    assert retrieved_newspost == newspost
+
 def test_insert_retrieve_multiple_users(test_database):
     user1 = User(1, name="test")
     user2 = User(2, name="test")
@@ -207,6 +242,18 @@ def test_insert_retrieve_multiple_discussions(test_database):
     retrieved_discussions = test_database.retrieve_discussions(where="beatmapset_id=%s", where_values=(beatmapset.id,))
     assert next(retrieved_discussions, None) == discussion1
     assert next(retrieved_discussions, None) == discussion2
+
+def test_insert_retrieve_multiple_newsposts(test_database):
+    author = User(_id=1, name="test")
+    newspost1 = NewsPost(_id=1, title="title", preview="preview", author=author, slug="slug", image_url="image_url")
+    newspost2 = NewsPost(_id=2, title="title2", preview="preview2", author=author, slug="slug2", image_url="image_url2")
+
+    test_database.insert_newspost(newspost1)
+    test_database.insert_newspost(newspost2)
+
+    retrieved_newsposts = test_database.retrieve_newsposts(where="author_id=%s", where_values=(author.id,))
+    assert next(retrieved_newsposts, None) == newspost1
+    assert next(retrieved_newsposts, None) == newspost2
 
 @pytest.mark.asyncio
 async def test_insert_retrieve_multiple_events(test_database):
