@@ -85,6 +85,9 @@ def test_format_link_no_beatmapset():
     
     assert "missing a beatmapset" in str(err)
 
+def test_format_link_newspost(newspost_event):
+    assert format_link(newspost_event) == "https://osu.ppy.sh/home/news/slug"
+
 
 
 @pytest.mark.asyncio
