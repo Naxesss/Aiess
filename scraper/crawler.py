@@ -17,6 +17,7 @@ async def get_all_events_between(start_time: datetime, end_time: datetime) -> Ge
     api.clear_response_cache()
     populator.cached_discussions_json = {}
 
+    # These are closely intertwined; beatmapset events rely on replies, which in turn rely on discussions.
     async for event in __get_discussion_events_between(start_time, end_time): yield event
     async for event in __get_reply_events_between(start_time, end_time):      yield event
     async for event in __get_beatmapset_events_between(start_time, end_time): yield event
