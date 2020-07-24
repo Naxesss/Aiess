@@ -292,7 +292,7 @@ class Database:
             selection    = "id, name"
         )
         for row in (fetched_rows or []):
-            _id = row[0]
+            _id  = row[0]
             name = row[1]
             yield User(_id, name)
     
@@ -323,11 +323,11 @@ class Database:
             selection    = "id, title, artist, creator_id"
         )
         for row in (fetched_rows or []):
-            _id = row[0]
-            title = row[1]
-            artist = row[2]
+            _id     = row[0]
+            title   = row[1]
+            artist  = row[2]
             creator = self.retrieve_user("id=%s", (row[3],))
-            modes = self.retrieve_beatmapset_modes(_id)
+            modes   = self.retrieve_beatmapset_modes(_id)
             yield Beatmapset(_id, artist, title, creator, modes)
 
     def retrieve_discussion(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Discussion:
@@ -345,10 +345,10 @@ class Database:
             selection    = "id, beatmapset_id, user_id, content"
         )
         for row in (fetched_rows or []):
-            _id = row[0]
+            _id     = row[0]
             if not beatmapset:
                 beatmapset = self.retrieve_beatmapset("id=%s", (row[1],))
-            user = self.retrieve_user("id=%s", (row[2],))
+            user    = self.retrieve_user("id=%s", (row[2],))
             content = row[3]
 
             yield Discussion(_id, beatmapset, user, content)
@@ -367,10 +367,10 @@ class Database:
         )
         for row in (fetched_rows or []):
             await asyncio.sleep(0) # Return control back to the event loop, granting other tasks a window to start/resume.
-            _type = row[0]
-            time = row[1]
+            _type      = row[0]
+            time       = row[1]
             beatmapset = self.retrieve_beatmapset("id=%s", (row[2],)) if row[2] else None
             discussion = self.retrieve_discussion("id=%s", (row[3],)) if row[3] else None
-            user = self.retrieve_user("id=%s", (row[4],)) if row[4] else None
-            content = row[5]
+            user       = self.retrieve_user("id=%s", (row[4],)) if row[4] else None
+            content    = row[6]
             yield Event(_type, time, beatmapset, discussion, user, content=content)
