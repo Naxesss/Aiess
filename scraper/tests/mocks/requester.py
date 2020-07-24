@@ -1,6 +1,8 @@
 import sys
 sys.path.append('..')
 
+from datetime import datetime
+
 from aiess import Event, Beatmapset, User, Discussion
 from aiess.timestamp import from_string
 
@@ -9,6 +11,16 @@ discussion = Discussion(5, beatmapset=beatmapset, user=User(2, "sometwo"), conte
 discussion_dq = Discussion(6, beatmapset=beatmapset, user=User(2, "sometwo"), content="no wait")
 
 # Note that all events are yielded from newest to oldest.
+
+def get_news_events(_from: datetime, limit: int=20):
+    # The actual newspost doesn't matter, we're just making sure crawling the events works properly.
+    if _from == from_string("2020-01-01 03:00:00"):
+        yield Event("news", from_string("2020-01-01 03:00:00"), newspost=None, user=User(2, "sometwo"))
+        yield Event("news", from_string("2020-01-01 02:30:00"), newspost=None, user=User(1, "someone"))
+        yield Event("news", from_string("2020-01-01 02:00:00"), newspost=None, user=User(4, "somefour"))
+    if _from == from_string("2020-01-01 02:00:00"):
+        yield Event("news", from_string("2020-01-01 01:00:00"), newspost=None, user=User(3, "somethree"))
+        yield Event("news", from_string("2020-01-01 00:00:00"), newspost=None, user=User(5, "somefive"))
 
 def get_discussion_events(page: int=1, limit: int=50):
     if page == 1:

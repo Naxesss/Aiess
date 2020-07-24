@@ -11,12 +11,32 @@ from aiess.timestamp import from_string
 from scraper.tests.mocks.requester import get_discussion_events
 from scraper.tests.mocks.requester import get_reply_events
 from scraper.tests.mocks.requester import get_beatmapset_events
+from scraper.tests.mocks.requester import get_news_events
 from scraper.tests.mocks.discussion_jsons.crawler_json import JSON as mock_discussion_json
 
-from scraper.crawler import __get_discussion_events_between, __get_reply_events_between, __get_beatmapset_events_between
+from scraper.crawler import get_news_between
+from scraper.crawler import __get_discussion_events_between
+from scraper.crawler import __get_reply_events_between
+from scraper.crawler import __get_beatmapset_events_between
 
 def mock_get_discussions_json(beatmapset_id: int) -> object:
     return json.loads(mock_discussion_json)
+
+@pytest.mark.asyncio
+async def test_get_news_between():
+    with mock.patch("scraper.crawler.get_news_events", side_effect=get_news_events):
+        generator = get_news_between(start_time=from_string("2020-01-01 03:00:00"), end_time=from_string("2020-01-01 00:00:00"))
+        event4 = await anext(generator, None)
+        event3 = await anext(generator, None)
+        event2 = await anext(generator, None)
+        event1 = await anext(generator, None)
+        event0 = await anext(generator, None)  # Should skip this since it was covered last iteration.
+
+    assert event0 is None
+    assert event1.user.name == "somethree"
+    assert event2.user.name == "somefour"
+    assert event3.user.name == "someone"
+    assert event4.user.name == "sometwo"
 
 @pytest.mark.asyncio
 async def test_get_discussion_events_between():
