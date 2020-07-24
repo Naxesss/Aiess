@@ -59,7 +59,7 @@ def kudosu_gain_event():
 @pytest.fixture
 def newspost_event():
     author = User(2, "sometwo")
-    newspost = NewsPost(_id=3, title="title", preview="preview", author=author, slug="slug", image_url="image_url")
+    newspost = NewsPost(_id=3, title="title", preview="preview", author=author, slug="slug", image_url="/image.jpg")
     event = Event("news", from_string("2020-07-24 20:00:00"), newspost=newspost, user=author, content="preview")
 
     return event
@@ -118,7 +118,7 @@ async def test_format_embed_newspost(newspost_event):
     assert embed.footer.text == "sometwo \"preview\""
     assert embed.footer.icon_url == "https://a.ppy.sh/2"
     assert embed.colour.to_rgb() == (255, 160, 200)
-    assert embed.image.url == "image_url"
+    assert embed.image.url == "https://osu.ppy.sh/image.jpg"
 
 @pytest.mark.asyncio
 async def test_format_embed_context(kudosu_gain_event):
@@ -211,7 +211,7 @@ def test_format_thumbnail_url_non_applicable(newspost_event):
     assert format_thumbnail_url(newspost_event) == Embed.Empty
 
 def test_format_image_url(newspost_event):
-    assert format_image_url(newspost_event) == "image_url"
+    assert format_image_url(newspost_event) == "https://osu.ppy.sh/image.jpg"
 
 def test_format_image_url_non_applicable(suggestion_event):
     assert format_image_url(suggestion_event) == Embed.Empty
