@@ -6,7 +6,7 @@ from enum import Enum
 from datetime import datetime
 from collections import defaultdict
 
-from aiess.objects import User, Beatmapset, Discussion, Event
+from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost
 from aiess.settings import DB_CONFIG
 from aiess.logger import log
 from aiess.common import anext
@@ -260,12 +260,29 @@ class Database:
             )
         )
     
+    def insert_newspost(self, newspost: NewsPost) -> None:
+        """Inserts/updates the given newspost object into the newsposts table.
+        Also inserts/updates the associated user (i.e. author of the newspost)."""
+        if newspost.author: self.insert_user(newspost.author)
+        self.insert_table_data(
+            "newsposts",
+            dict(
+                id        = newspost.id,
+                title     = newspost.title,
+                preview   = newspost.preview,
+                author_id = newspost.author.id,
+                slug      = newspost.slug,
+                image_url = newspost.image_url
+            )
+        )
+
     def insert_event(self, event: Event) -> None:
         """Inserts/updates the given event into the events table, along with any other values
         (e.g. beatmapset, discussion, user) into their respective tables."""
         if event.beatmapset: self.insert_beatmapset(event.beatmapset)
         if event.user:       self.insert_user(event.user)
         if event.discussion: self.insert_discussion(event.discussion)
+        if event.newspost:   self.insert_newspost(event.newspost)
         self.insert_table_data(
             "events",
             dict(
@@ -275,6 +292,7 @@ class Database:
                 beatmapset_id = event.beatmapset.id if event.beatmapset is not None else None,
                 discussion_id = event.discussion.id if event.discussion is not None else None,
                 user_id       = event.user.id if event.user is not None else None,
+                news_id       = event.newspost.id if event.newspost is not None else None,
                 content       = event.content if event.content is not None else None
             )
         )
@@ -353,6 +371,28 @@ class Database:
 
             yield Discussion(_id, beatmapset, user, content)
     
+    def retrieve_newspost(self, where: str, where_values: tuple=None) -> NewsPost:
+        """Returns the first newspost from the database matching the given WHERE clause, or None if no such newspost is stored."""
+        return next(self.retrieve_newsposts(where, where_values), None)
+    
+    def retrieve_newsposts(self, where: str, where_values: tuple=None) -> Generator[NewsPost, None, None]:
+        """Returns a generator of all newsposts from the database matching the given WHERE clause."""
+        fetched_rows = self.retrieve_table_data(
+            table        = "newsposts", 
+            where        = where,
+            where_values = where_values,
+            selection    = "id, title, preview, author_id, slug, image_url"
+        )
+        for row in (fetched_rows or []):
+            _id       = row[0]
+            title     = row[1]
+            preview   = row[2]
+            author    = self.retrieve_user("id=%s", (row[3],))
+            slug      = row[4]
+            image_url = row[5]
+
+            yield NewsPost(_id, title, preview, author, slug, image_url)
+
     async def retrieve_event(self, where: str, where_values: tuple=None) -> Event:
         """Returns the first event from the database matching the given WHERE clause, or None if no such event is stored."""
         return await anext(self.retrieve_events(where, where_values), None)
@@ -363,7 +403,7 @@ class Database:
             table        = "events",
             where        = where,
             where_values = where_values,
-            selection    = "type, time, beatmapset_id, discussion_id, user_id, content"
+            selection    = "type, time, beatmapset_id, discussion_id, user_id, news_id, content"
         )
         for row in (fetched_rows or []):
             await asyncio.sleep(0) # Return control back to the event loop, granting other tasks a window to start/resume.
@@ -372,5 +412,6 @@ class Database:
             beatmapset = self.retrieve_beatmapset("id=%s", (row[2],)) if row[2] else None
             discussion = self.retrieve_discussion("id=%s", (row[3],)) if row[3] else None
             user       = self.retrieve_user("id=%s", (row[4],)) if row[4] else None
+            newspost   = self.retrieve_newspost("id=%s", (row[5],)) if row[5] else None
             content    = row[6]
-            yield Event(_type, time, beatmapset, discussion, user, content=content)
+            yield Event(_type, time, beatmapset, discussion, user, newspost=newspost, content=content)
