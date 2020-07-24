@@ -86,7 +86,12 @@ def format_link(event: Event) -> str:
 async def format_embed(event: Event) -> str:
     """Returns an embed which represents the given event."""
     embed = Embed()
-    embed.add_field(name=format_field_name(event), value=await format_field_value(event), inline=False)
+
+    if event.newspost:
+        embed.title = format_title(event)
+    else:
+        embed.add_field(name=format_field_name(event), value=await format_field_value(event), inline=False)
+    
     embed.set_footer(text=format_footer_text(event), icon_url=format_footer_icon_url(event))
     embed.colour = type_props[event.type].colour
     
@@ -112,20 +117,16 @@ def escape_markdown(obj: str) -> str:
         .replace("`", "\\`")  # Code / Code Block
     )
 
+def format_title(event: Event) -> str:
+    """Returns the title of the embed (e.g. newspost title)."""
+    return f"{event.newspost.title} ({format_timeago(event.time)})"
+
 def format_field_name(event: Event) -> str:
     """Returns the embed title of the given event (e.g. :heart: Qualified)."""
-    if event.newspost:
-        title = event.newspost.title
-    else:
-        title = f"{type_props[event.type].emoji}\u2000{type_props[event.type].title}"
-    
-    return f"{title} ({format_timeago(event.time)})"
+    return f"{type_props[event.type].emoji}\u2000{type_props[event.type].title} ({format_timeago(event.time)})"
 
 async def format_field_value(event: Event) -> str:
     """Returns the embed contents of the given event (i.e. the \"artist - title, mapped by creator [modes]\" part)."""
-    if event.newspost:
-        return event.newspost.preview
-
     artist_title_str = escape_markdown(f"{event.beatmapset.artist} - {event.beatmapset.title}")
     creator_str = escape_markdown(event.beatmapset.creator)
 
@@ -148,7 +149,10 @@ def format_footer_text(event: Event, database: Database=None) -> str:
     if not event.user:
         return Embed.Empty
     
-    if event.content and not event.newspost:
+    if event.newspost:
+        return f"{event.user} {format_preview(event.newspost.preview, length=240)}"
+
+    if event.content:
         return f"{event.user} {format_preview(event.content)}"
     
     return str(event.user)

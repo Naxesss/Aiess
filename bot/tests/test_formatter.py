@@ -15,6 +15,7 @@ from bot import database as db_module
 from bot.database import Database
 from bot.formatter import format_link
 from bot.formatter import format_embed
+from bot.formatter import format_title
 from bot.formatter import format_field_name
 from bot.formatter import format_field_value
 from bot.formatter import format_footer_text
@@ -59,8 +60,9 @@ def kudosu_gain_event():
 @pytest.fixture
 def newspost_event():
     author = User(2, "sometwo")
-    newspost = NewsPost(_id=3, title="title", preview="preview", author=author, slug="slug", image_url="/image.jpg")
-    event = Event("news", from_string("2020-07-24 20:00:00"), newspost=newspost, user=author, content="preview")
+    preview = "quite long preview" * 10
+    newspost = NewsPost(_id=3, title="title", preview=preview, author=author, slug="slug", image_url="/image.jpg")
+    event = Event("news", from_string("2020-07-24 20:00:00"), newspost=newspost, user=author, content=preview)
 
     return event
 
@@ -109,13 +111,9 @@ async def test_format_embed(suggestion_event):
 async def test_format_embed_newspost(newspost_event):
     embed: Embed = await format_embed(newspost_event)
     
-    assert embed.fields[0].name.startswith("title (**")
-    assert embed.fields[0].name.endswith("** ago)")
-    assert (
-        embed.fields[0].value ==
-        "preview"
-    )
-    assert embed.footer.text == "sometwo \"preview\""
+    assert embed.title.startswith("title (**")
+    assert embed.title.endswith("** ago)")
+    assert embed.footer.text == "sometwo \"" + "quite long preview" * 10 + "\""
     assert embed.footer.icon_url == "https://a.ppy.sh/2"
     assert embed.colour.to_rgb() == (255, 160, 200)
     assert embed.image.url == "https://osu.ppy.sh/image.jpg"
@@ -136,9 +134,10 @@ def test_format_field_name_qualify(qualify_event):
     assert format_field_name(qualify_event).startswith(":heart:\u2000Qualified (**")
     assert format_field_name(qualify_event).endswith("** ago)")
 
-def test_format_field_name_newspost(newspost_event):
-    assert format_field_name(newspost_event).startswith("title (**")
-    assert format_field_name(newspost_event).endswith("** ago)")
+def test_format_title(newspost_event):
+    # Only gets called for newsposts.
+    assert format_title(newspost_event).startswith("title (**")
+    assert format_title(newspost_event).endswith("** ago)")
 
 @pytest.mark.asyncio
 async def test_format_field_value(suggestion_event):
@@ -146,10 +145,6 @@ async def test_format_field_value(suggestion_event):
         await format_field_value(suggestion_event) ==
         "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]"
     )
-
-@pytest.mark.asyncio
-async def test_format_field_value_newspost(newspost_event):
-    assert await format_field_value(newspost_event) == "preview"
 
 @pytest.mark.asyncio
 async def test_format_field_value_markdown(qualify_event):
@@ -163,7 +158,7 @@ def test_format_footer_text(suggestion_event):
 
 def test_format_footer_text_newspost(newspost_event):
     # Newsposts already include their preview in the post itself, so we skip this.
-    assert format_footer_text(newspost_event) == "sometwo"
+    assert format_footer_text(newspost_event) == "sometwo \"" + "quite long preview" * 10 + "\""
 
 def test_format_footer_text_no_user(qualify_event):
     assert format_footer_text(qualify_event) == Embed.Empty
