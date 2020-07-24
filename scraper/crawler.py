@@ -44,14 +44,14 @@ async def __get_beatmapset_events_between(start_time: datetime, end_time: dateti
 
 def __get_event_generations_between(
         generator_function: Callable[[int], Generator[Event, None, None]],
-        start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
-    """Returns the same generator as the generation function argument, but within the given time
-    frame and across multiple pages rather than just one."""
+        start_time: datetime, end_time: datetime, generate_by_page: bool=True) -> Generator[Event, None, None]:
+    """Returns the same generator as the generation function argument, but within the given time frame and across multiple
+    generations rather than just one. This essentially bypasses the `limit` of pages by performing all requests necessary."""
     current_time = start_time
     page = 1
 
     while current_time > end_time:
-        event_generator = generator_function(page)
+        event_generator = generator_function(page if generate_by_page else current_time)
         
         for event in event_generator:
             if event.time > current_time:
