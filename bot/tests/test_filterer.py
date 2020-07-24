@@ -4,7 +4,7 @@ sys.path.append('..')
 import pytest
 from datetime import datetime
 
-from aiess import Event, User, Beatmapset, Discussion
+from aiess import Event, User, Beatmapset, Discussion, NewsPost
 
 from bot.filterer import expand
 from bot.filterer import distribute
@@ -334,6 +334,24 @@ def test_dissect_discussion_reply():
     event_dissection = dissect(event)
     for pair in (["type:reply"] + dissect(discussion) + dissect(replier) + ["content:there"]):
         assert pair in event_dissection
+
+def test_dissect_newspost():
+    user = User(2, "some two")
+    newspost = NewsPost(_id=4, title="title", preview="preview", author=user, slug="slug", image_url="image_url")
+    event = Event(_type="test", time=datetime.utcnow(), newspost=newspost, content="preview")
+
+    dissection = dissect(newspost)
+    for pair in [
+        "news-id:4",
+        "news-title:title",
+        "news-content:preview",
+        "news-preview:preview",
+        "news-author:\"some two\"",
+        "news-author-id:2"
+    ]:
+        assert pair in dissection
+    
+    assert dissect(event) == ["type:test", "content:preview"] + dissect(newspost)
 
 def test_dissect_aliases():
     event = Event(_type="nominate", time=datetime.utcnow())
