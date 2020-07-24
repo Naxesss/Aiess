@@ -55,7 +55,7 @@ async def test_insert_retrieve_event(test_database):
 
     test_database.insert_event(event)
 
-    retrieved_event = await test_database.retrieve_event("type=\"test\"")
+    retrieved_event = await test_database.retrieve_event("type=%s", ("test",))
     assert retrieved_event.type == event.type
     assert retrieved_event.time == event.time
     assert retrieved_event.beatmapset == event.beatmapset
