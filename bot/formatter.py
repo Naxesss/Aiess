@@ -33,6 +33,7 @@ colour_nominated  = Colour.from_rgb(50,  150, 255)
 colour_discussion = Colour.from_rgb(65,  65,  65 )
 colour_resolve    = Colour.from_rgb(100, 200, 100)
 colour_reopen     = Colour.from_rgb(255, 160, 70 )
+colour_news       = Colour.from_rgb(255, 160, 200)
 
 type_props = {
     types.RANK:               TypeProps(":sparkling_heart:",    "Ranked",           colour_ranked,      show_history=True),
@@ -62,7 +63,10 @@ type_props = {
     types.DISCUSSION_DELETE:  TypeProps(":zap:",                "Deleted",          colour_discussion,  show_context=True),
     types.DISCUSSION_RESTORE: TypeProps(":wrench:",             "Restored",         colour_discussion,  show_context=True),
     types.REPLY_DELETE:       TypeProps(":zap:",                "Reply Deleted",    colour_discussion,  show_context=True),
-    types.REPLY_RESTORE:      TypeProps(":wrench:",             "Reply Restored",   colour_discussion,  show_context=True)
+    types.REPLY_RESTORE:      TypeProps(":wrench:",             "Reply Restored",   colour_discussion,  show_context=True),
+
+    # Unlike other events, the embed title of news is simply the news title.
+    types.NEWS:               TypeProps(None,                   None,               colour_news)
 }
 
 def format_link(event: Event) -> str:
