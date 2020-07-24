@@ -27,3 +27,5 @@ DISCUSSION_DELETE = "discussion_delete"
 DISCUSSION_RESTORE = "discussion_restore"
 REPLY_DELETE = "discussion_post_delete"
 REPLY_RESTORE = "discussion_post_restore"
+
+NEWS = "news"

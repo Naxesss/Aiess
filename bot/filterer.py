@@ -35,7 +35,9 @@ TYPE_ALIASES: Dict[str, List[str]] = {
     types.KUDOSU_GAIN:  ["kudosu gain",  "kudosu gained", "kudosu given"],
     types.KUDOSU_LOSS:  ["kudosu loss",  "kudosu lost",   "kudosu taken"],
     types.KUDOSU_DENY:  ["kudosu deny",  "kudosu denied"],
-    types.KUDOSU_ALLOW: ["kudosu allow", "kudosu allowed"]
+    types.KUDOSU_ALLOW: ["kudosu allow", "kudosu allowed"],
+
+    types.NEWS:         ["newspost", "newsposts", "news post", "news posts"]
 }
 
 def get_all_type_aliases() -> List[str]:
