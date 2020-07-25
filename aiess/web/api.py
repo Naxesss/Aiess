@@ -1,6 +1,8 @@
 import json
 from collections import defaultdict
 
+from urllib.parse import quote
+
 from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.settings import API_KEY, API_RATE_LIMIT
 
@@ -27,7 +29,7 @@ def request_beatmapset(beatmapset_id: str) -> object:
     if beatmapset_id in requested_beatmapsets and requested_beatmapsets[beatmapset_id]:
         return requested_beatmapsets[beatmapset_id]
     
-    beatmapset_json = request_api("get_beatmaps", f"s={beatmapset_id}")
+    beatmapset_json = request_api("get_beatmaps", f"s={quote(str(beatmapset_id))}")
     requested_beatmapsets[beatmapset_id] = beatmapset_json
     return beatmapset_json
 
@@ -38,7 +40,7 @@ def request_user(user_id: str) -> object:
     if user_id in requested_users and requested_users[user_id]:
         return requested_users[user_id]
     
-    user_json = request_api("get_user", f"u={user_id}")
+    user_json = request_api("get_user", f"u={quote(str(user_id))}")
     if len(user_json) > 0:
         requested_users[user_id] = user_json[0]
         return user_json[0]

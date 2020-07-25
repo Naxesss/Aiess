@@ -59,3 +59,8 @@ def test_request_user():
     user_response = api.request_user(2)
 
     assert user_response["username"] == "peppy"
+
+def test_request_user_escaped_name():
+    user_response = api.request_user("-Mo- &amp; Ephemeral")
+
+    assert user_response is None
