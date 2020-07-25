@@ -124,7 +124,6 @@ class Database(aiess.Database):
                 LEFT JOIN {self.db_name}.newsposts AS newspost ON events.news_id=newspost.id
                 LEFT JOIN {self.db_name}.users AS author ON discussion.user_id=author.id
                 LEFT JOIN {self.db_name}.users AS creator ON beatmapset.creator_id=creator.id
-                LEFT JOIN {self.db_name}.users AS newsauthor ON newspost.author_id=author.id
                 LEFT JOIN {self.db_name}.users AS user ON events.user_id=user.id
                 LEFT JOIN {self.db_name}.beatmapset_modes AS modes ON beatmapset.id=modes.beatmapset_id""",
             where        = where,

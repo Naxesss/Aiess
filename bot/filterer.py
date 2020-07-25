@@ -198,7 +198,7 @@ TAGS: Dict[List[str], Tag] = {
     ("news-author-id",) : Tag(
         "The id of the author of the newspost (e.g. \"102335\" for Ephemeral).",
         lambda obj: [escape(obj.author.id)] if isinstance(obj, NewsPost) else None,
-        VALIDATION_IDS, sql_format="newsauthor.id=%s",
+        VALIDATION_IDS, sql_format="newspost.author_id=%s",
         example_values=["102335"]
     ),
     # Event tags:
