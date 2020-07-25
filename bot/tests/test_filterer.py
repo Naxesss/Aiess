@@ -94,7 +94,6 @@ def test_dissect_newspost():
 
     dissection = dissect(newspost)
     for pair in [
-        "news-id:4",
         "news-title:title",
         "news-content:preview",
         "news-preview:preview",
