@@ -263,16 +263,18 @@ class Database:
     def insert_newspost(self, newspost: NewsPost) -> None:
         """Inserts/updates the given newspost object into the newsposts table.
         Also inserts/updates the associated user (i.e. author of the newspost)."""
-        if newspost.author: self.insert_user(newspost.author)
+        # Specifically checks `author.id`, as the id may be None in case of e.g. "The Spotlight Team".
+        if newspost.author.id: self.insert_user(newspost.author)
         self.insert_table_data(
             "newsposts",
             dict(
-                id        = newspost.id,
-                title     = newspost.title,
-                preview   = newspost.preview,
-                author_id = newspost.author.id,
-                slug      = newspost.slug,
-                image_url = newspost.image_url
+                id          = newspost.id,
+                title       = newspost.title,
+                preview     = newspost.preview,
+                author_id   = newspost.author.id,
+                author_name = newspost.author.name,
+                slug        = newspost.slug,
+                image_url   = newspost.image_url
             )
         )
 
