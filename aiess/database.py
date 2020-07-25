@@ -383,15 +383,18 @@ class Database:
             table        = "newsposts", 
             where        = where,
             where_values = where_values,
-            selection    = "id, title, preview, author_id, slug, image_url"
+            selection    = "id, title, preview, author_id, author_name, slug, image_url"
         )
         for row in (fetched_rows or []):
-            _id       = row[0]
-            title     = row[1]
-            preview   = row[2]
-            author    = self.retrieve_user("id=%s", (row[3],))
-            slug      = row[4]
-            image_url = row[5]
+            _id         = row[0]
+            title       = row[1]
+            preview     = row[2]
+            author      = self.retrieve_user("id=%s", (row[3],))
+            author_name = row[4]
+            if not author:
+                author = User(_id=None, name=author_name)
+            slug        = row[5]
+            image_url   = row[6]
 
             yield NewsPost(_id, title, preview, author, slug, image_url)
 
