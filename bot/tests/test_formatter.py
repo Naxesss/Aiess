@@ -60,7 +60,7 @@ def kudosu_gain_event():
 def newspost_event():
     author = User(2, "sometwo")
     preview = "quite long preview" * 10
-    newspost = NewsPost(_id=3, title="title", preview=preview, author=author, slug="slug", image_url="/image.jpg")
+    newspost = NewsPost(_id=3, title="title", preview=preview, author=author, slug="slug", image_url="https://osu.ppy.sh/image.jpg")
     event = Event("news", from_string("2020-07-24 20:00:00"), newspost=newspost, user=author, content=preview)
 
     return event
