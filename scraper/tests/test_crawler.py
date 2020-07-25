@@ -39,6 +39,20 @@ async def test_get_news_between():
     assert event1 is None
 
 @pytest.mark.asyncio
+async def test_get_news_between_far_back():
+    with mock.patch("scraper.crawler.get_news_events", side_effect=get_news_events):
+        generator = get_news_between(start_time=from_string("2020-01-01 03:00:00"), end_time=from_string("2019-12-01 00:00:00"))
+        event6 = await anext(generator, None)
+        event5 = await anext(generator, None)
+        event4 = await anext(generator, None)
+        event3 = await anext(generator, None)
+        event2 = await anext(generator, None)
+        event1 = await anext(generator, None)  # This is the part where no more newsposts generate.
+
+    assert event2 is not None
+    assert event1 is None
+
+@pytest.mark.asyncio
 async def test_get_discussion_events_between():
     with mock.patch("scraper.crawler.get_discussion_events", side_effect=get_discussion_events):
         with mock.patch("scraper.populator.get_discussions_json", side_effect=mock_get_discussions_json):
@@ -94,15 +108,15 @@ async def test_get_beatmapset_events_between():
     assert event4.content is None
 
 @pytest.mark.asyncio
-async def test_get_beatmapset_events_between_too_far_back():
+async def test_get_beatmapset_events_between_far_back():
     with mock.patch("scraper.crawler.get_beatmapset_events", side_effect=get_beatmapset_events):
         with mock.patch("scraper.populator.get_discussions_json", side_effect=mock_get_discussions_json):
-            with pytest.raises(ValueError) as err:
-                generator = __get_beatmapset_events_between(start_time=from_string("2020-01-03 00:00:00"), end_time=from_string("2019-12-01 00:00:00"))
-                event1 = await anext(generator, None)
-                event2 = await anext(generator, None)
-                event3 = await anext(generator, None)
-                event4 = await anext(generator, None)
-                event5 = await anext(generator, None)  # This is the part where we have no more events available to us.
+            generator = __get_beatmapset_events_between(start_time=from_string("2020-01-03 00:00:00"), end_time=from_string("2019-12-01 00:00:00"))
+            event1 = await anext(generator, None)
+            event2 = await anext(generator, None)
+            event3 = await anext(generator, None)
+            event4 = await anext(generator, None)
+            event5 = await anext(generator, None)  # This is the part where we have no more events available to us.
 
-    assert "page index has exceeded 500" in str(err)
+    assert event4 is not None
+    assert event5 is None
