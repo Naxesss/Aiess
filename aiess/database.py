@@ -143,22 +143,6 @@ class Database:
             ),
             where_values
         )
-    
-    def fetchone_table_data(self, table: str, where: str, where_values: tuple=None, selection: str="*") -> List[tuple]:
-        """Returns the first row from the table where the WHERE clause applies (e.g. `where` as "type=%s AND id=%s" and 
-        `where_values` as ("nominate", 5)), if specified, otherwise the first row in the table."""
-        return self.__execute("""
-            SELECT %(selection)s FROM %(db_name)s.%(table)s
-            WHERE %(where)s
-            LIMIT 1
-            """ % InterpolationDict(
-                selection = selection,
-                db_name   = self.db_name,
-                table     = table,
-                where     = where if where else "TRUE"
-            ),
-            where_values
-        )
 
     def delete_table_data(self, table: str, where: str, where_values: tuple=None, ignore_exception: bool=False) -> List[tuple]:
         """Deletes all rows from the table where the WHERE clause applies (e.g. `where` as "type=%s AND id=%s" and 
