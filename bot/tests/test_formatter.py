@@ -210,6 +210,11 @@ def test_format_footer_icon_url_non_existing_user(suggestion_event):
     suggestion_event.user = User(_id=None, name="a")
     assert format_footer_icon_url(suggestion_event) == "https://osu.ppy.sh/images/layout/avatar-guest.png"
 
+def test_format_footer_icon_url_news_freetext(newspost_event):
+    newspost_event.user = None
+    newspost_event.newspost.author = User(_id=None, name="-Mo- and Noffy")
+    assert format_footer_icon_url(newspost_event) == "https://osu.ppy.sh/images/layout/avatar-guest.png"
+
 def test_format_thumbnail_url(suggestion_event):
     assert format_thumbnail_url(suggestion_event) == "https://b.ppy.sh/thumb/3l.jpg"
 
