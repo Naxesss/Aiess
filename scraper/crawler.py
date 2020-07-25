@@ -58,11 +58,13 @@ def __get_event_generations_between(
 
     while current_time > end_time:
         event_generator = generator_function(page if generate_by_page else current_time)
-        
+        found_events = False
+
         for event in event_generator:
             if event.time > current_time:
                 continue
 
+            found_events = True
             current_time = event.time
             if current_time <= end_time:
                 # Since events are sorted, any remaining element time is also <= `end_time`.
@@ -70,6 +72,10 @@ def __get_event_generations_between(
             
             yield event
         
+        if not found_events:
+            # There are no more events.
+            break
+
         page += 1
         if page > 500:
             # Assuming 60 s / page, this would take 8 hours to hit, but that's within acceptable bounds for this purpose.
