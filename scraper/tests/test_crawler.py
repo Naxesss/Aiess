@@ -26,17 +26,17 @@ def mock_get_discussions_json(beatmapset_id: int) -> object:
 async def test_get_news_between():
     with mock.patch("scraper.crawler.get_news_events", side_effect=get_news_events):
         generator = get_news_between(start_time=from_string("2020-01-01 03:00:00"), end_time=from_string("2020-01-01 00:00:00"))
+        event5 = await anext(generator, None)
         event4 = await anext(generator, None)
         event3 = await anext(generator, None)
         event2 = await anext(generator, None)
-        event1 = await anext(generator, None)
-        event0 = await anext(generator, None)  # Should skip this since it was covered last iteration.
+        event1 = await anext(generator, None)  # Should skip this since it was covered last iteration.
 
-    assert event0 is None
-    assert event1.user.name == "somethree"
-    assert event2.user.name == "somefour"
-    assert event3.user.name == "someone"
-    assert event4.user.name == "sometwo"
+    assert event5.user.name == "sometwo"
+    assert event4.user.name == "someone"
+    assert event3.user.name == "somefour"
+    assert event2.user.name == "somethree"
+    assert event1 is None
 
 @pytest.mark.asyncio
 async def test_get_discussion_events_between():
