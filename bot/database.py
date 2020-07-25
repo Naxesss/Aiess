@@ -34,7 +34,7 @@ class Database(aiess.Database):
     
     def retrieve_subscription(self, where: str=None, where_values: tuple=None) -> Subscription:
         """Returns the first subscription matching the given WHERE clause, if any, otherwise None."""
-        return next(self.retrieve_subscriptions(where, where_values), None)
+        return next(self.retrieve_subscriptions(where + " LIMIT 1", where_values), None)
 
     def retrieve_subscriptions(self, where: str=None, where_values: tuple=None) -> Generator[Subscription, None, None]:
         """Returns a generator of all subscriptions from the database matching the given WHERE clause."""
@@ -70,7 +70,7 @@ class Database(aiess.Database):
     
     def retrieve_prefix(self, where: str=None, where_values: tuple=None) -> Prefix:
         """Returns the first command prefix matching the given WHERE clause, if any, otherwise None."""
-        return next(self.retrieve_prefixes(where, where_values), None)
+        return next(self.retrieve_prefixes(where + " LIMIT 1", where_values), None)
 
     def retrieve_prefixes(self, where: str=None, where_values: tuple=None) -> Generator[Prefix, None, None]:
         """Returns a generator of all command prefixes from the database matching the given WHERE clause."""
@@ -111,7 +111,7 @@ class Database(aiess.Database):
 
     def retrieve_event_extensive(self, where: str, where_values: tuple=None) -> Event:
         """Returns the first event from the database matching the given WHERE clause, or None if no such event is stored."""
-        return next(self.retrieve_events_extensive(where, where_values), None)
+        return next(self.retrieve_events_extensive(where + " LIMIT 1", where_values), None)
 
     def retrieve_events_extensive(self, where: str, where_values: tuple=None) -> Generator[Event, None, None]:
         """Returns a generator of all events from the database matching the given WHERE clause.

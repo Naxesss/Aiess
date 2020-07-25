@@ -37,7 +37,6 @@ async def cmd_recent(command: Command, _filter: str=None):
         where        = f"""
             {filter_query}
             ORDER BY time DESC
-            LIMIT 1
             """,
         where_values = filter_values
     )

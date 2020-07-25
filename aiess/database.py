@@ -301,7 +301,7 @@ class Database:
     
     def retrieve_user(self, where: str, where_values: tuple=None) -> User:
         """Returns the first user from the database matching the given WHERE clause, or None if no such user is stored."""
-        return next(self.retrieve_users(where, where_values), None)
+        return next(self.retrieve_users(where + " LIMIT 1", where_values), None)
     
     def retrieve_users(self, where: str, where_values: tuple=None) -> Generator[User, None, None]:
         """Returns a generator of all users from the database matching the given WHERE clause."""
@@ -332,7 +332,7 @@ class Database:
     
     def retrieve_beatmapset(self, where: str, where_values: tuple=None) -> Beatmapset:
         """Returns the first beatmapset from the database matching the given WHERE clause, or None if no such beatmapset is stored."""
-        return next(self.retrieve_beatmapsets(where, where_values), None)
+        return next(self.retrieve_beatmapsets(where + " LIMIT 1", where_values), None)
     
     def retrieve_beatmapsets(self, where: str, where_values: tuple=None) -> Generator[Beatmapset, None, None]:
         """Returns a generator of all beatmapsets from the database matching the given WHERE clause."""
@@ -353,7 +353,7 @@ class Database:
     def retrieve_discussion(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Discussion:
         """Returns the first discussion from the database matching the given WHERE clause, or None if no such discussion is stored.
         Also retrieves the associated beatmapset from the database if not supplied."""
-        return next(self.retrieve_discussions(where, where_values), None)
+        return next(self.retrieve_discussions(where + " LIMIT 1", where_values), None)
     
     def retrieve_discussions(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Generator[Discussion, None, None]:
         """Returns a generator of all discussions from the database matching the given WHERE clause.
@@ -375,7 +375,7 @@ class Database:
     
     def retrieve_newspost(self, where: str, where_values: tuple=None) -> NewsPost:
         """Returns the first newspost from the database matching the given WHERE clause, or None if no such newspost is stored."""
-        return next(self.retrieve_newsposts(where, where_values), None)
+        return next(self.retrieve_newsposts(where + " LIMIT 1", where_values), None)
     
     def retrieve_newsposts(self, where: str, where_values: tuple=None) -> Generator[NewsPost, None, None]:
         """Returns a generator of all newsposts from the database matching the given WHERE clause."""
@@ -400,7 +400,7 @@ class Database:
 
     async def retrieve_event(self, where: str, where_values: tuple=None) -> Event:
         """Returns the first event from the database matching the given WHERE clause, or None if no such event is stored."""
-        return await anext(self.retrieve_events(where, where_values), None)
+        return await anext(self.retrieve_events(where + " LIMIT 1", where_values), None)
     
     async def retrieve_events(self, where: str, where_values: tuple=None) -> Generator[Event, None, None]:
         """Returns an asynchronous generator of all events from the database matching the given WHERE clause."""
