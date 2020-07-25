@@ -5,6 +5,7 @@ from typing import Generator, Iterator
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 import json
+import html
 
 from aiess.objects import Event, User, NewsPost
 from aiess.timestamp import from_string
@@ -26,7 +27,8 @@ def parse_post_jsons(post_jsons: Iterator[object]) -> Generator[Event, None, Non
 def parse_post_json(post_json: object) -> Event:
     """Returns an event representing the given news post json object
     (a single news post instance, for multiple see `parse_post_jsons`)."""
-    author = User(name=post_json["author"].strip())
+    # Seems the author name is escaped such that & become &amp;, so we should unescape it.
+    author = User(name=html.unescape(post_json["author"].strip()))
     return Event(
         _type      = "news",
         time       = from_string(post_json["published_at"]),
