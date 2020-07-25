@@ -175,7 +175,11 @@ def format_footer_icon_url(event: Event) -> str:
     """Returns the footer icon url of the event (i.e. the image url of the user's avatar),
     if there's a user associated with the event, otherwise None."""
     if event.user:
-        return f"https://a.ppy.sh/{event.user.id}"
+        if event.user.id:
+            return f"https://a.ppy.sh/{event.user.id}"
+        else:
+            # In case the user is restricted or doesn't exist (e.g. newsposts with "Noffy and -Mo-" in the author field).
+            return "https://osu.ppy.sh/images/layout/avatar-guest.png"
     return Embed.Empty
 
 def format_thumbnail_url(event: Event) -> str:
