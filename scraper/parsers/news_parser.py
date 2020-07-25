@@ -36,8 +36,16 @@ def parse_post_json(post_json: object) -> Event:
             preview   = post_json["preview"],
             author    = author,
             slug      = post_json["slug"],
-            image_url = post_json["first_image"]
+            image_url = complete_image_url(post_json["first_image"])
         ),
         user       = author,  # Authors seem to have a space prefixed.
         content    = post_json["preview"]
     )
+
+def complete_image_url(url: str) -> str:
+    """Returns the given url, with https://osu.ppy.sh/ prepended, if it does not contain
+    that part already. Some image urls in newsposts include the domain, while others do not
+    (e.g "/help/wiki/shared/news/banners/community-mentorship-program.jpg")."""
+    if url.startswith("https://"):
+        return url
+    return f"https://osu.ppy.sh{url}"

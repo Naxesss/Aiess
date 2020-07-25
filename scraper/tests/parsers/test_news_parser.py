@@ -41,3 +41,9 @@ def test_parse():
         user       = User(_id=102335, name="Ephemeral"),
         content    = "We're excited to welcome Receptor aboard as our latest Featured Artist!"
     )
+
+def test_complete_image_url():
+    assert news_parser.complete_image_url("/hello") == "https://osu.ppy.sh/hello"
+
+def test_complete_image_url_complete():
+    assert news_parser.complete_image_url("https://assets.ppy.sh/hello") == "https://assets.ppy.sh/hello"
