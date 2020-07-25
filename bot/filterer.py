@@ -177,12 +177,6 @@ TAGS: Dict[List[str], Tag] = {
         example_values=["nice", "\"very cool\""]
     ),
     # NewsPost tags:
-    ("news-id",) : Tag(
-        "The id of the newspost (e.g. \"1000\" for the 1000th newspost).",
-        lambda obj: [escape(obj.id)] if isinstance(obj, NewsPost) else None,
-        VALIDATION_IDS, sql_format="news_id=%s",
-        example_values=["1000"]
-    ),
     ("news-title",) : Tag(
         "The title of the newspost (e.g. \"%featured artist%\" for FA news).",
         lambda obj: [escape(obj.title)] if isinstance(obj, NewsPost) else None,
