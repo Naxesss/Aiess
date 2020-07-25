@@ -38,7 +38,7 @@ def parse_post_json(post_json: object) -> Event:
             slug      = post_json["slug"],
             image_url = complete_image_url(post_json["first_image"])
         ),
-        user       = author,  # Authors seem to have a space prefixed.
+        user       = author if author.id else None,
         content    = post_json["preview"]
     )
 

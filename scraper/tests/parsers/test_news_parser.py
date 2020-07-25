@@ -24,7 +24,7 @@ def test_parse():
             slug      = "2020-07-21-aspire-v-finals-stage-voting",
             image_url = "https://assets.ppy.sh/contests/94/header.jpg"
         ),
-        user       = User(_id=None, name="-Mo- & Ephemeral"),
+        user       = None,
         content    = "You've chosen your favourite beatmaps from the Aspire V categories, now it's time to pick the best of the best!"
     )
     assert events[1] == Event(
