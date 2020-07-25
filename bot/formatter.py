@@ -187,7 +187,7 @@ def format_thumbnail_url(event: Event) -> str:
 def format_image_url(event: Event) -> str:
     """Returns the image url for the event (e.g. newspost banner), if applicable, else None."""
     if event.newspost:
-        return f"https://osu.ppy.sh{event.newspost.image_url}"
+        return event.newspost.image_url
     return Embed.Empty
 
 def format_context_field_name(event: Event) -> str:
