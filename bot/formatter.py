@@ -145,10 +145,13 @@ async def format_field_value(event: Event) -> str:
 def format_footer_text(event: Event, database: Database=None) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
     if there's a user associated with the event, otherwise None."""
+    if event.newspost:
+        return event.newspost.author.name
+
     if not event.user:
         return Embed.Empty
 
-    if event.content and not event.newspost:
+    if event.content:
         return f"{event.user} {format_preview(event.content)}"
     
     return str(event.user)
@@ -178,8 +181,13 @@ def format_footer_icon_url(event: Event) -> str:
         if event.user.id:
             return f"https://a.ppy.sh/{event.user.id}"
         else:
-            # In case the user is restricted or doesn't exist (e.g. newsposts with "Noffy and -Mo-" in the author field).
+            # In case the user is restricted.
             return "https://osu.ppy.sh/images/layout/avatar-guest.png"
+    
+    if event.newspost:
+        # In case the author field is free-text (e.g. "Noffy & -Mo-").
+        return "https://osu.ppy.sh/images/layout/avatar-guest.png"
+    
     return Embed.Empty
 
 def format_thumbnail_url(event: Event) -> str:
