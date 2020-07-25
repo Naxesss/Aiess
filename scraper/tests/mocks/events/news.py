@@ -11,7 +11,7 @@ HTML = """
         "news_posts": [
             {
                 "id": 812,
-                "author": " -Mo-",
+                "author": " -Mo- &amp; Ephemeral",
                 "edit_url": "https://github.com/ppy/osu-wiki/tree/master/news/2020-07-21-aspire-v-finals-stage-voting.md",
                 "first_image": "https://assets.ppy.sh/contests/94/header.jpg",
                 "published_at": "2020-07-22T21:00:00+00:00",
