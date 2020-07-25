@@ -75,7 +75,7 @@ async def test_recent_not_found():
 
 @pytest.mark.asyncio
 @mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
-async def test_sub_dm_channel():
+async def test_recent_dm_channel():
     mock_message = MockMessage(channel=MockDMChannel(_id=6))
     mock_command = MockCommand("recent", "type:(nominate or qualify)", context=mock_message)
 
