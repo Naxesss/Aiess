@@ -29,14 +29,6 @@ CREATE TABLE `beatmapset_modes` (
   PRIMARY KEY (`beatmapset_id`,`mode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE `users` (
-  `id` bigint(20) unsigned NOT NULL,
-  `name` mediumtext,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 DROP TABLE IF EXISTS `beatmapsets`;
 CREATE TABLE `beatmapsets` (
   `id` bigint(20) unsigned NOT NULL,
@@ -62,6 +54,22 @@ CREATE TABLE `discussions` (
   CONSTRAINT `discussionsfk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+DROP TABLE IF EXISTS `events`;
+CREATE TABLE `events` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `insert_time` datetime NOT NULL,
+  `time` datetime NOT NULL,
+  `type` varchar(64) NOT NULL,
+  `beatmapset_id` bigint(20) unsigned DEFAULT NULL,
+  `discussion_id` bigint(20) unsigned DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `group_id` bigint(20) unsigned DEFAULT NULL,
+  `news_id` bigint(20) unsigned DEFAULT NULL,
+  `content` mediumtext,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 DROP TABLE IF EXISTS `newsposts`;
 CREATE TABLE `newsposts` (
   `id` bigint(20) unsigned NOT NULL,
@@ -77,16 +85,10 @@ CREATE TABLE `newsposts` (
   CONSTRAINT `newsposts_author_id_fk` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-DROP TABLE IF EXISTS `events`;
-CREATE TABLE `events` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `insert_time` datetime NOT NULL,
-  `time` datetime NOT NULL,
-  `type` varchar(64) NOT NULL,
-  `beatmapset_id` bigint(20) unsigned DEFAULT NULL,
-  `discussion_id` bigint(20) unsigned DEFAULT NULL,
-  `user_id` bigint(20) unsigned DEFAULT NULL,
-  `content` mediumtext,
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` bigint(20) unsigned NOT NULL,
+  `name` mediumtext,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
