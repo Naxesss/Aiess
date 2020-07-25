@@ -75,6 +75,33 @@ async def test_recent_not_found():
 
 @pytest.mark.asyncio
 @mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
+async def test_recent_no_args():
+    beatmapset = Beatmapset(1, "artist", "title", creator=User(2, "sometwo"), modes=["osu"])
+    event1 = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
+    event2 = Event("qualify", from_string("2020-01-01 01:00:00"), beatmapset, user=User(4, "somefour"), content="nicely done")
+
+    database = Database(SCRAPER_TEST_DB_NAME)
+    database.insert_event(event1)
+    database.insert_event(event2)
+
+    mock_message = MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=2)))
+    mock_command = MockCommand("recent", context=mock_message)
+
+    assert await receive_command(mock_command)
+
+    assert mock_command.response.startswith("✓")
+    assert "https://osu.ppy.sh/beatmapsets/1" in mock_command.response
+    assert mock_command.response_embed
+    assert mock_command.response_embed.fields
+    assert mock_command.response_embed.fields[0].name.startswith(":heart:\u2000Qualified (**")
+    assert mock_command.response_embed.fields[0].name.endswith("** ago)")
+    assert "artist - title" in mock_command.response_embed.fields[0].value
+    assert "sometwo" in mock_command.response_embed.fields[0].value
+    assert mock_command.response_embed.footer.text == "somefour \"nicely done\""
+    assert mock_command.response_embed.footer.icon_url == "https://a.ppy.sh/4"
+
+@pytest.mark.asyncio
+@mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
 async def test_recent_dm_channel():
     mock_message = MockMessage(channel=MockDMChannel(_id=6))
     mock_command = MockCommand("recent", "type:(nominate or qualify)", context=mock_message)
