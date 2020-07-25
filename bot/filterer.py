@@ -180,13 +180,13 @@ TAGS: Dict[List[str], Tag] = {
     ("news-title",) : Tag(
         "The title of the newspost (e.g. \"%featured artist%\" for FA news).",
         lambda obj: [escape(obj.title)] if isinstance(obj, NewsPost) else None,
-        VALIDATION_ANY, sql_format="news.title LIKE %s",
+        VALIDATION_ANY, sql_format="newspost.title LIKE %s",
         example_values=["\"New Featured Artist: DragonForce\"", "\"%title contains this%\""]
     ),
     ("news-content", "news-preview") : Tag(
         "The preview of the newspost (e.g. \"We're excited to welcome Lasse as our newest featured artist!\").",
         lambda obj: [escape(obj.preview)] if isinstance(obj, NewsPost) else None,
-        VALIDATION_ANY, sql_format="news.preview LIKE %s",
+        VALIDATION_ANY, sql_format="newspost.preview LIKE %s",
         example_values=["\"preview is exactly this\"", "\"%preview contains this%\""]
     ),
     ("news-author",) : Tag(
