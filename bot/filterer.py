@@ -192,8 +192,8 @@ TAGS: Dict[List[str], Tag] = {
     ("news-author",) : Tag(
         "The username of the author of the newspost (e.g. \"Ephemeral\").",
         lambda obj: [escape(obj.author.name)] if isinstance(obj, NewsPost) else None,
-        VALIDATION_ANY, sql_format="newsauthor.name=%s",
-        example_values=["Ephemeral", "\"Seto Kousuke\""]
+        VALIDATION_ANY, sql_format="newspost.author_name LIKE %s",
+        example_values=["Ephemeral", "\"The Spotlights Team\"", "\"%contains this%\""]
     ),
     ("news-author-id",) : Tag(
         "The id of the author of the newspost (e.g. \"102335\" for Ephemeral).",
