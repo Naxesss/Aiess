@@ -294,8 +294,8 @@ def unit_str(unit: TimeUnit, long: bool=False, size: int=None):
     if unit == TimeUnit.MICROSECONDS: return ("microsecond" + s_if_plural) if long else "μs"
 
 def format_time(
-    delta_time: Union[timedelta, float], min_unit: TimeUnit=TimeUnit.SECONDS, max_units: int=2,
-    long: bool=False) -> str:
+        delta_time: Union[timedelta, float], min_unit: TimeUnit=TimeUnit.SECONDS, max_units: int=2,
+        long: bool=False) -> str:
     """Returns a string representing the difference in time, in the most appropriate units, (e.g. \"2 min 36 s\").
     
     `delta_time` : Union[timedelta, float]
