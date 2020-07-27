@@ -395,7 +395,7 @@ class Database:
             selection    = "type, time, beatmapset_id, discussion_id, user_id, news_id, content"
         )
         for row in (fetched_rows or []):
-            await asyncio.sleep(0) # Return control back to the event loop, granting other tasks a window to start/resume.
+            await asyncio.sleep(0)  # Return control back to the event loop, granting other tasks a window to start/resume.
             _type      = row[0]
             time       = row[1]
             beatmapset = self.retrieve_beatmapset("id=%s", (row[2],)) if row[2] else None
