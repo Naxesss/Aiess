@@ -141,7 +141,7 @@ async def test_nom_comment_none():
     discussion_json = json.loads(mock_discussion_json_nom_comment_1)
     await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
 
-    assert nominate_event.content == None
+    assert nominate_event.content is None
 
 @pytest.mark.asyncio
 async def test_nom_comment_from_note():
@@ -161,7 +161,7 @@ async def test_nom_comment_praise_then_suggestions():
     discussion_json = json.loads(mock_discussion_json_nom_comment_2)
     await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
 
-    assert nominate_event.content == None
+    assert nominate_event.content is None
 
 @pytest.mark.asyncio
 async def test_nom_comment_from_praise():

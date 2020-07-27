@@ -31,7 +31,7 @@ def test_set_prefix_none():
     assert Database(BOT_TEST_DB_NAME).retrieve_prefix("guild_id=%s", (3,)) == Prefix(3, "&")
     assert prefixes.cache[3] == "&"
     set_prefix(3, None)
-    assert Database(BOT_TEST_DB_NAME).retrieve_prefix("guild_id=%s", (3,)) == None
+    assert Database(BOT_TEST_DB_NAME).retrieve_prefix("guild_id=%s", (3,)) is None
     assert not prefixes.cache
 
 def test_get_prefix():
@@ -40,7 +40,7 @@ def test_get_prefix():
 
 def test_get_prefix_default():
     set_prefix(3, None)
-    assert Database(BOT_TEST_DB_NAME).retrieve_prefix("guild_id=%s", (3,)) == None
+    assert Database(BOT_TEST_DB_NAME).retrieve_prefix("guild_id=%s", (3,)) is None
     assert not prefixes.cache
     assert get_prefix(3) == DEFAULT_PREFIX
 

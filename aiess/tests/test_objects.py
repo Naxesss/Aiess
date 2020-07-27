@@ -41,7 +41,7 @@ def test_user_get_name_restricted():
 def test_user_get_id_restricted():
     user = User(name="a")
     
-    assert user.id == None
+    assert user.id is None
     assert user.name == "a"
 
 def test_user_int_name():
