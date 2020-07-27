@@ -30,6 +30,10 @@ class Reader():
     In this case, "new" refers to any event after the previously stored datetime in the respective file,
     named after the given identifier.
     
+    Upon reading a new event, the stored datetime is updated to the time of that event. Only reads events from
+    which `scope` returns True, if specified, else all. The scope can be used to read from separate event streams,
+    for example 
+    
     Use this by creating a class inheriting Reader, and override methods (e.g. on_event) as desired."""
     def __init__(self, reader_id: str, db_name: str):
         self.reader_id = reader_id
