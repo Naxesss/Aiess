@@ -47,8 +47,13 @@ class Reader():
 
         self.running = True
         while True:
-            await self.__push_new_events(Scope("mapset", lambda event: event.type != types.NEWS))
+            await self.__push_all_new_events()
             await asyncio.sleep(10)
+
+    async def __push_all_new_events(self) -> None:
+        """Triggers the on_event method for each new event since the last stored datetime for each scope."""
+        await self.__push_new_events(Scope("mapset", lambda event: event.type != types.NEWS))
+        await self.__push_new_events(Scope("news",   lambda event: event.type == types.NEWS))
 
     async def __push_new_events(self, scope: Scope) -> None:
         """Triggers the on_event method for each new event since the last stored datetime for the given scope."""

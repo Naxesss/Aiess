@@ -43,6 +43,31 @@ async def test_file_created(reader):
     assert timestamp.exists(expected_id)
 
 @pytest.mark.asyncio
+async def test_push_all_new_events(reader):
+    event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 01:00:00"))
+    event2 = Event(_type="news",     time=timestamp.from_string("2020-01-01 02:00:00"))
+    event3 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 03:00:00"))
+    event4 = Event(_type="qualify",  time=timestamp.from_string("2020-01-01 04:00:00"))
+    event5 = Event(_type="news",     time=timestamp.from_string("2020-01-01 05:00:00"))
+
+    reader.database.insert_event(event1)
+    reader.database.insert_event(event2)
+    reader.database.insert_event(event3)
+    reader.database.insert_event(event4)
+    reader.database.insert_event(event5)
+
+    mapset_scope = Scope("mapset", None)
+    news_scope = Scope("news", None)
+
+    timestamp.set_last(new_datetime=timestamp.from_string("2020-01-01 00:00:00"), _id=reader._Reader__time_id(mapset_scope))
+    timestamp.set_last(new_datetime=timestamp.from_string("2020-01-01 00:00:00"), _id=reader._Reader__time_id(news_scope))
+    await reader._Reader__push_all_new_events()
+
+    assert received_events == [event1, event3, event4, event2, event5]
+    assert timestamp.get_last(reader._Reader__time_id(mapset_scope)) == timestamp.from_string("2020-01-01 04:00:00")
+    assert timestamp.get_last(reader._Reader__time_id(news_scope)) == timestamp.from_string("2020-01-01 05:00:00")
+
+@pytest.mark.asyncio
 async def test_events_between(reader):
     event1 = Event(_type="test", time=timestamp.from_string("2020-01-01 05:00:00"))
     event2 = Event(_type="test", time=timestamp.from_string("2020-01-01 07:00:00"))
