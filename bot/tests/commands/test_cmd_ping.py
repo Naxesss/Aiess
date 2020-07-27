@@ -2,8 +2,6 @@ import sys
 sys.path.append('..')
 
 import pytest
-from datetime import datetime
-from time import sleep
 
 from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel, MockClient
 from bot.cmd_modules import cmd_ping

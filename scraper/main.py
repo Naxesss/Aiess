@@ -3,7 +3,6 @@ sys.path.append('..')
 
 import asyncio
 from datetime import datetime
-from time import sleep
 
 from aiess import timestamp, logger
 from aiess import Event

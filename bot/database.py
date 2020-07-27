@@ -5,7 +5,7 @@ from collections import defaultdict
 from typing import Generator, Dict, List
 
 import aiess
-from aiess import Event, Beatmapset, User
+from aiess import Event, Beatmapset
 from aiess.reader import merge_concurrent
 
 from bot.objects import Subscription, Prefix

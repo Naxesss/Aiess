@@ -5,7 +5,7 @@ from collections import defaultdict
 from typing import Callable, TypeVar, List
 
 from discord import Message, Embed, Client
-from discord import Forbidden, HTTPException
+from discord import Forbidden
 
 from bot.prefixes import get_prefix
 from bot.prefixes import DEFAULT_PREFIX

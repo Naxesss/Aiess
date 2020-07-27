@@ -1,8 +1,6 @@
 import sys
 sys.path.append('..')
 
-from datetime import datetime
-
 from discord import Embed
 
 from bot.commands import Command

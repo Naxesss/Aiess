@@ -3,7 +3,6 @@ sys.path.append('..')
 
 from typing import Generator, Iterator
 from bs4 import BeautifulSoup
-from bs4.element import Tag
 import json
 
 from aiess.objects import Event, User, NewsPost

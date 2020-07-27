@@ -1,5 +1,4 @@
 import pytest
-from typing import List
 
 import aiess
 from aiess import Event, Beatmapset, User

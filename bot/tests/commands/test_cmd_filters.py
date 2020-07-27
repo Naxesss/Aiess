@@ -2,14 +2,11 @@ import sys
 sys.path.append('..')
 
 import pytest
-from datetime import datetime
-from time import sleep
 
-from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel, MockClient
+from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel
 from bot.cmd_modules import cmd_filters
 from bot.receiver import receive_command
 from bot.prefixes import DEFAULT_PREFIX
-from bot.commands import FunctionWrapper
 from bot.commands import help_embed
 
 @pytest.mark.asyncio

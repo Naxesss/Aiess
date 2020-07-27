@@ -4,7 +4,6 @@ from mysql.connector.errors import Error, OperationalError
 from typing import List, Generator
 from enum import Enum
 from datetime import datetime
-from collections import defaultdict
 
 from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost
 from aiess.settings import DB_CONFIG

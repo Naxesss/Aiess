@@ -8,7 +8,7 @@ from typing import Union
 
 from discord import Embed, Colour
 
-from aiess import Event, User, Beatmapset
+from aiess import Event, Beatmapset
 from aiess import event_types as types
 
 from aiess.database import SCRAPER_DB_NAME

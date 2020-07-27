@@ -1,10 +1,6 @@
 import sys
 sys.path.append('..')
 
-from bs4 import BeautifulSoup
-
-from scraper.requester import soupify
-
 JSON1 = r"""
 {
   "beatmapset": {

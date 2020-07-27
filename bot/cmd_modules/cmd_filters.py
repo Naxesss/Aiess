@@ -1,12 +1,8 @@
 import sys
 sys.path.append('..')
 
-from discord import Embed
-
 from bot.commands import Command, register
-from bot.filterer import AND_GATES, OR_GATES, NOT_GATES, TAGS
 from bot.filterer import get_tag, get_tag_keys
-from bot.formatter import truncate
 from bot.commands import EVENTS_CATEGORY
 from bot.cmdcommon import filters_embed, filter_embed
 

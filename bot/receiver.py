@@ -6,7 +6,7 @@ import re as regex
 from discord import Message, Client
 from typing import List
 
-from bot.commands import Command, FunctionWrapper
+from bot.commands import Command
 from bot.commands import registered_commands, registered_aliases
 from bot.prefixes import get_prefix
 

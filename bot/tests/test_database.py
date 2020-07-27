@@ -3,7 +3,7 @@ sys.path.append('..')
 
 import pytest
 
-from aiess import Event, User, Beatmapset, Discussion
+from aiess import Event, User, Beatmapset
 from aiess.timestamp import from_string
 from aiess.database import SCRAPER_TEST_DB_NAME
 

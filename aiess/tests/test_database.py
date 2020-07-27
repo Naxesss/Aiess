@@ -2,7 +2,6 @@ import pytest
 from mysql.connector.errors import ProgrammingError
 from datetime import datetime
 
-from aiess.timestamp import from_string
 from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost
 from aiess.database import Database, SCRAPER_TEST_DB_NAME
 from aiess.common import anext
