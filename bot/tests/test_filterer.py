@@ -181,8 +181,10 @@ def test_invalid_filter_modes():
     assert list(get_invalid_filters("mode:test or mode:osu or mode:catch")) == [("mode", "test")]
 
 def test_invalid_filter_ids():
-    assert (list(get_invalid_filters("user-id:test or mapset-id:\"test two\" or user-id:12381031"))
-        == [("user-id", "test"), ("mapset-id", "test two")])
+    assert (
+        list(get_invalid_filters("user-id:test or mapset-id:\"test two\" or user-id:12381031")) ==
+        [("user-id", "test"), ("mapset-id", "test two")]
+    )
 
 def test_invalid_filter_types():
     assert list(get_invalid_filters("type:undefined or user:someone or type:qualify")) == [("type", "undefined")]
@@ -194,8 +196,10 @@ def test_invalid_filter_types_escaped():
     assert list(get_invalid_filters("type:\"kudosu gain\" or type:\"something else\"")) == [("type", "something else")]
 
 def test_invalid_filter_types_multiple():
-    assert (list(get_invalid_filters("type:undefined or type:nominate or user:someone and type:\"something else\""))
-        == [("type", "undefined"), ("type", "something else")])
+    assert (
+        list(get_invalid_filters("type:undefined or type:nominate or user:someone and type:\"something else\"")) ==
+        [("type", "undefined"), ("type", "something else")]
+    )
 
 def test_invalid_words_missed_colon():
     assert list(get_invalid_words("typequalify or type:nominate")) == ["typequalify"]
