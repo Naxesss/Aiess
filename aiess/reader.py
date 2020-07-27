@@ -1,4 +1,4 @@
-from typing import Generator, List, Iterable
+from typing import Generator, List, Iterable, Callable
 from datetime import datetime
 import itertools
 import asyncio
@@ -17,6 +17,13 @@ MERGABLE_TYPES = [
     (types.REPLY,    types.RESOLVE),
     (types.REPLY,    types.REOPEN)
 ]
+
+class Scope():
+    """Determines which events should be read in a Reader. If `passes` returns true when given an event,
+    it will be read and last time updated accordingly, else it'll be ignored."""
+    def __init__(self, name: str, passes: Callable[[Event], bool]):
+        self.name = name
+        self.passes = passes
 
 class Reader():
     """This constitutes an object from which a loop, looking through new events in the database, can be executed.
@@ -40,26 +47,28 @@ class Reader():
 
         self.running = True
         while True:
-            await self.__push_new_events()
+            await self.__push_new_events(Scope("mapset", lambda event: event.type != types.NEWS))
             await asyncio.sleep(10)
 
-    async def __push_new_events(self) -> None:
-        """Triggers the on_event method for each new event since the last stored datetime.
-        Updates the last stored datetime after each on_event call."""
-        last_time = timestamp.get_last(self.__time_id())
-        await self.__push_events_between(last_time, datetime.utcnow())
+    async def __push_new_events(self, scope: Scope) -> None:
+        """Triggers the on_event method for each new event since the last stored datetime for the given scope."""
+        last_time = timestamp.get_last(self.__time_id(scope))
+        await self.__push_events_between(last_time, datetime.utcnow(), scope)
     
-    async def __push_events_between(self, last_time: datetime, current_time: datetime) -> datetime:
-        """Triggers the on_event method for each event between the two datetimes."""
+    async def __push_events_between(self, last_time: datetime, current_time: datetime, scope: Scope) -> datetime:
+        """Triggers the on_event method for each event between the two datetimes.
+        Updates the last stored datetime after each on_event call."""
         await self.on_event_batch()
         async for event in await self.events_between(last_time, current_time):
+            if not scope.passes(event):
+                continue
             await self.on_event(event)
-            timestamp.set_last(event.time, self.__time_id())
+            timestamp.set_last(event.time, self.__time_id(scope))
 
-    def __time_id(self):
-        """Returns the identifier of the file the reader creates to keep track of the last time.
+    def __time_id(self, scope: Scope):
+        """Returns the identifier of the file the reader creates to keep track of the last time for this scope.
         This is based on the identifier supplied to the reader on initialization."""
-        return f"reader-{self.reader_id}"
+        return f"reader-{self.reader_id}-{scope.name}"
 
     async def events_between(self, _from: datetime, to: datetime) -> Generator[Event, None, None]:
         """Yields each event found in the database, from (excluding) the first time to (including) the second time."""

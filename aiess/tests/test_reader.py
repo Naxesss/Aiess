@@ -7,6 +7,7 @@ from aiess import timestamp
 from aiess.database import SCRAPER_TEST_DB_NAME
 from aiess.reader import merge_concurrent
 from aiess.common import anext
+from aiess.reader import Scope
 
 received_events = []
 received_event_batches = []
@@ -34,8 +35,9 @@ def reader():
 
 @pytest.mark.asyncio
 async def test_file_created(reader):
-    expected_id = reader._Reader__time_id()
-    await reader._Reader__push_new_events()
+    scope = Scope("any", lambda event: True)
+    expected_id = reader._Reader__time_id(scope)
+    await reader._Reader__push_new_events(scope)
 
     assert "test" in expected_id
     assert timestamp.exists(expected_id)
@@ -91,8 +93,9 @@ async def test_on_events(reader):
     start = timestamp.from_string("2020-01-01 00:00:00")
     middle = timestamp.from_string("2020-01-01 10:00:00")
     end = timestamp.from_string("2020-01-01 18:00:00")
-    await reader._Reader__push_events_between(start, middle)
-    await reader._Reader__push_events_between(middle, end)
+    scope = Scope("any", lambda event: True)
+    await reader._Reader__push_events_between(start, middle, scope)
+    await reader._Reader__push_events_between(middle, end, scope)
 
     assert len(received_event_batches) == 2
 
@@ -106,7 +109,8 @@ async def test_on_event(reader):
 
     _from = timestamp.from_string("2020-01-01 00:00:00")
     to = timestamp.from_string("2020-01-01 10:00:00")
-    await reader._Reader__push_events_between(_from, to)
+    scope = Scope("any", lambda event: True)
+    await reader._Reader__push_events_between(_from, to, scope)
 
     assert received_events == [event1, event2]
 
