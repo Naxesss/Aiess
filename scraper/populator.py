@@ -7,7 +7,10 @@ from aiess.database import Database, SCRAPER_DB_NAME
 from aiess.timestamp import from_string
 from aiess import event_types as types
 
-from scraper.requester import request_discussions_json, get_map_page_discussions, get_map_page_event_jsons, get_map_page_discussion_jsons
+from scraper.requester import request_discussions_json
+from scraper.requester import get_map_page_discussions
+from scraper.requester import get_map_page_event_jsons
+from scraper.requester import get_map_page_discussion_jsons
 from scraper.parsers.discussion_parser import discussion_parser
 
 cached_discussions_json = {}
