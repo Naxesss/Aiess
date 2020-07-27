@@ -80,8 +80,8 @@ class Reader():
         return f"reader-{self.reader_id}-{scope.name}"
 
     async def events_between(self, _from: datetime, to: datetime) -> Generator[Event, None, None]:
-        """Yields each event found in the database, from (excluding) the first time to (including) the second time."""
-        return self.database.retrieve_events(where="time > %s AND time <= %s", where_values=(_from, to))
+        """Yields each event found in the database, from (excluding) the later time to (including) the earlier time."""
+        return self.database.retrieve_events(where="time > %s AND time <= %s ORDER BY time ASC", where_values=(_from, to))
 
     async def on_event_batch(self) -> None:
         """Called for each new event batch found in the running loop of the reader.
