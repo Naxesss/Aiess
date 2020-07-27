@@ -19,11 +19,11 @@ from bot.commands import GENERAL_CATEGORY
 )
 async def cmd_prefix(command: Command, symbol: str):
     if not command.guild_id():
-        await command.respond_err(f"Cannot change prefix in DM channels.")
+        await command.respond_err("Cannot change prefix in DM channels.")
         return
     
     if " " in symbol:
-        await command.respond_err(f"`<symbol>` cannot include whitespace.")
+        await command.respond_err("`<symbol>` cannot include whitespace.")
         return
     
     # The discord message character limit is 2000.

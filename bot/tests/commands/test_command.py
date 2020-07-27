@@ -167,7 +167,7 @@ def test_help_embed_custom_prefix():
     )(None)
     embed = help_embed("test", prefix="&")
 
-    assert embed.fields[0].name == f"**`&test <one> <two> [three]`**"
+    assert embed.fields[0].name == "**`&test <one> <two> [three]`**"
     assert "A command that uses `<one>`, `<two>`, and `[three]` to do stuff." in embed.fields[0].value
     for example_args in ["one two", "1 2 3", "\"o n e\" two three"]:
         assert f"`&test {example_args}`" in embed.fields[1].value
@@ -225,5 +225,5 @@ def test_general_help_embed_custom_prefix():
     
     embed = general_help_embed(prefix="&")
 
-    assert f"**`&test/&alias <one> <two> [three]`**" in embed.fields[0].value
-    assert f"**`&test2`**" in embed.fields[1].value
+    assert "**`&test/&alias <one> <two> [three]`**" in embed.fields[0].value
+    assert "**`&test2`**" in embed.fields[1].value

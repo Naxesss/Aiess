@@ -33,8 +33,8 @@ async def test_sub():
     assert mock_command.response_embed
     assert mock_command.response_embed.fields
     assert "🔔\u2000Subscribed" in mock_command.response_embed.fields[0].name
-    assert f"type:(nominate or qualify)" in mock_command.response_embed.fields[0].value
-    assert f"`type:nominate or type:qualify`" in mock_command.response_embed.fields[0].value
+    assert "type:(nominate or qualify)" in mock_command.response_embed.fields[0].value
+    assert "`type:nominate or type:qualify`" in mock_command.response_embed.fields[0].value
 
     assert subscriber.cache[0].channel_id == mock_message.channel.id
     assert subscriber.cache[0].filter == mock_command.args[0]
@@ -50,8 +50,8 @@ async def test_sub_markdown_and_quotes():
     assert mock_command.response_embed
     assert mock_command.response_embed.fields
     assert "🔔\u2000Subscribed" in mock_command.response_embed.fields[0].name
-    assert f"user:\"\\_\\_don't underline this\\_\\_\"" in mock_command.response_embed.fields[0].value
-    assert f"`user:\"__don't underline this__\"`" in mock_command.response_embed.fields[0].value
+    assert "user:\"\\_\\_don't underline this\\_\\_\"" in mock_command.response_embed.fields[0].value
+    assert "`user:\"__don't underline this__\"`" in mock_command.response_embed.fields[0].value
 
     assert subscriber.cache[0].channel_id == mock_message.channel.id
     assert subscriber.cache[0].filter == mock_command.args[0]
@@ -79,8 +79,8 @@ async def test_sub_no_arg():
     assert f"`{DEFAULT_PREFIX}sub <filter>`" in mock_command.response  # Should suggest these for if the user intended something else.
     assert f"`{DEFAULT_PREFIX}unsub`" in mock_command.response
     assert "🔔\u2000Current Subscription" in mock_command.response_embed.fields[0].name
-    assert f"type:(nominate or qualify)" in mock_command.response_embed.fields[0].value
-    assert f"`type:nominate or type:qualify`" in mock_command.response_embed.fields[0].value
+    assert "type:(nominate or qualify)" in mock_command.response_embed.fields[0].value
+    assert "`type:nominate or type:qualify`" in mock_command.response_embed.fields[0].value
 
 @pytest.mark.asyncio
 async def test_sub_no_arg_no_sub():
@@ -91,7 +91,7 @@ async def test_sub_no_arg_no_sub():
     assert f"`{DEFAULT_PREFIX}sub <filter>`" in mock_command.response  # Should suggest these for if the user intended something else.
     assert f"`{DEFAULT_PREFIX}unsub`" not in mock_command.response  # Don't need to suggest unsubscribing if we don't have a sub.
     assert "🔔\u2000Current Subscription" in mock_command.response_embed.fields[0].name
-    assert f"None" in mock_command.response_embed.fields[0].value
+    assert "None" in mock_command.response_embed.fields[0].value
 
 @pytest.mark.asyncio
 async def test_sub_parenthesis_inequality():

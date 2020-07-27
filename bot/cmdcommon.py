@@ -52,7 +52,7 @@ async def validate_filter(command: Command, _filter: str):
 
     if not hasattr(command.context.channel, "guild"):
         # Prevents excessive discord rate limiting (5 DMs per second globally).
-        await command.respond_err(f"Cannot subscribe in DM channels.")
+        await command.respond_err("Cannot subscribe in DM channels.")
         return False
     
     return True
