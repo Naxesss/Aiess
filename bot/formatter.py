@@ -82,8 +82,12 @@ def format_link(event: Event) -> str:
     
     if event.newspost:
         return f"https://osu.ppy.sh/home/news/{event.newspost.slug}"
+    
+    if event.user:
+        # E.g. group additions/removals.
+        return f"https://osu.ppy.sh/users/{event.user.id}"
 
-    raise ValueError("Cannot format a link of an event missing a beatmapset or newspost.")
+    raise ValueError("Cannot format a link of an event missing a beatmapset, newspost, and user.")
 
 async def format_embed(event: Event) -> str:
     """Returns an embed which represents the given event."""
