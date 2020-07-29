@@ -7,7 +7,7 @@ from typing import Generator, Callable
 from aiess.web import api
 from aiess.objects import Event
 
-from scraper.requester import get_discussion_events, get_reply_events, get_beatmapset_events, get_news_events
+from scraper.requester import get_discussion_events, get_reply_events, get_beatmapset_events, get_news_events, get_group_events
 from scraper import populator
 
 async def get_all_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
@@ -26,6 +26,12 @@ async def get_news_between(start_time: datetime, end_time: datetime) -> Generato
     """Returns a generator of news events (from /home/news) within the given time frame."""
     # `get_news_events` generates events before a given time, rather than page, hence `generate_by_page=False`.
     for event in __get_event_generations_between(get_news_events, start_time, end_time, generate_by_page=False):
+        yield event
+
+async def get_group_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
+    """Returns a generator of group additions and removal events (from /group) from the given start time.
+    Note that end time does nothing in this case, as group changes are not timestamped."""
+    for event in get_group_events(_from=start_time):
         yield event
 
 async def __get_discussion_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:

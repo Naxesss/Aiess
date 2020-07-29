@@ -10,8 +10,7 @@ from aiess.logger import log, colors, fmt
 from aiess.database import Database, SCRAPER_DB_NAME
 from aiess.reader import merge_concurrent
 
-from scraper.requester import get_group_events
-from scraper.crawler import get_all_events_between, get_news_between
+from scraper.crawler import get_all_events_between, get_news_between, get_group_events_between
 
 init_time_str = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 
@@ -36,7 +35,7 @@ async def gather_news() -> None:
 
 async def gather_group_changes() -> None:
     """Gathers any new newsposts."""
-    await gather(get_group_events, "groups")
+    await gather(get_group_events_between, "groups")
 
 async def gather(async_event_generator, _id: str) -> None:
     """Iterates over new events since the last time, inserts them into the database, and then updates the last time."""
