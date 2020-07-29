@@ -56,7 +56,7 @@ class Reader():
 
     async def __push_all_new_events(self) -> None:
         """Triggers the on_event method for each new event since the last stored datetime for each scope."""
-        await self.__push_new_events(Scope("mapset", lambda event: event.type != types.NEWS and event.type not in [types.ADDED, types.REMOVED]))
+        await self.__push_new_events(Scope("mapset", lambda event: event.type != types.NEWS and event.type not in [types.ADD, types.REMOVE]))
         await self.__push_new_events(Scope("news",   lambda event: event.type == types.NEWS))
         await self.__push_new_events(Scope("groups", lambda event: event.type in [types.ADDED, types.REMOVED]))
 
