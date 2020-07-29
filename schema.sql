@@ -37,6 +37,13 @@ CREATE TABLE `users` (
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+DROP TABLE IF EXISTS `group_users`;
+CREATE TABLE `group_users` (
+  `group_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`group_id`,`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 DROP TABLE IF EXISTS `beatmapsets`;
 CREATE TABLE `beatmapsets` (
   `id` bigint(20) unsigned NOT NULL,
