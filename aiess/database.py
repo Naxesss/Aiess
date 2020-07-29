@@ -1,11 +1,11 @@
 import asyncio
 import mysql.connector
 from mysql.connector.errors import Error, OperationalError
-from typing import List, Generator
+from typing import List, Generator, Tuple
 from enum import Enum
 from datetime import datetime
 
-from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost
+from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost, Usergroup
 from aiess.settings import DB_CONFIG
 from aiess.logger import log
 from aiess.common import anext
@@ -171,6 +171,14 @@ class Database:
             )
         )
         self.__execute("SET FOREIGN_KEY_CHECKS = 1")
+    
+    def delete_group_user(self, group: Usergroup, user: User) -> None:
+        """Deletes the given user to group relation from the group_users table."""
+        self.delete_table_data(
+            table        = "group_users",
+            where        = "group_id=%s AND user_id=%s",
+            where_values = (group.id, user.id)
+        )
 
     def insert_user(self, user: User) -> None:
         """Inserts/updates the given user object into the users table."""
@@ -260,6 +268,18 @@ class Database:
                 image_url   = newspost.image_url
             )
         )
+    
+    def insert_group_user(self, group: Usergroup, user: User) -> None:
+        """Inserts/updates the given user to group relation into the group_users table.
+        Also inserts/updates the associated user (i.e. whoever got added/removed)."""
+        self.insert_user(user)
+        self.insert_table_data(
+            "group_users",
+            dict(
+                group_id = group.id,
+                user_id  = user.id
+            )
+        )
 
     def insert_event(self, event: Event) -> None:
         """Inserts/updates the given event into the events table, along with any other values
@@ -268,6 +288,9 @@ class Database:
         if event.user:       self.insert_user(event.user)
         if event.discussion: self.insert_discussion(event.discussion)
         if event.newspost:   self.insert_newspost(event.newspost)
+        if event.group:
+            if event.type == types.ADD:    self.insert_group_user(event.group, event.user)
+            if event.type == types.REMOVE: self.delete_group_user(event.group, event.user)
         self.insert_table_data(
             "events",
             dict(
@@ -381,6 +404,24 @@ class Database:
 
             yield NewsPost(_id, title, preview, author, slug, image_url)
 
+    def retrieve_group_user(self, where: str, where_values: tuple=None) -> NewsPost:
+        """Returns the first group user relation from the database matching the given WHERE clause,
+        or None if no such group user relation is stored."""
+        return next(self.retrieve_group_users(where + " LIMIT 1", where_values), None)
+
+    def retrieve_group_users(self, where: str, where_values: tuple=None) -> Generator[Tuple[Usergroup, User], None, None]:
+        """Returns a generator of all group user relations from the database matching the given WHERE clause."""
+        fetched_rows = self.retrieve_table_data(
+            table        = "group_users",
+            where        = where,
+            where_values = where_values,
+            selection    = "group_id, user_id"
+        )
+        for row in (fetched_rows or []):
+            group     = Usergroup(row[0])
+            user      = self.retrieve_user("id=%s", (row[1],))
+            yield (group, user)
+
     async def retrieve_event(self, where: str, where_values: tuple=None) -> Event:
         """Returns the first event from the database matching the given WHERE clause, or None if no such event is stored."""
         return await anext(self.retrieve_events(where + " LIMIT 1", where_values), None)
@@ -391,7 +432,7 @@ class Database:
             table        = "events",
             where        = where,
             where_values = where_values,
-            selection    = "type, time, beatmapset_id, discussion_id, user_id, news_id, content"
+            selection    = "type, time, beatmapset_id, discussion_id, user_id, group_id, news_id, content"
         )
         for row in (fetched_rows or []):
             await asyncio.sleep(0)  # Return control back to the event loop, granting other tasks a window to start/resume.
@@ -400,6 +441,7 @@ class Database:
             beatmapset = self.retrieve_beatmapset("id=%s", (row[2],)) if row[2] else None
             discussion = self.retrieve_discussion("id=%s", (row[3],)) if row[3] else None
             user       = self.retrieve_user("id=%s", (row[4],)) if row[4] else None
-            newspost   = self.retrieve_newspost("id=%s", (row[5],)) if row[5] else None
-            content    = row[6]
-            yield Event(_type, time, beatmapset, discussion, user, newspost=newspost, content=content)
+            group      = Usergroup(row[5]) if row[5] else None
+            newspost   = self.retrieve_newspost("id=%s", (row[6],)) if row[6] else None
+            content    = row[7]
+            yield Event(_type, time, beatmapset, discussion, user, group, newspost, content=content)
