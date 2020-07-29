@@ -9,6 +9,7 @@ from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost, Usergro
 from aiess.settings import DB_CONFIG
 from aiess.logger import log
 from aiess.common import anext
+from aiess import event_types as types
 
 SCRAPER_DB_NAME      = "aiess"
 SCRAPER_TEST_DB_NAME = "aiess_test"
@@ -300,6 +301,7 @@ class Database:
                 beatmapset_id = event.beatmapset.id if event.beatmapset is not None else None,
                 discussion_id = event.discussion.id if event.discussion is not None else None,
                 user_id       = event.user.id if event.user is not None else None,
+                group_id      = event.group.id if event.group is not None else None,
                 news_id       = event.newspost.id if event.newspost is not None else None,
                 content       = event.content if event.content is not None else None
             )
