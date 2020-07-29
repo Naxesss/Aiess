@@ -16,7 +16,7 @@ from aiess.timestamp import to_string
 from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
 from scraper.parsers.discussion_event_parser import discussion_event_parser
 from scraper.parsers.discussion_parser import discussion_parser
-from scraper.parsers import news_parser
+from scraper.parsers import news_parser, group_parser
 
 def request_page(url: str) -> Response:
     """Requests a response object using the page rate limit.
@@ -73,6 +73,10 @@ def request_news(_from: datetime, limit: int=20) -> BeautifulSoup:
     # The `id` attribute doesn't seem to matter.
     return request_soup(f"https://osu.ppy.sh/home/news?cursor[id]=0&cursor[published_at]={to_string(_from)}&limit={limit}")
 
+def request_group_page(group_id: int) -> BeautifulSoup:
+    """Requests the group page of the given group id as a BeautifulSoup object."""
+    return request_soup(f"https://osu.ppy.sh/groups/{group_id}")
+
 
 
 def get_beatmapset_events(page: int=1, limit: int=50) -> Generator[Event, None, None]:
@@ -90,6 +94,11 @@ def get_reply_events(page: int=1, limit: int=50) -> Generator[Event, None, None]
 def get_news_events(_from: datetime, limit: int=20) -> Generator[Event, None, None]:
     """Returns a generator of Event objects from the news home page. Newer events are yielded first."""
     return news_parser.parse(request_news(_from, limit))
+
+def get_group_events(_from: datetime) -> Generator[Event, None, None]:
+    """Returns a generator of group addition and removal Event objects from all group pages."""
+    for group_id in [4, 7, 11, 16, 22, 28, 32]:
+        yield from group_parser.parse(group_id=group_id, group_page=request_group_page(group_id), last_checked_at=_from)
 
 
 
