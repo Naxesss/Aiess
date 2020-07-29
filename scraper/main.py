@@ -10,6 +10,7 @@ from aiess.logger import log, colors, fmt
 from aiess.database import Database, SCRAPER_DB_NAME
 from aiess.reader import merge_concurrent
 
+from scraper.requester import get_group_events
 from scraper.crawler import get_all_events_between, get_news_between
 
 init_time_str = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
@@ -21,6 +22,9 @@ async def gather_loop() -> None:
         # We only need to check newsposts between exact hours, as this is when they're posted.
         if timestamp.get_last(_id="news").hour != datetime.utcnow().hour:
             await gather_news()
+        # Group changes happen very rarely compared to other events, but people tend to want these updates quickly.
+        if (timestamp.get_last(_id="groups") - datetime.utcnow()).total_seconds > 600:
+            await gather_group_changes()
 
 async def gather_new_events() -> None:
     """Gathers any new beatmapset/discussion/reply events."""
@@ -29,6 +33,10 @@ async def gather_new_events() -> None:
 async def gather_news() -> None:
     """Gathers any new newsposts."""
     await gather(get_news_between, "news")
+
+async def gather_group_changes() -> None:
+    """Gathers any new newsposts."""
+    await gather(get_group_events, "groups")
 
 async def gather(async_event_generator, _id: str) -> None:
     """Iterates over new events since the last time, inserts them into the database, and then updates the last time."""
