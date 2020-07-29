@@ -2,9 +2,10 @@ import sys
 sys.path.append('..')
 
 from typing import Union, Dict, List, Generator, Callable, Tuple
+from collections import OrderedDict
 import re
 
-from aiess import Event, User, Beatmapset, Discussion, NewsPost
+from aiess import Event, User, Beatmapset, Discussion, NewsPost, Usergroup
 from aiess import event_types as types
 
 from bot.logic import expand, split_unescaped, extract_not
@@ -37,7 +38,10 @@ TYPE_ALIASES: Dict[str, List[str]] = {
     types.KUDOSU_DENY:  ["kudosu deny",  "kudosu denied"],
     types.KUDOSU_ALLOW: ["kudosu allow", "kudosu allowed"],
 
-    types.NEWS:         ["newspost", "newsposts", "news post", "news posts"]
+    types.NEWS:         ["newspost", "newsposts", "news post", "news posts"],
+
+    types.ADD:          ["added", "promote", "promoted"],
+    types.REMOVE:       ["removed", "demote", "demoted"]
 }
 
 def get_all_type_aliases() -> List[str]:
@@ -54,6 +58,35 @@ def get_type_aliases(key: str) -> List[str]:
     # Accept "-" and "_" as substitutions of whitespace.
     VALID_TYPES.extend(alias.replace(" ", "-") for alias in TYPE_ALIASES[key])
     VALID_TYPES.extend(alias.replace(" ", "_") for alias in TYPE_ALIASES[key])
+    return VALID_TYPES
+
+# Includes both full and probationary bns.
+BN_ALIASES = ["bn", "bns", "bng", "nominators", "beatmap nominators"]
+GROUP_ALIASES: Dict[str, List[str]] = {
+    "4": ["gmt", "gmts", "global moderators", "global moderation team"],
+    "7": ["nat", "nats", "nomination assessment", "nomination assessment team"],
+    "11": ["dev", "devs", "developers"],
+    "16": ["alu", "alumni", "alumnis"],
+    "22": ["sup", "support", "support team"],
+    # Exclusively full/probo bns:
+    "28": BN_ALIASES + ["full", "full bn", "full bns", "full beatmap nominators"],
+    "32": BN_ALIASES + ["probo", "probo bn", "probo bns", "probation", "probation bn", "probation bns", "probationary beatmap nominators"]
+}
+
+def get_all_group_aliases() -> List[str]:
+    VALID_TYPES = [key for key in GROUP_ALIASES]
+    VALID_TYPES.extend(alias for aliases in GROUP_ALIASES.values() for alias in aliases)
+    # Accept "-" and "_" as substitutions of whitespace.
+    VALID_TYPES.extend(alias.replace(" ", "-") for aliases in GROUP_ALIASES.values() for alias in aliases)
+    VALID_TYPES.extend(alias.replace(" ", "_") for aliases in GROUP_ALIASES.values() for alias in aliases)
+    return VALID_TYPES
+
+def get_group_aliases(key: str) -> List[str]:
+    VALID_TYPES = [key] + GROUP_ALIASES[key]
+    VALID_TYPES.extend(alias for alias in GROUP_ALIASES[key])
+    # Accept "-" and "_" as substitutions of whitespace.
+    VALID_TYPES.extend(alias.replace(" ", "-") for alias in GROUP_ALIASES[key])
+    VALID_TYPES.extend(alias.replace(" ", "_") for alias in GROUP_ALIASES[key])
     return VALID_TYPES
 
 def escape(obj: str) -> str:
@@ -176,6 +209,27 @@ TAGS: Dict[List[str], Tag] = {
         VALIDATION_ANY, sql_format="discussion.content LIKE %s",
         example_values=["nice", "\"very cool\""]
     ),
+    # Group tags:
+    ("group",) : Tag(
+        # TODO: Have this be the case
+        "The name of the group a user was added to or removed from (e.g. \"bns\" for both full and probo BNs).",
+        lambda obj: (
+            [escape(str(obj.group.id))] +
+            ([escape(alias) for alias in get_group_aliases(str(obj.group.id))] if str(obj.group.id) in GROUP_ALIASES else [])
+        ) if isinstance(obj, Event) and obj.group else None,
+        Validation(
+            # Ignore group ids, only show distinct aliases (full bn and probo bn have some identical ones).
+            "\u2000".join(list(OrderedDict.fromkeys(f"`{alias}`" for aliases in GROUP_ALIASES.values() for alias in aliases))),
+            lambda value: value in get_all_group_aliases()
+        ), sql_format="group_id=%s",  # `GROUP_ALIASES` has the group id as key, so this should work.
+        example_values=["bns", "nat", "gmt", "devs"]
+    ),
+    ("group-id",) : Tag(
+        "The id of the group a user was added to or removed from (e.g. \"7\" for BAT/QAT/NAT).",
+        lambda obj: [escape(obj.group.id)] if isinstance(obj, Event) and obj.group else None,
+        VALIDATION_IDS, sql_format="group_id=%s",
+        example_values=["4", "7", "28", "32"]
+    ),
     # NewsPost tags:
     ("news-title",) : Tag(
         "The title of the newspost (e.g. \"%featured artist%\" for FA news).",
@@ -233,6 +287,7 @@ def dissect(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
         if obj.discussion: dissections.extend(dissect(obj.discussion))
         if obj.beatmapset: dissections.extend(dissect(obj.beatmapset))
         if obj.newspost:   dissections.extend(dissect(obj.newspost))
+        if obj.group:      dissections.extend(dissect(obj.group))
 
     # Lowercase everything for ease-of-access when filtering.
     return list(map(lambda dissection: dissection.lower(), dissections))
@@ -364,6 +419,12 @@ def filter_to_sql(_filter: str) -> (str, tuple):
             for _type in TYPE_ALIASES:
                 if value.lower() in TYPE_ALIASES[_type]:
                     value = _type
+        
+        # Support group aliases (e.g. "nat" should be converted to "7").
+        if key.lower() == "group":
+            for group in GROUP_ALIASES:
+                if value.lower() in GROUP_ALIASES[group]:
+                    value = group
 
         converted_words.append(tag.sql_format)
         converted_values.append(value)
