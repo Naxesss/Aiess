@@ -376,7 +376,6 @@ class Database:
                 beatmapset = self.retrieve_beatmapset("id=%s", (row[1],))
             user    = self.retrieve_user("id=%s", (row[2],))
             content = row[3]
-
             yield Discussion(_id, beatmapset, user, content)
     
     def retrieve_newspost(self, where: str, where_values: tuple=None) -> NewsPost:
@@ -386,7 +385,7 @@ class Database:
     def retrieve_newsposts(self, where: str, where_values: tuple=None) -> Generator[NewsPost, None, None]:
         """Returns a generator of all newsposts from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
-            table        = "newsposts", 
+            table        = "newsposts",
             where        = where,
             where_values = where_values,
             selection    = "id, title, preview, author_id, author_name, slug, image_url"
@@ -401,7 +400,6 @@ class Database:
                 author = User(_id=None, name=author_name)
             slug        = row[5]
             image_url   = row[6]
-
             yield NewsPost(_id, title, preview, author, slug, image_url)
 
     def retrieve_group_user(self, where: str, where_values: tuple=None) -> NewsPost:
