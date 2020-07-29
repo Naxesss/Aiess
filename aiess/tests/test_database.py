@@ -2,7 +2,7 @@ import pytest
 from mysql.connector.errors import ProgrammingError
 from datetime import datetime
 
-from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost
+from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost, Usergroup
 from aiess.database import Database, SCRAPER_TEST_DB_NAME
 from aiess.common import anext
 
@@ -15,6 +15,7 @@ def test_database():
     database.clear_table_data("beatmapsets")
     database.clear_table_data("beatmapset_modes")
     database.clear_table_data("newsposts")
+    database.clear_table_data("group_users")
     database.clear_table_data("users")
 
     return database
@@ -25,6 +26,7 @@ def test_correct_setup(test_database):
     assert not test_database.retrieve_table_data("beatmapsets")
     assert not test_database.retrieve_table_data("beatmapset_modes")
     assert not test_database.retrieve_table_data("newsposts")
+    assert not test_database.retrieve_table_data("group_users")
     assert not test_database.retrieve_table_data("users")
 
 def test_insert_delete(test_database):
@@ -206,6 +208,20 @@ def test_insert_retrieve_newspost(test_database):
     assert retrieved_newspost.image_url == newspost.image_url
     assert retrieved_newspost == newspost
 
+def test_insert_retrieve_delete_group_user(test_database):
+    user = User(1, name="test")
+    test_database.insert_group_user(group=Usergroup(4), user=user)
+
+    retrieved_group, retrieved_user = test_database.retrieve_group_user(where="group_id=%s AND user_id=%s", where_values=(4, 1))
+    assert retrieved_group.id == 4
+    assert retrieved_user.id == 1
+    assert retrieved_user.name == "test"
+
+    test_database.delete_group_user(group=Usergroup(4), user=user)
+
+    retrieved_group_user_relation = test_database.retrieve_group_user(where="group_id=%s AND user_id=%s", where_values=(4, 1))
+    assert retrieved_group_user_relation is None
+
 def test_insert_retrieve_multiple_users(test_database):
     user1 = User(1, name="test")
     user2 = User(2, name="test")
@@ -253,6 +269,23 @@ def test_insert_retrieve_multiple_newsposts(test_database):
     retrieved_newsposts = test_database.retrieve_newsposts(where="author_id=%s", where_values=(author.id,))
     assert next(retrieved_newsposts, None) == newspost1
     assert next(retrieved_newsposts, None) == newspost2
+
+def test_insert_retrieve_multiple_group_users(test_database):
+    user = User(1, name="test")
+    test_database.insert_group_user(group=Usergroup(4), user=user)
+    test_database.insert_group_user(group=Usergroup(4), user=User(2, name="test2"))
+    test_database.insert_group_user(group=Usergroup(7), user=user)
+
+    retrieved_group_user_relations = test_database.retrieve_group_users(where="user_id=%s", where_values=(1,))
+    retrieved_groups = []
+    retrieved_users = []
+    for retrieved_group, retrieved_user in retrieved_group_user_relations:
+        retrieved_groups.append(retrieved_group)
+        retrieved_users.append(retrieved_user)
+    
+    assert Usergroup(4) in retrieved_groups
+    assert Usergroup(7) in retrieved_groups
+    assert retrieved_users == [user, user]
 
 @pytest.mark.asyncio
 async def test_insert_retrieve_multiple_events(test_database):
