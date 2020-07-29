@@ -33,6 +33,7 @@ def test_get_news_events():
     
     event_n = 0
     for event in events:
+        assert event.type == types.NEWS
         assert event.newspost
         event_n += 1
     
@@ -64,6 +65,7 @@ def test_get_reply_events():
     
     event_n = 0
     for event in events:
+        assert event.type == types.REPLY
         assert event.user
         assert event.beatmapset
         assert event.discussion
