@@ -22,7 +22,7 @@ async def gather_loop() -> None:
         if timestamp.get_last(_id="news").hour != datetime.utcnow().hour:
             await gather_news()
         # Group changes happen very rarely compared to other events, but people tend to want these updates quickly.
-        if (timestamp.get_last(_id="groups") - datetime.utcnow()).total_seconds > 600:
+        if (datetime.utcnow() - timestamp.get_last(_id="groups")).total_seconds() > 300:
             await gather_group_changes()
 
 async def gather_new_events() -> None:
