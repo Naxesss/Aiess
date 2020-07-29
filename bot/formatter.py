@@ -129,24 +129,27 @@ def format_field_name(event: Event) -> str:
 
 async def format_field_value(event: Event) -> str:
     """Returns the embed contents of the given event (i.e. the \"artist - title, mapped by creator [modes]\" part)."""
+    if event.beatmapset:
+        artist_title_str = escape_markdown(f"{event.beatmapset.artist} - {event.beatmapset.title}")
+        creator_str = escape_markdown(event.beatmapset.creator)
+
+        beatmap_str = f"[**{artist_title_str}**](https://osu.ppy.sh/beatmapsets/{event.beatmapset.id})"
+        mapped_by_str = f"Mapped by [{creator_str}](https://osu.ppy.sh/users/{event.beatmapset.creator.id})"
+        mode_str = event.beatmapset.mode_str().replace("[", "[**").replace("]", "**]")
+
+        result = f"{beatmap_str}\n{mapped_by_str} {mode_str}"
+
+        if type_props[event.type].show_history:
+            # Give how much room the function has to work with, allowing it to smartly shorten/truncate if needed.
+            # This is to account for the embed field value character limit of 1024.
+            result += await format_history(event.beatmapset, length_limit=1024-len(result))
+
+        return result
+
     if event.newspost:
         return event.newspost.preview
-
-    artist_title_str = escape_markdown(f"{event.beatmapset.artist} - {event.beatmapset.title}")
-    creator_str = escape_markdown(event.beatmapset.creator)
-
-    beatmap_str = f"[**{artist_title_str}**](https://osu.ppy.sh/beatmapsets/{event.beatmapset.id})"
-    mapped_by_str = f"Mapped by [{creator_str}](https://osu.ppy.sh/users/{event.beatmapset.creator.id})"
-    mode_str = event.beatmapset.mode_str().replace("[", "[**").replace("]", "**]")
-
-    result = f"{beatmap_str}\n{mapped_by_str} {mode_str}"
-
-    if type_props[event.type].show_history:
-        # Give how much room the function has to work with, allowing it to smartly shorten/truncate if needed.
-        # This is to account for the embed field value character limit of 1024.
-        result += await format_history(event.beatmapset, length_limit=1024-len(result))
-
-    return result
+    
+    raise ValueError("Cannot format a field value of an event missing a beatmapset, newspost, and group.")
 
 def format_footer_text(event: Event, database: Database=None) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
