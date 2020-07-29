@@ -73,9 +73,11 @@ def format_link(event: Event) -> str:
     """Returns a link which leads to the source of the given event
     (e.g. the discussion of a suggestion, or the beatmapset of a nomination)."""
     if event.discussion and event.discussion.beatmapset:
+        # E.g. suggestions, problems, hypes, etc.
         return f"https://osu.ppy.sh/beatmapsets/{event.discussion.beatmapset.id}/discussion#/{event.discussion.id}"
     
     if event.beatmapset:
+        # E.g. nominations, qualifications, ranks, etc.
         return f"https://osu.ppy.sh/beatmapsets/{event.beatmapset.id}"
     
     if event.newspost:
