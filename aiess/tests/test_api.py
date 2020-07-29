@@ -37,17 +37,17 @@ def test_timing():
     time = datetime.utcnow()
     api.request_beatmapset(1)
     api.request_user(2)
-    deltaTime = datetime.utcnow() - time
+    delta_time = datetime.utcnow() - time
 
-    assert deltaTime.total_seconds() > 1
+    assert delta_time.total_seconds() > 1
 
     # Cached, can simply be read from a dictionary, should be pretty much instant.
     time = datetime.utcnow()
     api.request_beatmapset(1)
     api.request_user(2)
-    deltaTime = datetime.utcnow() - time
+    delta_time = datetime.utcnow() - time
 
-    assert deltaTime.total_seconds() < 0.01
+    assert delta_time.total_seconds() < 0.01
 
 def test_request_beatmapset():
     beatmapset_response = api.request_beatmapset(1)
