@@ -34,6 +34,8 @@ colour_discussion = Colour.from_rgb(65,  65,  65 )
 colour_resolve    = Colour.from_rgb(100, 200, 100)
 colour_reopen     = Colour.from_rgb(255, 160, 70 )
 colour_news       = Colour.from_rgb(255, 160, 200)
+colour_added      = Colour.from_rgb(130, 235, 125)
+colour_removed    = Colour.from_rgb(200, 160, 230)
 
 type_props = {
     types.RANK:               TypeProps(":sparkling_heart:",    "Ranked",           colour_ranked,      show_history=True),
@@ -66,7 +68,10 @@ type_props = {
     types.REPLY_RESTORE:      TypeProps(":wrench:",             "Reply Restored",   colour_discussion,  show_context=True),
 
     # Unlike other events, the embed title of news is simply the news title.
-    types.NEWS:               TypeProps(None,                   None,               colour_news)
+    types.NEWS:               TypeProps(None,                   None,               colour_news),
+
+    types.ADD:                TypeProps(":performing_arts:",    "Added",            colour_added),
+    types.REMOVE:             TypeProps(":performing_arts:",    "Removed",          colour_removed)
 }
 
 def format_link(event: Event) -> str:
@@ -125,6 +130,9 @@ def format_field_name(event: Event) -> str:
     else:
         title = f"{type_props[event.type].emoji}\u2000{type_props[event.type].title}"
     
+    if event.group:
+        return f"{title} (less than {format_timeago(event.time)})"
+
     return f"{title} ({format_timeago(event.time)})"
 
 async def format_field_value(event: Event) -> str:
@@ -149,6 +157,13 @@ async def format_field_value(event: Event) -> str:
     if event.newspost:
         return event.newspost.preview
     
+    if event.group:
+        added_to_or_removed_from = "added to" if event.type == types.ADD else "removed from"
+        return (
+            f"[{escape_markdown(event.user)}](https://osu.ppy.sh/users/{event.user.id}) has been {added_to_or_removed_from} the\r\n" +
+            f"[**{event.group.name}**](https://osu.ppy.sh/groups/{event.group.id})!"
+        )
+    
     raise ValueError("Cannot format a field value of an event missing a beatmapset, newspost, and group.")
 
 def format_footer_text(event: Event, database: Database=None) -> str:
@@ -157,7 +172,8 @@ def format_footer_text(event: Event, database: Database=None) -> str:
     if event.newspost:
         return event.newspost.author.name
 
-    if not event.user:
+    if event.group or not event.user:
+        # Group events already show the user involved in the field value and thumbnail.
         return Embed.Empty
 
     if event.content:
@@ -186,7 +202,7 @@ def format_preview(content: str, length: int=60, split_newline: bool=True) -> st
 def format_footer_icon_url(event: Event) -> str:
     """Returns the footer icon url of the event (i.e. the image url of the user's avatar),
     if there's a user associated with the event, otherwise None."""
-    if event.user:
+    if event.user and not event.group:
         if event.user.id:
             return f"https://a.ppy.sh/{event.user.id}"
         else:
@@ -203,6 +219,10 @@ def format_thumbnail_url(event: Event) -> str:
     """Returns the thumbnail url for the event (e.g. beatmapset thumbnail), if applicable, else None."""
     if event.beatmapset:
         return f"https://b.ppy.sh/thumb/{event.beatmapset.id}l.jpg"
+    
+    if event.group:
+        return f"https://a.ppy.sh/{event.user.id}"
+    
     return Embed.Empty
 
 def format_image_url(event: Event) -> str:
