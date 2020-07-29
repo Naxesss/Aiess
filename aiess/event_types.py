@@ -29,3 +29,6 @@ REPLY_DELETE = "discussion_post_delete"
 REPLY_RESTORE = "discussion_post_restore"
 
 NEWS = "news"
+
+ADD = "add"
+REMOVE = "remove"
