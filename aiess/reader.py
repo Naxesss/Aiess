@@ -97,8 +97,10 @@ def merge_concurrent(events: Iterable[Event]) -> List[Event]:
     # `dict.fromkeys` removes duplicates in the db, as keys in a dictonary are unique. We essentially merge same events.
     # This is copied such that any modification we make to this list won't affect the original references.
     new_events = list(dict.fromkeys(copy.deepcopy(list(events))))
+    merged_events = []
 
-    for event, other_event in itertools.permutations(new_events, 2):
+    # `reversed(new_events)` is to go through events closer to each other first.
+    for event, other_event in itertools.permutations(reversed(new_events), 2):
         # The system event is rarely 1 second late, hence the leniency.
         if abs((event.time - other_event.time).total_seconds()) > 1:
             continue
@@ -107,10 +109,16 @@ def merge_concurrent(events: Iterable[Event]) -> List[Event]:
             continue
 
         if (event.type, other_event.type) in MERGABLE_TYPES:
-            # Former event has all properties the second does and more,
-            # and is represented better having the type of the latter.
-            event.type = other_event.type
+            if event in merged_events or other_event in merged_events:
+                # This would result in lost information (e.g. overriding a user attribute).
+                continue
+
+            # Ensure that we have not already merged this event (e.g. nominate 1s <- nominate 0s <- qualify 0s).
             if other_event in new_events:
+                # Former event has all properties the second does and more,
+                # and is represented better having the type of the latter.
+                event.type = other_event.type
+                merged_events.append(event)
                 new_events.remove(other_event)
 
     return new_events

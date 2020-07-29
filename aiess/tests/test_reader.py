@@ -205,3 +205,16 @@ def test_merge_concurrent_duplicates():
     assert len(merged_events) == 1
     assert merged_events[0].type == qual_event1.type
     assert merged_events[0].user == nom_event1.user
+
+def test_merge_concurrent_same_time_nominates():
+    # Should pick the last event in the list before the qualify as the new qualify event, so the one by sometwo in this case.
+    nom_event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 05:00:00"), user=User(1, "someone"))
+    nom_event2 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 05:00:00"), user=User(2, "sometwo"))
+    qual_event1 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 05:00:00"))
+
+    merged_events = merge_concurrent([nom_event1, nom_event2, qual_event1])
+    assert len(merged_events) == 2
+    assert merged_events[0].type == nom_event1.type
+    assert merged_events[0].user == nom_event1.user
+    assert merged_events[1].type == qual_event1.type
+    assert merged_events[1].user == nom_event2.user
