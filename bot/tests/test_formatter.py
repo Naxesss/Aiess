@@ -7,7 +7,7 @@ from discord import Embed
 from datetime import timedelta
 from datetime import datetime
 
-from aiess import Event, User, Beatmapset, Discussion, NewsPost
+from aiess import Event, User, Beatmapset, Discussion, NewsPost, Usergroup
 from aiess.timestamp import from_string
 from aiess.database import SCRAPER_TEST_DB_NAME
 
@@ -66,6 +66,10 @@ def newspost_event():
     return event
 
 @pytest.fixture
+def group_event():
+    return Event("add", from_string("2020-07-24 20:00:00"), user=User(2, "sometwo"), group=Usergroup(32))
+
+@pytest.fixture
 def test_database():
     database = Database(SCRAPER_TEST_DB_NAME)
     database.clear_table_data("events")
@@ -88,6 +92,9 @@ def test_format_link_no_beatmapset():
 
 def test_format_link_newspost(newspost_event):
     assert format_link(newspost_event) == "https://osu.ppy.sh/home/news/slug"
+
+def test_format_link_group_event(group_event):
+    assert format_link(group_event) == "https://osu.ppy.sh/users/2"
 
 
 
@@ -138,6 +145,10 @@ def test_format_field_name_newspost(newspost_event):
     assert format_field_name(newspost_event).startswith("title (**")
     assert format_field_name(newspost_event).endswith("** ago)")
 
+def test_format_field_name_group_event(group_event):
+    assert format_field_name(group_event).startswith(":performing_arts:\u2000Added (less than **")
+    assert format_field_name(group_event).endswith("** ago)")
+
 @pytest.mark.asyncio
 async def test_format_field_value(suggestion_event):
     assert (
@@ -150,11 +161,27 @@ async def test_format_field_value_newspost(newspost_event):
     assert await format_field_value(newspost_event) == "quite long preview" * 10
 
 @pytest.mark.asyncio
+async def test_format_field_value(group_event):
+    assert (
+        await format_field_value(group_event) ==
+        "[sometwo](https://osu.ppy.sh/users/2) has been added to the\n" +
+        "[**Beatmap Nominators (Probationary)**](https://osu.ppy.sh/groups/32)!"
+    )
+
+@pytest.mark.asyncio
 async def test_format_field_value_markdown(qualify_event):
     assert (
         await format_field_value(qualify_event) ==
         "[**artist\\_with\\*strange\\~symbols\\` - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [\\_sometwo\\_](https://osu.ppy.sh/users/2) [**osu**]"
     )
+
+@pytest.mark.asyncio
+async def test_format_field_value_faulty():
+    event = Event(_type="test", time=from_string("2020-01-01 00:00:00"))
+    with pytest.raises(ValueError) as err:
+        await format_field_value(event)
+    
+    assert "cannot format a field value of an event" in str(err).lower()
 
 def test_format_footer_text(suggestion_event):
     assert format_footer_text(suggestion_event) == "someone \"hi\""
@@ -181,6 +208,10 @@ def test_format_footer_text_kudosu_denied(kudosu_gain_event):
     kudosu_gain_event.type = "kudosu-deny"
     kudosu_gain_event.user = None
     assert format_footer_text(kudosu_gain_event) == Embed.Empty
+
+def test_format_footer_text_group_event(group_event):
+    # Group events already include the user in the field value.
+    assert format_footer_text(group_event) == Embed.Empty
 
 def test_format_preview_empty_no_surrounding_quotes():
     assert format_preview("") == ""
@@ -217,6 +248,9 @@ def test_format_footer_icon_url_news_freetext(newspost_event):
 
 def test_format_thumbnail_url(suggestion_event):
     assert format_thumbnail_url(suggestion_event) == "https://b.ppy.sh/thumb/3l.jpg"
+
+def test_format_thumbnail_url_group_event(group_event):
+    assert format_thumbnail_url(group_event) == "https://a.ppy.sh/2"
 
 def test_format_thumbnail_url_non_applicable(newspost_event):
     assert format_thumbnail_url(newspost_event) == Embed.Empty
