@@ -14,3 +14,6 @@ PAGE_RATE_LIMIT = settings["page-rate-limit"]
 # STORAGE
 ROOT_PATH = settings["root-path"]
 DB_CONFIG = settings["db-config"]
+
+# 3RD PARTY
+BNSITE_MONGODB_URI = settings["bnsite-mongodb-uri"]

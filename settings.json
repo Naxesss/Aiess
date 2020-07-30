@@ -11,5 +11,6 @@
         "database": "aiess",
         "user": "root",
         "password": "${DB_PASSWORD}"
-    }
+    },
+    "bnsite-mongodb-uri": "${BNSITE_MONGODB_URI}"
 }
