@@ -160,7 +160,7 @@ async def format_field_value(event: Event) -> str:
     if event.group:
         added_to_or_removed_from = "added to" if event.type == types.ADD else "removed from"
         return (
-            f"[{escape_markdown(event.user)}](https://osu.ppy.sh/users/{event.user.id}) has been {added_to_or_removed_from} the\r\n" +
+            f"[{escape_markdown(event.user)}](https://osu.ppy.sh/users/{event.user.id}) has been {added_to_or_removed_from} the\n" +
             f"[**{event.group.name}**](https://osu.ppy.sh/groups/{event.group.id})!"
         )
     
