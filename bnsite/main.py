@@ -18,8 +18,6 @@ EXPECTED_TYPES = [
 ]
 
 class Reader(aiess.Reader):
-    client: Client = None
-    
     async def on_event(self, event: Event):
         log(event, postfix=self.reader_id)
         if event.type in EXPECTED_TYPES:
