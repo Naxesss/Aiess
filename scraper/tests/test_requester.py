@@ -47,7 +47,7 @@ def test_get_beatmapset_events():
         assert event.beatmapset
         event_n += 1
     
-    assert event_n >= 48  # Leniency in case a beatmapset was deleted.
+    assert event_n >= 45  # Leniency in case a beatmapset was deleted.
 
 def test_get_discussion_events():
     events = get_discussion_events(page=1, limit=50)
@@ -58,7 +58,7 @@ def test_get_discussion_events():
         assert event.discussion
         event_n += 1
     
-    assert event_n >= 48  # Leniency in case a discussion was deleted.
+    assert event_n >= 45  # Leniency in case a discussion was deleted.
 
 def test_get_reply_events():
     events = get_reply_events(page=1, limit=50)
@@ -71,4 +71,4 @@ def test_get_reply_events():
         assert event.discussion
         event_n += 1
     
-    assert event_n >= 48  # Leniency in case a reply was deleted.
+    assert event_n >= 45  # Leniency in case a reply was deleted.
