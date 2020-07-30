@@ -86,6 +86,18 @@ async def test_insert_retrieve_event_with_newspost(test_database):
     assert retrieved_event == event
 
 @pytest.mark.asyncio
+async def test_insert_retrieve_event_group_change(test_database):
+    event = Event(_type="add", time=datetime.utcnow(), user=User(2, name="sometwo"), group=Usergroup(7))
+    test_database.insert_event(event)
+
+    retrieved_event = await test_database.retrieve_event("type=%s", ("add",))
+    assert retrieved_event.type == event.type
+    assert retrieved_event.time == event.time
+    assert retrieved_event.group == event.group
+    assert retrieved_event.user == event.user
+    assert retrieved_event == event
+
+@pytest.mark.asyncio
 async def test_insert_retrieve_small_event(test_database):
     event = Event(_type="test", time=datetime.utcnow())
     test_database.insert_event(event)
