@@ -1,6 +1,7 @@
 import sys
 sys.path.append('..')
 
+import aiess
 from aiess.reader import Reader
 from aiess.database import SCRAPER_DB_NAME
 from aiess.logger import log
