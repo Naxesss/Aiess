@@ -29,9 +29,10 @@ async def get_news_between(start_time: datetime, end_time: datetime) -> Generato
         yield event
 
 async def get_group_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
-    """Returns a generator of group additions and removal events (from /group) from the given start time.
-    Note that end time does nothing in this case, as group changes are not timestamped."""
-    for event in get_group_events(_from=start_time):
+    """Returns a generator of group additions and removal events (from /group) from the given prev end time.
+    Note that start time does nothing in this case, as group changes are not timestamped, and as such have no
+    time limit for latest event possible."""
+    for event in get_group_events(_from=end_time):
         yield event
 
 async def __get_discussion_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
