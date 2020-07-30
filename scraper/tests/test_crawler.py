@@ -5,6 +5,7 @@ import pytest
 from unittest import mock
 import json
 
+from aiess import Event, User, Usergroup
 from aiess.common import anext
 from aiess.timestamp import from_string
 
@@ -15,6 +16,7 @@ from scraper.tests.mocks.requester import get_news_events
 from scraper.tests.mocks.discussion_jsons.crawler_json import JSON as mock_discussion_json
 
 from scraper.crawler import get_news_between
+from scraper.crawler import get_group_events_between
 from scraper.crawler import __get_discussion_events_between
 from scraper.crawler import __get_reply_events_between
 from scraper.crawler import __get_beatmapset_events_between
@@ -50,6 +52,30 @@ async def test_get_news_between_far_back():
         event1 = await anext(generator, None)  # This is the part where no more newsposts generate.
 
     assert event2 is not None
+    assert event1 is None
+
+@pytest.mark.asyncio
+async def test_get_group_events_between():
+    group_events = [
+        Event(_type="add", time=from_string("2020-01-01 00:00:00"), user=User(1, "someone"), group=Usergroup(4)),
+        Event(_type="add", time=from_string("2020-01-01 00:00:00"), user=User(2, "sometwo"), group=Usergroup(7)),
+        Event(_type="remove", time=from_string("2020-01-01 00:00:00"), user=User(1, "someone"), group=Usergroup(4))
+    ]
+    with mock.patch("scraper.crawler.get_group_events", return_value=group_events) as mock_get_group_events:
+        generator = get_group_events_between(start_time=from_string("2020-01-01 03:00:00"), end_time=from_string("2020-01-01 00:00:00"))
+        event4 = await anext(generator, None)
+        event3 = await anext(generator, None)
+        event2 = await anext(generator, None)
+        event1 = await anext(generator, None)
+
+        mock_get_group_events.assert_called_with(_from=from_string("2020-01-01 00:00:00"))
+
+    assert event4.user.name == "someone"
+    assert event4.type == "add"
+    assert event3.user.name == "sometwo"
+    assert event3.type == "add"
+    assert event2.user.name == "someone"
+    assert event2.type == "remove"
     assert event1 is None
 
 @pytest.mark.asyncio
