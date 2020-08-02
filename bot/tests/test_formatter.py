@@ -146,7 +146,7 @@ def test_format_field_name_newspost(newspost_event):
     assert format_field_name(newspost_event).endswith("** ago)")
 
 def test_format_field_name_group_event(group_event):
-    assert format_field_name(group_event).startswith(":performing_arts:\u2000Added (less than **")
+    assert format_field_name(group_event).startswith(":performing_arts:\u2000Added (< **")
     assert format_field_name(group_event).endswith("** ago)")
 
 @pytest.mark.asyncio
@@ -164,8 +164,8 @@ async def test_format_field_value_newspost(newspost_event):
 async def test_format_field_value(group_event):
     assert (
         await format_field_value(group_event) ==
-        "[sometwo](https://osu.ppy.sh/users/2) has been added to the\n" +
-        "[**Beatmap Nominators (Probationary)**](https://osu.ppy.sh/groups/32)!"
+        "[sometwo](https://osu.ppy.sh/users/2) to the\n" +
+        "[**Beatmap Nominators (Probationary)**](https://osu.ppy.sh/groups/32)"
     )
 
 @pytest.mark.asyncio
