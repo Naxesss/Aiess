@@ -27,7 +27,8 @@ def log_message(message: Message) -> None:
     log(f"({message.guild} > #{message.channel}) {message.author}: {message.content}", postfix="bot-messages")
 
 def parse_command(content: str, context: Message=None, client: Client=None) -> Command:
-    """Returns the given content string as a command, optionally with the given message as context."""
+    """Returns the given content string as a command, if it's formatted as one, else None.
+    Optionally with the given message as context."""
     match = regex.search(r"^" + regex.escape(get_prefix(context)) + r"([A-Za-z]+) ?(.+)?", content)
     if match:
         name = match.group(1)
