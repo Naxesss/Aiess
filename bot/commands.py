@@ -7,6 +7,8 @@ from typing import Callable, TypeVar, List
 from discord import Message, Embed, Client
 from discord import Forbidden
 
+from aiess.logger import log_err
+
 from bot.prefixes import get_prefix
 from bot.prefixes import DEFAULT_PREFIX
 
@@ -62,7 +64,7 @@ class Command():
             self.response_embed = embed
             return True
         except Forbidden:
-            print(f"Lacking permissions to write \"{response}\" in {self.context.channel}.")
+            log_err(f"Lacking permissions to write \"{response}\" in {self.context.channel}.")
         
         return False
 

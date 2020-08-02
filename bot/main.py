@@ -6,6 +6,7 @@ from discord import Message, Game
 
 import aiess
 from aiess import Event
+from aiess import logger
 from aiess.logger import log
 from aiess.database import SCRAPER_DB_NAME
 
@@ -17,6 +18,7 @@ from bot.formatter import format_link, format_embed
 from bot.cmd_modules import *
 from bot.prefixes import DEFAULT_PREFIX
 
+logger.init()
 subscriber.load()
 prefixes.load()
 
@@ -27,7 +29,7 @@ class Client(discord.Client):
         self.reader.client = self
 
     async def on_ready(self) -> None:
-        print(f"Logged on as {self.user}!")
+        log(f"Logged in as {self.user}!", postfix="bot")
         await self.change_presence(activity=Game(f"{DEFAULT_PREFIX}help"))
 
         if not self.reader.running:
