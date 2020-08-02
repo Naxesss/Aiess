@@ -21,10 +21,11 @@ class colors:
 def fmt(string: str, esc_seq: str):
     return f"{esc_seq}{string}{colors.CLEAR}"
 
-def init(_time_str: str):
+def init(_time_str: str=None):
     """Sets the time string for the log file (i.e. "log-{time_str}.txt")."""
     global time_str
-    time_str = _time_str
+    if _time_str: time_str = _time_str
+    else:         time_str = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 
 def log(_obj="", newline: bool=True, postfix: str="") -> None:
     """Takes the given object as a string with the current timestamp,

@@ -12,8 +12,6 @@ from aiess.reader import merge_concurrent
 
 from scraper.crawler import get_all_events_between, get_news_between, get_group_events_between
 
-init_time_str = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
-
 async def gather_loop() -> None:
     """Gathers new events in an infinite loop."""
     while(True):
@@ -92,7 +90,7 @@ def last_updated(current_time: datetime, _id: str) -> None:
     log(f"--- Last Updated [{_id}] {current_time} ---")
     timestamp.set_last(current_time, _id)
 
-logger.init(init_time_str)
+logger.init()
 database = Database(SCRAPER_DB_NAME)
 
 loop = asyncio.get_event_loop()
