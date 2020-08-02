@@ -13,7 +13,7 @@ from bnsite import interface
 EXPECTED_TYPES = [
     types.NOMINATE,
     types.QUALIFY,
-    types.NOMINATION_RESET,
+    types.RESET,
     types.DISQUALIFY,
     types.RANK,
     types.LOVE
