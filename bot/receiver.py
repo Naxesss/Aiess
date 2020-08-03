@@ -50,12 +50,10 @@ async def receive_command(command: Command) -> bool:
     # Let the user know the command was recognized, and that a response should follow.
     await command.trigger_typing()
 
+    caller = command.context.author
     # TODO: Permissions should be adjustable on a per-command basis.
-    if (
-        # `author` of DMChannel is of type User (instead of Member), and so has no `guild_permissions` attribute.
-        not hasattr(command.context.author, "guild_permissions") or
-        not command.context.author.guild_permissions.administrator
-    ):
+    # The `guild_permissions` attribute is only available in guilds, for DM channels we skip this.
+    if hasattr(caller, "guild_permissions") and not caller.guild_permissions.administrator:
         await command.respond(f"✗ Commands are limited to server admins for now.")
         return False
 
