@@ -43,9 +43,13 @@ async def receive_command(command: Command) -> bool:
     """Returns whether the received command was recognized and executed."""
     if command.name not in registered_aliases:
         return False
+    
     name = registered_aliases[command.name]
     func_wrapper = registered_commands[name]
     
+    # Let the user know the command was recognized, and that a response should follow.
+    await command.trigger_typing()
+
     if len(func_wrapper.required_args) > len(command.args):
         missing_args = func_wrapper.required_args[len(command.args):]
         missing_arg_str = "`<" + "`>, <`".join(missing_args) + ">`"

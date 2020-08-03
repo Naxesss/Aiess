@@ -55,6 +55,11 @@ class Command():
         """Returns the command prefix that should be used in this context."""
         return get_prefix(self.context)
     
+    async def trigger_typing(self) -> None:
+        """Triggers typing in the channel where the command was called.
+        Disappears after 10 seconds or after a message is sent."""
+        await self.context.channel.trigger_typing()
+
     async def respond(self, response: str, embed: Embed=None) -> bool:
         """Sends a message in the channel where the command was called, with the given response text and embed, if any.
         Handles Forbidden and HTTPException errors by logging. Returns whether a response was successfully sent."""

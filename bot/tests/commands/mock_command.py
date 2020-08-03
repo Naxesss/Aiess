@@ -1,6 +1,8 @@
 import sys
 sys.path.append('..')
 
+import mock
+
 from discord import Embed
 
 from bot.commands import Command
@@ -21,6 +23,10 @@ class MockDMChannel():
     def __init__(self, _id: int=None):
         self.id = int(_id) if _id is not None else None
         self.messages = []
+        self.typing_triggered = False
+    
+    async def trigger_typing(self):
+        self.typing_triggered = True
     
     async def send(self, content, embed: Embed=None):
         self.messages.append(
@@ -55,9 +61,11 @@ class MockErrorChannel(MockChannel):
 
 class MockUser():
     """Represents a user (e.g. an author of a sent message)."""
-    def __init__(self, _id: int=None, name: str=None):
+    def __init__(self, _id: int=None, name: str=None, is_admin: bool=True):
         self.id = int(_id) if _id is not None else None
         self.name = name
+        self.guild_permissions = mock.MagicMock()
+        self.guild_permissions.administrator = True
 
 class MockMessage():
     """Represents the message instance (e.g. from which a command was called). Contains
@@ -66,7 +74,7 @@ class MockMessage():
         self.content = str(content) if content is not None else None
         self.channel = channel
         self.guild = channel.guild if channel is not None and hasattr(channel, "guild") else None
-        self.author = author
+        self.author = author if author else MockUser()
         self.embed = embed
 
 class MockCommand(Command):

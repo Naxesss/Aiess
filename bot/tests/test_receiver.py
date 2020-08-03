@@ -62,6 +62,7 @@ async def test_receive_command():
     mock_channel = MockChannel()
     mock_message = MockMessage("+test", channel=mock_channel)
     assert await receive_command(Command("test", context=mock_message))
+    assert mock_channel.typing_triggered
     assert mock_channel.messages[0].content == "hi"
 
 @pytest.mark.asyncio
@@ -69,6 +70,7 @@ async def test_receive_command_alias():
     mock_channel = MockChannel()
     mock_message = MockMessage("+alias", channel=mock_channel)
     assert await receive_command(Command("alias", context=mock_message))
+    assert mock_channel.typing_triggered
     assert mock_channel.messages[0].content == "hi"
 
 @pytest.mark.asyncio
