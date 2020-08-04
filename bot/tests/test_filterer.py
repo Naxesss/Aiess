@@ -248,6 +248,9 @@ def test_filter_to_sql_invalid_words():
         filter_to_sql("user:someone and nothing else")
     assert "invalid" in str(err)
 
+def test_filter_to_sql_content_multiple_aliases():
+    assert filter_to_sql("group:bn") == ("(group_id=%s OR group_id=%s)", ("28", "32"))
+
 def test_filter_to_sql_content_wildcards():
     assert filter_to_sql("content:\"%hello there%\"") == ("events.content LIKE %s", ("%hello there%",))
 

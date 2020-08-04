@@ -435,7 +435,8 @@ def filter_to_sql(_filter: str) -> (str, tuple):
             # Our value is not an alias, so we can use it directly.
             values.append(value)
 
-        converted_words.append("(" + " OR ".join([tag.sql_format] * len(values)) + ")")
+        if len(values) > 1: converted_words.append("(" + " OR ".join([tag.sql_format] * len(values)) + ")")
+        else:               converted_words.append(tag.sql_format)
         converted_values.extend(values)
     
     return (" ".join(converted_words), tuple(converted_values))
