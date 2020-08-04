@@ -414,19 +414,25 @@ def filter_to_sql(_filter: str) -> (str, tuple):
         if not tag:
             continue
 
+        values = []
+
         # Support type aliases (e.g. "resolve" should be converted to "issue-resolve").
         if key.lower() == "type":
             for _type in TYPE_ALIASES:
                 if value.lower() in TYPE_ALIASES[_type]:
-                    value = _type
+                    values.append(_type)
         
         # Support group aliases (e.g. "nat" should be converted to "7").
         if key.lower() == "group":
             for group in GROUP_ALIASES:
                 if value.lower() in GROUP_ALIASES[group]:
-                    value = group
+                    values.append(group)
 
-        converted_words.append(tag.sql_format)
-        converted_values.append(value)
+        if not values:
+            # Our value is not an alias, so we can use it directly.
+            values.append(value)
+
+        converted_words.append("(" + " OR ".join([tag.sql_format] * len(values)) + ")")
+        converted_values.extend(values)
     
     return (" ".join(converted_words), tuple(converted_values))
