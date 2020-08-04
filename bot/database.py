@@ -5,7 +5,7 @@ from collections import defaultdict
 from typing import Generator, Dict, List
 
 import aiess
-from aiess import Event, Beatmapset
+from aiess import Event, Beatmapset, Usergroup
 from aiess.reader import merge_concurrent
 
 from bot.objects import Subscription, Prefix
@@ -128,7 +128,7 @@ class Database(aiess.Database):
                 LEFT JOIN {self.db_name}.beatmapset_modes AS modes ON beatmapset.id=modes.beatmapset_id""",
             where        = where,
             where_values = where_values,
-            selection    = "events.type, events.time, events.beatmapset_id, events.discussion_id, events.user_id, events.news_id, events.content"
+            selection    = "events.type, events.time, events.beatmapset_id, events.discussion_id, events.user_id, events.group_id, events.news_id, events.content"
         )
         for row in (fetched_rows or []):
             _type = row[0]
@@ -136,9 +136,10 @@ class Database(aiess.Database):
             beatmapset = self.retrieve_beatmapset("id=%s", (row[2],)) if row[2] else None
             discussion = self.retrieve_discussion("id=%s", (row[3],)) if row[3] else None
             user = self.retrieve_user("id=%s", (row[4],)) if row[4] else None
-            newspost = self.retrieve_newspost("id=%s", (row[5],)) if row[5] else None
-            content = row[6]
-            yield Event(_type, time, beatmapset, discussion, user, newspost=newspost, content=content)
+            group = Usergroup(row[5]) if row[5] else None
+            newspost = self.retrieve_newspost("id=%s", (row[6],)) if row[6] else None
+            content = row[7]
+            yield Event(_type, time, beatmapset, discussion, user, group, newspost, content=content)
 
 def clear_cache(db_name: str) -> None:
     """Clears any cache the database may be using, allowing new info to be obtained
