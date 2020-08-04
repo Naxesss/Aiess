@@ -141,7 +141,7 @@ TAGS: Dict[List[str], Tag] = {
     ("user",): Tag(
         "The username of the user performing the event (e.g. user nominating, replying, or giving kudosu).",
         lambda obj: [escape(obj.name)] if isinstance(obj, User) else None,
-        VALIDATION_ANY, sql_format="user.name=%s",
+        VALIDATION_ANY, sql_format="user.name LIKE %s",
         example_values=["lasse", "\"seto kousuke\""]
     ),
     ("user-id",) : Tag(
@@ -160,19 +160,19 @@ TAGS: Dict[List[str], Tag] = {
     ("artist",) : Tag(
         "The artist field of a beatmapset an event occurred on (e.g. \"LeaF\" in \"Leaf - Doppelganger\").",
         lambda obj: [escape(obj.artist)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_ANY, sql_format="beatmapset.artist=%s",
+        VALIDATION_ANY, sql_format="beatmapset.artist LIKE %s",
         example_values=["nhato", "\"the quick brown fox\""]
     ),
     ("title",) : Tag(
         "The title field of a beatmapset an event occurred on (e.g. \"Doppelganger\" in \"Leaf - Doppelganger\").",
         lambda obj: [escape(obj.title)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_ANY, sql_format="beatmapset.title=%s",
+        VALIDATION_ANY, sql_format="beatmapset.title LIKE %s",
         example_values=["uta", "\"miss you\""]
     ),
     ("creator",) : Tag(
         "The username of the creator of a beatmapset an event occurred on (e.g. \"Shurelia\" for any set hosted by them).",
         lambda obj: [escape(obj.creator.name)] if isinstance(obj, Beatmapset) else None,
-        VALIDATION_ANY, sql_format="creator.name=%s",
+        VALIDATION_ANY, sql_format="creator.name LIKE %s",
         example_values=["lasse", "\"seto kousuke\""]
     ),
     ("creator-id",) : Tag(
@@ -197,7 +197,7 @@ TAGS: Dict[List[str], Tag] = {
     ("author",) : Tag(
         "The username of the author of the discussion an event occurred on (e.g. \"Shurelia\" for any discussion started by them).",
         lambda obj: [escape(obj.user.name)] if isinstance(obj, Discussion) else None,
-        VALIDATION_ANY, sql_format="author.name=%s",
+        VALIDATION_ANY, sql_format="author.name LIKE %s",
         example_values=["lasse", "\"seto kousuke\""]
     ),
     ("author-id",) : Tag(

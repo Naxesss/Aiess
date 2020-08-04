@@ -228,10 +228,10 @@ def test_valid_words():
 
 
 def test_filter_to_sql():
-    assert filter_to_sql("type:nominate and not user:someone") == ("type=%s AND NOT user.name=%s", ("nominate", "someone"))
+    assert filter_to_sql("type:nominate and not user:someone") == ("type=%s AND NOT user.name LIKE %s", ("nominate", "someone"))
 
 def test_filter_to_sql_quotations():
-    assert filter_to_sql("user:\"space in name\"") == ("user.name=%s", ("space in name",))
+    assert filter_to_sql("user:\"space in name\"") == ("user.name LIKE %s", ("space in name",))
 
 def test_filter_to_sql_invalid_key():
     with pytest.raises(ValueError) as err:
@@ -254,7 +254,7 @@ def test_filter_to_sql_content_wildcards():
 def test_filter_to_sql_malicious():
     # Database drivers should take care of escaping anything within the second portion of the tuple, so
     # that's where we want the attacking string.
-    assert filter_to_sql("user:\"%s; DROP TABLE events; \"\"=\"\"") == ("user.name=%s", ("%s; DROP TABLE events; ",))
+    assert filter_to_sql("user:\"%s; DROP TABLE events; \"\"=\"\"") == ("user.name LIKE %s", ("%s; DROP TABLE events; ",))
 
 def test_filter_to_sql_none():
     assert filter_to_sql(None) == ("TRUE", ())
