@@ -13,35 +13,37 @@ from bot.logic import AND_GATES, OR_GATES, NOT_GATES
 
 KEY_VALUE_PATTERN = "(\"[^\"]+.|[^ ]+):(\"[^\"]+.|[^ ]+)"
 
+ANY_ALIASES = ["any", "all"]
+
 # Any of these values can be substituted for the respective key;
 # if the user expects it to work, it should work.
 TYPE_ALIASES: Dict[str, List[str]] = {
-    types.RANK:         ["ranked"],
-    types.LOVE:         ["loved"],
-    types.QUALIFY:      ["qualified",        "qualification",    "qual"],
-    types.DISQUALIFY:   ["disqualified",     "disqualification", "dq"],
-    types.NOMINATE:     ["nominated",        "nomination",       "nom",   "bubble", "bubbled"],
-    types.RESET:        ["nomination reset",                     "reset", "pop",    "popped"],
+    types.RANK:         ANY_ALIASES + ["ranked"],
+    types.LOVE:         ANY_ALIASES + ["loved"],
+    types.QUALIFY:      ANY_ALIASES + ["qualified",        "qualification",    "qual"],
+    types.DISQUALIFY:   ANY_ALIASES + ["disqualified",     "disqualification", "dq"],
+    types.NOMINATE:     ANY_ALIASES + ["nominated",        "nomination",       "nom",   "bubble", "bubbled"],
+    types.RESET:        ANY_ALIASES + ["nomination reset",                     "reset", "pop",    "popped"],
 
-    types.SUGGESTION:   [],
-    types.PROBLEM:      [],
-    types.NOTE:         ["mapper note", "note"],
-    types.PRAISE:       [],
-    types.HYPE:         [],
-    types.REPLY:        [],
+    types.SUGGESTION:   ANY_ALIASES + [],
+    types.PROBLEM:      ANY_ALIASES + [],
+    types.NOTE:         ANY_ALIASES + ["mapper note", "note"],
+    types.PRAISE:       ANY_ALIASES + [],
+    types.HYPE:         ANY_ALIASES + [],
+    types.REPLY:        ANY_ALIASES + [],
 
-    types.RESOLVE:      ["issue resolve", "issue resolved", "resolve", "resolved"],
-    types.REOPEN:       ["issue reopen",  "issue reopened", "reopen",  "reopened"],
+    types.RESOLVE:      ANY_ALIASES + ["issue resolve", "issue resolved", "resolve", "resolved"],
+    types.REOPEN:       ANY_ALIASES + ["issue reopen",  "issue reopened", "reopen",  "reopened"],
 
-    types.KUDOSU_GAIN:  ["kudosu gain",  "kudosu gained", "kudosu given"],
-    types.KUDOSU_LOSS:  ["kudosu loss",  "kudosu lost",   "kudosu taken"],
-    types.KUDOSU_DENY:  ["kudosu deny",  "kudosu denied"],
-    types.KUDOSU_ALLOW: ["kudosu allow", "kudosu allowed"],
+    types.KUDOSU_GAIN:  ANY_ALIASES + ["kudosu gain",  "kudosu gained", "kudosu given"],
+    types.KUDOSU_LOSS:  ANY_ALIASES + ["kudosu loss",  "kudosu lost",   "kudosu taken"],
+    types.KUDOSU_DENY:  ANY_ALIASES + ["kudosu deny",  "kudosu denied"],
+    types.KUDOSU_ALLOW: ANY_ALIASES + ["kudosu allow", "kudosu allowed"],
 
-    types.NEWS:         ["newspost", "newsposts", "news post", "news posts"],
+    types.NEWS:         ANY_ALIASES + ["newspost", "newsposts", "news post", "news posts"],
 
-    types.ADD:          ["added", "promote", "promoted"],
-    types.REMOVE:       ["removed", "demote", "demoted"]
+    types.ADD:          ANY_ALIASES + ["added", "promote", "promoted"],
+    types.REMOVE:       ANY_ALIASES + ["removed", "demote", "demoted"]
 }
 
 def get_all_type_aliases() -> List[str]:
@@ -63,14 +65,15 @@ def get_type_aliases(key: str) -> List[str]:
 # Includes both full and probationary bns.
 BN_ALIASES = ["bn", "bns", "bng", "nominators", "beatmap nominators"]
 GROUP_ALIASES: Dict[str, List[str]] = {
-    "4": ["gmt", "gmts", "global moderators", "global moderation team"],
-    "7": ["nat", "nats", "nomination assessment", "nomination assessment team"],
-    "11": ["dev", "devs", "developers"],
-    "16": ["alu", "alumni", "alumnis"],
-    "22": ["sup", "support", "support team"],
+    "4": ANY_ALIASES + ["gmt", "gmts", "global moderators", "global moderation team"],
+    "7": ANY_ALIASES + ["nat", "nats", "nomination assessment", "nomination assessment team"],
+    "11": ANY_ALIASES + ["dev", "devs", "developers"],
+    "16": ANY_ALIASES + ["alu", "alumni", "alumnis"],
+    "22": ANY_ALIASES + ["sup", "support", "support team"],
     # Exclusively full/probo bns:
-    "28": BN_ALIASES + ["full", "full bn", "full bns", "full beatmap nominators"],
-    "32": BN_ALIASES + ["probo", "probo bn", "probo bns", "probation", "probation bn", "probation bns", "probationary beatmap nominators"]
+    "28": ANY_ALIASES + BN_ALIASES + ["full", "full bn", "full bns", "full beatmap nominators"],
+    "32": (ANY_ALIASES + BN_ALIASES + ["probo", "probo bn", "probo bns", "probation", "probation bn",
+        "probation bns", "probationary beatmap nominators"])
 }
 
 def get_all_group_aliases() -> List[str]:
