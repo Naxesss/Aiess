@@ -79,6 +79,7 @@ class Database:
         cursor.execute(query, values)
 
         fetch = self.__fetch(cursor)
+        cursor.close()
         self.connection.commit()
         return fetch
     
