@@ -6,7 +6,6 @@ from typing import Generator, Dict, List
 
 import aiess
 from aiess import Event, Beatmapset, Usergroup
-from aiess.reader import merge_concurrent
 
 from bot.objects import Subscription, Prefix
 
@@ -96,16 +95,12 @@ class Database(aiess.Database):
     async def retrieve_beatmapset_events(self, beatmapset: Beatmapset) -> List[Event]:
         """Retrieves all events which have the given beatmapset id associated in descending
         order (i.e. newer events first), from the database, then stores the result in a cache
-        used for any consecutive call. Concurrent events are merged together using the same
-        method as on_event.
+        used for any consecutive call.
         
         The cache must be cleared before new information can be obtained, see `clear_cache`."""
         if beatmapset.id not in beatmapset_event_cache[self.db_name]:
-            # Retriving events from the database will give us non-merged events (e.g.
-            # user nominates -> system qualifies, instead of user qualifies), hence merge.
             raw_event_generator = self.retrieve_events(where="beatmapset_id=%s ORDER BY time DESC", where_values=(beatmapset.id,))
-            raw_events = [event async for event in raw_event_generator]
-            beatmapset_event_cache[self.db_name][beatmapset.id] = merge_concurrent(raw_events)
+            beatmapset_event_cache[self.db_name][beatmapset.id] = [event async for event in raw_event_generator]
 
         return beatmapset_event_cache[self.db_name][beatmapset.id]
 
