@@ -5,6 +5,7 @@ import pytest
 
 from aiess import Event, Beatmapset, Discussion, User
 from aiess.timestamp import from_string
+from aiess import event_types as types
 
 from bnsite.interface import Document
 
@@ -15,7 +16,7 @@ def dq_event():
     beatmapset = Beatmapset(_id=4, artist="artist", title="title", creator=creator, modes=["osu", "catch"])
     discussion = Discussion(_id=3, beatmapset=beatmapset, user=disqualifier, content="dqed")
     return Event(
-        _type      = "disqualify",
+        _type      = types.DISQUALIFY,
         time       = from_string("2020-01-01 03:00:00"),
         beatmapset = beatmapset,
         discussion = discussion,
@@ -26,13 +27,13 @@ def dq_event():
 def test_document(dq_event):
     document = Document(dq_event)
 
-    assert document.type          == "disqualify"
-    assert document.timestamp     == from_string("2020-01-01 03:00:00")
-    assert document.beatmapset_id == 4
-    assert document.creator_id    == 2
-    assert document.creator_name  == "sometwo"
-    assert document.modes         == ["osu", "catch"]
-    assert document.discussion_id == 3
-    assert document.user_id       == 1
-    assert document.artist_title  == "artist - title"
-    assert document.content       == "dqed"
+    assert document.eventType    == "Disqualified"
+    assert document.timestamp    == from_string("2020-01-01 03:00:00")
+    assert document.beatmapsetId == 4
+    assert document.hostId       == 2
+    assert document.hostName     == "sometwo"
+    assert document.modes        == ["osu", "catch"]
+    assert document.postId       == 3
+    assert document.userId       == 1
+    assert document.metadata     == "artist - title"
+    assert document.content      == "dqed"
