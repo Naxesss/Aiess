@@ -34,7 +34,7 @@ def reader():
 
 @pytest.mark.asyncio
 async def test_file_created(reader):
-    scope = Scope("any", lambda event: True)
+    scope = Scope("any")
     expected_id = reader._Reader__time_id(scope)
     await reader._Reader__push_new_events(scope)
 
@@ -117,7 +117,7 @@ async def test_on_events(reader):
     start = timestamp.from_string("2020-01-01 00:00:00")
     middle = timestamp.from_string("2020-01-01 10:00:00")
     end = timestamp.from_string("2020-01-01 18:00:00")
-    scope = Scope("any", lambda event: True)
+    scope = Scope("any")
     await reader._Reader__push_events_between(start, middle, scope)
     await reader._Reader__push_events_between(middle, end, scope)
 
@@ -133,7 +133,7 @@ async def test_on_event(reader):
 
     _from = timestamp.from_string("2020-01-01 00:00:00")
     to = timestamp.from_string("2020-01-01 10:00:00")
-    scope = Scope("any", lambda event: True)
+    scope = Scope("any")
     await reader._Reader__push_events_between(_from, to, scope)
 
     assert received_events == [event1, event2]
@@ -148,7 +148,7 @@ async def test_on_event_scope(reader):
 
     _from = timestamp.from_string("2020-01-01 00:00:00")
     to = timestamp.from_string("2020-01-01 10:00:00")
-    scope = Scope("greet", lambda event: event.type == "hello")
+    scope = Scope("greet", sql_target="type=\"hello\"")
     await reader._Reader__push_events_between(_from, to, scope)
 
     assert received_events == [event1]

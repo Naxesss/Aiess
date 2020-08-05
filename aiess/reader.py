@@ -19,11 +19,11 @@ MERGABLE_TYPES = [
 ]
 
 class Scope():
-    """Determines which events should be read in a Reader. If `passes` returns true when given an event,
-    it will be read and last time updated accordingly, else it'll be ignored."""
-    def __init__(self, name: str, passes: Callable[[Event], bool]):
+    """Determines which events should be read in a Reader. The `sql_target` WHERE clause is used
+    whenever events are retrieved using this scope."""
+    def __init__(self, name: str, sql_target: str="TRUE"):
         self.name = name
-        self.passes = passes
+        self.sql_target = sql_target
 
 class Reader():
     """This constitutes an object from which a loop, looking through new events in the database, can be executed.
@@ -56,9 +56,12 @@ class Reader():
 
     async def __push_all_new_events(self) -> None:
         """Triggers the on_event method for each new event since the last stored datetime for each scope."""
-        await self.__push_new_events(Scope("mapset", lambda event: event.type != types.NEWS and event.type not in [types.ADD, types.REMOVE]))
-        await self.__push_new_events(Scope("news",   lambda event: event.type == types.NEWS))
-        await self.__push_new_events(Scope("groups", lambda event: event.type in [types.ADD, types.REMOVE]))
+        news_target   = f"type=\"{types.NEWS}\""
+        groups_target = f"type=\"{types.ADD}\" OR type=\"{types.REMOVE}\""
+
+        await self.__push_new_events(Scope("mapset", sql_target=f"NOT ({news_target}) AND NOT ({groups_target})"))
+        await self.__push_new_events(Scope("news",   sql_target=news_target))
+        await self.__push_new_events(Scope("groups", sql_target=groups_target))
 
     async def __push_new_events(self, scope: Scope) -> None:
         """Triggers the on_event method for each new event since the last stored datetime for the given scope."""
@@ -69,9 +72,7 @@ class Reader():
         """Triggers the on_event method for each event between the two datetimes.
         Updates the last stored datetime after each on_event call."""
         await self.on_event_batch()
-        async for event in await self.events_between(last_time, current_time):
-            if not scope.passes(event):
-                continue
+        async for event in await self.events_between(last_time, current_time, scope.sql_target):
             await self.on_event(event)
             timestamp.set_last(event.time, self.__time_id(scope))
 
@@ -80,9 +81,10 @@ class Reader():
         This is based on the identifier supplied to the reader on initialization."""
         return f"reader-{self.reader_id}-{scope.name}"
 
-    async def events_between(self, _from: datetime, to: datetime) -> Generator[Event, None, None]:
-        """Yields each event found in the database, from (excluding) the later time to (including) the earlier time."""
-        return self.database.retrieve_events(where="time > %s AND time <= %s ORDER BY time ASC", where_values=(_from, to))
+    async def events_between(self, _from: datetime, to: datetime, sql_target: str="TRUE") -> Generator[Event, None, None]:
+        """Yields each event found in the database, from (excluding) the later time to (including) the earlier time.
+        Optionally only retrieves events matching the `sql_target` WHERE clause."""
+        return self.database.retrieve_events(where=f"({sql_target}) AND time > %s AND time <= %s ORDER BY time ASC", where_values=(_from, to))
 
     async def on_event_batch(self) -> None:
         """Called for each new event batch found in the running loop of the reader.
