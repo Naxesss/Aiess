@@ -64,8 +64,8 @@ async def receive_command(command: Command) -> bool:
         return False
 
     parsed_args = parse_args(command.args, arg_count=len(func_wrapper.required_args) + len(func_wrapper.optional_args))
-
     await func_wrapper.execute(command, *parsed_args)
+
     return True
 
 def parse_args(args: List[str], arg_count: int) -> List[str]:
