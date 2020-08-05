@@ -27,13 +27,13 @@ def dq_event():
 def test_document(dq_event):
     document = Document(dq_event)
 
-    assert document.eventType    == "Disqualified"
+    assert document.type         == "Disqualified"
     assert document.timestamp    == from_string("2020-01-01 03:00:00")
     assert document.beatmapsetId == 4
-    assert document.hostId       == 2
-    assert document.hostName     == "sometwo"
+    assert document.creatorId    == 2
+    assert document.creatorName  == "sometwo"
     assert document.modes        == ["osu", "catch"]
-    assert document.postId       == 3
+    assert document.discussionId == 3
     assert document.userId       == 1
-    assert document.metadata     == "artist - title"
+    assert document.artistTitle  == "artist - title"
     assert document.content      == "dqed"

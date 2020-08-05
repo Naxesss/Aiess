@@ -18,15 +18,15 @@ TYPE_NAME = {
 
 class Document():
     def __init__(self, event):
-        self.eventType    = TYPE_NAME[event.type]
+        self.type    = TYPE_NAME[event.type]
         self.timestamp    = event.time
         self.beatmapsetId = event.beatmapset.id
-        self.hostId       = event.beatmapset.creator.id
-        self.hostName     = event.beatmapset.creator.name
+        self.creatorId    = event.beatmapset.creator.id
+        self.creatorName  = event.beatmapset.creator.name
         self.modes        = event.beatmapset.modes
-        self.postId       = event.discussion.id if event.discussion else None
+        self.discussionId = event.discussion.id if event.discussion else None
         self.userId       = event.user.id if event.user else None
-        self.metadata     = f"{event.beatmapset.artist} - {event.beatmapset.title}"
+        self.artistTitle  = f"{event.beatmapset.artist} - {event.beatmapset.title}"
         self.content      = event.content
 
 def insert_event(event: Event) -> None:
