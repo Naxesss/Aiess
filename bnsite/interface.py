@@ -3,8 +3,18 @@ sys.path.append('..')
 
 from aiess import Event
 from aiess.settings import BNSITE_MONGODB_URI
+from aiess import event_types as types
 
 from pymongo import MongoClient
+
+# Translate event types to legacy names for DB compatibility.
+TYPE_NAME = {
+    types.NOMINATE:   "Bubbled",
+    types.QUALIFY:    "Qualified",
+    types.RESET:      "Popped",
+    types.DISQUALIFY: "Disqualified",
+    types.RANK:       "Ranked"
+}
 
 class Document():
     def __init__(self, event):
