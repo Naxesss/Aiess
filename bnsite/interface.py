@@ -7,17 +7,17 @@ from aiess.settings import BNSITE_MONGODB_URI
 from pymongo import MongoClient
 
 class Document():
-    def __init__(self, event):                                                          # LEGACY NAME
-        self.type          = event.type                                                 # eventType
-        self.timestamp     = event.time                                                 # timestamp
-        self.beatmapset_id = event.beatmapset.id                                        # beatmapsetId
-        self.creator_id    = event.beatmapset.creator.id                                # hostId
-        self.creator_name  = event.beatmapset.creator.name                              # hostName
-        self.modes         = event.beatmapset.modes                                     # modes
-        self.discussion_id = event.discussion.id if event.discussion else None          # postId
-        self.user_id       = event.user.id if event.user else None                      # userId
-        self.artist_title  = f"{event.beatmapset.artist} - {event.beatmapset.title}"    # metadata
-        self.content       = event.content                                              # content
+    def __init__(self, event):
+        self.eventType    = TYPE_NAME[event.type]
+        self.timestamp    = event.time
+        self.beatmapsetId = event.beatmapset.id
+        self.hostId       = event.beatmapset.creator.id
+        self.hostName     = event.beatmapset.creator.name
+        self.modes        = event.beatmapset.modes
+        self.postId       = event.discussion.id if event.discussion else None
+        self.userId       = event.user.id if event.user else None
+        self.metadata     = f"{event.beatmapset.artist} - {event.beatmapset.title}"
+        self.content      = event.content
 
 def insert_event(event: Event) -> None:
     """Creates a connection to the MongoDB server, inserts the event as a
