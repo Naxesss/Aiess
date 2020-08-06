@@ -18,7 +18,7 @@ TYPE_NAME = {
 
 class Document():
     def __init__(self, event):
-        self.type    = TYPE_NAME[event.type]
+        self.type         = TYPE_NAME[event.type]
         self.timestamp    = event.time
         self.beatmapsetId = event.beatmapset.id
         self.creatorId    = event.beatmapset.creator.id
