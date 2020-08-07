@@ -10,7 +10,7 @@ from aiess.objects import Event
 from scraper.requester import get_discussion_events, get_reply_events, get_beatmapset_events, get_news_events, get_group_events
 from scraper import populator
 
-async def get_all_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
+async def get_all_events_between(start_time: datetime, end_time: datetime, last_checked_time: datetime=None) -> Generator[Event, None, None]:
     """Returns a generator of all events within the given time frame."""
     # Ensures name changes, beatmap updates, etc are considered.
     # Updates once for each pass (more than that isn't necessary considering time is locked).
@@ -22,17 +22,18 @@ async def get_all_events_between(start_time: datetime, end_time: datetime) -> Ge
     async for event in __get_reply_events_between(start_time, end_time):      yield event
     async for event in __get_beatmapset_events_between(start_time, end_time): yield event
 
-async def get_news_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
+async def get_news_between(start_time: datetime, end_time: datetime, last_checked_time: datetime=None) -> Generator[Event, None, None]:
     """Returns a generator of news events (from /home/news) within the given time frame."""
     # `get_news_events` generates events before a given time, rather than page, hence `generate_by_page=False`.
     for event in __get_event_generations_between(get_news_events, start_time, end_time, generate_by_page=False):
         yield event
 
-async def get_group_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
+async def get_group_events_between(start_time: datetime, end_time: datetime, last_checked_time: datetime) -> Generator[Event, None, None]:
     """Returns a generator of group additions and removal events (from /group) from the given prev end time.
     Note that start time does nothing in this case, as group changes are not timestamped, and as such have no
     time limit for latest event possible."""
-    for event in get_group_events(_from=end_time):
+    # `_from` in `get_group_events` denotes the timestamp to set on any group events found.
+    for event in get_group_events(_from=last_checked_time):
         yield event
 
 async def __get_discussion_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
