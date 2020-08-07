@@ -94,17 +94,14 @@ def test_insert_retrieve_prefixes(bot_test_database):
 async def test_retrieve_beatmapset_events(scraper_test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "creator"), ["osu"])
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
-    nom2_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
-    qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset)
+    qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
     suggestion_event = Event("suggestion", from_string("2020-01-01 01:00:00"), beatmapset, user=User(3, "somethree"))
 
     scraper_test_database.insert_event(suggestion_event)
     scraper_test_database.insert_event(nom_event)
-    scraper_test_database.insert_event(nom2_event)
     scraper_test_database.insert_event(qual_event)
     
     events = await scraper_test_database.retrieve_beatmapset_events(beatmapset)
-    qual_event.user = nom2_event.user
     assert nom_event in events
     assert qual_event in events
     assert suggestion_event in events
@@ -113,15 +110,12 @@ async def test_retrieve_beatmapset_events(scraper_test_database):
 async def test_retrieve_beatmapset_events_cache(scraper_test_database):
     beatmapset = Beatmapset(3, "artist", "title", User(4, "creator"), ["osu"])
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
-    nom2_event = Event("nominate", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
-    qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset)
+    qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
 
     scraper_test_database.insert_event(nom_event)
-    scraper_test_database.insert_event(nom2_event)
     scraper_test_database.insert_event(qual_event)
     
     await scraper_test_database.retrieve_beatmapset_events(beatmapset)
-    qual_event.user = nom2_event.user
     assert db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME][3] == [qual_event, nom_event]
 
     db_module.clear_cache(SCRAPER_TEST_DB_NAME)
