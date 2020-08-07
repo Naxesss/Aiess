@@ -7,18 +7,9 @@ from aiess import event_types as types
 
 from pymongo import MongoClient
 
-# Translate event types to legacy names for DB compatibility.
-TYPE_NAME = {
-    types.NOMINATE:   "Bubbled",
-    types.QUALIFY:    "Qualified",
-    types.RESET:      "Popped",
-    types.DISQUALIFY: "Disqualified",
-    types.RANK:       "Ranked"
-}
-
 class Document():
     def __init__(self, event):
-        self.type         = TYPE_NAME[event.type]
+        self.type         = event.type
         self.timestamp    = event.time
         self.beatmapsetId = event.beatmapset.id
         self.creatorId    = event.beatmapset.creator.id
