@@ -21,8 +21,8 @@ EXPECTED_TYPES = [
 
 class Reader(aiess.Reader):
     async def on_event(self, event: Event):
-        log(event, postfix=self.reader_id)
         if event.type in EXPECTED_TYPES:
+            log(event, postfix=self.reader_id)
             interface.insert_event(event)
 
 reader = Reader("bnsite", db_name=SCRAPER_DB_NAME)
