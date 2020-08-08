@@ -1,6 +1,8 @@
 import sys
 sys.path.append('..')
 
+import asyncio
+
 import discord
 from discord import Message, Game
 
@@ -16,7 +18,7 @@ from bot.objects import Subscription
 from bot import database
 from bot.formatter import format_link, format_embed
 from bot.cmd_modules import *
-from bot.prefixes import DEFAULT_PREFIX
+from bot import activity
 
 logger.init()
 subscriber.load()
@@ -30,7 +32,7 @@ class Client(discord.Client):
 
     async def on_ready(self) -> None:
         log(f"Logged in as {self.user}!", postfix="bot")
-        await self.change_presence(activity=Game(f"{DEFAULT_PREFIX}help"))
+        asyncio.create_task(activity.loop(self))
 
         if not self.reader.running:
             await self.reader.run()
