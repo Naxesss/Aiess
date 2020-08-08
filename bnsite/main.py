@@ -1,6 +1,8 @@
 import sys
 sys.path.append('..')
 
+import asyncio
+
 import aiess
 from aiess import Event
 from aiess.reader import Reader
@@ -26,4 +28,5 @@ class Reader(aiess.Reader):
             interface.insert_event(event)
 
 reader = Reader("bnsite", db_name=SCRAPER_DB_NAME)
-reader.run()
+loop = asyncio.get_event_loop()
+loop.run_until_complete(reader.run())
