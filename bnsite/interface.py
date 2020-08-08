@@ -10,7 +10,7 @@ from pymongo import MongoClient
 class Document():
     def __init__(self, event):
         self.type         = event.type
-        self.timestamp    = event.time
+        self.timestamp    = event.time.isoformat()
         self.beatmapsetId = event.beatmapset.id
         self.creatorId    = event.beatmapset.creator.id
         self.creatorName  = event.beatmapset.creator.name
@@ -24,5 +24,5 @@ def insert_event(event: Event) -> None:
     """Creates a connection to the MongoDB server, inserts the event as a
     custom document, then immediately closes the connection."""
     client = MongoClient(BNSITE_MONGODB_URI)
-    #client.qatstuff.aiess.insert_one(Document(event))
+    client.qatstuff.aiess.insert_one(vars(Document(event)))
     client.close()
