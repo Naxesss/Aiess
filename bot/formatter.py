@@ -256,7 +256,8 @@ async def format_history(beatmapset: Beatmapset, length_limit: int=None, databas
             if event.discussion and event.discussion.user:
                 event.user = event.discussion.user
             else:
-                raise ValueError("Nomination event has no user.")
+                # Old versions of the scraper inserted system qualifications, we should ignore those.
+                continue
 
         long_history = (
             f"{type_props[event.type].emoji} [{event.user}](https://osu.ppy.sh/users/{event.user.id})" +
