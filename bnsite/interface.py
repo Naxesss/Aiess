@@ -23,6 +23,6 @@ class Document():
 def insert_event(event: Event) -> None:
     """Creates a connection to the MongoDB server, inserts the event as a
     custom document, then immediately closes the connection."""
-    client = MongoClient(BNSITE_MONGODB_URI)
+    client = MongoClient(BNSITE_MONGODB_URI, retryWrites=False)
     client.qatstuff.aiess.insert_one(vars(Document(event)))
     client.close()
