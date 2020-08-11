@@ -10,7 +10,7 @@ from pymongo import MongoClient
 class Document():
     def __init__(self, event):
         self.type         = event.type
-        self.timestamp    = event.time.isoformat()
+        self.timestamp    = event.time
         self.beatmapsetId = event.beatmapset.id
         self.creatorId    = event.beatmapset.creator.id
         self.creatorName  = event.beatmapset.creator.name

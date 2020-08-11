@@ -28,7 +28,7 @@ def test_document(dq_event):
     document = Document(dq_event)
 
     assert document.type         == "disqualify"
-    assert document.timestamp    == "2020-01-01T03:00:00"
+    assert document.timestamp    == from_string("2020-01-01 03:00:00")
     assert document.beatmapsetId == 4
     assert document.creatorId    == 2
     assert document.creatorName  == "sometwo"
