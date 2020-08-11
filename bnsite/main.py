@@ -23,7 +23,7 @@ EXPECTED_TYPES = [
 
 class Reader(aiess.Reader):
     async def on_event(self, event: Event):
-        if event.type in EXPECTED_TYPES:
+        if event.type in EXPECTED_TYPES and (not event.user or event.user.id != 3):
             log(event, postfix=self.reader_id)
             interface.insert_event(event)
 
