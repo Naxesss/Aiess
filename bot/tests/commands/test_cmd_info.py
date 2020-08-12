@@ -60,21 +60,3 @@ async def test_info():
     assert mock_command.response_embed.fields[5].name == "First event at"
     assert mock_command.response_embed.fields[5].value.startswith("**2020-01-01**\n(**")
     assert mock_command.response_embed.fields[5].value.endswith("** ago)")
-
-@pytest.mark.asyncio
-async def test_timing():
-    mock_client = mock.MagicMock()
-    mock_client.guilds = [object()] * 5
-    mock_client.user = mock.MagicMock()
-    mock_client.user.created_at = from_string("2020-01-01 00:00:00")
-    mock_client.user.name = "name"
-    mock_client.user.avatar_url = "avatar url"
-    mock_client.application_info = mock_application_info
-    mock_command = MockCommand("info", context=MockMessage(channel=MockChannel()), client=mock_client)
-
-    start_time = datetime.utcnow()
-    await receive_command(mock_command)
-    end_time = datetime.utcnow()
-    delta_seconds = (end_time - start_time).total_seconds()
-
-    assert delta_seconds <= 2
