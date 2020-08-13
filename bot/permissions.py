@@ -4,7 +4,6 @@ sys.path.append('..')
 from bot.objects import CommandPermission
 from bot.commands import FunctionWrapper
 from bot.database import Database, BOT_DB_NAME
-from bot.filterers.perms_filterer import filter_context
 
 cache = {}  # 2d-dict, `cache[guild_id][command_wrapper.names[0]] = permission_filter`
 
