@@ -3,6 +3,7 @@ sys.path.append('..')
 
 from bot.objects import Subscription
 from bot.objects import Prefix
+from bot.objects import CommandPermission
 
 def test_sub_init_str_ids():
     sub = Subscription(guild_id="1", channel_id="3", _filter="type:nominate")
@@ -50,3 +51,24 @@ def test_prefix_eq_type_mismatch():
 def test_prefix_hash():
     prefix = Prefix(guild_id=1, prefix="&")
     assert prefix.__hash__()
+
+
+
+def test_permission_init_str_id():
+    permission = CommandPermission(guild_id="1", command_name="test", permission_filter="filter")
+    assert permission.guild_id == 1
+
+def test_permission_eq():
+    permission1 = CommandPermission(guild_id=1, command_name="test", permission_filter="filter")
+    permission2 = CommandPermission(guild_id=1, command_name="test", permission_filter="filter")
+    permission3 = CommandPermission(guild_id=3, command_name="test", permission_filter="filter")
+    assert permission1 == permission2
+    assert permission1 != permission3
+
+def test_permission_eq_type_mismatch():
+    permission = CommandPermission(guild_id=1, command_name="test", permission_filter="filter")
+    assert permission != "not a sub"
+
+def test_permission_hash():
+    permission = CommandPermission(guild_id=1, command_name="test", permission_filter="filter")
+    assert permission.__hash__()
