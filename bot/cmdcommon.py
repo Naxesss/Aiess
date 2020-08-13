@@ -66,7 +66,7 @@ def filters_embed():
             """
     embed.add_field(
         name = "Keys (`/` denotes aliases)",
-        value = "\u2000".join("/".join(f"**`{key}`**" for key in keys) for keys in TAGS.keys()),
+        value = "\u2000".join("/".join(f"**`{name}`**" for name in tag.names) for tag in filter_context.tags),
         inline = True
     )
     embed.add_field(
