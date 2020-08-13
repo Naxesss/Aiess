@@ -9,7 +9,7 @@ from aiess.database import SCRAPER_TEST_DB_NAME
 
 from bot import database as db_module
 from bot.database import Database, BOT_TEST_DB_NAME
-from bot.objects import Subscription, Prefix
+from bot.objects import Subscription, Prefix, CommandPermission
 
 @pytest.fixture
 def scraper_test_database():
@@ -24,6 +24,7 @@ def bot_test_database():
     database = Database(BOT_TEST_DB_NAME)
     database.clear_table_data("subscriptions")
     database.clear_table_data("prefixes")
+    database.clear_table_data("permissions")
     db_module.clear_cache(BOT_TEST_DB_NAME)
     return database
 
@@ -89,6 +90,28 @@ def test_insert_retrieve_prefixes(bot_test_database):
     assert next(retrieved_prefixes, None) == prefix1
     assert next(retrieved_prefixes, None) == prefix2
     assert next(retrieved_prefixes, None) is None
+
+def test_insert_retrieve_permission(bot_test_database):
+    perm1 = CommandPermission(guild_id=3, command_name="test", permission_filter="filter1")
+    perm2 = CommandPermission(guild_id=4, command_name="test", permission_filter="filter2")
+
+    bot_test_database.insert_permission(perm1)
+    bot_test_database.insert_permission(perm2)
+
+    retrieved_perm = bot_test_database.retrieve_permission("guild_id=%s AND command_name=%s", (3, "test"))
+    assert retrieved_perm == perm1
+
+def test_insert_retrieve_permissions(bot_test_database):
+    perm1 = CommandPermission(guild_id=3, command_name="test", permission_filter="filter1")
+    perm2 = CommandPermission(guild_id=4, command_name="test", permission_filter="filter2")
+
+    bot_test_database.insert_permission(perm1)
+    bot_test_database.insert_permission(perm2)
+
+    retrieved_perms = bot_test_database.retrieve_permissions()
+    assert next(retrieved_perms, None) == perm1
+    assert next(retrieved_perms, None) == perm2
+    assert next(retrieved_perms, None) is None
 
 @pytest.mark.asyncio
 async def test_retrieve_beatmapset_events(scraper_test_database):
