@@ -83,7 +83,7 @@ def filters_embed():
 def filter_embed(key: str):
     key = key.lower().strip()
     tag = filter_context.get_tag(key)
-    keys = filter_context.get_tag_keys(key)
+    keys = filter_context.get_tag(key).names
 
     embed = Embed()
     embed.add_field(
@@ -93,7 +93,7 @@ def filter_embed(key: str):
     )
     embed.add_field(
         name = "Value(s)",
-        value = tag.validation.hint,
+        value = tag.value_hint,
         inline = True
     )
     embed.add_field(

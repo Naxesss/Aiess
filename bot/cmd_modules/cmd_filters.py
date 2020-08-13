@@ -17,7 +17,7 @@ async def cmd_filters(command: Command, key: str=None):
     if key:
         key = key.lower().strip()
         tag = filter_context.get_tag(key)
-        keys = filter_context.get_tag(key).names
+        keys = tag.names if tag else None
 
         if not tag or not keys:
             await command.respond_err(f"No filter key `{key}` exists.")
