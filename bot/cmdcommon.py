@@ -18,7 +18,7 @@ async def validate_filter(command: Command, _filter: str):
         await command.respond_err(f"{str(err)}")
         return False
 
-    invalid_keys = set(get_invalid_keys(_filter))
+    invalid_keys = set(get_invalid_keys(_filter, filter_context))
     if invalid_keys:
         invalids_formatted = "`" + "`, `".join(invalid_keys) + "`"
         await command.respond_err(
@@ -27,7 +27,7 @@ async def validate_filter(command: Command, _filter: str):
         )
         return False
 
-    invalid_filters = set(get_invalid_filters(_filter))
+    invalid_filters = set(get_invalid_filters(_filter, filter_context))
     if invalid_filters:
         keys = []
         invalids_strs = []
