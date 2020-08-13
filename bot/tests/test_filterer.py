@@ -6,17 +6,15 @@ from datetime import datetime
 
 from aiess import Event, User, Beatmapset, Discussion, NewsPost
 
+from bot.filterers.event_filterer import filter_context
+from bot.filterers.event_filterer import filter_to_sql
+
 from bot.filterer import escape
-from bot.filterer import dissect
-from bot.filterer import passes_filter
-from bot.filterer import get_tag
-from bot.filterer import get_tag_keys
 from bot.filterer import get_key_value_pairs
 from bot.filterer import get_invalid_keys
 from bot.filterer import get_invalid_filters
 from bot.filterer import get_invalid_words
 from bot.filterer import is_valid
-from bot.filterer import filter_to_sql
 
 def test_escape():
     assert escape("withoutspace") == "withoutspace"
@@ -27,22 +25,22 @@ def test_escape_int():
 
 def test_dissect_simple():
     event = Event(_type="test", time=datetime.utcnow())
-    assert dissect(event) == ["type:test"]
+    assert filter_context.dissect(event) == ["type:test"]
 
 def test_dissect_user():
     user = User(2, "some two")
     event = Event(_type="test", time=datetime.utcnow(), user=user)
-    assert dissect(user) == [
+    assert filter_context.dissect(user) == [
         "user:\"some two\"",
         "user-id:2"
     ]
-    assert dissect(event) == ["type:test"] + dissect(user)
+    assert filter_context.dissect(event) == ["type:test"] + filter_context.dissect(user)
 
 def test_dissect_beatmapset():
     user = User(2, "some two")
     beatmapset = Beatmapset(4, artist="yes", title="no", creator=user, modes=["osu", "catch"])
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset)
-    assert dissect(beatmapset) == [
+    assert filter_context.dissect(beatmapset) == [
         "set-id:4",
         "mapset-id:4",
         "beatmapset-id:4",
@@ -53,7 +51,7 @@ def test_dissect_beatmapset():
         "mode:osu",
         "mode:catch"
     ]
-    assert dissect(event) == ["type:test"] + dissect(beatmapset)
+    assert filter_context.dissect(event) == ["type:test"] + filter_context.dissect(beatmapset)
 
 def test_dissect_discussion():
     user = User(1, "some one")
@@ -62,7 +60,7 @@ def test_dissect_discussion():
     discussion = Discussion(3, beatmapset=beatmapset, user=user, content="hello")
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=user, content="hello")
 
-    dissection = dissect(discussion)
+    dissection = filter_context.dissect(discussion)
     for pair in [
         "discussion-id:3",
         "author:\"some one\"",
@@ -71,8 +69,8 @@ def test_dissect_discussion():
     ]:
         assert pair in dissection
 
-    event_dissection = dissect(event)
-    for pair in (["type:test"] + dissect(discussion) + dissect(user) + ["content:hello"]):
+    event_dissection = filter_context.dissect(event)
+    for pair in (["type:test"] + filter_context.dissect(discussion) + filter_context.dissect(user) + ["content:hello"]):
         assert pair in event_dissection
 
 def test_dissect_discussion_reply():
@@ -83,8 +81,8 @@ def test_dissect_discussion_reply():
     discussion = Discussion(3, beatmapset=beatmapset, user=user, content="hello")
     event = Event(_type="reply", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=replier, content="there")
 
-    event_dissection = dissect(event)
-    for pair in (["type:reply"] + dissect(discussion) + dissect(replier) + ["content:there"]):
+    event_dissection = filter_context.dissect(event)
+    for pair in (["type:reply"] + filter_context.dissect(discussion) + filter_context.dissect(replier) + ["content:there"]):
         assert pair in event_dissection
 
 def test_dissect_newspost():
@@ -92,7 +90,7 @@ def test_dissect_newspost():
     newspost = NewsPost(_id=4, title="title", preview="preview", author=user, slug="slug", image_url="image_url")
     event = Event(_type="test", time=datetime.utcnow(), newspost=newspost, content="preview")
 
-    dissection = dissect(newspost)
+    dissection = filter_context.dissect(newspost)
     for pair in [
         "news-title:title",
         "news-content:preview",
@@ -102,102 +100,98 @@ def test_dissect_newspost():
     ]:
         assert pair in dissection
     
-    assert dissect(event) == ["type:test", "content:preview"] + dissect(newspost)
+    assert filter_context.dissect(event) == ["type:test", "content:preview"] + filter_context.dissect(newspost)
 
 def test_dissect_aliases():
     event = Event(_type="nominate", time=datetime.utcnow())
 
-    assert "type:nominate" in dissect(event)
-    assert "type:nomination" in dissect(event)
-    assert "type:nominated" in dissect(event)
-    assert "type:bubbled" in dissect(event)
+    assert "type:nominate" in filter_context.dissect(event)
+    assert "type:nomination" in filter_context.dissect(event)
+    assert "type:nominated" in filter_context.dissect(event)
+    assert "type:bubbled" in filter_context.dissect(event)
 
 def test_dissect_aliases_whitespace_substitution():
     event = Event(_type="kudosu_gain", time=datetime.utcnow())
 
-    assert "type:kudosu_gain" in dissect(event)
-    assert "type:\"kudosu gain\"" in dissect(event)
-    assert "type:kudosu-gain" in dissect(event)
+    assert "type:kudosu_gain" in filter_context.dissect(event)
+    assert "type:\"kudosu gain\"" in filter_context.dissect(event)
+    assert "type:kudosu-gain" in filter_context.dissect(event)
 
 def test_passes_filter():
-    assert passes_filter("type:reply", ["mode:osu", "type:reply"])
-    assert not passes_filter("type:qualify", ["mode:osu", "type:reply"])
+    assert filter_context.test("type:reply", ["mode:osu", "type:reply"])
+    assert not filter_context.test("type:qualify", ["mode:osu", "type:reply"])
 
 def test_passes_filter_or():
-    assert passes_filter("type:reply or mode:taiko", ["mode:osu", "type:reply"])
-    assert passes_filter("type:reply or mode:taiko", ["mode:taiko", "type:qualify"])
-    assert not passes_filter("type:reply or mode:taiko", ["mode:osu", "type:qualify"])
+    assert filter_context.test("type:reply or mode:taiko", ["mode:osu", "type:reply"])
+    assert filter_context.test("type:reply or mode:taiko", ["mode:taiko", "type:qualify"])
+    assert not filter_context.test("type:reply or mode:taiko", ["mode:osu", "type:qualify"])
 
 def test_passes_filter_and():
-    assert passes_filter("type:reply and mode:taiko", ["mode:taiko", "type:reply"])
-    assert not passes_filter("type:reply and mode:taiko", ["mode:osu", "type:reply"])
-    assert not passes_filter("type:reply and mode:taiko", ["mode:taiko", "type:qualify"])
+    assert filter_context.test("type:reply and mode:taiko", ["mode:taiko", "type:reply"])
+    assert not filter_context.test("type:reply and mode:taiko", ["mode:osu", "type:reply"])
+    assert not filter_context.test("type:reply and mode:taiko", ["mode:taiko", "type:qualify"])
 
 def test_passes_filter_and_not():
-    assert passes_filter("type:reply and not mode:taiko", ["mode:catch", "type:reply"])
-    assert passes_filter("type:reply and !mode:taiko", ["mode:catch", "type:reply"])
-    assert not passes_filter("type:reply and not mode:taiko", ["mode:taiko", "type:reply"])
-    assert not passes_filter("type:reply and not mode:taiko", ["mode:osu", "type:qualify"])
+    assert filter_context.test("type:reply and not mode:taiko", ["mode:catch", "type:reply"])
+    assert filter_context.test("type:reply and !mode:taiko", ["mode:catch", "type:reply"])
+    assert not filter_context.test("type:reply and not mode:taiko", ["mode:taiko", "type:reply"])
+    assert not filter_context.test("type:reply and not mode:taiko", ["mode:osu", "type:qualify"])
 
 def test_passes_filter_missing_field():
-    assert not passes_filter("content:hi", ["user:sometwo", "type:nominate"])
-    assert passes_filter("not content:hi", ["user:sometwo", "type:nominate"])
+    assert not filter_context.test("content:hi", ["user:sometwo", "type:nominate"])
+    assert filter_context.test("not content:hi", ["user:sometwo", "type:nominate"])
 
 def test_passes_filter_case_sensitivity():
-    assert passes_filter("type:Reply AND mode:OSU", ["mode:osu", "type:reply"])
-    assert not passes_filter("TYPE:QUALIFY", ["mode:osu", "type:reply"])
+    assert filter_context.test("type:Reply AND mode:OSU", ["mode:osu", "type:reply"])
+    assert not filter_context.test("TYPE:QUALIFY", ["mode:osu", "type:reply"])
 
 def test_passes_filter_event_object():
     beatmapset = Beatmapset(3, "artist", "title", creator=User(1, "someone"), modes=["osu"])
     event = Event(_type="nominate", time=datetime.utcnow(), beatmapset=beatmapset, user=User(2, "sometwo"))
 
-    assert passes_filter("type:nominate and user:sometwo", event)
-    assert not passes_filter("type:reply", event)
+    assert filter_context.test("type:nominate and user:sometwo", event)
+    assert not filter_context.test("type:reply", event)
 
 
 
 def test_get_tag():
-    assert get_tag("user")
-    assert get_tag("user-id")
-    assert get_tag("set-id")
-
-def test_get_tag_keys():
-    assert get_tag_keys("user") == ("user",)
-    assert get_tag_keys("set-id") == ("set-id", "mapset-id", "beatmapset-id")
+    assert filter_context.get_tag("user")
+    assert filter_context.get_tag("user-id")
+    assert filter_context.get_tag("set-id")
 
 def test_get_tag_undefined():
-    assert not get_tag("undefined")
+    assert not filter_context.get_tag("undefined")
 
 def test_get_key_value_pairs():
     assert list(get_key_value_pairs("user:someone and content:test")) == [("user", "someone"), ("content", "test")]
 
 def test_invalid_keys():
-    assert list(get_invalid_keys("content:test or undefined:test and mpaset-id:12389")) == ["undefined", "mpaset-id"]
+    assert list(get_invalid_keys("content:test or undefined:test and mpaset-id:12389", filter_context)) == ["undefined", "mpaset-id"]
 
 def test_invalid_filter_freetext():
-    assert list(get_invalid_filters("content:\"askjda kjsfh jgniqweunf\" or user:kjfhakjshd")) == []
+    assert list(get_invalid_filters("content:\"askjda kjsfh jgniqweunf\" or user:kjfhakjshd", filter_context)) == []
 
 def test_invalid_filter_modes():
-    assert list(get_invalid_filters("mode:test or mode:osu or mode:catch")) == [("mode", "test")]
+    assert list(get_invalid_filters("mode:test or mode:osu or mode:catch", filter_context)) == [("mode", "test")]
 
 def test_invalid_filter_ids():
     assert (
-        list(get_invalid_filters("user-id:test or mapset-id:\"test two\" or user-id:12381031")) ==
+        list(get_invalid_filters("user-id:test or mapset-id:\"test two\" or user-id:12381031", filter_context)) ==
         [("user-id", "test"), ("mapset-id", "test two")]
     )
 
 def test_invalid_filter_types():
-    assert list(get_invalid_filters("type:undefined or user:someone or type:qualify")) == [("type", "undefined")]
+    assert list(get_invalid_filters("type:undefined or user:someone or type:qualify", filter_context)) == [("type", "undefined")]
 
 def test_invalid_filter_types_alias():
-    assert list(get_invalid_filters("type:nom or type:nomnom or type:qual")) == [("type", "nomnom")]
+    assert list(get_invalid_filters("type:nom or type:nomnom or type:qual", filter_context)) == [("type", "nomnom")]
 
 def test_invalid_filter_types_escaped():
-    assert list(get_invalid_filters("type:\"kudosu gain\" or type:\"something else\"")) == [("type", "something else")]
+    assert list(get_invalid_filters("type:\"kudosu gain\" or type:\"something else\"", filter_context)) == [("type", "something else")]
 
 def test_invalid_filter_types_multiple():
     assert (
-        list(get_invalid_filters("type:undefined or type:nominate or user:someone and type:\"something else\"")) ==
+        list(get_invalid_filters("type:undefined or type:nominate or user:someone and type:\"something else\"", filter_context)) ==
         [("type", "undefined"), ("type", "something else")]
     )
 
@@ -214,16 +208,16 @@ def test_invalid_words_quotations():
     assert list(get_invalid_words("user:\"some one else\" or type:\"kudosu given\"")) == []
 
 def test_valid_keys():
-    assert is_valid("type:nominate")
-    assert not is_valid("undefined:nominate")
+    assert is_valid("type:nominate", filter_context)
+    assert not is_valid("undefined:nominate", filter_context)
 
 def test_valid_values():
-    assert is_valid("type:nominate")
-    assert not is_valid("type:undefined")
+    assert is_valid("type:nominate", filter_context)
+    assert not is_valid("type:undefined", filter_context)
 
 def test_valid_words():
-    assert is_valid("type:nominate and user:someone")
-    assert not is_valid("type:nominate annd user:someone")
+    assert is_valid("type:nominate and user:someone", filter_context)
+    assert not is_valid("type:nominate annd user:someone", filter_context)
 
 
 

@@ -9,7 +9,7 @@ from aiess import Event
 
 from bot.objects import Subscription
 from bot.database import Database, BOT_DB_NAME
-from bot.filterer import passes_filter
+from bot.filterers.event_filterer import filter_context
 
 DEFAULT_DB_NAME = BOT_DB_NAME
 
@@ -63,5 +63,5 @@ def get_subscription(channel: TextChannel) -> Subscription:
 async def forward(event: Event, client: discord.Client) -> None:
     """Attempts to forward an event through all subscription filters."""
     for sub in cache:
-        if passes_filter(sub.filter, event):
+        if filter_context.test(sub.filter, event):
             await client.send_event(event, sub)

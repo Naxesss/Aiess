@@ -4,7 +4,7 @@ sys.path.append('..')
 from aiess.database import SCRAPER_DB_NAME
 
 from bot.commands import Command, register
-from bot.filterer import filter_to_sql
+from bot.filterers.event_filterer import filter_to_sql
 from bot.cmdcommon import validate_filter
 from bot.formatter import format_link, format_embed
 from bot.database import Database

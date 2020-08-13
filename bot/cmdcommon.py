@@ -5,8 +5,8 @@ from discord import Embed
 
 from bot.commands import Command
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
-from bot.filterer import get_tag, get_tag_keys
-from bot.filterer import TAGS, AND_GATES, OR_GATES, NOT_GATES
+from bot.filterers.event_filterer import filter_context
+from bot.logic import AND_GATES, OR_GATES, NOT_GATES
 
 async def validate_filter(command: Command, _filter: str):
     """Returns whether the filter was considered valid. If invalid, an appropriate response is sent
@@ -82,8 +82,8 @@ def filters_embed():
 
 def filter_embed(key: str):
     key = key.lower().strip()
-    tag = get_tag(key)
-    keys = get_tag_keys(key)
+    tag = filter_context.get_tag(key)
+    keys = filter_context.get_tag_keys(key)
 
     embed = Embed()
     embed.add_field(

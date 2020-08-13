@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 from bot.commands import Command, register
-from bot.filterer import get_tag, get_tag_keys
+from bot.filterers.event_filterer import filter_context
 from bot.commands import EVENTS_CATEGORY
 from bot.cmdcommon import filters_embed, filter_embed
 
@@ -16,8 +16,8 @@ from bot.cmdcommon import filters_embed, filter_embed
 async def cmd_filters(command: Command, key: str=None):
     if key:
         key = key.lower().strip()
-        tag = get_tag(key)
-        keys = get_tag_keys(key)
+        tag = filter_context.get_tag(key)
+        keys = filter_context.get_tag(key).names
 
         if not tag or not keys:
             await command.respond_err(f"No filter key `{key}` exists.")
