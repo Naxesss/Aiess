@@ -18,6 +18,14 @@ CREATE TABLE `subscriptions` (
   UNIQUE KEY `UNIQUE` (`channel_id`,`guild_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+DROP TABLE IF EXISTS `permissions`;
+CREATE TABLE `permissions` (
+  `guild_id` bigint(20) unsigned NOT NULL,
+  `command_name` varchar(60) NOT NULL,
+  `permission_filter` mediumtext,
+  PRIMARY KEY (`guild_id`,`command_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- Scraper database
 CREATE DATABASE IF NOT EXISTS `aiess_test`;
 USE `aiess_test`;
