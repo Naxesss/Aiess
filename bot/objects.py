@@ -47,3 +47,26 @@ class Prefix():
     
     def __hash__(self) -> str:
         return hash(self.__key())
+
+class CommandPermission():
+    """Represents the permission needed to call a command, including which guild
+    it is associated with, the first command name, and the permission filter."""
+    def __init__(self, guild_id: int, command_name: str, permission_filter: str):
+        self.guild_id = int(guild_id)
+        self.command_name = command_name
+        self.permission_filter = permission_filter
+    
+    def __key(self) -> tuple:
+        return (
+            self.guild_id,
+            self.command_name,
+            self.permission_filter
+        )
+    
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, CommandPermission):
+            return False
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())
