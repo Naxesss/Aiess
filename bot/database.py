@@ -7,7 +7,7 @@ from typing import Generator, Dict, List
 import aiess
 from aiess import Event, Beatmapset, Usergroup
 
-from bot.objects import Subscription, Prefix
+from bot.objects import Subscription, Prefix, CommandPermission
 
 BOT_DB_NAME      = "aiess_bot"
 BOT_TEST_DB_NAME = "aiess_bot_test"
@@ -90,6 +90,41 @@ class Database(aiess.Database):
             table        = "prefixes",
             where        = "guild_id=%s",
             where_values = (guild_id,)
+        )
+
+    def insert_permission(self, permission: CommandPermission):
+        """Inserts/updates the given command permission into the permissions table."""
+        self.insert_table_data(
+            "permissions",
+            dict(
+                guild_id=permission.guild_id,
+                command_name=permission.command_name,
+                permission_filter=permission.permission_filter))
+    
+    def retrieve_permission(self, where: str=None, where_values: tuple=None) -> CommandPermission:
+        """Returns the first command permission matching the given WHERE clause, if any, otherwise None."""
+        return next(self.retrieve_permissions(where + " LIMIT 1", where_values), None)
+
+    def retrieve_permissions(self, where: str=None, where_values: tuple=None) -> Generator[CommandPermission, None, None]:
+        """Returns a generator of all command permissions from the database matching the given WHERE clause."""
+        fetched_rows = self.retrieve_table_data(
+            table        = "permissions",
+            where        = where,
+            where_values = where_values,
+            selection    = "guild_id, command_name, permission_filter"
+        )
+        for row in (fetched_rows or []):
+            guild_id = row[0]
+            command_name = row[1]
+            permission_filter = row[2]
+            yield CommandPermission(guild_id, command_name, permission_filter)
+    
+    def delete_permission(self, guild_id: int, command_name: str) -> None:
+        """Deletes the command permission of the given guild id from the permissions table."""
+        self.delete_table_data(
+            table        = "permissions",
+            where        = "guild_id=%s AND command_name=%s",
+            where_values = (guild_id, command_name)
         )
     
     async def retrieve_beatmapset_events(self, beatmapset: Beatmapset) -> List[Event]:
