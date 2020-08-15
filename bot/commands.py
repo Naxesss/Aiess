@@ -127,14 +127,20 @@ def register(
     
     return wrapper
 
-def help_embed(name: str, prefix: str=DEFAULT_PREFIX) -> Embed:
-    """Returns an embed explaining how to use the command with the given name.
-    Includes e.g. arguments, description, and examples."""
+def get_wrapper(name: str) -> FunctionWrapper:
+    """Returns the command wrapper of the given command name/alias, case insensitive, if any, otherwise None."""
     name = name.lower()
     if name not in registered_aliases:
         return None
     name = registered_aliases[name]
-    wrapper = registered_commands[name]
+    return registered_commands[name]
+
+def help_embed(name: str, prefix: str=DEFAULT_PREFIX) -> Embed:
+    """Returns an embed explaining how to use the command with the given name.
+    Includes e.g. arguments, description, and examples."""
+    wrapper = get_wrapper(name)
+    if not wrapper:
+        return None
 
     embed = Embed()
     embed.add_field(

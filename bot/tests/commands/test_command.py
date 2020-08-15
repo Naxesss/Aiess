@@ -12,7 +12,7 @@ from bot.prefixes import DEFAULT_PREFIX
 from bot.prefixes import set_prefix
 from bot.commands import register, registered_commands, registered_categories
 from bot.commands import Command, FunctionWrapper
-from bot.commands import help_embed, general_help_embed
+from bot.commands import get_wrapper, help_embed, general_help_embed
 
 def test_init_command():
     command = Command("test", "1", "2", "3")
@@ -143,6 +143,19 @@ async def test_command_respond_httpexception():
     assert not mock_channel.messages
 
 
+
+def test_get_wrapper():
+    register(
+        category="Some Category", names=["test", "alias"], required_args=["one", "two"], optional_args=["three"],
+        description="A command that uses `<one>`, `<two>`, and `[three]` to do stuff.",
+        example_args=["one two", "1 2 3", "\"o n e\" two three"]
+    )(None)
+
+    assert get_wrapper("test") == registered_commands["test"]
+    assert get_wrapper("alias") == registered_commands["test"]
+
+def test_get_wrapper_unrecognized():
+    assert not get_wrapper("unrecognized")
 
 def test_help_embed():
     register(
