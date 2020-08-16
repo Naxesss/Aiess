@@ -2,8 +2,10 @@ import sys
 sys.path.append('..')
 
 from bot.objects import CommandPermission
-from bot.commands import FunctionWrapper
+from bot import commands
+from bot.commands import FunctionWrapper, Command
 from bot.database import Database, BOT_DB_NAME
+from bot.filterers.perms_filterer import filter_context
 
 cache = {}  # 2d-dict, `cache[guild_id][command_wrapper.names[0]] = permission_filter`
 
@@ -27,3 +29,16 @@ def set_permission_filter(guild_id: int, command_wrapper: FunctionWrapper, permi
     else:
         Database(BOT_DB_NAME).insert_permission(CommandPermission(guild_id, command_wrapper.names[0], permission_filter))
     load()
+
+def can_execute(command: Command) -> bool:
+    """Returns whether the given command has permissions to execute within its current context
+    (channel/author/roles of that guild). Administrators bypass any permission."""
+    command_wrapper = commands.get_wrapper(command.name)
+    perm_filter = get_permission_filter(command.guild_id(), command_wrapper)
+    has_permission = filter_context.test(perm_filter, command.context) if perm_filter else False
+
+    caller = command.context.author
+    # The `guild_permissions` attribute is only available in guilds, for DM channels we skip this.
+    is_admin_or_dm = not hasattr(caller, "guild_permissions") or caller.guild_permissions.administrator
+
+    return has_permission or is_admin_or_dm
