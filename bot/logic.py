@@ -4,9 +4,11 @@ sys.path.append('..')
 from typing import Union, List, Generator, Tuple, Match
 import re
 
-AND_GATES = [" and ", "&", "∧"]
-OR_GATES  = [" or ",  "|", "∨"]
-NOT_GATES = ["not ",  "!", "¬"]
+# With `&`, `!`, etc enabled, filters such as `<@&519273>` or `<@!97183472>` no longer function properly.
+# `and` / `or` / `not` do not suffer from this issue due to requiring spaces around them.
+AND_GATES = [" and "]#, "&", "∧"]
+OR_GATES  = [" or "]#,  "|", "∨"]
+NOT_GATES = ["not "]#,  "!", "¬"]
 
 # Regular expression for cases like "not A and (not B or not C)"
 # Any group captured may be removed.
