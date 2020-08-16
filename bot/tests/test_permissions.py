@@ -3,8 +3,10 @@ sys.path.append('..')
 
 import mock
 
+from bot.tests.commands.mock_command import MockMessage, MockChannel, MockDMChannel, MockGuild, MockUser, MockRole
 from bot.objects import CommandPermission
-from bot.commands import FunctionWrapper
+from bot.commands import register, get_wrapper
+from bot.commands import FunctionWrapper, Command
 from bot.database import Database, BOT_TEST_DB_NAME
 from bot import permissions
 from bot.permissions import set_permission_filter, get_permission_filter
@@ -42,3 +44,135 @@ def test_load():
         permissions.load()
     assert permissions.cache
     assert permissions.cache[3]["test1"] == "filter"
+
+def test_can_execute_channel_perm():
+    register(
+        category = None, names = ["test1", "test2", "test3"]
+    )(None)
+    command_wrapper = get_wrapper(name="test1")
+    mock_message = MockMessage(
+        channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=2, is_admin=False)
+    )
+    command = Command(name="test2", context=mock_message)
+
+    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="channel:<#44>")
+    
+    assert permissions.can_execute(command)
+
+def test_can_execute_channel_perm_fail():
+    register(
+        category = None, names = ["test1", "test2", "test3"]
+    )(None)
+    command_wrapper = get_wrapper(name="test1")
+    mock_message = MockMessage(
+        channel = MockChannel(_id=9, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=2, is_admin=False)
+    )
+    command = Command(name="test2", context=mock_message)
+
+    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="channel:<#44>")
+    
+    assert not permissions.can_execute(command)
+
+def test_can_execute_role_perm():
+    register(
+        category = None, names = ["test1", "test2", "test3"]
+    )(None)
+    command_wrapper = get_wrapper(name="test1")
+    mock_message = MockMessage(
+        channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=2, roles=[MockRole(_id=66)], is_admin=False)
+    )
+    command = Command(name="test2", context=mock_message)
+
+    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="role:<@&66>")
+    
+    assert permissions.can_execute(command)
+
+def test_can_execute_role_perm_fail():
+    register(
+        category = None, names = ["test1", "test2", "test3"]
+    )(None)
+    command_wrapper = get_wrapper(name="test1")
+    mock_message = MockMessage(
+        channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=2, roles=[MockRole(_id=3)], is_admin=False)
+    )
+    command = Command(name="test2", context=mock_message)
+
+    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="role:<@&66>")
+    
+    assert not permissions.can_execute(command)
+
+def test_can_execute_user_perm():
+    register(
+        category = None, names = ["test1", "test2", "test3"]
+    )(None)
+    command_wrapper = get_wrapper(name="test1")
+    mock_message = MockMessage(
+        channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=88, is_admin=False)
+    )
+    command = Command(name="test2", context=mock_message)
+
+    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="user:<@88>")
+    
+    assert permissions.can_execute(command)
+
+def test_can_execute_user_perm_fail():
+    register(
+        category = None, names = ["test1", "test2", "test3"]
+    )(None)
+    command_wrapper = get_wrapper(name="test1")
+    mock_message = MockMessage(
+        channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=2, is_admin=False)
+    )
+    command = Command(name="test2", context=mock_message)
+
+    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="user:<@88>")
+    
+    assert not permissions.can_execute(command)
+
+def test_can_execute_default():
+    register(
+        category = None, names = ["test1", "test2", "test3"]
+    )(None)
+    mock_message = MockMessage(
+        channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=2, is_admin=False)
+    )
+    command = Command(name="test2", context=mock_message)
+    
+    assert not permissions.can_execute(command)
+
+def test_can_execute_admin():
+    register(
+        category = None, names = ["test1", "test2", "test3"]
+    )(None)
+    mock_message = MockMessage(
+        channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=2, is_admin=True)
+    )
+    command = Command(name="test2", context=mock_message)
+    
+    assert permissions.can_execute(command)
+
+def test_can_execute_dm():
+    register(
+        category = None, names = ["test1", "test2", "test3"]
+    )(None)
+    mock_message = MockMessage(
+        channel = MockDMChannel(_id=44),
+        author  = MockUser(_id=2, is_dm=True)
+    )
+    command = Command(name="test2", context=mock_message)
+    
+    assert permissions.can_execute(command)

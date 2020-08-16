@@ -2,6 +2,7 @@ import sys
 sys.path.append('..')
 
 import mock
+from typing import List
 
 from discord import Embed
 
@@ -59,13 +60,20 @@ class MockErrorChannel(MockChannel):
     async def send(self, content, embed: Embed=None):
         raise self.raise_on_send
 
+class MockRole():
+    """Represents a role (e.g. role of the user sending a message)."""
+    def __init__(self, _id: int=None):
+        self.id = int(_id) if _id is not None else None
+
 class MockUser():
     """Represents a user (e.g. an author of a sent message)."""
-    def __init__(self, _id: int=None, name: str=None, is_admin: bool=True):
+    def __init__(self, _id: int=None, name: str=None, roles: List[MockRole]=[], is_admin: bool=True, is_dm: bool=False):
         self.id = int(_id) if _id is not None else None
         self.name = name
-        self.guild_permissions = mock.MagicMock()
-        self.guild_permissions.administrator = True
+        self.roles = roles
+        if not is_dm:
+            self.guild_permissions = mock.MagicMock()
+            self.guild_permissions.administrator = is_admin
 
 class MockMessage():
     """Represents the message instance (e.g. from which a command was called). Contains
