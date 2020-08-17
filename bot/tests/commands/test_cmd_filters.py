@@ -15,7 +15,7 @@ async def test_filters():
     
     assert await receive_command(mock_command)
     assert f"`{DEFAULT_PREFIX}filters <key>`" in mock_command.response  # Should suggest using this for more details of a specific key.
-    assert "filter" in mock_command.response_embed.title
+    assert "filter" in mock_command.response_embed.title.lower()
     assert "case insensitive" in mock_command.response_embed.description
     assert "`type:(nominate or qualify) and user:lasse`" in mock_command.response_embed.description
 
