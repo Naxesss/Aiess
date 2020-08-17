@@ -12,7 +12,7 @@ NOT_GATES = ["not "]#,  "!", "¬"]
 
 # Regular expression for cases like "not A and (not B or not C)"
 # Any group captured may be removed.
-NOT_GATE_PATTERNS = ["(?:(?:^|[^A-Za-z0-9_ ])|( ))(not)(?:(?:[^A-Za-z0-9_ ])|( ))", "(!)", "(¬)"]
+NOT_GATE_PATTERNS = [r"(?:(?:^|[^A-Za-z0-9_ ])|(?: ))(not)(?:(?:[^A-Za-z0-9_ ])|( ))"]#, r"(!)", r"(¬)"]
 
 QUOTE_CHARS = ["\"", "“", "”"]
 
@@ -72,13 +72,13 @@ def distribute(string: str) -> str:
         pass
     post_or, _ = next(split_unescaped(post, OR_GATES))
 
+    expanded_content = pre[:-len(pre_or)] if pre_or else pre
     # In this case there's no difference between AND or OR gates, as they maintain their relative orders.
     # e.g. "pre(x | y & z)post" would just become "prexpost | preypost & prezpost"
-    expanded_content = pre[:-len(pre_or)]
     for split, gate in split_unescaped(content, AND_GATES + OR_GATES):
         split = surround_nonspace(split, pre_or, post_or)
         expanded_content += split + (gate if gate else "")
-    expanded_content += post[len(post_or):]
+    expanded_content += post[len(post_or):] if post_or else post
 
     # first some (things or here (and then more) along with) even more
     # ^^^^^^^^^^^^               ^             ^           ^^^^^^^^^^^
@@ -207,7 +207,6 @@ def de_morgans_law(string: str) -> str:
     not_gate_start, not_gate_end = (None, None)
     needs_negating = None
     needs_negating_index = -1
-    not_gate_substitution = ""
     read = ""
     for index, char in enumerate(string):
         read += char
@@ -221,14 +220,11 @@ def de_morgans_law(string: str) -> str:
 
                 if match:
                     found_not_gate = NOT_GATES[pattern_index]
-                    not_gate_start, not_gate_end = match.span()
+                    not_gate_start, not_gate_end = combined_captured_span(match)
 
                     needs_negating = forwards_leveled(string[index + 1:])
                     needs_negating_index = index + 1
 
-                    if found_not_gate == "not " and string[:not_gate_start]:
-                        # Retain the space to not unintentionally merge the two sides of the gate.
-                        not_gate_substitution = " "
                     break
         
         if found_not_gate:
@@ -238,7 +234,7 @@ def de_morgans_law(string: str) -> str:
         return string
     
     # Excludes the found NOT gate.
-    prefix = string[:not_gate_start] + not_gate_substitution + string[not_gate_end:needs_negating_index - len("(")]
+    prefix = string[:not_gate_start] + string[not_gate_end:needs_negating_index - len("(")]
     postfix = string[needs_negating_index + len(needs_negating) + len(")"):]
 
     negated_part = negate(needs_negating, not_gate=found_not_gate)
