@@ -11,6 +11,7 @@ from aiess.logger import log
 from bot.commands import Command
 from bot.commands import registered_commands, registered_aliases
 from bot.prefixes import get_prefix
+from bot import permissions
 
 async def receive(message: Message, client: Client) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
@@ -50,11 +51,8 @@ async def receive_command(command: Command) -> bool:
     # Let the user know the command was recognized, and that a response should follow.
     await command.trigger_typing()
 
-    caller = command.context.author
-    # TODO: Permissions should be adjustable on a per-command basis.
-    # The `guild_permissions` attribute is only available in guilds, for DM channels we skip this.
-    if hasattr(caller, "guild_permissions") and not caller.guild_permissions.administrator:
-        await command.respond(f"✗ Commands are limited to server admins for now.")
+    if not permissions.can_execute(command):
+        await command.respond(f"✗ Lacking permission.")
         return False
 
     if len(func_wrapper.required_args) > len(command.args):
