@@ -19,10 +19,12 @@ from bot import database
 from bot.formatter import format_link, format_embed
 from bot.cmd_modules import *
 from bot import activity
+from bot import permissions
 
 logger.init()
 subscriber.load()
 prefixes.load()
+permissions.load()
 
 class Client(discord.Client):
     def __init__(self, reader):
