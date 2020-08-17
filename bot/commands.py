@@ -151,7 +151,7 @@ def help_embed(name: str, prefix: str=DEFAULT_PREFIX) -> Embed:
     if wrapper.example_args:
         embed.add_field(
             name   = "Example(s)",
-            value  = "\r\n".join(f"∙ `{prefix}{name}" + (f" {args}" if args else "") + "`" for args in wrapper.example_args),
+            value  = "\n".join(f"∙ `{prefix}{name}" + (f" {args}" if args else "") + "`" for args in wrapper.example_args),
             inline = True
         )
 
