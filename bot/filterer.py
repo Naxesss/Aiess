@@ -7,7 +7,7 @@ import re
 from bot.logic import expand, split_unescaped, extract_not
 from bot.logic import AND_GATES, OR_GATES, NOT_GATES
 
-KEY_VALUE_PATTERN = "(\"[^\"]+.|[^ ]+):(\"[^\"]+.|[^ ]+)"
+KEY_VALUE_PATTERN = r"(\"[^\"]+.|[^ ]+):(\"[^\"]+.|[^ ]+)"
 
 class Tag():
     """Used in filtering to find specific aspects of objects (e.g. the name of a user).
