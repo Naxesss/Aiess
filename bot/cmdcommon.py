@@ -65,8 +65,8 @@ def filters_embed():
             Keys and values are always case insensitive.
             """
     embed.add_field(
-        name = "Keys (`/` denotes aliases)",
-        value = "\u2000".join("/".join(f"**`{name}`**" for name in tag.names) for tag in filter_context.tags),
+        name   = "Keys (`/` denotes aliases)",
+        value  = "\u2000".join("/".join(f"**`{name}`**" for name in tag.names) for tag in filter_context.tags),
         inline = True
     )
     embed.add_field(
@@ -87,18 +87,18 @@ def filter_embed(key: str):
 
     embed = Embed()
     embed.add_field(
-        name = "/".join(f"**`{key}`**" for key in keys),
-        value = tag.description,
+        name   = "/".join(f"**`{key}`**" for key in keys),
+        value  = tag.description,
         inline = True
     )
     embed.add_field(
-        name = "Value(s)",
-        value = tag.value_hint,
+        name   = "Value(s)",
+        value  = tag.value_hint,
         inline = True
     )
     embed.add_field(
-        name = "Example(s)",
-        value = "\r\n".join(f"∙ `{key}:{value}`" for value in tag.example_values),
+        name   = "Example(s)",
+        value  = "\r\n".join(f"∙ `{key}:{value}`" for value in tag.example_values),
         inline = True
     )
     return embed
