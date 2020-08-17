@@ -136,7 +136,6 @@ def test_passes_filter_and():
 
 def test_passes_filter_and_not():
     assert filter_context.test("type:reply and not mode:taiko", ["mode:catch", "type:reply"])
-    assert filter_context.test("type:reply and !mode:taiko", ["mode:catch", "type:reply"])
     assert not filter_context.test("type:reply and not mode:taiko", ["mode:taiko", "type:reply"])
     assert not filter_context.test("type:reply and not mode:taiko", ["mode:osu", "type:qualify"])
 
@@ -205,7 +204,7 @@ def test_invalid_words_typoed_and():
     assert list(get_invalid_words("user:someone annd type:nominate")) == ["annd"]
 
 def test_invalid_words_unexpanded():
-    assert list(get_invalid_words("user:(someone or sometwo) and type: not (nominate or qualify)")) == []
+    assert list(get_invalid_words("user:(someone or sometwo) and type:not (nominate or qualify)")) == []
 
 def test_invalid_words_quotations():
     assert list(get_invalid_words("user:\"some one else\" or type:\"kudosu given\"")) == []

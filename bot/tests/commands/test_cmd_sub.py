@@ -164,15 +164,3 @@ async def test_sub_typoed_and():
     assert mock_command.response_embed.fields[0].name == filters_embed().fields[0].name
     assert mock_command.response_embed.fields[0].value == filters_embed().fields[0].value
     assert not subscriber.cache
-
-@pytest.mark.asyncio
-async def test_sub_exclamation_in_value():
-    mock_message = MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=2)))
-    mock_command = MockCommand("sub", "mode:osu or mode:osu!catch", context=mock_message)
-
-    assert await receive_command(mock_command)
-    assert mock_command.response.startswith("✗")
-    assert "`!mode`" in mock_command.response
-    assert mock_command.response_embed.fields[0].name == filters_embed().fields[0].name
-    assert mock_command.response_embed.fields[0].value == filters_embed().fields[0].value
-    assert not subscriber.cache

@@ -25,7 +25,7 @@ async def test_filters():
     assert "**`set-id`**/**`mapset-id`**" in mock_command.response_embed.fields[0].value.lower()
 
     assert "gates" in mock_command.response_embed.fields[1].name.lower()
-    assert "**`and`**\u2000**`&`**\u2000**`∧`**" in mock_command.response_embed.fields[1].value.lower()
+    assert "**`and`**" in mock_command.response_embed.fields[1].value.lower()
 
 @pytest.mark.asyncio
 async def test_filters_with_arg():
