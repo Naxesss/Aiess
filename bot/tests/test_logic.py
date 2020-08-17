@@ -51,6 +51,9 @@ def test_expand_not_before_type():
 def test_expand_complex():
     assert expand("A or E and not (B and (C or not D))") == "A or E and not B or E and not C and E and D"
 
+def test_expand_complex_capital():
+    assert expand("A OR E AND NOT (B AND (C OR NOT D))") == "A or E and not B or E and not C and E and D"
+
 def test_expand_nested_leading_or():
     assert expand("type:(not B or (not C and D))") == "not type:B or not type:C and type:D"
 
