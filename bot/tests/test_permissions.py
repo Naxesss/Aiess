@@ -24,6 +24,28 @@ def test_set_permission_filter():
     assert "test2" not in permissions.cache[3]
     assert permissions.cache[3]["test1"] == "filter"
 
+def test_set_permission_filter_none():
+    command_wrapper = FunctionWrapper(category=None, names=["test1", "test2", "test3"], execute=None)
+
+    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter=None)
+
+    # The guild no longer has any permission filters, so it should be discarded together with the filter.
+    assert 3 not in permissions.cache
+
+def test_set_permission_filter_none_keep_guild():
+    command_wrapper = FunctionWrapper(category=None, names=["test1", "test2", "test3"], execute=None)
+    command_wrapper2 = FunctionWrapper(category=None, names=["test4", "test5", "test6"], execute=None)
+
+    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper2, permission_filter="filter2")
+        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter=None)
+
+    assert "test4" in permissions.cache[3]
+    assert "test1" not in permissions.cache[3]
+
 def test_get_permission_filter():
     command_wrapper = FunctionWrapper(category=None, names=["test1", "test2", "test3"], execute=None)
 
