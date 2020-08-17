@@ -92,23 +92,10 @@ def get_group_aliases(key: str) -> List[str]:
     VALID_TYPES.extend(alias.replace(" ", "_") for alias in GROUP_ALIASES[key])
     return VALID_TYPES
 
-
-
-def dissect_targets(obj: Union[Event, User, Beatmapset, Discussion]) -> List[str]:
-    if not isinstance(obj, Event):
-        return
-
-    if obj.user:       yield obj.user
-    if obj.discussion: yield obj.discussion
-    if obj.beatmapset: yield obj.beatmapset
-    if obj.newspost:   yield obj.newspost
-    if obj.group:      yield obj.group
-
 HINT_ANY = "Accepts any value."
 HINT_INT = "Accepts any integer value."
 
 filter_context = FilterContext(
-    dissect_targets = dissect_targets,
     tags = [
         # User
         Tag(
@@ -117,7 +104,7 @@ filter_context = FilterContext(
             example_values  = ["lasse", "\"seto kousuke\""],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.name)] if isinstance(obj, User) else None
+            value_func      = lambda event: [escape(event.user.name)] if event.user else None
         ),
         Tag(
             names           = ["user-id"],
@@ -125,7 +112,7 @@ filter_context = FilterContext(
             example_values  = ["896613"],
             value_hint      = HINT_INT,
             value_predicate = is_int,
-            value_func      = lambda obj: [escape(obj.id)] if isinstance(obj, User) else None
+            value_func      = lambda event: [escape(event.user.id)] if event.user else None
         ),
         # Beatmapset
         Tag(
@@ -134,7 +121,7 @@ filter_context = FilterContext(
             example_values  = ["41823"],
             value_hint      = HINT_INT,
             value_predicate = is_int,
-            value_func      = lambda obj: [escape(obj.id)] if isinstance(obj, Beatmapset) else None
+            value_func      = lambda event: [escape(event.beatmapset.id)] if event.beatmapset else None
         ),
         Tag(
             names           = ["artist"],
@@ -142,7 +129,7 @@ filter_context = FilterContext(
             example_values  = ["nhato", "\"the quick brown fox\""],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.artist)] if isinstance(obj, Beatmapset) else None
+            value_func      = lambda event: [escape(event.beatmapset.artist)] if event.beatmapset else None
         ),
         Tag(
             names           = ["title"],
@@ -150,7 +137,7 @@ filter_context = FilterContext(
             example_values  = ["uta", "\"baka mitai\""],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.title)] if isinstance(obj, Beatmapset) else None
+            value_func      = lambda event: [escape(event.beatmapset.title)] if event.beatmapset else None
         ),
         Tag(
             names           = ["creator"],
@@ -158,7 +145,7 @@ filter_context = FilterContext(
             example_values  = ["lasse", "\"seto kousuke\""],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.creator.name)] if isinstance(obj, Beatmapset) else None
+            value_func      = lambda event: [escape(event.beatmapset.creator.name)] if event.beatmapset else None
         ),
         Tag(
             names           = ["creator-id"],
@@ -166,7 +153,7 @@ filter_context = FilterContext(
             example_values  = ["896613"],
             value_hint      = HINT_INT,
             value_predicate = is_int,
-            value_func      = lambda obj: [escape(obj.creator.id)] if isinstance(obj, Beatmapset) else None
+            value_func      = lambda event: [escape(event.beatmapset.creator.id)] if event.beatmapset else None
         ),
         Tag(
             names           = ["mode"],
@@ -174,7 +161,7 @@ filter_context = FilterContext(
             example_values  = ["osu", "taiko", "catch", "mania"],
             value_hint      = "\u2000".join(f"`{mode}`" for mode in ["osu", "taiko", "catch", "mania"]),
             value_predicate = lambda value: value in ["osu", "taiko", "catch", "mania"],
-            value_func      = lambda obj: [escape(mode) for mode in obj.modes] if isinstance(obj, Beatmapset) else None
+            value_func      = lambda event: [escape(mode) for mode in event.beatmapset.modes] if event.beatmapset else None
         ),
         # Discussion
         Tag(
@@ -183,7 +170,7 @@ filter_context = FilterContext(
             example_values  = ["1687831"],
             value_hint      = HINT_INT,
             value_predicate = is_int,
-            value_func      = lambda obj: [escape(obj.id)] if isinstance(obj, Discussion) else None
+            value_func      = lambda event: [escape(event.discussion.id)] if event.discussion else None
         ),
         Tag(
             names           = ["author"],
@@ -191,7 +178,7 @@ filter_context = FilterContext(
             example_values  = ["lasse", "\"seto kousuke\""],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.user.name)] if isinstance(obj, Discussion) else None
+            value_func      = lambda event: [escape(event.discussion.user.name)] if event.discussion else None
         ),
         Tag(
             names           = ["author-id"],
@@ -199,7 +186,7 @@ filter_context = FilterContext(
             example_values  = ["896613"],
             value_hint      = HINT_INT,
             value_predicate = is_int,
-            value_func      = lambda obj: [escape(obj.user.id)] if isinstance(obj, Discussion) else None
+            value_func      = lambda event: [escape(event.discussion.user.id)] if event.discussion else None
         ),
         Tag(
             names           = ["discussion-content"],
@@ -207,7 +194,7 @@ filter_context = FilterContext(
             example_values  = ["nice", "\"very cool\""],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.content)] if isinstance(obj, Discussion) else None
+            value_func      = lambda event: [escape(event.discussion.content)] if event.discussion else None
         ),
         # Usergroup
         Tag(
@@ -217,10 +204,10 @@ filter_context = FilterContext(
             # Ignore group ids, only show distinct aliases (full bn and probo bn have some identical ones).
             value_hint      = "\u2000".join(list(OrderedDict.fromkeys(f"`{alias}`" for aliases in GROUP_ALIASES.values() for alias in aliases))),
             value_predicate = lambda value: value in get_all_group_aliases(),
-            value_func      = lambda obj: (
-                    [escape(str(obj.group.id))] +
-                    ([escape(alias) for alias in get_group_aliases(str(obj.group.id))] if str(obj.group.id) in GROUP_ALIASES else [])
-                ) if isinstance(obj, Event) and obj.group else None
+            value_func      = lambda event: (
+                    [escape(str(event.group.id))] +
+                    ([escape(alias) for alias in get_group_aliases(str(event.group.id))] if str(event.group.id) in GROUP_ALIASES else [])
+                ) if event.group else None
         ),
         Tag(
             names           = ["group-id"],
@@ -228,7 +215,7 @@ filter_context = FilterContext(
             example_values  = ["4", "7", "28", "32"],
             value_hint      = HINT_INT,
             value_predicate = is_int,
-            value_func      = lambda obj: [escape(obj.group.id)] if isinstance(obj, Event) and obj.group else None
+            value_func      = lambda event: [escape(event.group.id)] if event.group else None
         ),
         # Newspost
         Tag(
@@ -237,7 +224,7 @@ filter_context = FilterContext(
             example_values  = ["\"New Featured Artist: DragonForce\"", "\"%title contains this%\""],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.title)] if isinstance(obj, NewsPost) else None
+            value_func      = lambda event: [escape(event.newspost.title)] if event.newspost else None
         ),
         Tag(
             names           = ["news-content", "news-preview"],
@@ -245,7 +232,7 @@ filter_context = FilterContext(
             example_values  = ["\"preview is exactly this\"", "\"%preview contains this%\""],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.preview)] if isinstance(obj, NewsPost) else None
+            value_func      = lambda event: [escape(event.newspost.preview)] if event.newspost else None
         ),
         Tag(
             names           = ["news-author"],
@@ -253,7 +240,7 @@ filter_context = FilterContext(
             example_values  = ["Ephemeral", "\"The Spotlights Team\"", "\"%contains this%\""],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.author.name)] if isinstance(obj, NewsPost) else None
+            value_func      = lambda event: [escape(event.newspost.author.name)] if event.newspost else None
         ),
         Tag(
             names           = ["news-author-id"],
@@ -261,7 +248,7 @@ filter_context = FilterContext(
             example_values  = ["102335"],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.author.id)] if isinstance(obj, NewsPost) else None
+            value_func      = lambda event: [escape(event.newspost.author.id)] if event.newspost else None
         ),
         # Event
         Tag(
@@ -270,10 +257,10 @@ filter_context = FilterContext(
             example_values  = ["reset", "nomination-reset", "\"nomination reset\""],
             value_hint      = "\u2000".join(f"`{alias}`" for alias in TYPE_ALIASES) + "\u2000(+lots of aliases)",
             value_predicate = lambda value: value in get_all_type_aliases(),
-            value_func      = lambda obj: (
-                    [escape(obj.type)] +
-                    ([escape(alias) for alias in get_type_aliases(obj.type)] if obj.type in TYPE_ALIASES else [])
-                ) if isinstance(obj, Event) else None
+            value_func      = lambda event: (
+                    [escape(event.type)] +
+                    ([escape(alias) for alias in get_type_aliases(event.type)] if event.type in TYPE_ALIASES else [])
+                )
         ),
         Tag(
             names           = ["content"],
@@ -281,7 +268,7 @@ filter_context = FilterContext(
             example_values  = ["nice", "\"very cool\"", "\"%contains this%\""],
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
-            value_func      = lambda obj: [escape(obj.content)] if isinstance(obj, Event) and obj.content else None
+            value_func      = lambda event: [escape(event.content)] if event.content else None
         )
     ]
 )
