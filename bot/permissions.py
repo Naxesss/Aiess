@@ -13,7 +13,10 @@ def load() -> None:
     """Loads the guild-specific command permissions from the database into the cache."""
     cache.clear()
     for perm_obj in Database(BOT_DB_NAME).retrieve_permissions():
-        cache[perm_obj.guild_id] = { perm_obj.command_name : perm_obj.permission_filter }
+        if perm_obj.guild_id not in cache:
+            cache[perm_obj.guild_id] = { perm_obj.command_name : perm_obj.permission_filter }
+        else:
+            cache[perm_obj.guild_id][perm_obj.command_name] = perm_obj.permission_filter
 
 def get_permission_filter(guild_id: int, command_wrapper: FunctionWrapper) -> str:
     """Returns the permission filter used for this command type in this guild, or None if no such filter exists."""
