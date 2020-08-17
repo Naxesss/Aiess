@@ -43,16 +43,16 @@ def test_expand_multiple_and():
     )
 
 def test_expand_not():
-    assert expand("type: not (nominate or qualify)") == "not type:nominate and not type:qualify"
+    assert expand("type:not (nominate or qualify)") == "not type:nominate and not type:qualify"
 
 def test_expand_not_before_type():
     assert expand("not type:(nominate or qualify)") == "not type:nominate and not type:qualify"
 
-def test_expand_mathematical():
-    assert expand("A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))") == "A ∨ E ∧ ¬B ∨ E ∧ ¬C ∧ E ∧ D"
+def test_expand_complex():
+    assert expand("A or E and not (B and (C or not D))") == "A or E and not B or E and not C and E and D"
 
 def test_expand_nested_leading_or():
-    assert expand("type:(¬B ∨ (¬C ∧ D))") == "¬type:B ∨ ¬type:C ∧ type:D"
+    assert expand("type:(not B or (not C and D))") == "not type:B or not type:C and type:D"
 
 
 
@@ -117,7 +117,7 @@ def test_split_unescaped_long_delimiter():
     assert next(generator, None) is None
 
 def test_de_morgans_law():
-    assert de_morgans_law("!(A | B & C)") == "(!A & (!B | !C))"
+    assert de_morgans_law("not (A or B and C)") == "(not A and (not B or not C))"
 
     # !(A | B & C)      filter out x in first !(x) match
     # A | B & C         insert ! in front of all ground-level terms
@@ -129,7 +129,7 @@ def test_de_morgans_law():
     # (!A & (!B | !C))  return
 
 def test_de_morgans_law_complex():
-    assert de_morgans_law("x!(D & !(A | B & C) | E & F)y") == "x((!D | (A | B & C)) & (!E | !F))y"
+    assert de_morgans_law("x not (D and not (A or B and C) or E and F)y") == "x ((not D or (A or B and C)) and (not E or not F))y"
 
     # x!(D & !(A | B & C) | E & F)y         filter out x in first !(x) match
     # D & !(A | B & C) | E & F              insert ! in front of all ground-level terms
@@ -142,7 +142,7 @@ def test_de_morgans_law_complex():
     # x((!D | (A | B & C)) & (!E | !F))y    return, rest is cleaned up by expand
 
 def test_de_morgans_law_elimination():
-    assert de_morgans_law("!!(A & B)") == "(A & B)"
+    assert de_morgans_law("not not (A and B)") == "(A and B)"
 
 def test_de_morgans_law_negated_word():
     assert de_morgans_law("not type:(nominate or qualify)") == "type:(not nominate and not qualify)"
@@ -155,24 +155,14 @@ def test_de_morgans_law_negated_key_with_gate():
     assert a == "content:hi and (not user and not author and not creator):someone"
 
 def test_negate():
-    assert negate("A | B & C") == "!A & (!B | !C)"
+    assert negate("A or B and C") == "not A and (not B or not C)"
 
 def test_negate_outside_parentheses():
-    assert negate("A | (B & !D | E) & C") == "!A & (!(B & !D | E) | !C)"
-
-def test_negate_literal():
-    assert negate("A or B and C", "not ") == "not A and (not B or not C)"
-
-def test_negate_mathematical():
-    assert negate("A ∨ B ∧ C", "¬") == "¬A ∧ (¬B ∨ ¬C)"
+    assert negate("A or (B and not D or E) and C") == "not A and (not (B and not D or E) or not C)"
 
 def test_flip_gate():
     assert flip_gate(" or ") == " and "
     assert flip_gate(" and ") == " or "
-    assert flip_gate("|") == "&"
-    assert flip_gate("&") == "|"
-    assert flip_gate("∨") == "∧"
-    assert flip_gate("∧") == "∨"
 
 def test_flip_gate_not_a_gate():
     with pytest.raises(ValueError) as err:
@@ -181,29 +171,23 @@ def test_flip_gate_not_a_gate():
     assert "Cannot flip" in str(err)
 
 def test_double_negation_elimination():
-    assert double_negation_elimination("!!(A & B)") == "(A & B)"
+    assert double_negation_elimination("not not (A and B)") == "(A and B)"
 
 def test_double_negation_elimination_multiple():
-    assert double_negation_elimination("!!!!!(A & B)") == "!(A & B)"
-    assert double_negation_elimination("(!!!A & !!!!B)") == "(!A & B)"
-
-def test_double_negation_elimination_literal():
-    assert double_negation_elimination("not not (A & not B) Anot not B") == "(A & not B) Anot not B"
-
-def test_double_negation_elimination_mathematical():
-    assert double_negation_elimination("¬¬¬(A & ¬¬B)") == "¬(A & B)"
+    assert double_negation_elimination("not not not not not (A and B)") == "not (A and B)"
+    assert double_negation_elimination("(not not not A and not not not not B)") == "(not A and B)"
 
 def test_double_negation_elimination_word_between():
-    assert double_negation_elimination("not type: not (A & B)") == "type:(A & B)"
+    assert double_negation_elimination("not type:not (A & B)") == "type:(A & B)"
 
 def test_double_negation_elimination_gates_between():
     assert double_negation_elimination("not type and all between or not (A & B)") == "not type and all between or not (A & B)"
 
-def test_double_negation_elimination_mixed():
-    assert double_negation_elimination("not !(A & !¬¬B)") == "(A & ¬B)"
+def test_double_negation_elimination_after_or_gate():
+    assert double_negation_elimination("not B or not not D") == "not B or D"
 
-def test_double_negation_elimination_word_between_and_mixed():
-    assert double_negation_elimination("not type:!A") == "type:A"
+def test_double_negation_elimination_note():
+    assert double_negation_elimination("not B or not note and D") == "not B or not note and D"
 
 def test_double_negation_elimination_keep_colon():
     assert double_negation_elimination("type:not not (A or B)") == "type:(A or B)"
@@ -214,16 +198,10 @@ def test_normalize_not():
 def test_normalize_not_multiple():
     assert normalize_not("type:not nominate and type:not qualify") == "not type:nominate and not type:qualify"
 
-def test_normalize_not_programatic():
-    assert normalize_not("type:!nominate & type:!qualify") == "!type:nominate & !type:qualify"
-
-def test_normalize_not_mathematical():
-    assert normalize_not("type:¬nominate ∧ type:¬qualify") == "¬type:nominate ∧ ¬type:qualify"
-
 def test_normalize_not_and_or():
     assert (
-        normalize_not("type:¬nominate ∧ type:¬qualify ∨ type:¬nominate ∧ type:reply") ==
-        "¬type:nominate ∧ ¬type:qualify ∨ ¬type:nominate ∧ type:reply"
+        normalize_not("type:not nominate and type:not qualify or type:not nominate and type:reply") ==
+        "not type:nominate and not type:qualify or not type:nominate and type:reply"
     )
 
 def test_normalize_not_spacing():
