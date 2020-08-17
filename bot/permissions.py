@@ -23,7 +23,8 @@ def get_permission_filter(guild_id: int, command_wrapper: FunctionWrapper) -> st
     return cache[guild_id][command_wrapper.names[0]]
 
 def set_permission_filter(guild_id: int, command_wrapper: FunctionWrapper, permission_filter: str) -> None:
-    """Updates the permission filter in this guild for this command to the given value."""
+    """Updates the permission filter in this guild for this command to the given value.
+    If given `None`, the permission entry is deleted."""
     if permission_filter is None:
         Database(BOT_DB_NAME).delete_permission(guild_id, command_wrapper.names[0])
     else:
