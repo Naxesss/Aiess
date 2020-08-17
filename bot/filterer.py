@@ -36,16 +36,8 @@ class Tag():
 
 class FilterContext():
     """Determines how any filter passed into this class should behave
-    (e.g. which tags are valid and how objects are broken down into tags).
-    
-    - `dissect_targets` :
-        A function yielding additional parts of the object to dissect (apart from the object itself).
-        For example `yield object.user`, if there is a tag depending on the user of the object.
-    - `tags` :
-        A list of tags available. Uses the objects dissected to create key:value pairs describing
-        aspects of them, which can then be filtered for by matching these key:value pairs."""
-    def __init__(self, dissect_targets: Callable[[object], Generator[object, None, None]], tags: List[Tag]=[]):
-        self.dissect_targets = dissect_targets
+    (e.g. which tags are valid and how objects are broken down into tags)."""
+    def __init__(self, tags: List[Tag]=[]):
         self.tags = tags
     
     def get_tag(self, name: str) -> Tag:
@@ -56,17 +48,14 @@ class FilterContext():
         return None
     
     def dissect(self, obj: object) -> List[str]:
-        """Returns a list of lowercased key:value strings representing the given object."""
+        """Returns a list of lowercased key:value strings representing the given object in this context."""
         dissections = list(self.dissect_shallow(obj))
-        for dissect_target in self.dissect_targets(obj):
-            dissections.extend(self.dissect_shallow(dissect_target))
-        
         # Lowercase everything for ease-of-access when filtering.
         return list(map(lambda dissection: dissection.lower(), dissections))
     
     def dissect_shallow(self, obj: object) -> Generator[str, None, None]:
-        """Returns a generator of dissections on the given object without recursion
-        (e.g. if on an event, the user properties are not part of the generator)."""
+        """Returns a generator of dissections on the given object,
+        based on the tags of this filter context."""
         for tag in self.tags:
             for value in (tag.value_func(obj) or []):
                 for name in tag.names:

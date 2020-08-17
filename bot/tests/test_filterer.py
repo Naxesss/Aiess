@@ -30,17 +30,17 @@ def test_dissect_simple():
 def test_dissect_user():
     user = User(2, "some two")
     event = Event(_type="test", time=datetime.utcnow(), user=user)
-    assert filter_context.dissect(user) == [
+    assert filter_context.dissect(event) == [
         "user:\"some two\"",
-        "user-id:2"
+        "user-id:2",
+        "type:test"
     ]
-    assert filter_context.dissect(event) == ["type:test"] + filter_context.dissect(user)
 
 def test_dissect_beatmapset():
     user = User(2, "some two")
     beatmapset = Beatmapset(4, artist="yes", title="no", creator=user, modes=["osu", "catch"])
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset)
-    assert filter_context.dissect(beatmapset) == [
+    assert filter_context.dissect(event) == [
         "set-id:4",
         "mapset-id:4",
         "beatmapset-id:4",
@@ -49,9 +49,9 @@ def test_dissect_beatmapset():
         "creator:\"some two\"",
         "creator-id:2",
         "mode:osu",
-        "mode:catch"
+        "mode:catch",
+        "type:test"
     ]
-    assert filter_context.dissect(event) == ["type:test"] + filter_context.dissect(beatmapset)
 
 def test_dissect_discussion():
     user = User(1, "some one")
@@ -60,17 +60,15 @@ def test_dissect_discussion():
     discussion = Discussion(3, beatmapset=beatmapset, user=user, content="hello")
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=user, content="hello")
 
-    dissection = filter_context.dissect(discussion)
+    event_dissection = filter_context.dissect(event)
     for pair in [
+        "type:test",
+        "content:hello",
         "discussion-id:3",
         "author:\"some one\"",
         "author-id:1",
         "discussion-content:hello"
     ]:
-        assert pair in dissection
-
-    event_dissection = filter_context.dissect(event)
-    for pair in (["type:test"] + filter_context.dissect(discussion) + filter_context.dissect(user) + ["content:hello"]):
         assert pair in event_dissection
 
 def test_dissect_discussion_reply():
@@ -82,25 +80,30 @@ def test_dissect_discussion_reply():
     event = Event(_type="reply", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=replier, content="there")
 
     event_dissection = filter_context.dissect(event)
-    for pair in (["type:reply"] + filter_context.dissect(discussion) + filter_context.dissect(replier) + ["content:there"]):
+    for pair in [
+        "user:\"some three\"",
+        "user-id:3",
+        "author:\"some one\"",
+        "author-id:1",
+        "type:reply",
+        "content:there"
+    ]:
         assert pair in event_dissection
 
 def test_dissect_newspost():
     user = User(2, "some two")
     newspost = NewsPost(_id=4, title="title", preview="preview", author=user, slug="slug", image_url="image_url")
     event = Event(_type="test", time=datetime.utcnow(), newspost=newspost, content="preview")
-
-    dissection = filter_context.dissect(newspost)
-    for pair in [
+    
+    assert filter_context.dissect(event) == [
         "news-title:title",
         "news-content:preview",
         "news-preview:preview",
         "news-author:\"some two\"",
-        "news-author-id:2"
-    ]:
-        assert pair in dissection
-    
-    assert filter_context.dissect(event) == ["type:test", "content:preview"] + filter_context.dissect(newspost)
+        "news-author-id:2",
+        "type:test",
+        "content:preview"
+    ]
 
 def test_dissect_aliases():
     event = Event(_type="nominate", time=datetime.utcnow())
