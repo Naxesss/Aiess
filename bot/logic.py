@@ -4,28 +4,26 @@ sys.path.append('..')
 from typing import Union, List, Generator, Tuple, Match
 import re
 
-# With `&`, `!`, etc enabled, filters such as `<@&519273>` or `<@!97183472>` no longer function properly.
-# `and` / `or` / `not` do not suffer from this issue due to requiring spaces around them.
-AND_GATES = [" and "]#, "&", "∧"]
-OR_GATES  = [" or "]#,  "|", "∨"]
-NOT_GATES = ["not "]#,  "!", "¬"]
+AND_GATES = [" and "]
+OR_GATES  = [" or "]
+NOT_GATES = ["not "]
 
 # Regular expression for cases like "not A and (not B or not C)"
 # Any group captured may be removed.
-NOT_GATE_PATTERNS = [r"(?:(?:^|[^A-Za-z0-9_ ])|(?: ))(not)(?:(?:[^A-Za-z0-9_ ])|( ))"]#, r"(!)", r"(¬)"]
+NOT_GATE_PATTERNS = [r"(?:(?:^|[^A-Za-z0-9_ ])|(?: ))(not)(?:(?:[^A-Za-z0-9_ ])|( ))"]
 
 QUOTE_CHARS = ["\"", "“", "”"]
 
 def expand(string: str) -> str:
     """Converts the given expression into disjunctive normal form.
-    Supports literal, programatic and mathematical boolean operators (e.g. "and", "&", as well as "∧").
+    Only supports literal operators (e.g. `and` / `or` / `not`).
     
     As an example,
-    \"A ∨ E ∧ ¬(B ∧ (C ∨ ¬D))\"
+    \"A or E and not (B and (C or not D))\"
     would be converted to
-    \"A ∨ E ∧ ¬B ∨ E ∧ ¬C ∧ E ∧ D\"."""
+    \"A or E and not B or E and not C and E and D\"."""
 
-    # e.g. "!(A & B)" -> "(!A | !B)"
+    # e.g. "not (A and B)" -> "(not A or not B)"
     string = de_morgans_law(string)
 
     # Performing expansion individually for each OR group ensures we don't
@@ -74,7 +72,7 @@ def distribute(string: str) -> str:
 
     expanded_content = pre[:-len(pre_or)] if pre_or else pre
     # In this case there's no difference between AND or OR gates, as they maintain their relative orders.
-    # e.g. "pre(x | y & z)post" would just become "prexpost | preypost & prezpost"
+    # e.g. "pre(x or y and z)post" would just become "prexpost or preypost and prezpost"
     for split, gate in split_unescaped(content, AND_GATES + OR_GATES):
         split = surround_nonspace(split, pre_or, post_or)
         expanded_content += split + (gate if gate else "")
@@ -170,7 +168,7 @@ def split_unescaped(string: str, delimiters: List[str]) -> Generator[Tuple[str, 
     unescaped delimiters (or None if at the end) from the given string. Escaped delimiters are ones
     inside quotes or parentheses.
     
-    So for example splitting \"\"A|B\"|C\" by \"|\" would result in (\"\"A|B\"\", \"|\") and (\"C\", None)."""
+    So for example splitting \"\"A or B\" or C\" by \" or \" would result in (\"\"A or B\"\", \" or \") and (\"C\", None)."""
     read = ""
     quotes = 0
     parentheses = 0
@@ -245,19 +243,19 @@ def de_morgans_law(string: str) -> str:
 
 def negate(string: str, not_gate: str=NOT_GATES[0]) -> str:
     """Returns an expression where everything in the string outside parentheses is negated, including OR and AND gates.
-    Uses "!" as not gate, unless another is given."""
+    Uses the first available NOT gate, unless another is given."""
 
     reconstruction = ""
     for or_split, or_gate in split_unescaped(string, OR_GATES):
 
-        # e.g. "A & B" -> "A | B"
+        # e.g. "A and B" -> "A or B"
         and_temp = ""
         for and_split, and_gate in split_unescaped(or_split, AND_GATES):
             and_split = surround_nonspace(and_split, not_gate, "")
             if and_gate: and_temp += and_split + flip_gate(and_gate)
             else:        and_temp += and_split
         
-        # e.g. "A " -> "A ", but "A | B " -> "(A | B) "
+        # e.g. "A " -> "A ", but "A or B " -> "(A or B) "
         if any(or_gate in and_temp for or_gate in OR_GATES):
             and_temp = surround_nonspace(and_temp, "(", ")")
 
@@ -267,8 +265,7 @@ def negate(string: str, not_gate: str=NOT_GATES[0]) -> str:
     return reconstruction
 
 def flip_gate(gate: str) -> str:
-    """Returns any AND gate as the equivalent OR gate, and visa versa. So "&" would return "|", "∨" returns "∧", etc.
-    If no such gate exists, we raise a ValueError."""
+    """Returns any AND gate as the equivalent OR gate, and vice versa. If no such gate exists, we raise a ValueError."""
     for index, and_gate in enumerate(AND_GATES):
         if gate == and_gate:
             return OR_GATES[index]
@@ -280,8 +277,7 @@ def flip_gate(gate: str) -> str:
     raise ValueError(f"Cannot flip the gate \"{gate}\".")
 
 def double_negation_elimination(string: str) -> str:
-    """Returns the same string, but where all double NOT gates are removed, including mixed gate symbols
-    (e.g. "not type:!A" -> "type:A")."""
+    """Returns the same string, but where all double NOT gates are removed (e.g. "not type:not A" -> "type:A")."""
     read = ""
     for char in string:
         read += char
