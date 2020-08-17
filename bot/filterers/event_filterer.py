@@ -54,7 +54,6 @@ GROUP_ALIASES: Dict[str, List[str]] = {
     "11": ANY_ALIASES + ["dev", "devs", "developers"],
     "16": ANY_ALIASES + ["alu", "alumni", "alumnis"],
     "22": ANY_ALIASES + ["sup", "support", "support team"],
-    # Exclusively full/probo bns:
     "28": ANY_ALIASES + BN_ALIASES + ["full", "full bn", "full bns", "full beatmap nominators"],
     "32": (ANY_ALIASES + BN_ALIASES + ["probo", "probo bn", "probo bns", "probation", "probation bn",
         "probation bns", "probationary beatmap nominators"])
