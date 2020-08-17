@@ -10,13 +10,13 @@ NOT_GATES = ["not "]
 
 # Regular expression for cases like "not A and (not B or not C)"
 # Any group captured may be removed.
-NOT_GATE_PATTERNS = [r"(?:(?:^|[^A-Za-z0-9_ ])|(?: ))(not)(?:(?:[^A-Za-z0-9_ ])|( ))"]
+NOT_GATE_PATTERNS = [r"(?i)(?:(?:^|[^A-Za-z0-9_ ])|(?: ))(not)(?:(?:[^A-Za-z0-9_ ])|( ))"]
 
 QUOTE_CHARS = ["\"", "“", "”"]
 
 def expand(string: str) -> str:
     """Converts the given expression into disjunctive normal form.
-    Only supports literal operators (e.g. `and` / `or` / `not`).
+    Only supports literal operators (e.g. `and` / `or` / `not`), case insensitive.
     
     As an example,
     \"A or E and not (B and (C or not D))\"
@@ -189,7 +189,7 @@ def split_unescaped(string: str, delimiters: List[str]) -> Generator[Tuple[str, 
         # Quotes and parentheses are considered escaped, so we ignore delimiters inside them.
         if not quotes and not parentheses:
             for delimiter in delimiters:
-                if read.endswith(delimiter):
+                if read.lower().endswith(delimiter):
                     split = read[:-len(delimiter)]  # Don't include the delimiter itself in the split.
                     yield (split, delimiter)
                     read = ""
@@ -213,7 +213,7 @@ def de_morgans_law(string: str) -> str:
             for pattern_index, not_gate_pattern in enumerate(NOT_GATE_PATTERNS):
                 match = None
                 for temp_match in re.finditer(not_gate_pattern, read):
-                    if not any(gate in read[temp_match.start(0):] for gate in (AND_GATES + OR_GATES)):
+                    if not any(gate in read[temp_match.start(0):].lower() for gate in (AND_GATES + OR_GATES)):
                         match = temp_match
 
                 if match:
@@ -267,11 +267,11 @@ def negate(string: str, not_gate: str=NOT_GATES[0]) -> str:
 def flip_gate(gate: str) -> str:
     """Returns any AND gate as the equivalent OR gate, and vice versa. If no such gate exists, we raise a ValueError."""
     for index, and_gate in enumerate(AND_GATES):
-        if gate == and_gate:
+        if gate.lower() == and_gate.lower():
             return OR_GATES[index]
     
     for index, or_gate in enumerate(OR_GATES):
-        if gate == or_gate:
+        if gate.lower() == or_gate.lower():
             return AND_GATES[index]
     
     raise ValueError(f"Cannot flip the gate \"{gate}\".")
@@ -285,7 +285,7 @@ def double_negation_elimination(string: str) -> str:
         matches = []
         for pattern in NOT_GATE_PATTERNS:
             for match in re.finditer("(?=(?:" + pattern + "))", read):
-                if not any(gate in read[match.start(0):] for gate in (AND_GATES + OR_GATES + ["(", ")"])):
+                if not any(gate in read[match.start(0):].lower() for gate in (AND_GATES + OR_GATES + ["(", ")"])):
                     matches.append(match)
 
         if len(matches) > 1:
