@@ -5,7 +5,7 @@ from typing import Union, List, Generator, Callable, Tuple
 import re
 
 from bot.logic import expand, split_unescaped, extract_not
-from bot.logic import AND_GATES, OR_GATES, NOT_GATES
+from bot.logic import AND_GATES, OR_GATES, NOT_GATES, QUOTE_CHARS
 
 KEY_VALUE_PATTERN = r"(\"[^\"]+.|[^ ]+):(\"[^\"]+.|[^ ]+)"
 
@@ -94,6 +94,12 @@ def escape(obj: str) -> str:
     if " " in str(obj):
         return f"\"{obj}\""
     return str(obj)
+
+def unescape(string: str) -> str:
+    """Returns the string without surrounding quotes recursively, accounts for different quote symbols."""
+    if string.startswith(tuple(QUOTE_CHARS)) and string.endswith(tuple(QUOTE_CHARS)):
+        return unescape(string[1:-1])
+    return string
 
 def is_int(value: str) -> bool:
     """Returns whether the given string can be parsed as an integer."""

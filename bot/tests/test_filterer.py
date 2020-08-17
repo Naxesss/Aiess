@@ -10,6 +10,7 @@ from bot.filterers.event_filterer import filter_context
 from bot.filterers.event_filterer import filter_to_sql
 
 from bot.filterer import escape
+from bot.filterer import unescape
 from bot.filterer import get_key_value_pairs
 from bot.filterer import get_invalid_keys
 from bot.filterer import get_invalid_filters
@@ -22,6 +23,15 @@ def test_escape():
 
 def test_escape_int():
     assert escape(42) == "42"
+
+def test_unescape():
+    assert unescape("\"normal \"quotes\"\"") == "normal \"quotes\""
+
+def test_unescape_different_quotes():
+    assert unescape("”“different \"quotes”\"“") == "different \"quotes”"
+
+def test_unescape_no_quotes():
+    assert unescape("no quotes") == "no quotes"
 
 def test_dissect_simple():
     event = Event(_type="test", time=datetime.utcnow())
