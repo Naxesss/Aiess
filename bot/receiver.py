@@ -12,6 +12,8 @@ from bot.commands import Command
 from bot.commands import registered_commands, registered_aliases
 from bot.prefixes import get_prefix
 from bot import permissions
+from bot.filterer import unescape
+from bot.logic import split_unescaped
 
 async def receive(message: Message, client: Client) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
@@ -36,7 +38,8 @@ def parse_command(content: str, context: Message=None, client: Client=None) -> C
         args = match.group(2)
 
         if args:
-            return Command(name, *args.split(" "), context=context, client=client)
+            args_respecting_quotes = [unescape(arg) for arg, _ in split_unescaped(args, [" "])]
+            return Command(name, *args_respecting_quotes, context=context, client=client)
         return Command(name, context=context, client=client)
     return None
 

@@ -37,6 +37,13 @@ def test_parse_command():
     assert not parse_command("++test")
     assert not parse_command("123 +test")
 
+def test_parse_command_quotes():
+    assert parse_command("+test \"123\"") == Command("test", "123")
+    assert parse_command("+test \"1 2\" \"3 4 5\"") == Command("test", "1 2", "3 4 5")
+
+def test_parse_command_nested_quotes():
+    assert parse_command("+test \"nested \"quotes\"\"") == Command("test", "nested \"quotes\"")
+
 def test_parse_command_custom_prefix():
     context = MockMessage(channel=MockChannel(guild=MockGuild(_id=3)))
     set_prefix(guild_id=3, prefix="&")
