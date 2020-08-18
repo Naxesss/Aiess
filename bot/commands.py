@@ -63,6 +63,8 @@ class Command():
     async def respond(self, response: str, embed: Embed=None) -> bool:
         """Sends a message in the channel where the command was called, with the given response text and embed, if any.
         Handles Forbidden and HTTPException errors by logging. Returns whether a response was successfully sent."""
+        # `\u200b` is a zero-width space. This prevents any kind of mention/highlight.
+        response = response.replace("@", "@\u200b")
         try:
             await self.context.channel.send(response, embed=embed)
             self.response = response
