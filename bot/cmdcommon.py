@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from discord import Embed
 
+from bot import commands
 from bot.commands import Command, FunctionWrapper
 from bot.commands import registered_commands
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
@@ -139,3 +140,16 @@ def _permission_name(guild_id: int, command_wrapper: FunctionWrapper) -> str:
 def _permission_value(guild_id: int, command_wrapper: FunctionWrapper) -> str:
     """Returns the embed field value this permission should have given its guild and command wrapper."""
     return f"{command_wrapper}".replace("{0}", get_prefix(guild_id))
+
+def get_command_wrappers(commands_str: str) -> List[FunctionWrapper]:
+    """Returns the respective command wrappers given the comma separated command names."""
+    if not commands_str:
+        return []
+    
+    wrappers = []
+    for name in commands_str.replace("+", "").split(","):
+        # `strip` ensures any spaces between commas are ignored (e.g. "one, two" is same as "one,two").
+        wrapper = commands.get_wrapper(name.strip())
+        if wrapper:
+            wrappers.append(wrapper)
+    return wrappers
