@@ -7,6 +7,7 @@ from bot.commands import Command
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
 from bot.logic import AND_GATES, OR_GATES, NOT_GATES
 from bot.filterer import FilterContext
+from bot.formatter import format_dotted_list
 
 async def validate_filter(command: Command, _filter: str, filter_context: FilterContext) -> bool:
     """Returns whether the filter was considered valid. If invalid, an appropriate response is sent
@@ -62,21 +63,19 @@ def filters_embed(filter_context: FilterContext) -> Embed:
     embed = Embed()
     embed.title = f"Filter ({filter_context.name})"
     embed.description = """
-            A string of key:value pairs (e.g. `type:(nominate or qualify) and user:lasse`).
-            Keys and values are always case insensitive.
+            A string of key:value pairs (e.g. `key1:(value1 or value2) and key2:value3`).
+            Keys and values are always case insensitive. Gates are `and`, `or`, and `not`.
             """
+    
+    keys = "\u2000".join("**`" + ("/".join(f"{name}" for name in tag.names) + "`**") for tag in filter_context.tags)
     embed.add_field(
-        name   = "Keys (`/` denotes aliases)",
-        value  = "\u2000".join("/".join(f"**`{name}`**" for name in tag.names) for tag in filter_context.tags),
+        name   = "Keys" + (" (`/` denotes aliases)" if "/" in keys else ""),
+        value  = keys,
         inline = True
     )
     embed.add_field(
-        name = "Gates",
-        value = (
-            "**AND**\u2000" + "\u2000".join(f"**`{gate.strip()}`**" for gate in AND_GATES) + "\r\n" +
-            "**OR**\u2000"  + "\u2000".join(f"**`{gate.strip()}`**" for gate in OR_GATES)  + "\r\n" +
-            "**NOT**\u2000" + "\u2000".join(f"**`{gate.strip()}`**" for gate in NOT_GATES)
-        ),
+        name   = "Example(s)",
+        value  = format_dotted_list(filter_context.examples),
         inline = True
     )
     return embed
@@ -101,7 +100,7 @@ def filter_embed(key: str, filter_context: FilterContext) -> Embed:
     )
     embed.add_field(
         name   = "Example(s)",
-        value  = "\r\n".join(f"∙ `{key}:{value}`" for value in tag.example_values),
+        value  = format_dotted_list(f"`{key}:{value}`" for value in tag.example_values),
         inline = True
     )
     return embed
