@@ -3,7 +3,7 @@ sys.path.append('..')
 
 import pytest
 
-from bot.tests.commands.mock_command import MockMessage, MockChannel, MockGuild
+from bot.tests.commands.mock_command import MockMessage, MockChannel, MockGuild, MockClient, MockUser
 from bot.commands import Command
 from bot.commands import register
 from bot.prefixes import set_prefix
@@ -54,7 +54,7 @@ def test_parse_command_custom_prefix():
 async def test_receive():
     mock_channel = MockChannel()
     mock_message = MockMessage("+test", channel=mock_channel)
-    await receive(mock_message, client=None)
+    await receive(mock_message, client=MockClient())
     assert mock_channel.messages[0].content == "hi"
 
 @pytest.mark.asyncio
