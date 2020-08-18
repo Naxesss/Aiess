@@ -113,8 +113,6 @@ async def test_sub_undefined_type():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "`type:undefined`" in mock_command.response.lower()
-    assert mock_command.response_embed.fields[0].name == filter_embed("type").fields[0].name
-    assert mock_command.response_embed.fields[0].value == filter_embed("type").fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -125,8 +123,6 @@ async def test_sub_undefined_type_duplicates():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert mock_command.response.lower().count("`type:undefined`") == 1
-    assert mock_command.response_embed.fields[0].name == filter_embed("type").fields[0].name
-    assert mock_command.response_embed.fields[0].value == filter_embed("type").fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -137,8 +133,6 @@ async def test_sub_undefined_key():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert mock_command.response.lower().count("`undefined`") == 1
-    assert mock_command.response_embed.fields[0].name == filters_embed().fields[0].name
-    assert mock_command.response_embed.fields[0].value == filters_embed().fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -149,8 +143,6 @@ async def test_sub_forgotten_colon():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "`typequalify`" in mock_command.response
-    assert mock_command.response_embed.fields[0].name == filters_embed().fields[0].name
-    assert mock_command.response_embed.fields[0].value == filters_embed().fields[0].value
     assert not subscriber.cache
 
 @pytest.mark.asyncio
@@ -161,6 +153,4 @@ async def test_sub_typoed_and():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "`annd`" in mock_command.response
-    assert mock_command.response_embed.fields[0].name == filters_embed().fields[0].name
-    assert mock_command.response_embed.fields[0].value == filters_embed().fields[0].value
     assert not subscriber.cache

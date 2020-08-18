@@ -118,11 +118,8 @@ async def test_recent_invalid_key():
     mock_command = MockCommand("recent", "undefined:test", context=mock_message)
 
     assert await receive_command(mock_command)
-
     assert mock_command.response.startswith("✗")
     assert "invalid key" in mock_command.response.lower()
-    assert mock_command.response_embed.fields[0].name == filters_embed().fields[0].name
-    assert mock_command.response_embed.fields[0].value == filters_embed().fields[0].value
 
 @pytest.mark.asyncio
 @mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
@@ -131,11 +128,8 @@ async def test_recent_invalid_value():
     mock_command = MockCommand("recent", "type:undefined", context=mock_message)
 
     assert await receive_command(mock_command)
-
     assert mock_command.response.startswith("✗")
     assert "invalid value" in mock_command.response.lower()
-    assert mock_command.response_embed.fields[0].name == filter_embed("type").fields[0].name
-    assert mock_command.response_embed.fields[0].value == filter_embed("type").fields[0].value
 
 @pytest.mark.asyncio
 @mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
@@ -144,8 +138,5 @@ async def test_recent_invalid_word():
     mock_command = MockCommand("recent", "type:nominate eand type:qualify", context=mock_message)
 
     assert await receive_command(mock_command)
-
     assert mock_command.response.startswith("✗")
     assert "invalid word" in mock_command.response.lower()
-    assert mock_command.response_embed.fields[0].name == filters_embed().fields[0].name
-    assert mock_command.response_embed.fields[0].value == filters_embed().fields[0].value
