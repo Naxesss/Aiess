@@ -3,10 +3,11 @@ sys.path.append('..')
 
 import pytest
 
-from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel
+from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel, MockGuild
 from bot.cmd_modules import cmd_filters
 from bot.receiver import receive_command
 from bot.prefixes import DEFAULT_PREFIX
+from bot.prefixes import set_prefix
 from bot.commands import help_embed
 
 @pytest.mark.asyncio
@@ -41,6 +42,22 @@ async def test_filters_with_arg():
     assert "accepts any value" in mock_command.response_embed.fields[1].value.lower()
     assert "example(s)" in mock_command.response_embed.fields[2].name.lower()
     assert "∙\u00a0`user:lasse`" in mock_command.response_embed.fields[2].value.lower()
+
+@pytest.mark.asyncio
+async def test_filters_custom_prefix():
+    mock_command = MockCommand("filters", context=MockMessage(channel=MockChannel(guild=MockGuild(_id=8))))
+    set_prefix(guild_id=8, prefix="&")
+    
+    assert await receive_command(mock_command)
+    assert f"`&filters <key>`" in mock_command.response
+
+@pytest.mark.asyncio
+async def test_filters_with_arg_custom_prefix():
+    mock_command = MockCommand("filters", "user", context=MockMessage(channel=MockChannel(guild=MockGuild(_id=8))))
+    set_prefix(guild_id=8, prefix="&")
+    
+    assert await receive_command(mock_command)
+    assert f"`&filters`" in mock_command.response
 
 @pytest.mark.asyncio
 async def test_filters_unrecognized_command():
