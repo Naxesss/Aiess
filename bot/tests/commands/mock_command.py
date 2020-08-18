@@ -81,7 +81,7 @@ class MockMessage():
     the channel from where it was sent, as well as by whom."""
     def __init__(self, content: str=None, channel: MockChannel=None, author: MockUser=None, embed: Embed=None):
         self.content = str(content) if content is not None else None
-        self.channel = channel
+        self.channel = channel if channel else MockChannel()
         self.guild = channel.guild if channel is not None and hasattr(channel, "guild") else None
         self.author = author if author else MockUser()
         self.embed = embed
