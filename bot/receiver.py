@@ -14,6 +14,7 @@ from bot.prefixes import get_prefix
 from bot import permissions
 from bot.filterer import unescape
 from bot.logic import split_unescaped
+from bot.cmdcommon import permissions_embed
 
 async def receive(message: Message, client: Client) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
@@ -55,7 +56,14 @@ async def receive_command(command: Command) -> bool:
     await command.trigger_typing()
 
     if not permissions.can_execute(command):
-        await command.respond(f"✗ Lacking permission.")
+        await command.respond(
+            response = f"✗ Lacking permission.",
+            embed = permissions_embed(
+                # Can only lack permission in a guild.
+                guild_id         = command.guild_id(),
+                command_wrappers = [func_wrapper]
+            )
+        )
         return False
 
     if len(func_wrapper.required_args) > len(command.args):
