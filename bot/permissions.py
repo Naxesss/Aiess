@@ -7,12 +7,14 @@ from bot.commands import FunctionWrapper, Command
 from bot.database import Database, BOT_DB_NAME
 from bot.filterers.perms_filterer import filter_context
 
+DEFAULT_DB_NAME = BOT_DB_NAME
+
 cache = {}  # 2d-dict, `cache[guild_id][command_wrapper.names[0]] = permission_filter`
 
 def load() -> None:
     """Loads the guild-specific command permissions from the database into the cache."""
     cache.clear()
-    for perm_obj in Database(BOT_DB_NAME).retrieve_permissions():
+    for perm_obj in Database(DEFAULT_DB_NAME).retrieve_permissions():
         if perm_obj.guild_id not in cache:
             cache[perm_obj.guild_id] = { perm_obj.command_name : perm_obj.permission_filter }
         else:
@@ -29,9 +31,9 @@ def set_permission_filter(guild_id: int, command_wrapper: FunctionWrapper, permi
     """Updates the permission filter in this guild for this command to the given value.
     If given `None`, the permission entry is deleted."""
     if permission_filter is None:
-        Database(BOT_DB_NAME).delete_permission(guild_id, command_wrapper.names[0])
+        Database(DEFAULT_DB_NAME).delete_permission(guild_id, command_wrapper.names[0])
     else:
-        Database(BOT_DB_NAME).insert_permission(CommandPermission(guild_id, command_wrapper.names[0], permission_filter))
+        Database(DEFAULT_DB_NAME).insert_permission(CommandPermission(guild_id, command_wrapper.names[0], permission_filter))
     load()
 
 def can_execute(command: Command) -> bool:
