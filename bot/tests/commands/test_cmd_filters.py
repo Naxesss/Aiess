@@ -17,15 +17,17 @@ async def test_filters():
     assert f"`{DEFAULT_PREFIX}filters <key>`" in mock_command.response  # Should suggest using this for more details of a specific key.
     assert "filter" in mock_command.response_embed.title.lower()
     assert "case insensitive" in mock_command.response_embed.description
-    assert "`type:(nominate or qualify) and user:lasse`" in mock_command.response_embed.description
+    assert "`key1:(value1 or value2) and key2:value3`" in mock_command.response_embed.description
 
     assert "keys" in mock_command.response_embed.fields[0].name.lower()
     assert "`/` denotes aliases" in mock_command.response_embed.fields[0].name.lower()
     assert "**`user`**" in mock_command.response_embed.fields[0].value.lower()
-    assert "**`set-id`**/**`mapset-id`**" in mock_command.response_embed.fields[0].value.lower()
+    assert "**`set-id/mapset-id/beatmapset-id`**" in mock_command.response_embed.fields[0].value.lower()
 
-    assert "gates" in mock_command.response_embed.fields[1].name.lower()
-    assert "**`and`**" in mock_command.response_embed.fields[1].value.lower()
+    assert "gates" in mock_command.response_embed.description.lower()
+    assert "`and`" in mock_command.response_embed.description.lower()
+    assert "`or`" in mock_command.response_embed.description.lower()
+    assert "`not`" in mock_command.response_embed.description.lower()
 
 @pytest.mark.asyncio
 async def test_filters_with_arg():
@@ -38,7 +40,7 @@ async def test_filters_with_arg():
     assert "value(s)" in mock_command.response_embed.fields[1].name.lower()
     assert "accepts any value" in mock_command.response_embed.fields[1].value.lower()
     assert "example(s)" in mock_command.response_embed.fields[2].name.lower()
-    assert "∙ `user:lasse`" in mock_command.response_embed.fields[2].value.lower()
+    assert "∙\u00a0`user:lasse`" in mock_command.response_embed.fields[2].value.lower()
 
 @pytest.mark.asyncio
 async def test_filters_unrecognized_command():
