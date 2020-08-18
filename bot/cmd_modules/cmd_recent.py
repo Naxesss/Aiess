@@ -9,6 +9,7 @@ from bot.cmdcommon import validate_filter
 from bot.formatter import format_link, format_embed
 from bot.database import Database
 from bot.commands import EVENTS_CATEGORY
+from bot.filterers.event_filterer import filter_context
 
 @register(
     category      = EVENTS_CATEGORY,
@@ -26,7 +27,7 @@ from bot.commands import EVENTS_CATEGORY
     ]
 )
 async def cmd_recent(command: Command, _filter: str=None):
-    if _filter and not await validate_filter(command, _filter):
+    if _filter and not await validate_filter(command, _filter, filter_context):
         return  # `validate_filter` will respond for us.
 
     filter_query, filter_values = filter_to_sql(_filter)

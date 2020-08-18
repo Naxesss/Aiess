@@ -10,6 +10,7 @@ from bot.subscriber import subscribe
 from bot.filterer import expand
 from bot.formatter import escape_markdown
 from bot.commands import EVENTS_CATEGORY
+from bot.filterers.event_filterer import filter_context
 
 @register(
     category      = EVENTS_CATEGORY,
@@ -47,7 +48,7 @@ async def cmd_sub(command: Command, _filter: str=None):
         await command.respond(content, embed=embed)
         return
 
-    if not await validate_filter(command, _filter):
+    if not await validate_filter(command, _filter, filter_context):
         return  # `validate_filter` will respond for us.
 
     subscribe(command.context.channel, _filter)
