@@ -1,13 +1,19 @@
 import sys
 sys.path.append('..')
 
+from typing import List
+from collections import defaultdict
+
 from discord import Embed
 
-from bot.commands import Command
+from bot.commands import Command, FunctionWrapper
+from bot.commands import registered_commands
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
 from bot.logic import AND_GATES, OR_GATES, NOT_GATES
 from bot.filterer import FilterContext
 from bot.formatter import format_dotted_list
+from bot.permissions import get_permission_filter
+from bot.prefixes import get_prefix
 
 async def validate_filter(command: Command, _filter: str, filter_context: FilterContext) -> bool:
     """Returns whether the filter was considered valid. If invalid, an appropriate response is sent
@@ -104,3 +110,32 @@ def filter_embed(key: str, filter_context: FilterContext) -> Embed:
         inline = True
     )
     return embed
+
+def permissions_embed(guild_id: int, command_wrappers: List[FunctionWrapper]=None) -> Embed:
+    """Returns an embed showing how the permissions of the given commands are setup in this guild.
+    If command_wrappers is omitted, or a falsy value is given, all registered commands are shown instead."""
+    embed = Embed()
+    wrappers = defaultdict(list)
+    for command_wrapper in (command_wrappers or registered_commands.values()):
+        wrappers[_permission_name(guild_id, command_wrapper)].append(_permission_value(guild_id, command_wrapper))
+    
+    first_field = True
+    for name in wrappers:
+        embed.add_field(
+            # We fake the appearance of a title in order to allow mentions in sub-titles.
+            name   = "Permissions" if first_field else "\u200b",
+            value  = f"**{name}**\n" + format_dotted_list(wrappers[name]),
+            inline = True
+        )
+        first_field = False
+    
+    return embed
+
+def _permission_name(guild_id: int, command_wrapper: FunctionWrapper) -> str:
+    """Returns the embed field name this permission should have given its guild and command wrapper."""
+    _filter = get_permission_filter(guild_id, command_wrapper)
+    return _filter if _filter else "*admin-only*"
+
+def _permission_value(guild_id: int, command_wrapper: FunctionWrapper) -> str:
+    """Returns the embed field value this permission should have given its guild and command wrapper."""
+    return f"{command_wrapper}".replace("{0}", get_prefix(guild_id))
