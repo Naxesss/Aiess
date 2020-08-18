@@ -5,6 +5,7 @@ from bot.commands import Command, register
 from bot.filterers.event_filterer import filter_context
 from bot.commands import EVENTS_CATEGORY
 from bot.cmdcommon import filters_embed, filter_embed
+from bot.filterers.event_filterer import filter_context
 
 @register(
     category      = EVENTS_CATEGORY,
@@ -23,7 +24,13 @@ async def cmd_filters(command: Command, key: str=None):
             await command.respond_err(f"No filter key `{key}` exists.")
             return
 
-        await command.respond(f"Type `{command.prefix()}filters` for a list of keys and gates.", embed=filter_embed(key))
+        await command.respond(
+            response = f"Type `{command.prefix()}filters` for a list of keys and gates.",
+            embed    = filter_embed(key, filter_context)
+        )
         return
 
-    await command.respond(f"Type `{command.prefix()}filters <key>` for usage.", embed=filters_embed())
+    await command.respond(
+        response = f"Type `{command.prefix()}filters <key>` for usage.",
+        embed    = filters_embed(filter_context)
+    )
