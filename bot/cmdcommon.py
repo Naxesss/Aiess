@@ -5,12 +5,12 @@ from discord import Embed
 
 from bot.commands import Command
 from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
-from bot.filterers.event_filterer import filter_context
 from bot.logic import AND_GATES, OR_GATES, NOT_GATES
+from bot.filterer import FilterContext
 
-async def validate_filter(command: Command, _filter: str):
+async def validate_filter(command: Command, _filter: str, filter_context: FilterContext) -> bool:
     """Returns whether the filter was considered valid. If invalid, an appropriate response is sent
-    where the command was called."""
+    where the command was called. Requires a filter context to determine filter validity."""
     try:
         expansion = expand(_filter)
     except ValueError as err:
@@ -23,7 +23,7 @@ async def validate_filter(command: Command, _filter: str):
         invalids_formatted = "`" + "`, `".join(invalid_keys) + "`"
         await command.respond_err(
             response = f"Invalid key(s) {invalids_formatted} in expansion `{expansion}`.",
-            embed    = filters_embed()
+            embed    = filters_embed(filter_context)
         )
         return False
 
@@ -37,7 +37,7 @@ async def validate_filter(command: Command, _filter: str):
         invalids_formatted = "`" + "`, `".join(invalids_strs) + "`"
         await command.respond_err(
             response = f"Invalid value(s) for key(s) {invalids_formatted} in expansion `{expansion}`.",
-            embed    = filter_embed(keys[0])  # `keys` will have at least one element, else `invalid_filters` would be falsy.
+            embed    = filter_embed(keys[0], filter_context)  # `keys` will have at least one element, else `invalid_filters` would be falsy.
         )
         return False
 
@@ -46,7 +46,7 @@ async def validate_filter(command: Command, _filter: str):
         invalids_formatted = "`" + "`, `".join(invalid_words) + "`"
         await command.respond_err(
             response = f"Invalid word(s) {invalids_formatted} in expansion `{expansion}`.",
-            embed    = filters_embed()
+            embed    = filters_embed(filter_context)
         )
         return False
 
@@ -57,9 +57,10 @@ async def validate_filter(command: Command, _filter: str):
     
     return True
 
-def filters_embed():
+def filters_embed(filter_context: FilterContext) -> Embed:
+    """Returns an embed representing the given filter context; showing all tag names and examples."""
     embed = Embed()
-    embed.title = "The **`<filter>`** Argument"
+    embed.title = f"Filter ({filter_context.name})"
     embed.description = """
             A string of key:value pairs (e.g. `type:(nominate or qualify) and user:lasse`).
             Keys and values are always case insensitive.
@@ -80,7 +81,9 @@ def filters_embed():
     )
     return embed
 
-def filter_embed(key: str):
+def filter_embed(key: str, filter_context: FilterContext) -> Embed:
+    """Returns an embed representing the tag with the given name `key`, for this context.
+    Goes more in detail regarding how to use this specific tag."""
     key = key.lower().strip()
     tag = filter_context.get_tag(key)
     keys = filter_context.get_tag(key).names
