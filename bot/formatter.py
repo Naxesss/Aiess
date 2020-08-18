@@ -385,3 +385,8 @@ def format_timeago(time: datetime, min_unit: TimeUnit=TimeUnit.SECONDS, max_unit
         formatted_time = formatted_time.replace("<", "less than ")
 
     return f"{formatted_time} ago"
+
+def format_dotted_list(elements: list) -> str:
+    """Returns a dotted list representing the given elements."""
+    # `\00a0` is a non-breaking space, ensuring that the dot and element are always aligned.
+    return "\n".join(f"∙\u00a0{element}" for element in elements)

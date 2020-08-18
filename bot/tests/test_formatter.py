@@ -29,6 +29,7 @@ from bot.formatter import format_history
 from bot.formatter import TimeUnit
 from bot.formatter import format_time
 from bot.formatter import format_timeago
+from bot.formatter import format_dotted_list
 
 @pytest.fixture
 def suggestion_event():
@@ -362,3 +363,6 @@ def test_format_timeago_not_bold():
         mock_datetime.side_effect = datetime
 
         assert format_timeago(from_string("2020-01-01 00:00:00"), bold=False) == "5 hours ago"
+
+def test_format_dotted_list():
+    assert format_dotted_list(["abc", "def", "ghi"]) == "∙\u00a0abc\n∙\u00a0def\n∙\u00a0ghi"
