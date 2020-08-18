@@ -7,8 +7,15 @@ from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChanne
 from bot.cmd_modules import cmd_perms
 from bot.receiver import receive_command
 from bot.prefixes import DEFAULT_PREFIX
+from bot import prefixes
 from bot.prefixes import set_prefix
 from bot.commands import help_embed
+from bot.database import Database, BOT_TEST_DB_NAME
+
+def setup_function():
+    prefixes.DEFAULT_DB_NAME = BOT_TEST_DB_NAME
+    Database(BOT_TEST_DB_NAME).clear_table_data("prefixes")
+    prefixes.cache = {}
 
 @pytest.mark.asyncio
 async def test_perms():
