@@ -3,7 +3,6 @@ sys.path.append('..')
 
 from typing import Optional, List
 
-from bot.prefixes import DEFAULT_PREFIX
 from bot import commands
 from bot.commands import register
 from bot.commands import Command, FunctionWrapper
@@ -16,10 +15,10 @@ from bot.filterers.perms_filterer import filter_context
     category      = PERMISSIONS_CATEGORY,
     names         = ["perms", "permissions"],
     optional_args = ["command(s)"],
-    description   = f"""
+    description   = """
         Shows all command permissions in the server. Optionally only `[command(s)]`.
 
-        See also `{DEFAULT_PREFIX}enable` and `{DEFAULT_PREFIX}disable`.
+        See also `{0}enable` and `{0}disable`.
         """,
     example_args  = [
         None,
