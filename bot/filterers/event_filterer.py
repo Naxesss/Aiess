@@ -95,7 +95,18 @@ HINT_ANY = "Accepts any value."
 HINT_INT = "Accepts any integer value."
 
 filter_context = FilterContext(
-    tags = [
+    name     = "Events",
+    examples = [
+        "**#mapfeed** `type:(nom or qual or dq or reset or rank or love) and not user:banchobot`",
+        "**#mapfeed-osu** `type:(nom or qual or dq or reset or rank or love) and not user:banchobot and mode:osu`",
+        "**#groupfeed** `group:any`",
+        "**#groupfeed-bns** `group:bns`",
+        "**#newsfeed** `type:news`",
+        "**#newsfeed-fa** `type:news and news-title:\"%featured artist%\"`",
+        "**involves you** `(author or creator):{your name} and not user:{your name}`",
+        "**involves you + works with renames** `(author-id or creator-id):{your id} and not user-id:{your id}`"
+    ],
+    tags     = [
         # User
         Tag(
             names           = ["user"],

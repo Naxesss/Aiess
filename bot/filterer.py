@@ -37,7 +37,9 @@ class Tag():
 class FilterContext():
     """Determines how any filter passed into this class should behave
     (e.g. which tags are valid and how objects are broken down into tags)."""
-    def __init__(self, tags: List[Tag]=[]):
+    def __init__(self, name: str, examples: List[str], tags: List[Tag]):
+        self.name = name
+        self.examples = examples
         self.tags = tags
     
     def get_tag(self, name: str) -> Tag:
