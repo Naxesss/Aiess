@@ -15,7 +15,7 @@ from bot import permissions
 
 async def receive(message: Message, client: Client) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
-    if message.author and message.author.id == 680467769573244928:  # This is the user id of the bot itself.
+    if message.author and message.author.id == client.user.id:
         log_message(message)
 
     command = parse_command(message.content, context=message, client=client)
