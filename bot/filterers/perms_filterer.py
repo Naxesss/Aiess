@@ -3,10 +3,22 @@ sys.path.append('..')
 
 import re as regex
 
+from bot.prefixes import DEFAULT_PREFIX
 from bot.filterer import FilterContext, Tag
 
 filter_context = FilterContext(
-    tags = [
+    name     = "Permissions",
+    examples = [
+        f"**everyone** leave empty OR `role:@@everyone` (two @)",
+        f"**admin-only** see `{DEFAULT_PREFIX}disable <command(s)>`",
+        "**in #offtopic** `channel:#offtopic`",
+        "**from @verified role** `role:@verified`",
+        "**from @someone** `user:@someone`",
+        "**from @verified role in #offtopic** `role:@verified and channel:#offtopic`",
+        "**from @verified role in #offtopic or #bot** `role:@verified and channel:(#offtopic or #bot)`",
+        "**from @verified role in #bot, or from @moderators anywhere** `role:@verified and channel:#bot or role:@moderators`"
+    ],
+    tags     = [
         Tag(
             names           = ["user"],
             description     = "Ensure caller is this user.",
