@@ -12,13 +12,14 @@ from bot import permissions
 from bot.permissions import set_permission_filter, get_permission_filter
 
 def setup_function():
+    permissions.DEFAULT_DB_NAME = BOT_TEST_DB_NAME
     Database(BOT_TEST_DB_NAME).clear_table_data("permissions")
+    permissions.cache = {}
 
 def test_set_permission_filter():
     command_wrapper = FunctionWrapper(category=None, names=["test1", "test2", "test3"], execute=None)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
 
     assert "test1" in permissions.cache[3]
     assert "test2" not in permissions.cache[3]
@@ -28,9 +29,8 @@ def test_set_permission_filter_multiple():
     command_wrapper = FunctionWrapper(category=None, names=["test1", "test2", "test3"], execute=None)
     command_wrapper2 = FunctionWrapper(category=None, names=["test4", "test5", "test6"], execute=None)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper2, permission_filter="filter2")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper2, permission_filter="filter2")
 
     assert "test1" in permissions.cache[3]
     assert "test2" not in permissions.cache[3]
@@ -41,9 +41,8 @@ def test_set_permission_filter_multiple():
 def test_set_permission_filter_none():
     command_wrapper = FunctionWrapper(category=None, names=["test1", "test2", "test3"], execute=None)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter=None)
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter=None)
 
     # The guild no longer has any permission filters, so it should be discarded together with the filter.
     assert 3 not in permissions.cache
@@ -52,10 +51,9 @@ def test_set_permission_filter_none_keep_guild():
     command_wrapper = FunctionWrapper(category=None, names=["test1", "test2", "test3"], execute=None)
     command_wrapper2 = FunctionWrapper(category=None, names=["test4", "test5", "test6"], execute=None)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper2, permission_filter="filter2")
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter=None)
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper2, permission_filter="filter2")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter=None)
 
     assert "test4" in permissions.cache[3]
     assert "test1" not in permissions.cache[3]
@@ -63,21 +61,18 @@ def test_set_permission_filter_none_keep_guild():
 def test_get_permission_filter():
     command_wrapper = FunctionWrapper(category=None, names=["test1", "test2", "test3"], execute=None)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
-        permission_filter = get_permission_filter(guild_id=3, command_wrapper=command_wrapper)
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="filter")
+    permission_filter = get_permission_filter(guild_id=3, command_wrapper=command_wrapper)
 
     assert permission_filter == "filter"
 
 def test_load():
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        permissions.load()
+    permissions.load()
     assert not permissions.cache
 
     Database(BOT_TEST_DB_NAME).insert_permission(CommandPermission(guild_id=3, command_name="test1", permission_filter="filter"))
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        permissions.load()
+    permissions.load()
     assert permissions.cache
     assert permissions.cache[3]["test1"] == "filter"
 
@@ -92,8 +87,7 @@ def test_can_execute_channel_perm():
     )
     command = Command(name="test2", context=mock_message)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="channel:<#44>")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="channel:<#44>")
     
     assert permissions.can_execute(command)
 
@@ -108,8 +102,7 @@ def test_can_execute_channel_perm_fail():
     )
     command = Command(name="test2", context=mock_message)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="channel:<#44>")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="channel:<#44>")
     
     assert not permissions.can_execute(command)
 
@@ -124,8 +117,7 @@ def test_can_execute_role_perm():
     )
     command = Command(name="test2", context=mock_message)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="role:<@&66>")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="role:<@&66>")
     
     assert permissions.can_execute(command)
 
@@ -140,8 +132,7 @@ def test_can_execute_role_perm_fail():
     )
     command = Command(name="test2", context=mock_message)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="role:<@&66>")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="role:<@&66>")
     
     assert not permissions.can_execute(command)
 
@@ -156,8 +147,7 @@ def test_can_execute_user_perm():
     )
     command = Command(name="test2", context=mock_message)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="user:<@88>")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="user:<@88>")
     
     assert permissions.can_execute(command)
 
@@ -172,8 +162,7 @@ def test_can_execute_user_perm_fail():
     )
     command = Command(name="test2", context=mock_message)
 
-    with mock.patch("bot.permissions.BOT_DB_NAME", BOT_TEST_DB_NAME):
-        set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="user:<@88>")
+    set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="user:<@88>")
     
     assert not permissions.can_execute(command)
 
