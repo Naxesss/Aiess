@@ -84,6 +84,27 @@ async def test_command_respond():
     assert mock_channel.messages[0].embed is None
 
 @pytest.mark.asyncio
+async def test_command_respond_mention_everyone():
+    command = Command("test", context=MockMessage(channel=MockChannel()))
+
+    assert await command.respond("@everyone")
+    assert command.response == "@\u200beveryone"
+
+@pytest.mark.asyncio
+async def test_command_respond_mention_user():
+    command = Command("test", context=MockMessage(channel=MockChannel()))
+
+    assert await command.respond("<@51289736123>")
+    assert command.response == "<@\u200b51289736123>"
+
+@pytest.mark.asyncio
+async def test_command_respond_mention_role():
+    command = Command("test", context=MockMessage(channel=MockChannel()))
+
+    assert await command.respond("<@&51289736123>")
+    assert command.response == "<@\u200b&51289736123>"
+
+@pytest.mark.asyncio
 async def test_command_respond_embed():
     mock_channel = MockChannel()
     mock_message = MockMessage("+test 1 2 3", channel=mock_channel)
