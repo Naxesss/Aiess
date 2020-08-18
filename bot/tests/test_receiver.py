@@ -110,5 +110,14 @@ async def test_receive_command_with_optional_arg():
     assert await receive_command(Command("greet", "someone", "how are you doing?", context=mock_message))
     assert mock_channel.messages[0].content == "hi someone, how are you doing?"
 
+@pytest.mark.asyncio
+async def test_receive_command_lacking_permission():
+    mock_channel = MockChannel(guild=MockGuild(_id=3))
+    mock_message = MockMessage("+test", channel=mock_channel, author=MockUser(is_admin=False))
+
+    assert not await receive_command(Command("test", context=mock_message))
+    assert mock_channel.typing_triggered
+    assert "✗ lacking permission" in mock_channel.messages[0].content.lower()
+
 def test_parse_args():
     assert parse_args(["well", "hello", "there"], 2) == ["well", "hello there"]
