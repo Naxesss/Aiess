@@ -9,6 +9,7 @@ from discord import Forbidden
 
 from aiess.logger import log_err
 
+from bot.formatter import format_dotted_list
 from bot.prefixes import get_prefix
 from bot.prefixes import DEFAULT_PREFIX
 
@@ -168,11 +169,10 @@ def general_help_embed(prefix: str=DEFAULT_PREFIX) -> Embed:
     for category in registered_categories:
         embed.add_field(
             name   = category,
-            value  = "\u2000".join(
-                f"**{str(registered_commands[name])}**".replace("{0}", prefix)
-                for name in registered_categories[category]
+            value  = format_dotted_list(
+                f"**{registered_commands[name]}**".replace("{0}", prefix) for name in registered_categories[category]
             ),
-            inline = True
+            inline = False
         )
     
     return embed
