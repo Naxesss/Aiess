@@ -108,6 +108,7 @@ registered_aliases = defaultdict(str)
 registered_commands = defaultdict(FunctionWrapper)
 registered_categories = defaultdict(list)
 
+PERMISSIONS_CATEGORY = "Permissions"
 GENERAL_CATEGORY = "General"
 EVENTS_CATEGORY = "Events"
 
