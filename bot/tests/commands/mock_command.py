@@ -8,11 +8,6 @@ from discord import Embed
 
 from bot.commands import Command
 
-class MockClient():
-    """Represents a bot client instance."""
-    def __init__(self, latency: float=0):
-        self.latency = latency
-
 class MockGuild():
     """Represents a guild (i.e. the parent of channels)."""
     def __init__(self, _id: int=None):
@@ -74,6 +69,12 @@ class MockUser():
         if not is_dm:
             self.guild_permissions = mock.MagicMock()
             self.guild_permissions.administrator = is_admin
+
+class MockClient():
+    """Represents a bot client instance."""
+    def __init__(self, user: MockUser=None, latency: float=0):
+        self.user = user if user else MockUser()
+        self.latency = latency
 
 class MockMessage():
     """Represents the message instance (e.g. from which a command was called). Contains
