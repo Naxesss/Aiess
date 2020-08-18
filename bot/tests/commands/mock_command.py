@@ -8,10 +8,16 @@ from discord import Embed
 
 from bot.commands import Command
 
+class MockRole():
+    """Represents a role (e.g. role of the user sending a message)."""
+    def __init__(self, _id: int=None):
+        self.id = int(_id) if _id is not None else None
+
 class MockGuild():
     """Represents a guild (i.e. the parent of channels)."""
     def __init__(self, _id: int=None):
         self.id = int(_id) if _id is not None else None
+        self.default_role = MockRole(_id=0)
 
 class MockDMChannel():
     """Represents a DM channel (e.g. in which a message was sent).
@@ -54,11 +60,6 @@ class MockErrorChannel(MockChannel):
 
     async def send(self, content, embed: Embed=None):
         raise self.raise_on_send
-
-class MockRole():
-    """Represents a role (e.g. role of the user sending a message)."""
-    def __init__(self, _id: int=None):
-        self.id = int(_id) if _id is not None else None
 
 class MockUser():
     """Represents a user (e.g. an author of a sent message)."""
