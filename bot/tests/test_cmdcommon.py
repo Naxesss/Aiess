@@ -80,6 +80,22 @@ async def test_validate_filter_invalid_word():
     assert command.response_embed.fields[1].name == embed.fields[1].name
     assert command.response_embed.fields[1].value == embed.fields[1].value
 
+@pytest.mark.asyncio
+async def test_validate_filter_missing_gate():
+    command = Command(name="test", context=MockMessage(channel=MockChannel()))
+    assert not await validate_filter(command=command, _filter="user:sometwo type:qualify", filter_context=filter_context)
+    assert "✗" in command.response
+    assert "missing gate" in command.response.lower()
+    assert "between `user:sometwo` and `type:qualify`" in command.response.lower()
+
+    embed = filters_embed(filter_context=filter_context)
+    assert command.response_embed.title == embed.title
+    assert command.response_embed.description == embed.description
+    assert command.response_embed.fields[0].name == embed.fields[0].name
+    assert command.response_embed.fields[0].value == embed.fields[0].value
+    assert command.response_embed.fields[1].name == embed.fields[1].name
+    assert command.response_embed.fields[1].value == embed.fields[1].value
+
 def test_get_command_wrappers():
     assert len(get_command_wrappers("test4, test5")) == 2
 
