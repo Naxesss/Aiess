@@ -44,6 +44,9 @@ class Client(discord.Client):
     
     async def send_event(self, event: Event, subscription: Subscription):
         channel = self.get_channel(subscription.channel_id)
+        if not channel:
+            # Ignore channels we no longer have access to (e.g. deleted / power outage).
+            return
 
         await channel.send(content=format_link(event), embed=await format_embed(event))
 
