@@ -65,6 +65,13 @@ async def test_receive():
     assert mock_channel.messages[0].content == "hi"
 
 @pytest.mark.asyncio
+async def test_receive_too_many_args():
+    mock_channel = MockChannel()
+    mock_message = MockMessage("+test one two three", channel=mock_channel)
+    await receive(mock_message, client=MockClient())
+    assert mock_channel.messages[0].content == "hi"
+
+@pytest.mark.asyncio
 async def test_receive_command():
     mock_channel = MockChannel()
     mock_message = MockMessage("+test", channel=mock_channel)
