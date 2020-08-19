@@ -82,6 +82,10 @@ def parse_args(args: List[str], arg_count: int) -> List[str]:
     are greater than the count, the last returned argument is a combination of the remaining ones.
     
     E.g. `+tell <user> <text>` with "+tell someone hello there" gives <text> = "hello there"."""
+    if not arg_count:
+        # Takes no args, so ignore any given.
+        return []
+
     parsed_args = []
     for index, arg in enumerate(args):
         if index >= arg_count:
