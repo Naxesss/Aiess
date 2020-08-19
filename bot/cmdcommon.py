@@ -9,7 +9,7 @@ from discord import Embed
 from bot import commands
 from bot.commands import Command, FunctionWrapper
 from bot.commands import registered_commands
-from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words
+from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words, get_missing_gate
 from bot.logic import AND_GATES, OR_GATES, NOT_GATES
 from bot.filterer import FilterContext
 from bot.formatter import format_dotted_list
@@ -54,6 +54,15 @@ async def validate_filter(command: Command, _filter: str, filter_context: Filter
         invalids_formatted = "`" + "`, `".join(invalid_words) + "`"
         await command.respond_err(
             response = f"Invalid word(s) {invalids_formatted} in expansion `{expansion}`.",
+            embed    = filters_embed(filter_context)
+        )
+        return False
+    
+    parts = get_missing_gate(_filter)
+    if parts:
+        left_part, right_part = parts
+        await command.respond_err(
+            response = f"Missing gate between `{left_part}` and `{right_part}` in expansion `{expansion}`.",
             embed    = filters_embed(filter_context)
         )
         return False

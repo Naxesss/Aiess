@@ -138,6 +138,21 @@ def get_invalid_words(_filter: str) -> Generator[str, None, None]:
         if not is_key_value_pair and not is_logical_gate:
             yield split
 
+def get_missing_gate(_filter: str) -> Generator[str, None, None]:
+    """Returns a tuple of the first two space-separated instances of text,
+    which have no gate between them, in the given filter."""
+    was_gate = False
+    prev_split = None
+    for split, _ in split_unescaped(expand(_filter), delimiters=[" "]):
+        is_key_value_pair = re.match(KEY_VALUE_PATTERN, split)
+        is_logical_gate = split.lower() in map(lambda gate: gate.replace(" ", ""), NOT_GATES + AND_GATES + OR_GATES)
+
+        if prev_split and is_key_value_pair and not was_gate:
+            return (prev_split, split)
+        
+        was_gate = is_logical_gate
+        prev_split = split
+
 def is_valid(_filter: str, filter_context: FilterContext) -> bool:
     if (
         list(get_invalid_keys(_filter, filter_context)) or
