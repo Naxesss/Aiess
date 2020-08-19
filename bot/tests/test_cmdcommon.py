@@ -27,6 +27,15 @@ async def test_validate_filter():
     assert await validate_filter(command=command, _filter="type:nominate", filter_context=filter_context)
 
 @pytest.mark.asyncio
+async def test_validate_filter_complex():
+    command = Command(name="test", context=MockMessage(channel=MockChannel()))
+    assert await validate_filter(
+        command        = command,
+        _filter        = "type:(nom or qual or reset or dq) and not user:(banchobot or peppy)",
+        filter_context = filter_context
+    )
+
+@pytest.mark.asyncio
 async def test_validate_filter_invalid_key():
     command = Command(name="test", context=MockMessage(channel=MockChannel()))
     assert not await validate_filter(command=command, _filter="undefined:undefined", filter_context=filter_context)
