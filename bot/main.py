@@ -2,9 +2,11 @@ import sys
 sys.path.append('..')
 
 import asyncio
+from contextlib import suppress
 
 import discord
 from discord import Message, Game
+from discord.errors import Forbidden
 
 import aiess
 from aiess import Event
@@ -48,7 +50,8 @@ class Client(discord.Client):
             # Ignore channels we no longer have access to (e.g. deleted / power outage).
             return
 
-        await channel.send(content=format_link(event), embed=await format_embed(event))
+        with suppress(Forbidden):
+            await channel.send(content=format_link(event), embed=await format_embed(event))
 
 class Reader(aiess.Reader):
     client: Client = None
