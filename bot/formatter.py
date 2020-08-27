@@ -97,8 +97,15 @@ def format_link(event: Event) -> str:
 async def format_embed(event: Event) -> str:
     """Returns an embed which represents the given event."""
     embed = Embed()
-    embed.add_field(name=format_field_name(event), value=await format_field_value(event), inline=False)
-    embed.set_footer(text=format_footer_text(event), icon_url=format_footer_icon_url(event))
+    embed.add_field(
+        name   = format_field_name(event),
+        value  = await format_field_value(event),
+        inline = False
+    )
+    embed.set_footer(
+        text     = format_footer_text(event),
+        icon_url = format_footer_icon_url(event)
+    )
     embed.colour = type_props[event.type].colour
     
     # Unlike `set_footer`, providing `Embed.Empty` to thumbnail and image urls will cause a 400 Bad Request error.
@@ -106,7 +113,10 @@ async def format_embed(event: Event) -> str:
     if format_image_url(event) != Embed.Empty:     embed.set_image(url=format_image_url(event))
 
     if type_props[event.type].show_context and event.discussion:
-        embed.add_field(name=format_context_field_name(event), value=format_context_field_value(event))
+        embed.add_field(
+            name  = format_context_field_name(event),
+            value = format_context_field_value(event)
+        )
 
     return embed
 
