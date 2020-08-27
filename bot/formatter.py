@@ -94,11 +94,11 @@ def format_link(event: Event) -> str:
 
     raise ValueError("Cannot format a link of an event missing a beatmapset, newspost, and user.")
 
-async def format_embed(event: Event) -> str:
+async def format_embed(event: Event, skip_timeago_if_recent: bool=False) -> str:
     """Returns an embed which represents the given event."""
     embed = Embed()
     embed.add_field(
-        name   = format_field_name(event),
+        name   = format_field_name(event, skip_timeago_if_recent=skip_timeago_if_recent),
         value  = await format_field_value(event),
         inline = False
     )
@@ -133,7 +133,7 @@ def escape_markdown(obj: str) -> str:
         .replace("`", "\\`")  # Code / Code Block
     )
 
-def format_field_name(event: Event) -> str:
+def format_field_name(event: Event, skip_timeago_if_recent: bool=False) -> str:
     """Returns the embed title of the given event (e.g. :heart: Qualified)."""
     if event.newspost:
         title = event.newspost.title
@@ -142,6 +142,10 @@ def format_field_name(event: Event) -> str:
     
     if event.group:
         return f"{title} (< {format_timeago(event.time)})"
+
+    is_recent = (datetime.utcnow() - event.time).total_seconds() < 600
+    if skip_timeago_if_recent and is_recent:
+        return title
 
     return f"{title} ({format_timeago(event.time)})"
 
