@@ -394,9 +394,6 @@ def format_timeago(time: datetime, min_unit: TimeUnit=TimeUnit.SECONDS, max_unit
     formatted_time = format_time(delta_time, min_unit=min_unit, max_units=max_units, long=True)
     if bold:
         formatted_time = f"**{formatted_time}**"
-    
-    if formatted_time.startswith("<"):
-        formatted_time = formatted_time.replace("<", "less than ")
 
     return f"{formatted_time} ago"
 
