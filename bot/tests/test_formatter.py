@@ -169,6 +169,10 @@ def test_format_field_name_skip_timeago(suggestion_event):
     suggestion_event.time = datetime.utcnow() - timedelta(minutes=5)
     assert format_field_name(suggestion_event, skip_timeago_if_recent=True) == ":yellow_circle:\u2000Suggestion"
 
+def test_format_field_name_dont_skip_timeago(suggestion_event):
+    suggestion_event.time = datetime.utcnow() - timedelta(minutes=20)
+    assert format_field_name(suggestion_event, skip_timeago_if_recent=True) == ":yellow_circle:\u2000Suggestion (**20 minutes** ago)"
+
 @pytest.mark.asyncio
 async def test_format_field_value(suggestion_event):
     assert (
