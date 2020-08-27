@@ -388,7 +388,7 @@ def format_time(
 
 def format_timeago(time: datetime, min_unit: TimeUnit=TimeUnit.SECONDS, max_units: int=1, bold=True):
     """Returns the string representation of the time since the given datetime, using `format_time`, in
-    the format "about {time} ago". Always uses long units (e.g. "seconds", not "s"). Surrounds {time}
+    the format "{time} ago". Always uses long units (e.g. "seconds", not "s"). Surrounds {time}
     in bold markup (**) if `bold`."""
     delta_time = datetime.utcnow() - time
     formatted_time = format_time(delta_time, min_unit=min_unit, max_units=max_units, long=True)
