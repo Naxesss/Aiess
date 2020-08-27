@@ -162,7 +162,7 @@ async def test_format_field_value_newspost(newspost_event):
     assert await format_field_value(newspost_event) == "quite long preview" * 10
 
 @pytest.mark.asyncio
-async def test_format_field_value(group_event):
+async def test_format_field_value_group_change(group_event):
     assert (
         await format_field_value(group_event) ==
         "[sometwo](https://osu.ppy.sh/users/2) to the\n" +
