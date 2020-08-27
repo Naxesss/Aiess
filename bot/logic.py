@@ -278,23 +278,26 @@ def flip_gate(gate: str) -> str:
 
 def double_negation_elimination(string: str) -> str:
     """Returns the same string, but where all double NOT gates are removed (e.g. "not type:not A" -> "type:A")."""
-    read = ""
-    for char in string:
-        read += char
+    matches = []
+    for pattern in NOT_GATE_PATTERNS:
+        temp = list(re.finditer("(?=(?:" + pattern + "))", string))
+        for index, match in enumerate(temp):
+            next_match = temp[index + 1] if len(temp) > index + 1 else None
+            if not next_match:
+                continue
 
-        matches = []
-        for pattern in NOT_GATE_PATTERNS:
-            for match in re.finditer("(?=(?:" + pattern + "))", read):
-                if not any(gate in read[match.start(0):].lower() for gate in (AND_GATES + OR_GATES + ["(", ")"])):
-                    matches.append(match)
+            substring = string[match.start(0):next_match.end(1)].lower()
+            if not any(gate in substring for gate in (AND_GATES + OR_GATES + ["(", ")"])):
+                matches.append(match)
+                matches.append(next_match)
 
-        if len(matches) > 1:
-            start1, end1 = combined_captured_span(matches[0])
-            start2, end2 = combined_captured_span(matches[1])
+    if len(matches) > 1:
+        start1, end1 = combined_captured_span(matches[0])
+        start2, end2 = combined_captured_span(matches[1])
 
-            # Recursively remove double NOT gates.
-            string = string[:start1] + string[end1:start2] + string[end2:]
-            return double_negation_elimination(string)
+        # Recursively remove double NOT gates.
+        string = string[:start1] + string[end1:start2] + string[end2:]
+        return double_negation_elimination(string)
 
     # No more double NOT gates.
     return string
