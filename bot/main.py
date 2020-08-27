@@ -51,7 +51,10 @@ class Client(discord.Client):
             return
 
         with suppress(Forbidden):
-            await channel.send(content=format_link(event), embed=await format_embed(event))
+            await channel.send(
+                content = format_link(event),
+                embed   = await format_embed(event, skip_timeago_if_recent=True)
+            )
 
 class Reader(aiess.Reader):
     client: Client = None
