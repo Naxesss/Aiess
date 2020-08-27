@@ -115,6 +115,21 @@ async def test_format_embed(suggestion_event):
     assert embed.thumbnail.url == "https://b.ppy.sh/thumb/3l.jpg"
 
 @pytest.mark.asyncio
+async def test_format_embed_no_timeago(suggestion_event):
+    suggestion_event.time = datetime.utcnow() - timedelta(minutes=5)
+    embed: Embed = await format_embed(suggestion_event, skip_timeago_if_recent=True)
+    
+    assert embed.fields[0].name == ":yellow_circle:\u2000Suggestion"
+    assert (
+        embed.fields[0].value ==
+        "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]"
+    )
+    assert embed.footer.text == "someone \"hi\""
+    assert embed.footer.icon_url == "https://a.ppy.sh/1"
+    assert embed.colour.to_rgb() == (65, 65, 65)
+    assert embed.thumbnail.url == "https://b.ppy.sh/thumb/3l.jpg"
+
+@pytest.mark.asyncio
 async def test_format_embed_newspost(newspost_event):
     embed: Embed = await format_embed(newspost_event)
     
@@ -149,6 +164,10 @@ def test_format_field_name_newspost(newspost_event):
 def test_format_field_name_group_event(group_event):
     assert format_field_name(group_event).startswith(":performing_arts:\u2000Added (< **")
     assert format_field_name(group_event).endswith("** ago)")
+
+def test_format_field_name_skip_timeago(suggestion_event):
+    suggestion_event.time = datetime.utcnow() - timedelta(minutes=5)
+    assert format_field_name(suggestion_event, skip_timeago_if_recent=True) == ":yellow_circle:\u2000Suggestion"
 
 @pytest.mark.asyncio
 async def test_format_field_value(suggestion_event):
