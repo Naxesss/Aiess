@@ -6,8 +6,6 @@ import re as regex
 from discord import Message, Client
 from typing import List
 
-from aiess.logger import log
-
 from bot.commands import Command
 from bot.commands import registered_commands, registered_aliases
 from bot.prefixes import get_prefix
@@ -19,16 +17,16 @@ from bot.cmdcommon import permissions_embed
 async def receive(message: Message, client: Client) -> None:
     """Handles logic ran upon receiving a discord message (e.g. printing and parsing potential commands)."""
     if message.author and message.author.id == client.user.id:
-        log_message(message)
+        print_message(message)
 
     command = parse_command(message.content, context=message, client=client)
     if command:
-        log_message(message)
+        print_message(message)
         await receive_command(command)
 
-def log_message(message: Message) -> None:
-    """Prints and logs the given message."""
-    log(f"({message.guild} > #{message.channel}) {message.author}: {message.content}", postfix="bot-messages")
+def print_message(message: Message) -> None:
+    """Prints the given message."""
+    print(f"({message.guild} > #{message.channel}) {message.author}: {message.content}")
 
 def parse_command(content: str, context: Message=None, client: Client=None) -> Command:
     """Returns the given content string as a command, if it's formatted as one, else None.
