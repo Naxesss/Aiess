@@ -2,6 +2,7 @@
     "api-key": "${OSU_API_KEY}",
     "api-rate-limit": 1,
     "page-rate-limit": 60,
+    "bnsite-rate-limit": 1,
     "discord-api-key": "${DISCORD_API_KEY}",
     "root-path": "${ROOT_PATH}",
     "db-config":
@@ -12,5 +13,10 @@
         "user": "root",
         "password": "${DB_PASSWORD}"
     },
-    "bnsite-mongodb-uri": "${BNSITE_MONGODB_URI}"
+    "bnsite-mongodb-uri": "${BNSITE_MONGODB_URI}",
+    "bnsite-api-uri": "${BNSITE_API_URI}",
+    "bnsite-headers":
+    {
+        "Qat-Key": "${BNSITE_HEADER_VALUE}"
+    }
 }

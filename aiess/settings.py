@@ -7,9 +7,10 @@ with open("settings.json", mode="r") as settings_file:
     settings = json.loads(json_str)
 
 # WEB
-API_KEY         = settings["api-key"]
-API_RATE_LIMIT  = settings["api-rate-limit"]
-PAGE_RATE_LIMIT = settings["page-rate-limit"]
+API_KEY           = settings["api-key"]
+API_RATE_LIMIT    = settings["api-rate-limit"]
+PAGE_RATE_LIMIT   = settings["page-rate-limit"]
+BNSITE_RATE_LIMIT = settings["bnsite-rate-limit"]
 
 # STORAGE
 ROOT_PATH = settings["root-path"]
@@ -17,3 +18,5 @@ DB_CONFIG = settings["db-config"]
 
 # 3RD PARTY
 BNSITE_MONGODB_URI = settings["bnsite-mongodb-uri"]
+BNSITE_API_URI     = settings["bnsite-api-uri"]
+BNSITE_HEADERS     = settings["bnsite-headers"]
