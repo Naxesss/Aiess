@@ -6,9 +6,9 @@ from aiess.settings import ROOT_PATH
 
 PATH_PREFIX = ROOT_PATH + "time/"
 
-TIME_FORMAT       = "%Y-%m-%d %H:%M:%S"      # e.g. "2020-01-12 05:00:00"
-TIME_FORMAT_ALT   = "%Y-%m-%dT%H:%M:%S%z"    # e.g. "2019-01-04T16:41:24+0200"
-TIME_FORMAT_ALT_2 = "%Y-%m-%dT%H:%M:%S.%fZ"  # e.g. "2020-04-23T16:25:03.000Z"
+TIME_FORMAT     = "%Y-%m-%d %H:%M:%S"      # e.g. "2020-01-12 05:00:00"
+TIME_FORMAT_TZ  = "%Y-%m-%dT%H:%M:%S%z"    # e.g. "2020-01-12T05:00:00+00:00"
+TIME_FORMAT_TZ2 = "%Y-%m-%dT%H:%M:%S.%fZ"  # e.g. "2020-01-12T05:00:00.302Z"
 
 FILE_NAME_PREFIX = "last_datetime-"
 FILE_NAME_POSTFIX = ".txt"
@@ -65,9 +65,15 @@ def to_string(_datetime: datetime) -> str:
 def from_string(string: str) -> datetime:
     """Returns the datetime of the given ISO 8601 formatted string (except timezone and microsecond
     values), otherwise raises ValueError (e.g. wrong format)."""
-    with suppress(ValueError): return datetime.strptime(string, TIME_FORMAT)
-    with suppress(ValueError): return datetime.strptime(string, TIME_FORMAT_ALT)
-    with suppress(ValueError): return datetime.strptime(string, TIME_FORMAT_ALT_2)
+    time = None
+    with suppress(ValueError): time = datetime.strptime(string, TIME_FORMAT)
+    with suppress(ValueError): time = datetime.strptime(string, TIME_FORMAT_TZ)
+    with suppress(ValueError): time = datetime.strptime(string, TIME_FORMAT_TZ2)
+
+    if not time.tzinfo:
+        return time
+
+    return time.replace(tzinfo=None) + time.tzinfo.utcoffset(time)
 
     # Any other case (e.g. time being None or not matching the format).
     raise ValueError(f"The given string, {string}, did not match the format \"{TIME_FORMAT}\".")
