@@ -1,4 +1,5 @@
 import os
+import pytest
 from datetime import datetime
 from contextlib import suppress
 
@@ -43,6 +44,12 @@ def test_from_string():
     assert result.hour == 5
     assert result.minute == 0
     assert result.second == 0
+
+def test_from_string_wrong_format():
+    with pytest.raises(ValueError) as err:
+        timestamp.from_string("this isn't a datetime")
+    
+    assert "could not parse" in str(err).lower()
 
 def test_from_string_tz():
     assert timestamp.from_string("2020-01-12T05:00:00+00:00") == timestamp.from_string("2020-01-12 05:00:00")
