@@ -41,3 +41,14 @@ def test_request_dq_info():
 def test_request_dq_info_missing():
     json = bnsite_api.request_dq_info(discussion_id=4)
     assert not json
+
+def test_request_qa_checks():
+    json = bnsite_api.request_qa_checks(user_id=10974170)
+    assert json
+    assert json[0]
+    assert int(json[0]["beatmapsetId"])
+    assert from_string(json[0]["timestamp"])
+
+def test_request_qa_checks_none():
+    json = bnsite_api.request_qa_checks(user_id=5128277)
+    assert not json
