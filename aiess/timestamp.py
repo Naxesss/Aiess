@@ -70,6 +70,9 @@ def from_string(string: str) -> datetime:
     with suppress(ValueError): time = datetime.strptime(string, TIME_FORMAT_TZ)
     with suppress(ValueError): time = datetime.strptime(string, TIME_FORMAT_TZ2)
 
+    if not time:
+        raise ValueError(f"Could not parse \"{string}\" as an ISO-8061 formatted datetime.")
+
     if not time.tzinfo:
         return time
 
