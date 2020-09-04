@@ -40,6 +40,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest & generate coverage
       env:
+        BNSITE_HEADER_VALUE: ${{ secrets.BNSITE_HEADER_VALUE }}
         OSU_API_KEY: ${{ secrets.OSU_API_KEY }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_PORT: ${{ job.services.mysql.ports['3306'] }}
