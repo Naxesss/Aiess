@@ -33,3 +33,12 @@ def test_get_set():
 def test_exists():
     assert not timestamp.exists("test_missing")
     assert timestamp.exists("test")
+
+def test_from_string():
+    assert timestamp.from_string("2020-01-12 05:00:00")
+
+def test_from_string_alt():
+    assert timestamp.from_string("2020-01-12T05:00:00+00:00")
+
+def test_from_string_alt_2():
+    assert timestamp.from_string("2020-01-12T05:00:00.302Z")
