@@ -3,13 +3,13 @@ from collections import defaultdict
 from typing import Tuple
 
 from aiess.web.ratelimiter import request_with_rate_limit
-from aiess.settings import BNSITE_API_URI, BNSITE_RATE_LIMIT, BNSITE_HEADERS
+from aiess.settings import BNSITE_RATE_LIMIT, BNSITE_HEADERS
 
 response_cache = defaultdict()
 def request(route: str, query: str) -> object:
     """Requests the page from the given route and query.
     Caches any response such that requesting the same discussion id yields the same result."""
-    request_url = BNSITE_API_URI + f"/{route}/{query}"
+    request_url = f"https://bn.mappersguild.com/interOp/{route}/{query}"
     if request_url in response_cache:
         return response_cache[request_url]
 

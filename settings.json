@@ -14,7 +14,6 @@
         "password": "${DB_PASSWORD}"
     },
     "bnsite-mongodb-uri": "${BNSITE_MONGODB_URI}",
-    "bnsite-api-uri": "${BNSITE_API_URI}",
     "bnsite-headers":
     {
         "Qat-Key": "${BNSITE_HEADER_VALUE}"

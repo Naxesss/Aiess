@@ -18,5 +18,4 @@ DB_CONFIG = settings["db-config"]
 
 # 3RD PARTY
 BNSITE_MONGODB_URI = settings["bnsite-mongodb-uri"]
-BNSITE_API_URI     = settings["bnsite-api-uri"]
 BNSITE_HEADERS     = settings["bnsite-headers"]
