@@ -44,7 +44,7 @@ def try_request(request_url: str) -> Response:
     try:
         response = requests.get(request_url)
     except ConnectionError:
-        log_err(f"WARNING | ConnectionError was raised on GET \"{request_url}\", retrying...")
+        log_err(f"WARNING | ConnectionError was raised on GET \"{request_url}\"")
         return None
     
     if "<title>Just a moment...</title>" in response.text:
