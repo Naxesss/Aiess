@@ -38,3 +38,7 @@ def request_obv_sev(discussion_id: int) -> Tuple[int, int]:
     associated with the given discussion id, if any, otherwise a (None, None) tuple. Caches results."""
     dq_info_json = request_dq_info(discussion_id)
     return (dq_info_json["obviousness"], dq_info_json["severity"])
+
+def request_qa_checks(user_id: int) -> object:
+    """Returns all quality assurance checks done by the user with the given user id. Caches results."""
+    return request("qaEventsByUser", query=user_id)
