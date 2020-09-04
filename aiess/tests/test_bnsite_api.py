@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from aiess.timestamp import from_string
 from aiess.web import bnsite_api
 
 def setup_function():
