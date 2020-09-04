@@ -1,5 +1,5 @@
-from datetime import datetime
 import os
+from datetime import datetime
 from contextlib import suppress
 
 from aiess import timestamp
