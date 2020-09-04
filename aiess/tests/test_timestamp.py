@@ -35,10 +35,23 @@ def test_exists():
     assert timestamp.exists("test")
 
 def test_from_string():
-    assert timestamp.from_string("2020-01-12 05:00:00")
+    result = timestamp.from_string("2020-01-12 05:00:00")
+    assert result
+    assert result.year == 2020
+    assert result.month == 1
+    assert result.day == 12
+    assert result.hour == 5
+    assert result.minute == 0
+    assert result.second == 0
 
-def test_from_string_alt():
-    assert timestamp.from_string("2020-01-12T05:00:00+00:00")
+def test_from_string_tz():
+    assert timestamp.from_string("2020-01-12T05:00:00+00:00") == timestamp.from_string("2020-01-12 05:00:00")
 
-def test_from_string_alt_2():
-    assert timestamp.from_string("2020-01-12T05:00:00.302Z")
+def test_from_string_tz_different_timezone():
+    assert timestamp.from_string("2020-01-12T05:00:00+02:00") == timestamp.from_string("2020-01-12 07:00:00")
+
+def test_from_string_tz2():
+    assert timestamp.from_string("2020-01-12T05:00:00.000Z") == timestamp.from_string("2020-01-12 05:00:00")
+
+def test_from_string_tz2_different_timezone():
+    assert timestamp.from_string("2020-01-12T05:00:00.000Z") == timestamp.from_string("2020-01-12 05:00:00")
