@@ -5,8 +5,11 @@ import os
 from aiess.settings import ROOT_PATH
 
 PATH_PREFIX = ROOT_PATH + "time/"
-TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
-TIME_FORMAT_ALT = "%Y-%m-%dT%H:%M:%S+00:00"
+
+TIME_FORMAT       = "%Y-%m-%d %H:%M:%S"      # e.g. "2020-01-12 05:00:00"
+TIME_FORMAT_ALT   = "%Y-%m-%dT%H:%M:%S%z"    # e.g. "2019-01-04T16:41:24+0200"
+TIME_FORMAT_ALT_2 = "%Y-%m-%dT%H:%M:%S.%fZ"  # e.g. "2020-04-23T16:25:03.000Z"
+
 FILE_NAME_PREFIX = "last_datetime-"
 FILE_NAME_POSTFIX = ".txt"
 
@@ -62,11 +65,9 @@ def to_string(_datetime: datetime) -> str:
 def from_string(string: str) -> datetime:
     """Returns the datetime of the given ISO 8601 formatted string (except timezone and microsecond
     values), otherwise raises ValueError (e.g. wrong format)."""
-    with suppress(ValueError):
-        return datetime.strptime(string, TIME_FORMAT)
-
-    with suppress(ValueError):
-        return datetime.strptime(string, TIME_FORMAT_ALT)
+    with suppress(ValueError): return datetime.strptime(string, TIME_FORMAT)
+    with suppress(ValueError): return datetime.strptime(string, TIME_FORMAT_ALT)
+    with suppress(ValueError): return datetime.strptime(string, TIME_FORMAT_ALT_2)
 
     # Any other case (e.g. time being None or not matching the format).
     raise ValueError(f"The given string, {string}, did not match the format \"{TIME_FORMAT}\".")
