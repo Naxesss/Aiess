@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..')
+
 from datetime import datetime
 
 from aiess.timestamp import from_string
