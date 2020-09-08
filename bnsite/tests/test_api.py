@@ -35,6 +35,17 @@ def test_request_cached():
     assert json1 == json1_cached
     assert json2 == json2_cached
 
+def test_request_removal_reason():
+    # https://osu.ppy.sh/users/5999631
+    json = api.request_removal_reason(user_id=5999631)
+    assert json
+    assert json["action"] == "Kicked"
+    assert from_string(json["timestamp"])
+
+def test_request_removal_reason_missing():
+    json = api.request_removal_reason(user_id=4)
+    assert not json
+
 def test_request_dq_info():
     # https://osu.ppy.sh/beatmapsets/1179039/discussion#/1755074
     json = api.request_dq_info(discussion_id=1755074)
