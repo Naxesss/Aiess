@@ -56,3 +56,7 @@ def test_request_qa_checks():
 def test_request_qa_checks_none():
     json = api.request_qa_checks(user_id=5128277)
     assert not json
+
+def test_request_qa_checks_missing():
+    json = api.request_qa_checks(user_id=4)
+    assert not json
