@@ -31,6 +31,10 @@ def request(route: str, query: str) -> object:
     response_cache[request_url] = result
     return result
 
+def request_removal_reason(user_id: int) -> object:
+    """Returns the reason for a bn being removed given their user id. Caches results."""
+    return request("bnRemoval", query=user_id)
+
 def request_dq_info(discussion_id: int) -> object:
     """Returns the disqualification info (SEV, QAH checkers, etc) associated with the given
     discussion id. Caches results."""
