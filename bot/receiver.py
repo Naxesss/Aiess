@@ -19,6 +19,11 @@ async def receive(message: Message, client: Client) -> None:
     if message.author and message.author.id == client.user.id:
         print_message(message)
 
+    if not message.author or message.author.bot:
+        # Ignore messages from bots, prevents weird loopholes like
+        # changing permissions through making another bot invoke commands.
+        return
+
     command = parse_command(message.content, context=message, client=client)
     if command:
         print_message(message)
