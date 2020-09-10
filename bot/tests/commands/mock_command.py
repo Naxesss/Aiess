@@ -67,6 +67,7 @@ class MockUser():
         self.id = int(_id) if _id is not None else None
         self.name = name
         self.roles = roles
+        self.bot = False
         if not is_dm:
             self.guild_permissions = mock.MagicMock()
             self.guild_permissions.administrator = is_admin
