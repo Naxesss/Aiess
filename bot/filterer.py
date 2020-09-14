@@ -82,9 +82,11 @@ class FilterContext():
                 if not_gate:
                     if any(wildcard_sensitive_in(without_not_gate, kvpair) for kvpair in dissection):
                         passes_and = False
+                        break
                 else:
                     if not any(wildcard_sensitive_in(and_split, kvpair) for kvpair in dissection):
                         passes_and = False
+                        break
             
             if passes_and:
                 return True
