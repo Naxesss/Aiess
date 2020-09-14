@@ -80,16 +80,30 @@ class FilterContext():
             for and_split, _ in split_unescaped(or_split, AND_GATES):
                 without_not_gate, not_gate = extract_not(and_split)
                 if not_gate:
-                    if without_not_gate in dissection:
+                    if any(wildcard_sensitive_in(without_not_gate, kvpair) for kvpair in dissection):
                         passes_and = False
                 else:
-                    if and_split not in dissection:
+                    if not any(wildcard_sensitive_in(and_split, kvpair) for kvpair in dissection):
                         passes_and = False
             
             if passes_and:
                 return True
 
         return False
+
+def wildcard_sensitive_in(substring: str, full_string: str) -> bool:
+    """Returns whether the given substring exists in the given full string,
+    taking into account any wildcards in the substring. Acceptable wildcards are
+    `%` and `_`."""
+    pattern = (
+        re.escape(substring)
+            .replace("%", "(.*)")
+            .replace("_", ".")
+    )
+    match = re.search(pattern, full_string)
+
+    if match: return True
+    else:     return False
 
 def escape(obj: str) -> str:
     """Returns the same object cast to string, but surrounded in quotes if it contains a space."""

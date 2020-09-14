@@ -157,6 +157,19 @@ def test_passes_filter_case_sensitivity():
     assert filter_context.test("type:Reply AND mode:OSU", ["mode:osu", "type:reply"])
     assert not filter_context.test("TYPE:QUALIFY", ["mode:osu", "type:reply"])
 
+def test_passes_filter_percent_wildcard():
+    assert filter_context.test("content:%something%", ["content:someone or something"])
+    assert filter_context.test("content:%something", ["content:someone or something"])
+    assert filter_context.test("%", ["content:someone or something"])
+    assert not filter_context.test("content:something%", ["content:someone or something"])
+    assert not filter_context.test("content:%something else%", ["content:someone or something"])
+
+def test_passes_filter_underscore_wildcard():
+    assert filter_context.test("content:so_ething", ["content:something"])
+    assert filter_context.test("content:someth___", ["content:something"])
+    assert not filter_context.test("content:something_", ["content:something"])
+    assert not filter_context.test("content:some_thing", ["content:something"])
+
 def test_passes_filter_event_object():
     beatmapset = Beatmapset(3, "artist", "title", creator=User(1, "someone"), modes=["osu"])
     event = Event(_type="nominate", time=datetime.utcnow(), beatmapset=beatmapset, user=User(2, "sometwo"))
