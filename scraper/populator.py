@@ -1,11 +1,14 @@
 import sys
 sys.path.append('..')
 
+from datetime import datetime, timedelta
+
 from aiess.objects import Discussion, Beatmapset, Event
 from aiess.errors import ParsingError
 from aiess.database import Database, SCRAPER_DB_NAME
 from aiess.timestamp import from_string
 from aiess import event_types as types
+from bnsite import api as bnsite_api
 
 from scraper.requester import request_discussions_json
 from scraper.requester import get_map_page_discussions
@@ -24,6 +27,12 @@ async def populate_from_discussion(event: Event) -> None:
 
     event.discussion = get_complete_discussion_info(event.discussion, event.beatmapset, discussions_json)
     await __populate_additional_details(event, discussions_json)
+
+async def populate_from_bnsite(event: Event) -> None:
+    """Populates the given event using the bnsite API if possible."""
+    if event.type in [types.REMOVE]:
+        # Group removal content should reflect the bnsite removal reason (e.g. Kicked/Resigned)
+        event.content = get_group_bnsite_comment(event)
 
 def get_discussions_json(beatmapset: Beatmapset) -> object:
     """Returns the beatmapset discussions json, containing all of the discussion information for the mapset,
@@ -134,3 +143,24 @@ def get_nomination_comment(event: Event, discussions_json: object) -> str:
         return latest_hype_discussion_json["posts"][0]["message"]
     
     return None
+
+def get_group_bnsite_comment(event: Event) -> str:
+    """Returns any comment the bnsite has put on group events
+    (e.g. BN removal reasons), if any, otherwise None."""
+    if not event.group:
+        raise ValueError("Event lacks a group.")
+
+    # Only comments removals of BNs.
+    if event.type != "remove" and event.group.id not in [32, 28]:
+        return None
+
+    json = bnsite_api.request_removal_reason(event.user.id)
+    if not json:
+        return None
+
+    time = from_string(json["timestamp"]) if "timestamp" in json and json["timestamp"] else None
+    if not time or (datetime.utcnow() - time) > timedelta(days=7):
+        # In case the BN website for some reason doesn't update the removal entry, we should avoid using an old one.
+        return None
+
+    return json['action']

@@ -34,6 +34,7 @@ async def get_group_events_between(start_time: datetime, end_time: datetime, las
     time limit for latest event possible."""
     # `_from` in `get_group_events` denotes the timestamp to set on any group events found.
     for event in get_group_events(_from=last_checked_time):
+        await populator.populate_from_bnsite(event)
         yield event
 
 async def __get_discussion_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
