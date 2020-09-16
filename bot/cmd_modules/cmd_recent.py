@@ -32,12 +32,13 @@ async def cmd_recent(command: Command, _filter: str=None):
 
     filter_query, filter_values = filter_to_sql(_filter)
     database = Database(SCRAPER_DB_NAME)
-    event = database.retrieve_event_extensive(
+    event = await database.retrieve_event(
         where        = f"""
             {filter_query}
             ORDER BY time DESC
             """,
-        where_values = filter_values
+        where_values = filter_values,
+        extensive    = True
     )
     
     matching_filter_str = f" matching `{_filter}`" if _filter else ""

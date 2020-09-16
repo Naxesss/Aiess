@@ -423,18 +423,25 @@ class Database:
             user      = self.retrieve_user("id=%s", (row[1],))
             yield (group, user)
 
-    async def retrieve_event(self, where: str, where_values: tuple=None) -> Event:
+    async def retrieve_event(self, where: str, where_values: tuple=None, extensive: bool=False) -> Event:
         """Returns the first event from the database matching the given WHERE clause, or None if no such event is stored."""
-        return await anext(self.retrieve_events(where + " LIMIT 1", where_values), None)
-    
-    async def retrieve_events(self, where: str, where_values: tuple=None) -> Generator[Event, None, None]:
-        """Returns an asynchronous generator of all events from the database matching the given WHERE clause."""
-        fetched_rows = self.retrieve_table_data(
-            table        = "events",
-            where        = where,
-            where_values = where_values,
-            selection    = "type, time, beatmapset_id, discussion_id, user_id, group_id, news_id, content"
+        return await anext(
+            self.retrieve_events(
+                where        = where + " LIMIT 1",
+                where_values = where_values,
+                extensive    = extensive
+            ),
+            default_value = None
         )
+    
+    async def retrieve_events(self, where: str, where_values: tuple=None, extensive: bool=False) -> Generator[Event, None, None]:
+        """Returns an asynchronous generator of all events from the database matching the given WHERE clause.
+        Optionally retrieve extensively so that more can be queried (e.g. user name, beatmap creator/artist/title)."""
+        if not extensive:
+            fetched_rows = self.__fetch_events(where, where_values)
+        else:
+            fetched_rows = self.__fetch_events_extensive(where, where_values)
+        
         for row in (fetched_rows or []):
             await asyncio.sleep(0)  # Return control back to the event loop, granting other tasks a window to start/resume.
             _type      = row[0]
@@ -446,3 +453,26 @@ class Database:
             newspost   = self.retrieve_newspost("id=%s", (row[6],)) if row[6] else None
             content    = row[7]
             yield Event(_type, time, beatmapset, discussion, user, group, newspost, content=content)
+    
+    def __fetch_events(self, where: str, where_values: tuple=None):
+        return self.retrieve_table_data(
+            table        = "events",
+            where        = where,
+            where_values = where_values,
+            selection    = "type, time, beatmapset_id, discussion_id, user_id, group_id, news_id, content"
+        )
+
+    def __fetch_events_extensive(self, where: str, where_values: tuple=None):
+        return self.retrieve_table_data(
+            table        = f"""events
+                LEFT JOIN {self.db_name}.discussions AS discussion ON events.discussion_id=discussion.id
+                LEFT JOIN {self.db_name}.beatmapsets AS beatmapset ON events.beatmapset_id=beatmapset.id
+                LEFT JOIN {self.db_name}.newsposts AS newspost ON events.news_id=newspost.id
+                LEFT JOIN {self.db_name}.users AS author ON discussion.user_id=author.id
+                LEFT JOIN {self.db_name}.users AS creator ON beatmapset.creator_id=creator.id
+                LEFT JOIN {self.db_name}.users AS user ON events.user_id=user.id
+                LEFT JOIN {self.db_name}.beatmapset_modes AS modes ON beatmapset.id=modes.beatmapset_id""",
+            where        = where,
+            where_values = where_values,
+            selection    = "events.type, events.time, events.beatmapset_id, events.discussion_id, events.user_id, events.group_id, events.news_id, events.content"
+        )
