@@ -15,7 +15,7 @@ from scraper.parsers.discussion_parser import discussion_parser
 
 cached_discussions_json = {}
 
-async def populate_event(event: Event) -> None:
+async def populate_from_discussion(event: Event) -> None:
     """Populates the given event using the beatmapset discussion json
     (e.g. missing discussion info and additional details like who did votes)."""
     discussions_json = get_discussions_json(event.beatmapset)

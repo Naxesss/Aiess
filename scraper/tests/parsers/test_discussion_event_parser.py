@@ -90,7 +90,7 @@ def test_reply_user_attr(reply_event):
 @pytest.mark.asyncio
 async def test_reply_discussion_attr(reply_event):
     assert reply_event.discussion.id == 1396395
-    await populator.populate_event(reply_event)
+    await populator.populate_from_discussion(reply_event)
     assert reply_event.discussion.user.id == 9555243
     assert reply_event.discussion.user.name == "Dubstek"
     assert reply_event.discussion.content == "If you want to express 00:27:528 (27528|1) - this clap sound with LN, I think 00:33:046 (33046|2) - this NM also should be changed into LN for consistency."

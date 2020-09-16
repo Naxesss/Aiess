@@ -44,7 +44,7 @@ async def __get_discussion_events_between(start_time: datetime, end_time: dateti
 async def __get_reply_events_between(start_time: datetime, end_time: datetime) -> Generator[Event, None, None]:
     """Returns a generator of discussion events (from /beatmap-disussions) within the given time frame."""
     for event in __get_event_generations_between(get_reply_events, start_time, end_time):
-        await populator.populate_event(event)
+        await populator.populate_from_discussion(event)
         if not event.marked_for_deletion:
             yield event
 
@@ -52,7 +52,7 @@ async def __get_beatmapset_events_between(start_time: datetime, end_time: dateti
     """Returns a generator of beatmapset events (from /events) within the given time frame.
     Should be run after discussion events so that discussion contexts are available."""
     for event in __get_event_generations_between(get_beatmapset_events, start_time, end_time):
-        await populator.populate_event(event)
+        await populator.populate_from_discussion(event)
         if not event.marked_for_deletion:
             yield event
 
