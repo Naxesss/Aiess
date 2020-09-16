@@ -10,9 +10,6 @@ from discord import Embed, Colour
 
 from aiess import Event, Beatmapset
 from aiess import event_types as types
-from aiess import timestamp
-
-from bnsite import api as bnsite_api
 
 from aiess.database import SCRAPER_DB_NAME
 from bot.database import Database
@@ -190,13 +187,11 @@ def format_footer_text(event: Event, database: Database=None) -> str:
         return event.newspost.author.name
 
     if event.group:
-        # Group events' `user` field is the user having their role changed, so for the footer we instead
-        # state the reason for the addition or removal, if relevant.
-        _, reason = relevant_group_footer(event)
-        if reason is None:
+        if not event.content:
+            # Group events already include `event.user` elsewhere in the embed, so shouldn't be here.
             return Embed.Empty
         else:
-            return reason
+            return f"NAT {format_preview(event.content)}"
 
     if not event.user:
         return Embed.Empty
@@ -205,31 +200,6 @@ def format_footer_text(event: Event, database: Database=None) -> str:
         return f"{event.user} {format_preview(event.content)}"
     
     return str(event.user)
-
-def relevant_group_footer(event: Event) -> Tuple[str, str]:
-    """Returns the relevant footer icon url and text for the given group event
-    (e.g. removal reasons for BNs/NAT), if any."""
-    if not event.group:
-        raise ValueError("Event lacks a group.")
-
-    # Currently just use the BN website for this, which only keeps track of BNs/NAT removal reasons.
-    if event.type != "remove" and event.group.id not in [32, 28, 7]:
-        return (None, None)
-
-    if not event.user:
-        raise ValueError("Expected a user object associated with group event.")
-
-    json = bnsite_api.request_removal_reason(event.user.id)
-    if not json:
-        return (None, None)
-
-    time = timestamp.from_string(json["timestamp"]) if "timestamp" in json and json["timestamp"] else None
-    if not time or (datetime.utcnow() - time) > timedelta(days=7):
-        # In case the BN website for some reason doesn't update the removal entry, we should avoid using an old one.
-        return (None, None)
-
-    # `6616586` is the user id for the QAT bot, which I'm just going to use to represent the NAT.
-    return ("https://a.ppy.sh/6616586", f"NAT {format_preview(json['action'])}")
 
 def truncate(content: str, length: int, indicator: str="... [truncated]") -> str:
     """Returns a string as per normal, unless it exceeds the length, at which point
@@ -253,11 +223,11 @@ def format_footer_icon_url(event: Event) -> str:
     """Returns the footer icon url of the event (i.e. the image url of the user's avatar),
     if there's a user associated with the event, otherwise None."""
     if event.group:
-        icon_url, _ = relevant_group_footer(event)
-        if not icon_url:
+        if not event.content:
             return Embed.Empty
         else:
-            return icon_url
+            # `6616586` is the user id for the QAT bot, which I'm just going to use to represent the NAT/BNSite.
+            return "https://a.ppy.sh/6616586"
 
     if event.user and not event.group:
         if event.user.id:

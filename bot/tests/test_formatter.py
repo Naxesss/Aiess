@@ -21,7 +21,6 @@ from bot.formatter import format_footer_text
 from bot.formatter import truncate
 from bot.formatter import format_preview
 from bot.formatter import format_footer_icon_url
-from bot.formatter import relevant_group_footer
 from bot.formatter import format_thumbnail_url
 from bot.formatter import format_image_url
 from bot.formatter import format_context_field_name
@@ -240,68 +239,8 @@ def test_format_footer_text_group_event(group_event):
 
 def test_format_footer_text_group_event_reason(group_event):
     group_event.type = "remove"
-
-    with mock.patch("bot.formatter.relevant_group_footer", return_value=("", "NAT \"Resigned\"")):
-        assert format_footer_text(group_event) == "NAT \"Resigned\""
-
-def test_relevant_group_footer(group_event):
-    group_event.type = "remove"
-
-    with mock.patch("bot.formatter.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-01-01 00:01:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("bot.formatter.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {
-                "action": "Resigned",
-                "timestamp": "2020-01-01 00:00:00"
-            }
-
-            assert relevant_group_footer(group_event) == ("https://a.ppy.sh/6616586", "NAT \"Resigned\"")
-
-def test_relevant_group_footer_old(group_event):
-    group_event.type = "remove"
-
-    with mock.patch("bot.formatter.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-03-08 00:00:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("bot.formatter.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {
-                "action": "Resigned",
-                "timestamp": "2020-01-01 00:00:00"
-            }
-
-            assert relevant_group_footer(group_event) == (None, None)
-
-def test_relevant_group_footer_missing_timestamp(group_event):
-    group_event.type = "remove"
-
-    with mock.patch("bot.formatter.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-01-01 00:01:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("bot.formatter.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {
-                "action": "Resigned"
-            }
-
-            # Cannot assume that this action is up to date, since we're missing the timestamp.
-            assert relevant_group_footer(group_event) == (None, None)
-
-def test_relevant_group_footer_empty_json(group_event):
-    group_event.type = "remove"
-
-    with mock.patch("bot.formatter.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-01-01 00:01:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("bot.formatter.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {}
-
-            # Should continue without this info; people generally want to know about
-            # group changes as soon as possible, so crashing probably isn't a great idea.
-            assert relevant_group_footer(group_event) == (None, None)
+    group_event.content = "Resigned"
+    assert format_footer_text(group_event) == "NAT \"Resigned\""
 
 def test_format_preview_empty_no_surrounding_quotes():
     assert format_preview("") == ""
@@ -338,6 +277,7 @@ def test_format_footer_icon_url_news_freetext(newspost_event):
 
 def test_format_footer_icon_url_removal_reason(group_event):
     group_event.type = "remove"
+    group_event.content = "Resigned"
 
     with mock.patch("bot.formatter.relevant_group_footer", return_value=("https://a.ppy.sh/6616586", "")):
         assert format_footer_icon_url(group_event) == "https://a.ppy.sh/6616586"
