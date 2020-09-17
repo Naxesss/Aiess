@@ -170,6 +170,10 @@ def test_passes_filter_underscore_wildcard():
     assert not filter_context.test("content:something_", ["content:something"])
     assert not filter_context.test("content:some_thing", ["content:something"])
 
+def test_passes_filter_partial():
+    assert not filter_context.test("type:reply", ["special-type:reply"])
+    assert not filter_context.test("type:reply", ["type:reply-special"])
+
 def test_passes_filter_event_object():
     beatmapset = Beatmapset(3, "artist", "title", creator=User(1, "someone"), modes=["osu"])
     event = Event(_type="nominate", time=datetime.utcnow(), beatmapset=beatmapset, user=User(2, "sometwo"))
