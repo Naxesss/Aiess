@@ -159,7 +159,7 @@ def get_group_bnsite_comment(event: Event) -> str:
         return None
 
     time = from_string(json["timestamp"]) if "timestamp" in json and json["timestamp"] else None
-    if not time or (datetime.utcnow() - time) > timedelta(days=7):
+    if not time or (datetime.utcnow() - time) > timedelta(days=1):
         # In case the BN website for some reason doesn't update the removal entry, we should avoid using an old one.
         return None
 
