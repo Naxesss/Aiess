@@ -98,9 +98,11 @@ def wildcard_sensitive_in(substring: str, full_string: str) -> bool:
     taking into account any wildcards in the substring. Acceptable wildcards are
     `%` and `_`."""
     pattern = (
+        "^" +
         re.escape(substring)
             .replace("%", "(.*)")
-            .replace("_", ".")
+            .replace("_", ".") +
+        "$"
     )
     match = re.search(pattern, full_string)
 
