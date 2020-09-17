@@ -278,9 +278,7 @@ def test_format_footer_icon_url_news_freetext(newspost_event):
 def test_format_footer_icon_url_removal_reason(group_event):
     group_event.type = "remove"
     group_event.content = "Resigned"
-
-    with mock.patch("bot.formatter.relevant_group_footer", return_value=("https://a.ppy.sh/6616586", "")):
-        assert format_footer_icon_url(group_event) == "https://a.ppy.sh/6616586"
+    assert format_footer_icon_url(group_event) == "https://a.ppy.sh/6616586"
 
 def test_format_thumbnail_url(suggestion_event):
     assert format_thumbnail_url(suggestion_event) == "https://b.ppy.sh/thumb/3l.jpg"
