@@ -2,7 +2,6 @@ import sys
 sys.path.append('..')
 
 import asyncio
-from contextlib import suppress
 from aiohttp.client_exceptions import ClientOSError
 
 import discord
