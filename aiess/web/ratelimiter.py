@@ -44,7 +44,7 @@ def try_request(request_url: str, **kwargs) -> Response:
 
     try:
         response = requests.get(request_url, **kwargs)
-    except ConnectionError:
+    except requests.exceptions.ConnectionError:
         log_err(f"WARNING | ConnectionError was raised on GET \"{request_url}\"")
         return None
     
