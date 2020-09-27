@@ -26,15 +26,14 @@ class Scope():
         self.sql_target = sql_target
 
 class Reader():
-    """This constitutes an object from which a loop, looking through new events in the database, can be executed.
-    In this case, "new" refers to any event after the previously stored datetime in the respective file,
-    named after the given identifier.
+    """This has an async method `run`, which starts a loop that reads Aiess events every 10 seconds.
+
+    If an event is found that is after an internal timestamp (initially current time on first run),
+    then `on_event` is called with this; basically called for every new event.
+
+    For each of these reads, `on_event_batch` is called, regardless of if any new events were found.
     
-    Upon reading a new event, the stored datetime is updated to the time of that event. Only reads events from
-    which `scope` returns True, if specified, else all. The scope can be used to read from separate event streams,
-    for example 
-    
-    Use this by creating a class inheriting Reader, and override methods (e.g. on_event) as desired."""
+    Use this by creating a class inheriting Reader, and override above methods with custom functionality."""
     def __init__(self, reader_id: str, db_name: str):
         self.reader_id = reader_id
         self.database = Database(db_name)
