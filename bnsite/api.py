@@ -43,6 +43,9 @@ def request_obv_sev(discussion_id: int) -> Tuple[int, int]:
     """Returns a tuple of the obviousness (0-2) and severity (0-3) ratings from the disqualification
     associated with the given discussion id, if any, otherwise a (None, None) tuple. Caches results."""
     dq_info_json = request_dq_info(discussion_id)
+    if not dq_info_json:
+        return (None, None)
+    
     return (dq_info_json["obviousness"], dq_info_json["severity"])
 
 def request_qa_checks(user_id: int) -> object:
