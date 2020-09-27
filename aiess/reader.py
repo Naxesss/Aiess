@@ -36,8 +36,8 @@ class Reader():
     Use this by creating a class inheriting Reader, and override above methods with custom functionality."""
     def __init__(self, reader_id: str, db_name: str):
         self.reader_id = reader_id
-        self.database = Database(db_name)
-        self.running = False
+        self.database  = Database(db_name)
+        self.running   = False
         self.last_heartbeat = datetime.utcnow()
 
     async def run(self) -> None:
