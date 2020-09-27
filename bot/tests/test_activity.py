@@ -12,3 +12,8 @@ def test_activity():
     mock_client = mock.MagicMock()
     mock_client.guilds = [object()] * 3
     assert get_activity(mock_client) == Game("+help | 3 servers")
+
+def test_activity_singular():
+    mock_client = mock.MagicMock()
+    mock_client.guilds = [object()] * 1
+    assert get_activity(mock_client) == Game("+help | 1 server")
