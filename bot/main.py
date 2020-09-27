@@ -36,7 +36,7 @@ class Client(discord.Client):
 
     async def on_ready(self) -> None:
         log(f"Logged in as {self.user}!", postfix="bot")
-        asyncio.create_task(activity.loop(self))
+        asyncio.create_task(activity.loop(self, self.reader))
 
         if not self.reader.running:
             await self.reader.run()
