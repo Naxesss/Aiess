@@ -3,6 +3,7 @@ sys.path.append('..')
 
 import asyncio
 from contextlib import suppress
+from aiohttp.client_exceptions import ClientOSError
 
 import discord
 from discord import Message, Game
@@ -11,7 +12,7 @@ from discord.errors import Forbidden
 import aiess
 from aiess import Event
 from aiess import logger
-from aiess.logger import log
+from aiess.logger import log, log_err
 from aiess.database import SCRAPER_DB_NAME
 
 from bot.settings import API_KEY
@@ -50,11 +51,17 @@ class Client(discord.Client):
             # Ignore channels we no longer have access to (e.g. deleted / power outage).
             return
 
-        with suppress(Forbidden):
-            await channel.send(
-                content = format_link(event),
-                embed   = await format_embed(event, skip_timeago_if_recent=True)
-            )
+        while True:
+            try:
+                await channel.send(
+                    content = format_link(event),
+                    embed   = await format_embed(event, skip_timeago_if_recent=True)
+                )
+                break
+            except Forbidden:
+                break  # In case we're subscribed to a channel we don't have access to.
+            except ClientOSError as ex:
+                log_err(f"WARNING | Encountered ClientOSError \"{ex}\" when sending to channel \"{channel}\", retrying...")
 
 class Reader(aiess.Reader):
     client: Client = None
