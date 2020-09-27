@@ -38,6 +38,7 @@ class Reader():
         self.reader_id = reader_id
         self.database = Database(db_name)
         self.running = False
+        self.last_heartbeat = datetime.utcnow()
 
     async def run(self) -> None:
         """A blocking method which initiates a loop looking through events in the database.
@@ -52,6 +53,8 @@ class Reader():
         while True:
             await self.__push_all_new_events()
             await asyncio.sleep(10)
+            
+            self.last_heartbeat = datetime.utcnow()
 
     async def __push_all_new_events(self) -> None:
         """Triggers the on_event method for each new event since the last stored datetime for each scope."""
