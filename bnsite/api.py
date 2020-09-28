@@ -7,13 +7,13 @@ from typing import Tuple
 from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.settings import BNSITE_RATE_LIMIT, BNSITE_HEADERS
 
-response_cache = {}
+cache = {}
 def request(route: str, query: str) -> object:
     """Requests the page from the given route and query.
     Caches any response such that requesting the same discussion id yields the same result."""
     request_url = f"https://bn.mappersguild.com/interOp/{route}/{query}"
-    if request_url in response_cache:
-        return response_cache[request_url]
+    if request_url in cache:
+        return cache[request_url]
 
     response = request_with_rate_limit(
         request_url   = request_url,
@@ -27,7 +27,7 @@ def request(route: str, query: str) -> object:
         # This happens whenever the response text is empty (e.g. "[]").
         result = None
     
-    response_cache[request_url] = result
+    cache[request_url] = result
     return result
 
 def request_removal_reason(user_id: int) -> object:

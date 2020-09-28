@@ -7,7 +7,7 @@ from aiess.timestamp import from_string
 from bnsite import api
 
 def setup_function():
-    api.response_cache.clear()
+    api.cache.clear()
 
 def test_request():
     # https://osu.ppy.sh/beatmapsets/1179039/discussion#/1755074
