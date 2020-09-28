@@ -3,35 +3,20 @@ from datetime import datetime
 from aiess.web import api
 
 def test_cache():
-    api.clear_response_cache()
+    api.cache.clear()
+    assert not api.cache
 
     beatmapset_response = api.request_beatmapset(1)
-    user_response = api.request_user(2)
-    cached_beatmapset_response = api.request_beatmapset(1)
-    cached_user_response = api.request_user(2)
-
+    user_response       = api.request_user(2)
     assert beatmapset_response
     assert user_response
-    assert beatmapset_response == cached_beatmapset_response
-    assert user_response == cached_user_response
 
-    api.clear_response_cache()
+    assert api.cache
+    assert api.cache["/get_beatmaps?s=1"]
+    assert api.cache["/get_user?u=2"]
 
-    assert not api.requested_beatmapsets
-    assert not api.requested_users
-
-    assert api.request_beatmapset(1) == beatmapset_response
-    assert api.request_user(2) == user_response
-
-def test_cache_none():
-    api.requested_beatmapsets[1] = None
-    api.requested_users[2] = None
-
-    assert api.request_beatmapset(1)
-    assert api.request_user(2)
-
-def test_timing():
-    api.clear_response_cache()
+def test_cache_timing():
+    api.cache.clear()
 
     # Not cached, needs to be retrieved with API rate limit.
     time = datetime.utcnow()
