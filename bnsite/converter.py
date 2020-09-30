@@ -5,9 +5,9 @@ from aiess import Event
 from aiess import timestamp
 from aiess.database import Database, SCRAPER_DB_NAME
 
-def convert_to_event(json: object) -> Event:
-    database = Database(SCRAPER_DB_NAME)
+database = Database(SCRAPER_DB_NAME)
 
+def convert_to_event(json: object) -> Event:
     beatmapset_id = float(json["beatmapsetId"]) if "beatmapsetId" in json and json["beatmapsetId"] else None
     discussion_id = float(json["discussionId"]) if "discussionId" in json and json["discussionId"] else None
     user_id       = float(json["userId"])       if "userId"       in json and json["userId"]       else None
