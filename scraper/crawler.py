@@ -68,9 +68,11 @@ def __get_event_generations_between(
     while current_time > end_time:
         event_generator = generator_function(page if generate_by_page else current_time)
         found_events = False
+        found_too_new_events = False
 
         for event in event_generator:
             if event.time > current_time:
+                found_too_new_events = True
                 continue
 
             found_events = True
@@ -81,7 +83,7 @@ def __get_event_generations_between(
             
             yield event
         
-        if not found_events:
+        if not found_events and not found_too_new_events:
             # There are no more events.
             break
 
