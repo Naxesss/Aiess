@@ -14,7 +14,7 @@ async def get_all_events_between(start_time: datetime, end_time: datetime, last_
     """Returns a generator of all events within the given time frame."""
     # Ensures name changes, beatmap updates, etc are considered.
     # Updates once for each pass (more than that isn't necessary considering time is locked).
-    api.clear_response_cache()
+    api.cache.clear()
     populator.cached_discussions_json = {}
 
     # These are closely intertwined; beatmapset events rely on replies, which in turn rely on discussions.
