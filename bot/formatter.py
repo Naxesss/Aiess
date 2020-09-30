@@ -102,10 +102,11 @@ async def format_embed(event: Event, skip_timeago_if_recent: bool=False) -> str:
         value  = await format_field_value(event),
         inline = False
     )
-    embed.set_footer(
-        text     = format_footer_text(event),
-        icon_url = format_footer_icon_url(event)
-    )
+    if format_footer_text(event) is not None:
+        embed.set_footer(
+            text     = format_footer_text(event),
+            icon_url = format_footer_icon_url(event)
+        )
     embed.colour = type_props[event.type].colour
     
     # Unlike `set_footer`, providing `Embed.Empty` to thumbnail and image urls will cause a 400 Bad Request error.
