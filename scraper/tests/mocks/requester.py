@@ -47,3 +47,14 @@ def get_beatmapset_events(page: int=1, limit: int=50):
         yield Event("nominate", from_string("2020-01-01 02:31:00"), beatmapset, user=User(2, "sometwo"))
     if page == 2:
         yield Event("nominate", from_string("2020-01-01 02:30:30"), beatmapset, user=User(1, "someone"))
+
+def get_beatmapset_events_too_new(page: int=1, limit: int=50):
+    if page == 1:
+        # Feburary for this one
+        yield Event("disqualify", from_string("2020-02-01 03:00:00"), beatmapset, discussion_dq, user=User(2, "sometwo"))
+    if page == 2:
+        # January for the rest
+        yield Event("qualify", from_string("2020-01-01 02:31:00"), beatmapset)
+        yield Event("nominate", from_string("2020-01-01 02:31:00"), beatmapset, user=User(2, "sometwo"))
+    if page == 3:
+        yield Event("nominate", from_string("2020-01-01 02:30:30"), beatmapset, user=User(1, "someone"))

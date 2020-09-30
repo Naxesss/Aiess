@@ -12,6 +12,7 @@ from aiess.timestamp import from_string
 from scraper.tests.mocks.requester import get_discussion_events
 from scraper.tests.mocks.requester import get_reply_events
 from scraper.tests.mocks.requester import get_beatmapset_events
+from scraper.tests.mocks.requester import get_beatmapset_events_too_new
 from scraper.tests.mocks.requester import get_news_events
 from scraper.tests.mocks.discussion_jsons.crawler_json import JSON as mock_discussion_json
 
@@ -150,3 +151,20 @@ async def test_get_beatmapset_events_between_far_back():
 
     assert event2 is not None
     assert event1 is None
+
+@pytest.mark.asyncio
+async def test_get_beatmapset_events_between_too_new():
+    with mock.patch("scraper.crawler.get_beatmapset_events", side_effect=get_beatmapset_events_too_new):
+        with mock.patch("scraper.populator.get_discussions_json", side_effect=mock_get_discussions_json):
+            generator = __get_beatmapset_events_between(start_time=from_string("2020-01-03 00:00:00"), end_time=from_string("2020-01-01 00:00:00"))
+            event2 = await anext(generator, None)
+            event3 = await anext(generator, None)
+            event4 = await anext(generator, None)
+
+    assert event2.type == "qualify"
+    assert event2.user is None
+    assert event3.type == "nominate"
+    assert event3.user.name == "sometwo"
+    assert event3.content == "hype"
+    assert event4.type == "nominate"
+    assert event4.content is None
