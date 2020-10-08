@@ -115,6 +115,7 @@ def __complete_discussion_context(discussion: Discussion, db_name: str=SCRAPER_D
 
     discussion.user = cached_discussion.user
     discussion.content = cached_discussion.content
+    discussion.tab = cached_discussion.tab
     return True
 
 def get_nomination_comment(event: Event, discussions_json: object) -> str:

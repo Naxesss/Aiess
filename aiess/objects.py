@@ -118,18 +118,20 @@ class Beatmapset:
 
 class Discussion:
     """Contains the discussion data either supplied or further scraped (latter in case of e.g. disqualify or nomination_reset events)."""
-    def __init__(self, _id: int, beatmapset: Beatmapset, user: User=None, content: str=None):
+    def __init__(self, _id: int, beatmapset: Beatmapset, user: User=None, content: str=None, tab: str=None):
         self.id = int(_id)
         self.beatmapset = beatmapset
         self.user = user if user is not None else None
         self.content = str(content) if content is not None else None
+        self.tab = str(tab) if tab is not None else None
     
     def __key(self) -> tuple:
         return (
             self.id,
             self.beatmapset,
             self.user,
-            self.content
+            self.content,
+            self.tab
         )
     
     def __eq__(self, other) -> bool:

@@ -242,6 +242,7 @@ class Database:
         # being inserted into the database.
         if discussion.user is None: self.__raise_missing("User is missing from discussion")
         if discussion.content is None: self.__raise_missing("Content is missing from discussion")
+        if discussion.tab is None: self.__raise_missing("Tab is missing from discussion")
 
         self.insert_table_data(
             "discussions",
@@ -249,7 +250,8 @@ class Database:
                 id            = discussion.id,
                 beatmapset_id = discussion.beatmapset.id,
                 user_id       = discussion.user.id,
-                content       = discussion.content
+                content       = discussion.content,
+                tab           = discussion.tab
             )
         )
     
@@ -371,7 +373,7 @@ class Database:
             table        = "discussions", 
             where        = where,
             where_values = where_values,
-            selection    = "id, beatmapset_id, user_id, content"
+            selection    = "id, beatmapset_id, user_id, content, tab"
         )
         for row in (fetched_rows or []):
             _id     = row[0]
@@ -379,7 +381,8 @@ class Database:
                 beatmapset = self.retrieve_beatmapset("id=%s", (row[1],))
             user    = self.retrieve_user("id=%s", (row[2],))
             content = row[3]
-            yield Discussion(_id, beatmapset, user, content)
+            tab     = row[4]
+            yield Discussion(_id, beatmapset, user, content, tab)
     
     def retrieve_newspost(self, where: str, where_values: tuple=None) -> NewsPost:
         """Returns the first newspost from the database matching the given WHERE clause, or None if no such newspost is stored."""
