@@ -30,9 +30,6 @@ def parse_users_json(group_id: int, users_json: object, last_checked_at: datetim
         else:
             new_users.append(User(_id=user_id, name=user_json["username"]))
     
-    # TODO: If `group_id` in [28, 32]:
-    #   - Check for "Resigned" or "Kicked" from bnsite, if timestamp is close enough.
-    #   - Use the time given from ^, if close enough.
     content = None
     time = last_checked_at
 
