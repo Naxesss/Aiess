@@ -7,6 +7,7 @@ from aiess import timestamp
 
 from scraper.tests.mocks.events import problem, reply
 from scraper.tests.mocks.events.faulty import discussion_events
+from scraper.tests.mocks import discussion_diff_and_tabs
 from scraper.tests.mocks import discussion_events_json
 from scraper.parsers.discussion_event_parser import discussion_event_parser
 from scraper import populator
@@ -23,6 +24,30 @@ def test_parse_reply_message():
 
     assert actual_content == expected_content
 
+def test_parse_discussion_tab():
+    actual_content = discussion_event_parser.parse_discussion_tab(discussion_diff_and_tabs.tag)
+    expected_content = "general"
+
+    assert actual_content == expected_content
+
+def test_parse_discussion_diff():
+    actual_content = discussion_event_parser.parse_discussion_diff(discussion_diff_and_tabs.tag)
+    expected_content = "Expert"
+
+    assert actual_content == expected_content
+
+def test_parse_discussion_tab_and_diff():
+    actual_content = discussion_event_parser.parse_discussion_diff_tab(discussion_diff_and_tabs.tag)
+    expected_content = "General, [Expert]"
+
+    assert actual_content == expected_content
+
+def test_parse_discussion_tab_and_diff_all():
+    actual_content = discussion_event_parser.parse_discussion_diff_tab(discussion_diff_and_tabs.tag2)
+    expected_content = "General, All difficulties"
+
+    assert actual_content == expected_content
+
 def test_parse():
     generator = discussion_event_parser.parse(discussion_events.soup)
 
@@ -32,6 +57,7 @@ def test_parse():
     
     assert len(generated_events) == 1  # 1 of 2 events is of a beatmapset that no longer exists.
     assert generated_events[0].type == "suggestion"
+    assert generated_events[0].discussion.tab == "Timeline, [Expert]"
 
 def test_parse_json():
     generator = discussion_event_parser.parse(discussion_events_json.soup)
@@ -46,6 +72,7 @@ def test_parse_json():
     assert generated_events[0].time == timestamp.from_string("2020-03-07T20:42:58+00:00")
     assert generated_events[2].user.id == 2597417
     assert generated_events[2].user.name == "Jaltzu"
+    assert generated_events[2].discussion.tab == "Timeline, [Muzukashii]"
 
 @pytest.fixture(scope="module")
 def discussion_event():
@@ -71,6 +98,7 @@ def test_beatmapset_attr(discussion_event):
 def test_discussion_attr(discussion_event):
     assert discussion_event.discussion.id == 1295203
     assert discussion_event.discussion.beatmapset == discussion_event.beatmapset
+    assert discussion_event.discussion.tab == "General, [Expert]"
 
 
 
