@@ -476,3 +476,25 @@ class Database:
             where_values = where_values,
             selection    = "events.type, events.time, events.beatmapset_id, events.discussion_id, events.user_id, events.group_id, events.news_id, events.content"
         )
+
+class CachedDatabase(Database):
+    """Creates an aiess database connection. Stores any query results in a cache and retrieves from it whenever available."""
+    def __init__(self, _db_name: str):
+        super().__init__(_db_name=_db_name)
+        self.cache = {}
+    
+    def _execute(self, query: str, values: tuple=None) -> List[tuple]:
+        """Executes the given SQL query with the given argument values, if any. Use like "%s" in query
+        and ("name",) in values. Returns the fetched result sets as a list of tuples, or None if no result.
+        
+        Returns from cache, if available, otherwise caches the result."""
+        cache_line = f"Q:{query}, V:{values}"
+        if cache_line in self.cache and self.cache[cache_line]:
+            return self.cache[cache_line]
+        
+        self.cache[cache_line] = super()._execute(
+            query  = query,
+            values = values
+        )
+        
+        return self.cache[cache_line]
