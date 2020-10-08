@@ -71,7 +71,7 @@ class Database:
                 return None  # Reached end of result set, not an issue.
             raise
 
-    def __execute(self, query: str, values: tuple=None) -> List[tuple]:
+    def _execute(self, query: str, values: tuple=None) -> List[tuple]:
         """Executes the given SQL query with the given argument values, if any. Use like "%s" in query
         and ("name",) in values. Returns the fetched result sets as a list of tuples, or None if no result."""
         cursor = self.__get_cursor()
@@ -86,7 +86,7 @@ class Database:
     def __execute_dict(self, query: str, **values: object) -> List[tuple]:
         """Executes the given SQL query with the given argument values, if any. Use like "%(name)s" in query
         and name=name in values. Returns the fetched result sets as a list of tuples, or None if no result."""
-        return self.__execute(query, values)
+        return self._execute(query, values)
     
     def __executemany(self, query: str, values: List[tuple]) -> List[tuple]:
         """Executes the given SQL query over multiple values (e.g. list or array of tuples).
@@ -133,7 +133,7 @@ class Database:
     def retrieve_table_data(self, table: str, where: str=None, where_values: tuple=None, selection: str="*") -> List[tuple]:
         """Returns all rows from the table where the WHERE clause applies (e.g. `where` as "type=%s AND id=%s" and 
         `where_values` as ("nominate", 5)), if specified, otherwise any data present in the table."""
-        return self.__execute("""
+        return self._execute("""
             SELECT %(selection)s FROM %(db_name)s.%(table)s
             WHERE %(where)s
             """ % InterpolationDict(
@@ -149,7 +149,7 @@ class Database:
         """Deletes all rows from the table where the WHERE clause applies (e.g. `where` as "type=%s AND id=%s" and 
         `where_values` as ("nominate", 5)). Can optionally allow failure by ignoring any thrown exception from the query.
         Returns the result of the query."""
-        return self.__execute("""
+        return self._execute("""
             DELETE %(ignore)sFROM %(db_name)s.%(table)s
             WHERE %(where)s
             """ % InterpolationDict(
@@ -164,15 +164,15 @@ class Database:
     def clear_table_data(self, table: str) -> None:
         """Deletes all rows from the table. Ignores the foreign key check, meaning this
         will disconnect keys from values. As such use with care."""
-        self.__execute("SET FOREIGN_KEY_CHECKS = 0")
-        self.__execute("""
+        self._execute("SET FOREIGN_KEY_CHECKS = 0")
+        self._execute("""
             TRUNCATE %(db_name)s.%(table)s
             """ % InterpolationDict(
                 db_name = self.db_name,
                 table   = table
             )
         )
-        self.__execute("SET FOREIGN_KEY_CHECKS = 1")
+        self._execute("SET FOREIGN_KEY_CHECKS = 1")
     
     def delete_group_user(self, group: Usergroup, user: User) -> None:
         """Deletes the given user to group relation from the group_users table."""
