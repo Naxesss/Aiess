@@ -3,7 +3,7 @@ from mysql.connector.errors import ProgrammingError
 from datetime import datetime
 
 from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost, Usergroup
-from aiess.database import Database, SCRAPER_TEST_DB_NAME
+from aiess.database import Database, CachedDatabase, SCRAPER_TEST_DB_NAME
 from aiess.common import anext
 
 @pytest.fixture
@@ -315,3 +315,46 @@ async def test_insert_retrieve_multiple_events(test_database):
     retrieved_events = test_database.retrieve_events(where="beatmapset_id=%s", where_values=(beatmapset.id,))
     assert await anext(retrieved_events, None) == event1
     assert await anext(retrieved_events, None) == event2
+
+
+
+@pytest.fixture
+def cached_database():
+    database = CachedDatabase(SCRAPER_TEST_DB_NAME)
+    # Reset database to state before any tests ran.
+    database.clear_table_data("events")
+    database.clear_table_data("discussions")
+    database.clear_table_data("beatmapsets")
+    database.clear_table_data("beatmapset_modes")
+    database.clear_table_data("newsposts")
+    database.clear_table_data("group_users")
+    database.clear_table_data("users")
+
+    return database
+
+@pytest.mark.asyncio
+async def test_insert_retrieve_event_cached(cached_database):
+    time = datetime.utcnow()
+
+    user = User(1, name="test")
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    discussion = Discussion(1, beatmapset=beatmapset, user=user, content="testing")
+
+    for i in range(100):
+        event = Event(_type=f"{i}", time=time, beatmapset=beatmapset, discussion=discussion, user=user)
+        cached_database.insert_event(event)
+
+    start_time = datetime.utcnow()
+    retrieved_events_uncached = cached_database.retrieve_events(where="beatmapset_id=%s", where_values=(beatmapset.id,))
+    async for event in retrieved_events_uncached:
+        assert event.beatmapset == beatmapset
+    delta_time_uncached = datetime.utcnow() - start_time
+
+    start_time = datetime.utcnow()
+    retrieved_events_cached = cached_database.retrieve_events(where="beatmapset_id=%s", where_values=(beatmapset.id,))
+    async for event in retrieved_events_cached:
+        assert event.beatmapset == beatmapset
+    delta_time_cached = datetime.utcnow() - start_time
+
+    assert await anext(retrieved_events_uncached, None) == await anext(retrieved_events_cached, None)
+    assert delta_time_uncached > delta_time_cached
