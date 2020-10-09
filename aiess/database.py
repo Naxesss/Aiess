@@ -251,7 +251,8 @@ class Database:
                 beatmapset_id = discussion.beatmapset.id,
                 user_id       = discussion.user.id,
                 content       = discussion.content,
-                tab           = discussion.tab
+                tab           = discussion.tab,
+                difficulty    = discussion.difficulty
             )
         )
     
@@ -373,16 +374,17 @@ class Database:
             table        = "discussions", 
             where        = where,
             where_values = where_values,
-            selection    = "id, beatmapset_id, user_id, content, tab"
+            selection    = "id, beatmapset_id, user_id, content, tab, difficulty"
         )
         for row in (fetched_rows or []):
             _id     = row[0]
             if not beatmapset:
                 beatmapset = self.retrieve_beatmapset("id=%s", (row[1],))
-            user    = self.retrieve_user("id=%s", (row[2],))
-            content = row[3]
-            tab     = row[4]
-            yield Discussion(_id, beatmapset, user, content, tab)
+            user       = self.retrieve_user("id=%s", (row[2],))
+            content    = row[3]
+            tab        = row[4]
+            difficulty = row[5]
+            yield Discussion(_id, beatmapset, user, content, tab, difficulty)
     
     def retrieve_newspost(self, where: str, where_values: tuple=None) -> NewsPost:
         """Returns the first newspost from the database matching the given WHERE clause, or None if no such newspost is stored."""
