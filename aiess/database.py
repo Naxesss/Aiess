@@ -242,7 +242,6 @@ class Database:
         # being inserted into the database.
         if discussion.user is None: self.__raise_missing("User is missing from discussion")
         if discussion.content is None: self.__raise_missing("Content is missing from discussion")
-        if discussion.tab is None: self.__raise_missing("Tab is missing from discussion")
 
         self.insert_table_data(
             "discussions",
