@@ -70,6 +70,7 @@ CREATE TABLE `discussions` (
   `user_id` bigint(20) unsigned NOT NULL,
   `content` mediumtext,
   `tab` mediumtext,
+  `difficulty` mediumtext,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   KEY `discussionsfk_beatmapset_id_idx` (`beatmapset_id`),

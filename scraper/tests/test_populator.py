@@ -57,13 +57,13 @@ def test_discussion():
 
 def test_incomplete_context():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
-    discussion = Discussion(99, beatmapset)  # Missing user and content.
+    discussion = Discussion(99, beatmapset)  # Missing user, content, tab, and difficulty.
     
     assert not __complete_discussion_context(discussion, db_name=SCRAPER_TEST_DB_NAME)
 
 def test_complete_context():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
-    discussion = Discussion(99, beatmapset, user=User(1, "someone"), content="hello there", tab="tab")
+    discussion = Discussion(99, beatmapset, user=User(1, "someone"), content="hello there", tab="tab", difficulty="diff")
     incomplete_discussion = Discussion(99, beatmapset)
     
     Database(SCRAPER_TEST_DB_NAME).insert_discussion(discussion)
@@ -72,6 +72,7 @@ def test_complete_context():
     assert incomplete_discussion.user
     assert incomplete_discussion.content
     assert incomplete_discussion.tab
+    assert incomplete_discussion.difficulty
 
 @pytest.mark.asyncio
 async def test_delete_incomplete_context():

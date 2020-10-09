@@ -36,18 +36,6 @@ def test_parse_discussion_diff():
 
     assert actual_content == expected_content
 
-def test_parse_discussion_tab_and_diff():
-    actual_content = discussion_event_parser.parse_discussion_diff_tab(discussion_diff_and_tabs.tag)
-    expected_content = "General, [Expert]"
-
-    assert actual_content == expected_content
-
-def test_parse_discussion_tab_and_diff_all():
-    actual_content = discussion_event_parser.parse_discussion_diff_tab(discussion_diff_and_tabs.tag2)
-    expected_content = "General, All difficulties"
-
-    assert actual_content == expected_content
-
 def test_parse():
     generator = discussion_event_parser.parse(discussion_events.soup)
 
