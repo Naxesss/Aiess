@@ -45,7 +45,8 @@ def test_parse():
     
     assert len(generated_events) == 1  # 1 of 2 events is of a beatmapset that no longer exists.
     assert generated_events[0].type == "suggestion"
-    assert generated_events[0].discussion.tab == "Timeline, [Expert]"
+    assert generated_events[0].discussion.tab == "timeline"
+    assert generated_events[0].discussion.difficulty == "Expert"
 
 def test_parse_json():
     generator = discussion_event_parser.parse(discussion_events_json.soup)
@@ -60,7 +61,8 @@ def test_parse_json():
     assert generated_events[0].time == timestamp.from_string("2020-03-07T20:42:58+00:00")
     assert generated_events[2].user.id == 2597417
     assert generated_events[2].user.name == "Jaltzu"
-    assert generated_events[2].discussion.tab == "Timeline, [Muzukashii]"
+    assert generated_events[2].discussion.tab == "timeline"
+    assert generated_events[2].discussion.difficulty == "Muzukashii"
 
 @pytest.fixture(scope="module")
 def discussion_event():
@@ -86,7 +88,8 @@ def test_beatmapset_attr(discussion_event):
 def test_discussion_attr(discussion_event):
     assert discussion_event.discussion.id == 1295203
     assert discussion_event.discussion.beatmapset == discussion_event.beatmapset
-    assert discussion_event.discussion.tab == "General, [Expert]"
+    assert discussion_event.discussion.tab == "general"
+    assert discussion_event.discussion.difficulty == "Expert"
 
 
 

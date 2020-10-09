@@ -63,8 +63,10 @@ class DiscussionEventParser(EventParser):
                 # Replies should look up the discussion they are posted on.
                 discussion = Discussion(discussion_id, beatmapset) if discussion_id is not None else None
             else:
-                tab = self.parse_discussion_diff_tab(event)
-                discussion = Discussion(discussion_id, beatmapset, user, content, tab) if discussion_id is not None else None
+                tab = self.parse_discussion_tab(event)
+                difficulty = self.parse_discussion_diff(event)
+
+                discussion = Discussion(discussion_id, beatmapset, user, content, tab, difficulty) if discussion_id is not None else None
         except DeletedContextError as err:
             log_err(err)
         else:
@@ -103,19 +105,19 @@ class DiscussionEventParser(EventParser):
             user_name = user_json["username"] if user_json else None
             
             content = event_json["starting_post"]["message"]
-            diff = event_json["beatmap"]["version"] if "beatmap" in event_json and "version" in event_json["beatmap"] else None
-            tab_raw = None
-            if event_json["timestamp"] is not None: tab_raw = "timeline"
-            elif diff:                              tab_raw = "general"
-            else:                                   tab_raw = "generalAll"
-            tab = self.discussion_diff_tab(diff, tab_raw)
+
+            difficulty = event_json["beatmap"]["version"] if "beatmap" in event_json and "version" in event_json["beatmap"] else None
+            tab = None
+            if event_json["timestamp"] is not None: tab = "timeline"
+            elif difficulty:                        tab = "general"
+            else:                                   tab = "generalAll"
 
             # Reconstruct objects
             beatmapset = Beatmapset(beatmapset_id)
             user = User(user_id, user_name) if user_id is not None else None
             # TODO: This portion is missing handling for replies, see the other method.
             # Still unclear which message_type replies use; will need to find out if/when replies get json formats.
-            discussion = Discussion(discussion_id, beatmapset, user, content, tab) if discussion_id is not None else None
+            discussion = Discussion(discussion_id, beatmapset, user, content, tab, difficulty) if discussion_id is not None else None
         except DeletedContextError as err:
             log_err(err)
         else:
@@ -193,23 +195,6 @@ class DiscussionEventParser(EventParser):
             raise ValueError("Could not parse the difficulty associated with a discussion.")
 
         return active_diff_tag.find("div", {"data-beatmap-title": True})["data-beatmap-title"]
-    
-    def parse_discussion_diff_tab(self, event: Tag) -> str:
-        """Parses the difficulty and tab which a discussion post is on
-        (e.g. "General, [Expert]" / "General, All difficulties")."""
-        diff = self.parse_discussion_diff(event)
-        tab  = self.parse_discussion_tab(event)
-
-        return self.discussion_diff_tab(diff, tab)
-    
-    def discussion_diff_tab(self, diff: str, tab: str) -> str:
-        """Parses the difficulty and tab which a discussion post is on
-        (e.g. "General, [Expert]" / "General, All difficulties")."""
-        # For "General (All difficulties)", the difficulty is irrelevant.
-        if tab == "generalAll":
-            return "General, All difficulties"
-
-        return f"{tab.capitalize()}, [{diff}]"
 
 # Only need one instance since it's always the same.
 discussion_event_parser = DiscussionEventParser()
