@@ -61,6 +61,15 @@ def test_incomplete_context():
     
     assert not __complete_discussion_context(discussion, db_name=SCRAPER_TEST_DB_NAME)
 
+def test_incomplete_context_from_db():
+    beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
+    discussion = Discussion(99, beatmapset, user=User(1, "someone"), content="hello there")  # Missing tab and difficulty.
+    incomplete_discussion = Discussion(99, beatmapset)
+    
+    Database(SCRAPER_TEST_DB_NAME).insert_discussion(discussion)
+
+    assert not __complete_discussion_context(incomplete_discussion, db_name=SCRAPER_TEST_DB_NAME)
+
 def test_complete_context():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
     discussion = Discussion(99, beatmapset, user=User(1, "someone"), content="hello there", tab="tab", difficulty="diff")

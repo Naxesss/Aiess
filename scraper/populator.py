@@ -113,6 +113,15 @@ def __complete_discussion_context(discussion: Discussion, db_name: str=SCRAPER_D
     if not cached_discussion:
         return False
 
+    complete = (
+        cached_discussion.user and
+        cached_discussion.content and
+        cached_discussion.tab and
+        cached_discussion.difficulty
+    )
+    if not complete:
+        return False
+
     discussion.user       = cached_discussion.user
     discussion.content    = cached_discussion.content
     discussion.tab        = cached_discussion.tab
