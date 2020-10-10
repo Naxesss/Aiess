@@ -7,8 +7,8 @@ from aiess import Event, Beatmapset, User, Discussion
 from aiess.timestamp import from_string
 
 beatmapset = Beatmapset(4, "artist", "title", creator=User(1, "someone"), modes=["osu"])
-discussion = Discussion(5, beatmapset=beatmapset, user=User(2, "sometwo"), content="hi")
-discussion_dq = Discussion(6, beatmapset=beatmapset, user=User(2, "sometwo"), content="no wait")
+discussion = Discussion(20, beatmapset=beatmapset, user=User(2, "sometwo"), content="hi")
+discussion_dq = Discussion(22, beatmapset=beatmapset, user=User(2, "sometwo"), content="no wait")
 
 # Note that all events are yielded from newest to oldest.
 
