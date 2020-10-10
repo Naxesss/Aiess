@@ -197,7 +197,10 @@ def format_footer_text(event: Event, database: Database=None) -> str:
         return Embed.Empty
 
     if event.content:
-        return f"{event.user} {format_preview(event.content)}"
+        text = f"{event.user} {format_preview(event.content)}"
+        if event.discussion and event.discussion.tab != "generalAll" and event.discussion.difficulty is not None:
+            text += f" [{event.discussion.difficulty}]"
+        return text
     
     return str(event.user)
 
