@@ -102,25 +102,25 @@ def get_group_events(_from: datetime) -> Generator[Event, None, None]:
 
 
 
-def request_discussions_json(beatmapset: Beatmapset) -> object:
+def request_discussions_json(beatmapset_id: int) -> object:
     """Requests the beatmapset discussion page as a json object, if it exists, otherwise None.
     Older beatmapsets have no discussions, for example, so they will return None."""
     try:
-        return request_json(f"https://osu.ppy.sh/beatmapsets/{beatmapset.id}/discussion?format=json")
+        return request_json(f"https://osu.ppy.sh/beatmapsets/{beatmapset_id}/discussion?format=json")
     except json.decoder.JSONDecodeError:
         return None
 
 def get_map_page_discussions(beatmapset: Beatmapset, discussions_json: object=None) -> Generator[Discussion, None, None]:
     """Returns a generator of discussion objects from the beatmapset discussion page json. If not supplied it is scraped."""
-    discussions_json = request_discussions_json(beatmapset) if discussions_json is None else discussions_json
+    discussions_json = request_discussions_json(beatmapset.id) if discussions_json is None else discussions_json
     return discussion_parser.parse(discussions_json, beatmapset)
 
 def get_map_page_event_jsons(beatmapset: Beatmapset, discussions_json: object=None) -> Generator[object, None, None]:
     """Returns a generator of event json objects from the beatmapset discussion page json. If not supplied it is scraped."""
-    discussions_json = request_discussions_json(beatmapset) if discussions_json is None else discussions_json
+    discussions_json = request_discussions_json(beatmapset.id) if discussions_json is None else discussions_json
     return discussions_json["beatmapset"]["events"]
 
 def get_map_page_discussion_jsons(beatmapset: Beatmapset, discussions_json: object=None) -> Generator[object, None, None]:
     """Returns a generator of event json objects from the beatmapset discussion page json. If not supplied it is scraped."""
-    discussions_json = request_discussions_json(beatmapset) if discussions_json is None else discussions_json
+    discussions_json = request_discussions_json(beatmapset.id) if discussions_json is None else discussions_json
     return discussions_json["beatmapset"]["discussions"]

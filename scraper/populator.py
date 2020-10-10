@@ -38,7 +38,7 @@ def get_discussions_json(beatmapset: Beatmapset) -> object:
     """Returns the beatmapset discussions json, containing all of the discussion information for the mapset,
     if possible, otherwise None."""
     if beatmapset.id not in cached_discussions_json:
-        discussions_json = request_discussions_json(beatmapset)
+        discussions_json = request_discussions_json(beatmapset.id)
         if discussions_json:
             cached_discussions_json[beatmapset.id] = discussions_json
     else:
