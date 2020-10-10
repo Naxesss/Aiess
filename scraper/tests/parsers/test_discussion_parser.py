@@ -60,3 +60,29 @@ def test_parse_discussion_post_author(discussions_json):
         assert user
         assert user.id
         assert user.name
+
+def test_parse_tab(discussions_json):
+    discussion_jsons = discussions_json["beatmapset"]["discussions"]
+    tabs = set()
+    for discussion_json in discussion_jsons:
+        if not discussion_json: continue
+
+        tab = discussion_parser.parse_tab(discussion_json=discussion_json, beatmapset_json=discussions_json["beatmapset"])
+        tabs.add(tab)
+        assert tab
+    
+    assert "timeline" in tabs
+    assert "general" in tabs
+    assert "generalAll" in tabs
+
+def test_parse_diff(discussions_json):
+    discussion_jsons = discussions_json["beatmapset"]["discussions"]
+    difficulties = set()
+    for discussion_json in discussion_jsons:
+        if not discussion_json: continue
+
+        difficulty = discussion_parser.parse_diff(discussion_json=discussion_json, beatmapset_json=discussions_json["beatmapset"])
+        difficulties.add(difficulty)
+    
+    for beatmap_json in discussions_json["beatmapset"]["beatmaps"]:
+        assert beatmap_json["version"] in difficulties
