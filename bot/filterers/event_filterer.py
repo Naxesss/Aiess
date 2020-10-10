@@ -206,6 +206,22 @@ filter_context = FilterContext(
             value_predicate = lambda value: True,
             value_func      = lambda event: [escape(event.discussion.content)] if event.discussion else None
         ),
+        Tag(
+            names           = ["discussion-tab"],
+            description     = "The tab which the discussion of an event occurred on (e.g. \"timeline\" for any discussion associated with a timestamp).",
+            example_values  = ["timeline", "general", "generalAll"],
+            value_hint      = "\u2000".join(f"`{tab}`" for tab in ["timeline", "general", "generalAll"]),
+            value_predicate = lambda value: value in ["timeline", "general", "generalAll"],
+            value_func      = lambda event: [escape(event.discussion.tab)] if event.discussion else None
+        ),
+        Tag(
+            names           = ["discussion-difficulty"],
+            description     = "The difficulty which the discussion of an event occurred on (e.g. \"Expert\" for any discussion on that difficulty).",
+            example_values  = ["insane", "\"gder's expert\""],
+            value_hint      = HINT_ANY,
+            value_predicate = lambda value: True,
+            value_func      = lambda event: [escape(event.discussion.difficulty)] if event.discussion else None
+        ),
         # Usergroup
         Tag(
             names           = ["group"],
@@ -284,26 +300,28 @@ filter_context = FilterContext(
 )
 
 TAG_TO_SQL = {
-    filter_context.get_tag("user")               : "user.name LIKE %s",
-    filter_context.get_tag("user-id")            : "user.id=%s",
-    filter_context.get_tag("set-id")             : "beatmapset.id=%s",
-    filter_context.get_tag("artist")             : "beatmapset.artist LIKE %s",
-    filter_context.get_tag("title")              : "beatmapset.title LIKE %s",
-    filter_context.get_tag("creator")            : "creator.name LIKE %s",
-    filter_context.get_tag("creator-id")         : "creator.id=%s",
-    filter_context.get_tag("mode")               : "mode=%s",
-    filter_context.get_tag("discussion-id")      : "discussion.id=%s",
-    filter_context.get_tag("author")             : "author.name LIKE %s",
-    filter_context.get_tag("author-id")          : "author.id LIKE %s",
-    filter_context.get_tag("discussion-content") : "discussion.content LIKE %s",
-    filter_context.get_tag("group")              : "group_id=%s",
-    filter_context.get_tag("group-id")           : "group_id=%s",
-    filter_context.get_tag("news-title")         : "newspost.title LIKE %s",
-    filter_context.get_tag("news-content")       : "newspost.preview LIKE %s",
-    filter_context.get_tag("news-author")        : "newspost.author_name LIKE %s",
-    filter_context.get_tag("news-author-id")     : "newspost.author_id=%s",
-    filter_context.get_tag("type")               : "type=%s",
-    filter_context.get_tag("content")            : "events.content LIKE %s"
+    filter_context.get_tag("user")                  : "user.name LIKE %s",
+    filter_context.get_tag("user-id")               : "user.id=%s",
+    filter_context.get_tag("set-id")                : "beatmapset.id=%s",
+    filter_context.get_tag("artist")                : "beatmapset.artist LIKE %s",
+    filter_context.get_tag("title")                 : "beatmapset.title LIKE %s",
+    filter_context.get_tag("creator")               : "creator.name LIKE %s",
+    filter_context.get_tag("creator-id")            : "creator.id=%s",
+    filter_context.get_tag("mode")                  : "mode=%s",
+    filter_context.get_tag("discussion-id")         : "discussion.id=%s",
+    filter_context.get_tag("author")                : "author.name LIKE %s",
+    filter_context.get_tag("author-id")             : "author.id LIKE %s",
+    filter_context.get_tag("discussion-content")    : "discussion.content LIKE %s",
+    filter_context.get_tag("group")                 : "group_id=%s",
+    filter_context.get_tag("group-id")              : "group_id=%s",
+    filter_context.get_tag("news-title")            : "newspost.title LIKE %s",
+    filter_context.get_tag("news-content")          : "newspost.preview LIKE %s",
+    filter_context.get_tag("news-author")           : "newspost.author_name LIKE %s",
+    filter_context.get_tag("news-author-id")        : "newspost.author_id=%s",
+    filter_context.get_tag("type")                  : "type=%s",
+    filter_context.get_tag("content")               : "events.content LIKE %s",
+    filter_context.get_tag("discussion-tab")        : "discussion.tab LIKE %s",
+    filter_context.get_tag("discussion-difficulty") : "discussion.difficulty LIKE %s"
 }
 
 def filter_to_sql(_filter: str) -> (str, tuple):
