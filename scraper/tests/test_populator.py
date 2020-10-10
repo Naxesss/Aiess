@@ -54,6 +54,7 @@ def test_discussion():
     assert discussion.user.id == 4967662
     assert discussion.user.name == "greenhue"
     assert discussion.content == "since it ranks soon gonna just dq for fierys discussion https://osu.ppy.sh/beatmapsets/1001546/discussion/-/generalAll#/1228459 plus thought about points i brought up privately in dms."
+    assert discussion.tab == "generalAll"
 
 def test_incomplete_context():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
