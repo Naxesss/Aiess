@@ -215,6 +215,12 @@ def test_format_footer_text_difficulty(suggestion_event):
     suggestion_event.discussion.difficulty = "Someone's Expert"
     assert format_footer_text(suggestion_event) == "someone \"hi\" [Someone's Expert]"
 
+def test_format_footer_text_difficulty_reply(suggestion_event):
+    suggestion_event.type = "reply"
+    suggestion_event.discussion.tab = "timeline"
+    suggestion_event.discussion.difficulty = "Someone's Expert"
+    assert format_footer_text(suggestion_event) == "someone \"hi\""
+
 def test_format_footer_text_newspost(newspost_event):
     # Newsposts already include their preview in the post itself, so we skip this.
     assert format_footer_text(newspost_event) == "sometwo"
@@ -305,6 +311,12 @@ def test_context_field_name(kudosu_gain_event):
 
 def test_context_field_value(kudosu_gain_event):
     assert format_context_field_value(kudosu_gain_event) == "\"hi\\*\""
+
+def test_context_field_value_difficulty(kudosu_gain_event):
+    kudosu_gain_event.discussion.content = "test"
+    kudosu_gain_event.discussion.tab = "general"
+    kudosu_gain_event.discussion.difficulty = "Insane"
+    assert format_context_field_value(kudosu_gain_event) == "\"test\" [Insane]"
 
 def test_context_field_value_truncate(kudosu_gain_event):
     kudosu_gain_event.discussion.content = "a very long piece of text " * 10
