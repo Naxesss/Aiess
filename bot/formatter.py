@@ -200,8 +200,8 @@ def format_footer_text(event: Event, database: Database=None) -> str:
         text = f"{event.user} {format_preview(event.content)}"
 
         formatted_diff = format_tab_diff(event)
-        # Difficulty is already displayed in the context field for replies.
-        if formatted_diff and event.type != "reply":
+        # Difficulty is already displayed in the context field for replies/resolves/etc.
+        if formatted_diff and not type_props[event.type].show_context:
             text += f" {formatted_diff}"
         
         return text
