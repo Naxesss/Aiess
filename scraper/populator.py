@@ -59,7 +59,7 @@ def get_complete_discussion_info(
         discussion.content is not None and
         discussion.tab is not None
     ):
-        return discussion  # Either None (i.e. unused by the event type) or already completed.
+        return discussion  # None of required attributes are missing, so is considered already complete.
 
     if not discussions_json:
         # Discussions json is the quickest option, which is why we check this first.
