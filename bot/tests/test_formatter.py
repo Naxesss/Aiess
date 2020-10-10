@@ -35,7 +35,7 @@ from bot.formatter import format_dotted_list
 def suggestion_event():
     beatmapset = Beatmapset(3, "artist", "title", User(2, "sometwo"), ["osu"])
     user = User(1, "someone")
-    discussion = Discussion(5, beatmapset, user, content="hi")
+    discussion = Discussion(5, beatmapset, user, content="hi", tab="generalAll", difficulty=None)
     event = Event("suggestion", from_string("2020-04-11 20:00:00"), beatmapset, discussion, user, content="hi")
 
     return event
@@ -52,7 +52,7 @@ def kudosu_gain_event():
     mapper = User(2, "sometwo")
     beatmapset = Beatmapset(3, "artist", "title", mapper, ["osu"])
     user = User(1, "_someone_")
-    discussion = Discussion(5, beatmapset, user, content="hi*")
+    discussion = Discussion(5, beatmapset, user, content="hi*", tab="generalAll", difficulty=None)
     event = Event("kudosu_gain", from_string("2020-04-11 20:00:00"), beatmapset, discussion, mapper)
 
     return event
@@ -209,6 +209,11 @@ async def test_format_field_value_faulty():
 
 def test_format_footer_text(suggestion_event):
     assert format_footer_text(suggestion_event) == "someone \"hi\""
+
+def test_format_footer_text_difficulty(suggestion_event):
+    suggestion_event.discussion.tab = "timeline"
+    suggestion_event.discussion.difficulty = "Someone's Expert"
+    assert format_footer_text(suggestion_event) == "someone \"hi\" [Someone's Expert]"
 
 def test_format_footer_text_newspost(newspost_event):
     # Newsposts already include their preview in the post itself, so we skip this.
