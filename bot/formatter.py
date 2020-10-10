@@ -198,8 +198,12 @@ def format_footer_text(event: Event, database: Database=None) -> str:
 
     if event.content:
         text = f"{event.user} {format_preview(event.content)}"
-        if event.discussion and event.discussion.tab != "generalAll" and event.discussion.difficulty is not None:
-            text += f" [{event.discussion.difficulty}]"
+
+        formatted_diff = format_tab_diff(event)
+        # Difficulty is already displayed in the context field for replies.
+        if formatted_diff and event.type != "reply":
+            text += f" {formatted_diff}"
+        
         return text
     
     return str(event.user)
@@ -221,6 +225,16 @@ def format_preview(content: str, length: int=60, split_newline: bool=True) -> st
 
     # Markdown does not function in footer text; trying to escape it here would lead to visible '\'.
     return "\"" + truncate(preview, length=length, indicator="...") + "\""
+
+def format_tab_diff(event: Event):
+    """Returns the difficulty in square brackets, if any and our tab is not "generalAll", otherwise None."""
+    if (
+        event.discussion and
+        event.discussion.tab != "generalAll" and
+        event.discussion.difficulty is not None
+    ):
+        return f"[{event.discussion.difficulty}]"
+    return None
 
 def format_footer_icon_url(event: Event) -> str:
     """Returns the footer icon url of the event (i.e. the image url of the user's avatar),
@@ -267,7 +281,13 @@ def format_context_field_name(event: Event) -> str:
 
 def format_context_field_value(event: Event) -> str:
     """Returns the content for the discussion context, surrounded in quotes."""
-    return format_preview(escape_markdown(event.discussion.content))
+    text = format_preview(escape_markdown(event.discussion.content))
+
+    formatted_diff = format_tab_diff(event)
+    if formatted_diff:
+        text += escape_markdown(f" {formatted_diff}")
+    
+    return text
 
 async def format_history(beatmapset: Beatmapset, length_limit: int=None, database: Database=None) -> str:
     """Returns the nomination history of this beatmapset (i.e. icons and names of actions and their authors).
