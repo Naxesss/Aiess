@@ -10,6 +10,7 @@ from datetime import datetime
 from aiess import Event, User, Beatmapset, Discussion, NewsPost, Usergroup
 from aiess.timestamp import from_string
 from aiess.database import SCRAPER_TEST_DB_NAME
+from aiess import event_types as types
 
 from bot import database as db_module
 from bot.database import Database
@@ -216,7 +217,19 @@ def test_format_footer_text_difficulty(suggestion_event):
     assert format_footer_text(suggestion_event) == "someone \"hi\" [Someone's Expert]"
 
 def test_format_footer_text_difficulty_reply(suggestion_event):
-    suggestion_event.type = "reply"
+    suggestion_event.type = types.REPLY
+    suggestion_event.discussion.tab = "timeline"
+    suggestion_event.discussion.difficulty = "Someone's Expert"
+    assert format_footer_text(suggestion_event) == "someone \"hi\""
+
+def test_format_footer_text_difficulty_resolve(suggestion_event):
+    suggestion_event.type = types.RESOLVE
+    suggestion_event.discussion.tab = "timeline"
+    suggestion_event.discussion.difficulty = "Someone's Expert"
+    assert format_footer_text(suggestion_event) == "someone \"hi\""
+
+def test_format_footer_text_difficulty_reopen(suggestion_event):
+    suggestion_event.type = types.REOPEN
     suggestion_event.discussion.tab = "timeline"
     suggestion_event.discussion.difficulty = "Someone's Expert"
     assert format_footer_text(suggestion_event) == "someone \"hi\""
