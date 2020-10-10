@@ -51,7 +51,14 @@ def get_complete_discussion_info(
         discussions_json: object=None, db_name: str=SCRAPER_DB_NAME) -> Discussion:
     """Returns a discussion with complete information from the beatmapset discussion json
     (e.g. user and content, neither of which are guaranteed)."""
-    if not discussion or discussion.user is not None and discussion.content is not None:
+    if not discussion:
+        return None
+
+    if (
+        discussion.user is not None and
+        discussion.content is not None and
+        discussion.tab is not None
+    ):
         return discussion  # Either None (i.e. unused by the event type) or already completed.
 
     if not discussions_json:
