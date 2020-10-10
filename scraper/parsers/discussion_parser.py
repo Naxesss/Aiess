@@ -41,13 +41,17 @@ class DiscussionParser():
     
     def parse_tab(self, discussion_json: str, beatmapset_json: object) -> User:
         """Returns the tab which the given discussion is posted on."""
-        if discussion_json["timestamp"] is not None: return "timeline"
-        elif discussion_json["beatmap_id"]:          return "general"
-        else:                                        return "generalAll"
+        has_timestamp = "timestamp" in discussion_json and discussion_json["timestamp"] is not None
+        has_difficulty = "beatmap_id" in discussion_json and discussion_json["beatmap_id"]
+
+        if   has_timestamp:  return "timeline"
+        elif has_difficulty: return "general"
+        else:                return "generalAll"
     
     def parse_diff(self, discussion_json: str, beatmapset_json: object) -> User:
         """Returns the name of the difficulty which the given discussion is posted on, if any, otherwise None."""
-        if not discussion_json["beatmap_id"]:
+        # Key may be missing in case the value would be N/A.
+        if "beatmap_id" not in discussion_json or not discussion_json["beatmap_id"]:
             return None
         
         beatmap_id = discussion_json["beatmap_id"]
