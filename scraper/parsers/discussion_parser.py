@@ -21,19 +21,19 @@ class DiscussionParser():
         content = discussion_json["posts"][0]["message"] if discussion_json["posts"] else None
         return Discussion(_id, beatmapset, user, content)
 
-    def parse_user(self, _id: str, beatmapset_json: object) -> User:
+    def parse_user(self, user_id: str, beatmapset_json: object) -> User:
         """Returns a user with the given id and name supplied by the beatmapset json."""
         for related_user in beatmapset_json["related_users"]:
-            if related_user["id"] == _id:
-                return User(_id, related_user["username"])
+            if related_user["id"] == user_id:
+                return User(user_id, related_user["username"])
     
-    def parse_discussion_post_author(self, _id: str, beatmapset_json: object) -> User:
+    def parse_discussion_post_author(self, post_id: str, beatmapset_json: object) -> User:
         """Returns the author of the given discussion post id if one exists, otherwise None."""
         for page_discussion in beatmapset_json["discussions"]:
             if not page_discussion: continue
             for page_discussion_post in page_discussion["posts"]:
                 if not page_discussion_post: continue
-                if page_discussion_post["id"] == _id:
+                if page_discussion_post["id"] == post_id:
                     return self.parse_user(page_discussion_post["user_id"], beatmapset_json)
         return None
 
