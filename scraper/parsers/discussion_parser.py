@@ -19,7 +19,9 @@ class DiscussionParser():
         _id = discussion_json["id"]
         user = self.parse_user(discussion_json["user_id"], beatmapset_json)
         content = discussion_json["posts"][0]["message"] if discussion_json["posts"] else None
-        return Discussion(_id, beatmapset, user, content)
+        tab = self.parse_tab(discussion_json, beatmapset_json)
+        difficulty = self.parse_diff(discussion_json, beatmapset_json)
+        return Discussion(_id, beatmapset, user, content, tab, difficulty)
 
     def parse_user(self, user_id: str, beatmapset_json: object) -> User:
         """Returns a user with the given id and name supplied by the beatmapset json."""
@@ -36,5 +38,21 @@ class DiscussionParser():
                 if page_discussion_post["id"] == post_id:
                     return self.parse_user(page_discussion_post["user_id"], beatmapset_json)
         return None
+    
+    def parse_tab(self, discussion_json: str, beatmapset_json: object) -> User:
+        """Returns the tab which the given discussion is posted on."""
+        if discussion_json["timestamp"] is not None: return "timeline"
+        elif discussion_json["beatmap_id"]:          return "general"
+        else:                                        return "generalAll"
+    
+    def parse_diff(self, discussion_json: str, beatmapset_json: object) -> User:
+        """Returns the name of the difficulty which the given discussion is posted on, if any, otherwise None."""
+        if not discussion_json["beatmap_id"]:
+            return None
+        
+        beatmap_id = discussion_json["beatmap_id"]
+        for beatmap_json in beatmapset_json["beatmaps"]:
+            if beatmap_json["id"] == beatmap_id:
+                return beatmap_json["version"]
 
 discussion_parser = DiscussionParser()
