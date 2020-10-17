@@ -11,6 +11,7 @@ from scraper.tests.mocks.events import nominate as mock_nominate
 from scraper.tests.mocks.events.faulty import beatmapset_events as mock_beatmapset_events
 from scraper.tests.mocks import events_json as mock_events_json
 from scraper.tests.mocks import events_json_deleted_mapset as mock_events_json_deleted_mapset
+from scraper.tests.mocks import events_json_lang_genre as mock_events_lang_genre_json
 
 from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
 
@@ -61,6 +62,18 @@ def test_parse_json_deleted_beatmapset():
         generated_events.append(event)
     
     assert not generated_events
+
+def test_parse_lang_genre_json():
+    generated_events = []
+    for event in beatmapset_event_parser.parse(mock_events_lang_genre_json.soup):
+        generated_events.append(event)
+    
+    assert len(generated_events) == 2
+    assert generated_events[0].type == "language_edit"
+    assert generated_events[0].user.id == 10660777
+    assert generated_events[0].content == "Unspecified -> Instrumental"
+    assert generated_events[1].type == "genre_edit"
+    assert generated_events[1].content == "Unspecified -> Electronic"
 
 @pytest.fixture(scope="module")
 def beatmapset_event():
