@@ -115,7 +115,7 @@ def test_insert_retrieve_permissions(bot_test_database):
 
 @pytest.mark.asyncio
 async def test_retrieve_beatmapset_events(scraper_test_database):
-    beatmapset = Beatmapset(3, "artist", "title", User(4, "creator"), ["osu"])
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "creator"), ["osu"], genre="g", language="l")
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
     suggestion_event = Event("suggestion", from_string("2020-01-01 01:00:00"), beatmapset, user=User(3, "somethree"))
@@ -131,7 +131,7 @@ async def test_retrieve_beatmapset_events(scraper_test_database):
 
 @pytest.mark.asyncio
 async def test_retrieve_beatmapset_events_cache(scraper_test_database):
-    beatmapset = Beatmapset(3, "artist", "title", User(4, "creator"), ["osu"])
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "creator"), ["osu"], genre="g", language="l")
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
 

@@ -12,8 +12,20 @@ from scraper.parsers.discussion_parser import discussion_parser
 def discussions_json():
     return request_discussions_json(beatmapset_id=1001546)
 
-def test_parse(discussions_json):
-    beatmapset = Beatmapset(_id=1001546, artist="Carpool Tunnel", title="Afterlight", creator=User(_id=7342798, name="_Epreus"), modes=["osu"])
+@pytest.fixture
+def beatmapset():
+    return Beatmapset(
+        _id      = 1001546,
+        artist   = "Carpool Tunnel",
+        title    = "Afterlight",
+        creator  = User(_id=7342798,
+        name     = "_Epreus"),
+        modes    = ["osu"],
+        genre    = "g",
+        language = "l"
+    )
+
+def test_parse(discussions_json, beatmapset):
     discussions = discussion_parser.parse(discussions_json=discussions_json, beatmapset=beatmapset)
     for discussion in discussions:
         assert discussion
@@ -23,8 +35,7 @@ def test_parse(discussions_json):
         assert discussion.content is not None
         assert discussion.tab is not None
 
-def test_parse_discussion(discussions_json):
-    beatmapset = Beatmapset(_id=1001546, artist="Carpool Tunnel", title="Afterlight", creator=User(_id=7342798, name="_Epreus"), modes=["osu"])
+def test_parse_discussion(discussions_json, beatmapset):
     discussion_jsons = discussions_json["beatmapset"]["discussions"]
     for discussion_json in discussion_jsons:
         if not discussion_json: continue

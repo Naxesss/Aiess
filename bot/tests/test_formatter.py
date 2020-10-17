@@ -34,7 +34,7 @@ from bot.formatter import format_dotted_list
 
 @pytest.fixture
 def suggestion_event():
-    beatmapset = Beatmapset(3, "artist", "title", User(2, "sometwo"), ["osu"])
+    beatmapset = Beatmapset(3, "artist", "title", User(2, "sometwo"), ["osu"], genre="g", language="l")
     user = User(1, "someone")
     discussion = Discussion(5, beatmapset, user, content="hi", tab="generalAll", difficulty=None)
     event = Event("suggestion", from_string("2020-04-11 20:00:00"), beatmapset, discussion, user, content="hi")
@@ -43,7 +43,7 @@ def suggestion_event():
 
 @pytest.fixture
 def qualify_event():
-    beatmapset = Beatmapset(3, "artist_with*strange~symbols`", "title", User(2, "_sometwo_"), ["osu"])
+    beatmapset = Beatmapset(3, "artist_with*strange~symbols`", "title", User(2, "_sometwo_"), ["osu"], genre="g", language="l")
     event = Event("qualify", from_string("2020-04-11 20:00:00"), beatmapset)
 
     return event
@@ -51,7 +51,7 @@ def qualify_event():
 @pytest.fixture
 def kudosu_gain_event():
     mapper = User(2, "sometwo")
-    beatmapset = Beatmapset(3, "artist", "title", mapper, ["osu"])
+    beatmapset = Beatmapset(3, "artist", "title", mapper, ["osu"], genre="g", language="l")
     user = User(1, "_someone_")
     discussion = Discussion(5, beatmapset, user, content="hi*", tab="generalAll", difficulty=None)
     event = Event("kudosu_gain", from_string("2020-04-11 20:00:00"), beatmapset, discussion, mapper)
@@ -337,7 +337,7 @@ def test_context_field_value_truncate(kudosu_gain_event):
 
 @pytest.mark.asyncio
 async def test_history(test_database):
-    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"], genre="g", language="l")
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
 
@@ -349,7 +349,7 @@ async def test_history(test_database):
 
 @pytest.mark.asyncio
 async def test_history_filtering(test_database):
-    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"], genre="g", language="l")
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
     suggestion_event = Event("suggestion", from_string("2020-01-01 01:00:00"), beatmapset, user=User(3, "somethree"))
@@ -364,7 +364,7 @@ async def test_history_filtering(test_database):
 
 @pytest.mark.asyncio
 async def test_history_truncated(test_database):
-    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"])
+    beatmapset = Beatmapset(3, "artist", "title", User(4, "mapper"), ["osu"], genre="g", language="l")
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
 

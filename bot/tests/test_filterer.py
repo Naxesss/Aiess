@@ -48,7 +48,7 @@ def test_dissect_user():
 
 def test_dissect_beatmapset():
     user = User(2, "some two")
-    beatmapset = Beatmapset(4, artist="yes", title="no", creator=user, modes=["osu", "catch"])
+    beatmapset = Beatmapset(4, artist="yes", title="no", creator=user, modes=["osu", "catch"], genre="g", language="l")
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset)
     assert filter_context.dissect(event) == [
         "set-id:4",
@@ -66,7 +66,7 @@ def test_dissect_beatmapset():
 def test_dissect_discussion():
     user = User(1, "some one")
     creator = User(2, "some two")
-    beatmapset = Beatmapset(4, artist="yes", title="no", creator=creator, modes=["osu", "catch"])
+    beatmapset = Beatmapset(4, artist="yes", title="no", creator=creator, modes=["osu", "catch"], genre="g", language="l")
     discussion = Discussion(3, beatmapset=beatmapset, user=user, content="hello")
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=user, content="hello")
 
@@ -85,7 +85,7 @@ def test_dissect_discussion_reply():
     user = User(1, "some one")
     creator = User(2, "some two")
     replier = User(3, "some three")
-    beatmapset = Beatmapset(4, artist="yes", title="no", creator=creator, modes=["osu", "catch"])
+    beatmapset = Beatmapset(4, artist="yes", title="no", creator=creator, modes=["osu", "catch"], genre="g", language="l")
     discussion = Discussion(3, beatmapset=beatmapset, user=user, content="hello")
     event = Event(_type="reply", time=datetime.utcnow(), beatmapset=beatmapset, discussion=discussion, user=replier, content="there")
 
@@ -175,7 +175,7 @@ def test_passes_filter_partial():
     assert not filter_context.test("type:reply", ["type:reply-special"])
 
 def test_passes_filter_event_object():
-    beatmapset = Beatmapset(3, "artist", "title", creator=User(1, "someone"), modes=["osu"])
+    beatmapset = Beatmapset(3, "artist", "title", creator=User(1, "someone"), modes=["osu"], genre="g", language="l")
     event = Event(_type="nominate", time=datetime.utcnow(), beatmapset=beatmapset, user=User(2, "sometwo"))
 
     assert filter_context.test("type:nominate and user:sometwo", event)

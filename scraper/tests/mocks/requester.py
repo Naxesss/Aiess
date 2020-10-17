@@ -6,7 +6,7 @@ from datetime import datetime
 from aiess import Event, Beatmapset, User, Discussion
 from aiess.timestamp import from_string
 
-beatmapset = Beatmapset(4, "artist", "title", creator=User(1, "someone"), modes=["osu"])
+beatmapset = Beatmapset(4, "artist", "title", creator=User(1, "someone"), modes=["osu"], genre="genre", language="language")
 discussion = Discussion(20, beatmapset=beatmapset, user=User(2, "sometwo"), content="hi")
 discussion_dq = Discussion(22, beatmapset=beatmapset, user=User(2, "sometwo"), content="no wait")
 

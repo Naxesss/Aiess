@@ -13,7 +13,7 @@ from bnsite.interface import Document
 def dq_event():
     disqualifier = User(1, "someone")
     creator = User(2, "sometwo")
-    beatmapset = Beatmapset(_id=4, artist="artist", title="title", creator=creator, modes=["osu", "catch"])
+    beatmapset = Beatmapset(_id=4, artist="artist", title="title", creator=creator, modes=["osu", "catch"], genre="g", language="l")
     discussion = Discussion(_id=3, beatmapset=beatmapset, user=disqualifier, content="dqed")
     return Event(
         _type      = types.DISQUALIFY,

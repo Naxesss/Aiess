@@ -52,7 +52,7 @@ async def test_insert_retrieve_event(test_database):
     time = datetime.utcnow()
 
     user = User(1, name="test")
-    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"], genre="genre", language="language")
     discussion = Discussion(1, beatmapset=beatmapset, user=user, content="testing", tab="tab", difficulty="diff")
     event = Event(_type="test", time=time, beatmapset=beatmapset, discussion=discussion, user=user)
 
@@ -114,7 +114,7 @@ async def test_insert_retrieve_small_event(test_database):
 @pytest.mark.asyncio
 async def test_insert_retrieve_event_digit_properties(test_database):
     user = User(1, "497")
-    beatmapset = Beatmapset(3, artist="5", title="2", creator=user, modes=["osu"])
+    beatmapset = Beatmapset(3, artist="5", title="2", creator=user, modes=["osu"], genre="genre", language="language")
     discussion = Discussion(2, beatmapset, user, content="8", tab="tab", difficulty="diff")
     event = Event(_type="test", time=datetime.utcnow(), user=user, beatmapset=beatmapset, discussion=discussion, content="4")
     test_database.insert_event(event)
@@ -139,7 +139,7 @@ def test_insert_retrieve_user(test_database):
 def test_insert_retrieve_beatmapset_modes(test_database):
     modes = ["osu", "taiko"]
     user = User(1, name="test")
-    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=modes)
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=modes, genre="genre", language="language")
     test_database.insert_beatmapset_modes(beatmapset)
 
     retrieved_modes = test_database.retrieve_beatmapset_modes(1)
@@ -162,7 +162,7 @@ def test_insert_retrieve_beatmapset(test_database):
 
 def test_insert_retrieve_discussion(test_database):
     user = User(1, name="test")
-    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"], genre="genre", language="language")
     discussion = Discussion(1, beatmapset=beatmapset, user=user, content="testing", tab="tab", difficulty="diff")
     test_database.insert_discussion(discussion)
 
@@ -177,7 +177,7 @@ def test_insert_retrieve_discussion(test_database):
 
 def test_insert_incomplete_discussion(test_database):
     user = User(1, name="test")
-    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"], genre="genre", language="language")
     discussion = Discussion(1, beatmapset=beatmapset)
 
     with pytest.raises(ValueError) as error:
@@ -190,7 +190,7 @@ def test_insert_retrieve_discussion_and_replies(test_database):
     author = User(1, name="one")
     replier = User(2, name="two")
 
-    beatmapset = Beatmapset(1, artist="123", title="456", creator=replier, modes=["osu", "taiko"])
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=replier, modes=["osu", "taiko"], genre="genre", language="language")
     discussion = Discussion(1, beatmapset=beatmapset, user=author, content="ping", tab="tab", difficulty="diff")
 
     problem = Event(_type="problem", time=time, beatmapset=beatmapset, discussion=discussion, user=author, content="ping")
@@ -251,8 +251,8 @@ def test_insert_retrieve_multiple_users(test_database):
 
 def test_insert_retrieve_multiple_beatmapsets(test_database):
     user = User(1, name="test")
-    beatmapset1 = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
-    beatmapset2 = Beatmapset(2, artist="456", title="789", creator=user, modes=["osu"])
+    beatmapset1 = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"], genre="genre", language="language")
+    beatmapset2 = Beatmapset(2, artist="456", title="789", creator=user, modes=["osu"], genre="genre", language="language")
 
     test_database.insert_beatmapset(beatmapset1)
     test_database.insert_beatmapset(beatmapset2)
@@ -263,7 +263,7 @@ def test_insert_retrieve_multiple_beatmapsets(test_database):
 
 def test_insert_retrieve_multiple_discussions(test_database):
     user = User(1, name="test")
-    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"], genre="genre", language="language")
     discussion1 = Discussion(1, beatmapset=beatmapset, user=user, content="testing", tab="tab", difficulty="diff")
     discussion2 = Discussion(2, beatmapset=beatmapset, user=user, content="real testing", tab="tab", difficulty="diff")
 
@@ -308,7 +308,7 @@ async def test_insert_retrieve_multiple_events(test_database):
     time = datetime.utcnow()
 
     user = User(1, name="test")
-    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"], genre="genre", language="language")
     discussion = Discussion(1, beatmapset=beatmapset, user=user, content="testing", tab="tab", difficulty="diff")
     event1 = Event(_type="test", time=time, beatmapset=beatmapset, discussion=discussion, user=user)
     event2 = Event(_type="123", time=time, beatmapset=beatmapset, discussion=discussion, user=user)
@@ -341,7 +341,7 @@ async def test_insert_retrieve_event_cached(cached_database):
     time = datetime.utcnow()
 
     user = User(1, name="test")
-    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"], genre="genre", language="language")
     discussion = Discussion(1, beatmapset=beatmapset, user=user, content="testing", tab="tab", difficulty="diff")
 
     for i in range(100):
