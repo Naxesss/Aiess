@@ -6,6 +6,13 @@ from urllib.parse import quote
 from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.settings import API_KEY, API_RATE_LIMIT
 
+MODES = {
+    "0": "osu",
+    "1": "taiko",
+    "2": "catch",
+    "3": "mania"
+}
+
 cache = {}
 def request_api(request_type: str, query: str) -> object:
     """Requests a json object from the v1 osu!api, where the api key is supplied."""

@@ -48,13 +48,6 @@ class User:
 
 class Beatmapset:
     """Contains the beatmapset data requested from the api or supplied as a json object (e.g. artist, title, creator)."""
-    MODES = {
-        "0": "osu",
-        "1": "taiko",
-        "2": "catch",
-        "3": "mania"
-    }
-
     def __init__(
             self, _id: int, artist: str=None, title: str=None, creator: User=None,
             modes: List[str]=None, beatmapset_json: object=None):
@@ -94,7 +87,7 @@ class Beatmapset:
         mode_names = []
         for beatmap_json in beatmapset_json:
             mode_id = beatmap_json["mode"]
-            mode_name = self.MODES[mode_id]
+            mode_name = api.MODES[mode_id]
             if mode_name not in mode_names:
                 mode_names.append(mode_name)
         return mode_names
