@@ -45,6 +45,7 @@ def request_beatmapset_events(page: int=1, limit: int=50) -> BeautifulSoup:
         types.NOMINATE, types.QUALIFY, types.RANK, types.LOVE, types.RESET, types.DISQUALIFY,  # Beatmap Status Events
         types.KUDOSU_GAIN, types.KUDOSU_LOSS, types.KUDOSU_ALLOW, types.KUDOSU_DENY,  # Kudosu Events
         types.RESOLVE, types.REOPEN,  # Discussion Status Events
+        types.GENRE_EDIT, types.LANGUAGE_EDIT,  # Genre/Language Events
         types.DISCUSSION_DELETE, types.DISCUSSION_RESTORE, types.REPLY_DELETE, types.REPLY_RESTORE  # Delete/Restore Events
     ]
 
