@@ -10,6 +10,7 @@ from aiess.objects import Event, Beatmapset, Discussion, User
 from aiess.errors import DeletedContextError
 from aiess.logger import log_err
 from aiess import timestamp
+from aiess import event_types as types
 
 from scraper.parsers.event_parser import EventParser
 
@@ -97,6 +98,13 @@ class BeatmapsetEventParser(EventParser):
             user_json = self.__lookup_user_json(user_id, user_jsons)
             user_name = user_json["username"] if user_json else None
 
+            content = None
+            if _type in [types.LANGUAGE_EDIT, types.GENRE_EDIT]:
+                # Language/genre edits always have "old" and "new" fields, which no other type has.
+                old = event_json["comment"]["old"]
+                new = event_json["comment"]["new"]
+                content = f"{old} -> {new}"
+
             # Reconstruct objects
             beatmapset = Beatmapset(beatmapset_id)
             user = User(user_id, user_name) if user_id is not None else None
@@ -109,7 +117,8 @@ class BeatmapsetEventParser(EventParser):
                 time = time,
                 beatmapset = beatmapset,
                 discussion = discussion,
-                user = user)
+                user = user,
+                content = content)
         
         return None
     
