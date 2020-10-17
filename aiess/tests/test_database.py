@@ -147,7 +147,7 @@ def test_insert_retrieve_beatmapset_modes(test_database):
 
 def test_insert_retrieve_beatmapset(test_database):
     user = User(1, name="test")
-    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"])
+    beatmapset = Beatmapset(1, artist="123", title="456", creator=user, modes=["osu", "taiko"], genre="genre", language="language")
     test_database.insert_beatmapset(beatmapset)
 
     retrieved_beatmapset = test_database.retrieve_beatmapset(where="id=%s", where_values=(1,))
@@ -156,6 +156,8 @@ def test_insert_retrieve_beatmapset(test_database):
     assert retrieved_beatmapset.title == beatmapset.title
     assert retrieved_beatmapset.creator == beatmapset.creator
     assert retrieved_beatmapset.modes == beatmapset.modes
+    assert retrieved_beatmapset.genre == beatmapset.genre
+    assert retrieved_beatmapset.language == beatmapset.language
     assert retrieved_beatmapset == beatmapset
 
 def test_insert_retrieve_discussion(test_database):
