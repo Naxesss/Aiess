@@ -227,7 +227,9 @@ class Database:
                 id         = beatmapset.id,
                 title      = beatmapset.title,
                 artist     = beatmapset.artist,
-                creator_id = beatmapset.creator.id
+                creator_id = beatmapset.creator.id,
+                genre      = beatmapset.genre,
+                language   = beatmapset.language
             )
         )
     
@@ -351,15 +353,17 @@ class Database:
             table        = "beatmapsets",
             where        = where,
             where_values = where_values,
-            selection    = "id, title, artist, creator_id"
+            selection    = "id, title, artist, creator_id, genre, language"
         )
         for row in (fetched_rows or []):
-            _id     = row[0]
-            title   = row[1]
-            artist  = row[2]
-            creator = self.retrieve_user("id=%s", (row[3],))
-            modes   = self.retrieve_beatmapset_modes(_id)
-            yield Beatmapset(_id, artist, title, creator, modes)
+            _id      = row[0]
+            title    = row[1]
+            artist   = row[2]
+            creator  = self.retrieve_user("id=%s", (row[3],))
+            modes    = self.retrieve_beatmapset_modes(_id)
+            genre    = row[4]
+            language = row[5]
+            yield Beatmapset(_id, artist, title, creator, modes, genre, language)
 
     def retrieve_discussion(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Discussion:
         """Returns the first discussion from the database matching the given WHERE clause, or None if no such discussion is stored.
