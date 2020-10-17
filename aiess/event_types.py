@@ -23,6 +23,9 @@ KUDOSU_LOSS = "kudosu_lost"
 KUDOSU_ALLOW = "kudosu_allow"
 KUDOSU_DENY = "kudosu_deny"
 
+LANGUAGE_EDIT = "language_edit"
+GENRE_EDIT = "genre_edit"
+
 DISCUSSION_DELETE = "discussion_delete"
 DISCUSSION_RESTORE = "discussion_restore"
 REPLY_DELETE = "discussion_post_delete"
