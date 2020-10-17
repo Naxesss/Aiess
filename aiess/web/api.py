@@ -12,6 +12,39 @@ MODES = {
     "2": "catch",
     "3": "mania"
 }
+GENRES = {
+    "0": "Any",
+    "1": "Unspecified",
+    "2": "Video Game",
+    "3": "Anime",
+    "4": "Rock",
+    "5": "Pop",
+    "6": "Other",
+    "7": "Novelty",
+    # There is apparently no 8.
+    "9": "Hip Hop",
+    "10": "Electronic",
+    "11": "Metal",  # API docs excluded 11, 12, and 14, so "Metal", "Classical", and "Jazz" are guesses.
+    "12": "Classical",
+    "13": "Folk",
+    "14": "Jazz"
+}
+LANGUAGES = {
+    "0": "Any",
+    "1": "Other",
+    "2": "English",
+    "3": "Japanese",
+    "4": "Chinese",
+    "5": "Instrumental",
+    "6": "Korean",
+    "7": "French",
+    "8": "German",
+    "9": "Swedish",
+    "10": "Spanish",
+    "11": "Italian",
+    "12": "Russian",  # "Russian" and "Polish" are missing from API docs, so ids are guesses.
+    "13": "Polish"
+}
 
 cache = {}
 def request_api(request_type: str, query: str) -> object:

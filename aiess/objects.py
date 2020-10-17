@@ -50,12 +50,12 @@ class Beatmapset:
     """Contains the beatmapset data requested from the api or supplied as a json object (e.g. artist, title, creator)."""
     def __init__(
             self, _id: int, artist: str=None, title: str=None, creator: User=None,
-            modes: List[str]=None, beatmapset_json: object=None):
+            modes: List[str]=None, genre: str=None, language: str=None, beatmapset_json: object=None):
         if _id is None:
             raise ValueError("Beatmapset id should not be None.")
 
         # No need to get the beatmap json if we already have all the data.
-        if artist is None or title is None or creator is None or modes is None:
+        if artist is None or title is None or creator is None or modes is None or language is None or genre is None:
             if not beatmapset_json:
                 beatmapset_json = api.request_beatmapset(_id)
                 if not beatmapset_json:
@@ -72,6 +72,8 @@ class Beatmapset:
             beatmap_json["creator"])
         
         self.modes = modes if modes is not None else self.__get_modes(beatmapset_json)
+        self.genre = genre if genre is not None else self.__get_genre(beatmapset_json)
+        self.language = language if language is not None else self.__get_language(beatmapset_json)
     
     def __str__(self) -> str:
         return f"{self.artist} - {self.title} (mapped by {self.creator}) {self.mode_str()}"
@@ -91,6 +93,14 @@ class Beatmapset:
             if mode_name not in mode_names:
                 mode_names.append(mode_name)
         return mode_names
+    
+    def __get_genre(self, beatmapset_json: object) -> str:
+        """Returns the genre by name included in the given beatmapset json (e.g. "Electronic")."""
+        return api.GENRES[beatmapset_json[0]["genre_id"]]
+
+    def __get_language(self, beatmapset_json: object) -> str:
+        """Returns the language by name included in the given beatmapset json (e.g. "Instrumental")."""
+        return api.LANGUAGES[beatmapset_json[0]["language_id"]]
     
     def __key(self) -> tuple:
         return (
