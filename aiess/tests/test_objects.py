@@ -61,6 +61,8 @@ def test_beatmapset():
     assert beatmapset.creator.id == 19048
     assert beatmapset.creator.name == "Blue Dragon"
     assert beatmapset.modes == ["osu", "taiko"]
+    assert beatmapset.genre == "Electronic"
+    assert beatmapset.language == "English"
 
     assert beatmapset.mode_str() == "[osu][taiko]"
     assert str(beatmapset) == "The Quick Brown Fox - The Big Black (mapped by Blue Dragon) [osu][taiko]"
