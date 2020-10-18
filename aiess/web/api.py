@@ -44,6 +44,7 @@ LANGUAGES = {
     "11": "Italian",
     "12": "Russian",
     "13": "Polish",
+    "14": "Other"  # Seems 14 is also "Other".
 }
 
 cache = {}
