@@ -42,8 +42,8 @@ LANGUAGES = {
     "9": "Swedish",
     "10": "Spanish",
     "11": "Italian",
-    "12": "Russian",  # "Russian" and "Polish" are missing from API docs, so ids are guesses.
-    "13": "Polish"
+    "12": "Russian",
+    "13": "Polish",
 }
 
 cache = {}
