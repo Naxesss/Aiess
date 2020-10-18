@@ -39,6 +39,9 @@ TYPE_ALIASES: Dict[str, List[str]] = {
     types.KUDOSU_LOSS:  ANY_ALIASES + ["kudosu loss",  "kudosu lost",   "kudosu taken"],
     types.KUDOSU_DENY:  ANY_ALIASES + ["kudosu deny",  "kudosu denied"],
     types.KUDOSU_ALLOW: ANY_ALIASES + ["kudosu allow", "kudosu allowed"],
+    
+    types.GENRE_EDIT:    ANY_ALIASES + ["genre edit", "genre"],
+    types.LANGUAGE_EDIT: ANY_ALIASES + ["language edit", "language"],
 
     types.NEWS:         ANY_ALIASES + ["newspost", "newsposts", "news post", "news posts"],
 
