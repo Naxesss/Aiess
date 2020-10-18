@@ -38,40 +38,43 @@ colour_added      = Colour.from_rgb(130, 235, 125)
 colour_removed    = Colour.from_rgb(200, 160, 230)
 
 type_props = {
-    types.RANK:               TypeProps(":sparkling_heart:",    "Ranked",           colour_ranked,      show_history=True),
-    types.LOVE:               TypeProps(":gift_heart:",         "Loved",            colour_ranked,      show_history=True),
+    types.RANK:               TypeProps(":sparkling_heart:",         "Ranked",           colour_ranked,      show_history=True),
+    types.LOVE:               TypeProps(":gift_heart:",              "Loved",            colour_ranked,      show_history=True),
 
-    types.QUALIFY:            TypeProps(":heart:",              "Qualified",        colour_qualified,   show_in_history=True),
-    types.DISQUALIFY:         TypeProps(":broken_heart:",       "Disqualified",     colour_qualified,   show_in_history=True),
+    types.QUALIFY:            TypeProps(":heart:",                   "Qualified",        colour_qualified,   show_in_history=True),
+    types.DISQUALIFY:         TypeProps(":broken_heart:",            "Disqualified",     colour_qualified,   show_in_history=True),
 
-    types.NOMINATE:           TypeProps(":thought_balloon:",    "Nominated",        colour_nominated,   show_in_history=True),
-    types.RESET:              TypeProps(":anger_right:",        "Nomination Reset", colour_nominated,   show_in_history=True),
+    types.NOMINATE:           TypeProps(":thought_balloon:",         "Nominated",        colour_nominated,   show_in_history=True),
+    types.RESET:              TypeProps(":anger_right:",             "Nomination Reset", colour_nominated,   show_in_history=True),
 
-    types.SUGGESTION:         TypeProps(":yellow_circle:",      "Suggestion",       colour_discussion),
-    types.PROBLEM:            TypeProps(":red_circle:",         "Problem",          colour_discussion),
-    types.NOTE:               TypeProps(":purple_circle:",      "Note",             colour_discussion),
-    types.PRAISE:             TypeProps(":blue_heart:",         "Praise",           colour_discussion),
-    types.HYPE:               TypeProps(":blue_circle:",        "Hype",             colour_discussion),
-    types.REPLY:              TypeProps(":white_circle:",       "Reply",            colour_discussion,  show_context=True),
+    types.SUGGESTION:         TypeProps(":yellow_circle:",           "Suggestion",       colour_discussion),
+    types.PROBLEM:            TypeProps(":red_circle:",              "Problem",          colour_discussion),
+    types.NOTE:               TypeProps(":purple_circle:",           "Note",             colour_discussion),
+    types.PRAISE:             TypeProps(":blue_heart:",              "Praise",           colour_discussion),
+    types.HYPE:               TypeProps(":blue_circle:",             "Hype",             colour_discussion),
+    types.REPLY:              TypeProps(":white_circle:",            "Reply",            colour_discussion,  show_context=True),
 
-    types.RESOLVE:            TypeProps(":green_circle:",       "Resolved",         colour_resolve,     show_context=True),
-    types.KUDOSU_GAIN:        TypeProps(":arrow_up:",           "Kudosu Given",     colour_resolve,     show_context=True),
-    types.KUDOSU_ALLOW:       TypeProps(":arrow_double_up:",    "Kudosu Allowed",   colour_resolve,     show_context=True),
+    types.RESOLVE:            TypeProps(":green_circle:",            "Resolved",         colour_resolve,     show_context=True),
+    types.KUDOSU_GAIN:        TypeProps(":arrow_up:",                "Kudosu Given",     colour_resolve,     show_context=True),
+    types.KUDOSU_ALLOW:       TypeProps(":arrow_double_up:",         "Kudosu Allowed",   colour_resolve,     show_context=True),
 
-    types.REOPEN:             TypeProps(":orange_circle:",      "Reopened",         colour_reopen,      show_context=True),
-    types.KUDOSU_LOSS:        TypeProps(":arrow_down:",         "Kudosu Removed",   colour_reopen,      show_context=True),
-    types.KUDOSU_DENY:        TypeProps(":arrow_double_down:",  "Kudosu Denied",    colour_reopen,      show_context=True),
+    types.REOPEN:             TypeProps(":orange_circle:",           "Reopened",         colour_reopen,      show_context=True),
+    types.KUDOSU_LOSS:        TypeProps(":arrow_down:",              "Kudosu Removed",   colour_reopen,      show_context=True),
+    types.KUDOSU_DENY:        TypeProps(":arrow_double_down:",       "Kudosu Denied",    colour_reopen,      show_context=True),
 
-    types.DISCUSSION_DELETE:  TypeProps(":zap:",                "Deleted",          colour_discussion,  show_context=True),
-    types.DISCUSSION_RESTORE: TypeProps(":wrench:",             "Restored",         colour_discussion,  show_context=True),
-    types.REPLY_DELETE:       TypeProps(":zap:",                "Reply Deleted",    colour_discussion,  show_context=True),
-    types.REPLY_RESTORE:      TypeProps(":wrench:",             "Reply Restored",   colour_discussion,  show_context=True),
+    types.DISCUSSION_DELETE:  TypeProps(":zap:",                     "Deleted",          colour_discussion,  show_context=True),
+    types.DISCUSSION_RESTORE: TypeProps(":wrench:",                  "Restored",         colour_discussion,  show_context=True),
+    types.REPLY_DELETE:       TypeProps(":zap:",                     "Reply Deleted",    colour_discussion,  show_context=True),
+    types.REPLY_RESTORE:      TypeProps(":wrench:",                  "Reply Restored",   colour_discussion,  show_context=True),
+    
+    types.GENRE_EDIT:         TypeProps(":arrows_counterclockwise:", "Genre Edit",       colour_discussion),
+    types.LANGUAGE_EDIT:      TypeProps(":arrows_counterclockwise:", "Language Edit",    colour_discussion),
 
     # Unlike other events, the embed title of news is simply the news title.
-    types.NEWS:               TypeProps(None,                   None,               colour_news),
+    types.NEWS:               TypeProps(None,                        None,               colour_news),
 
-    types.ADD:                TypeProps(":performing_arts:",    "Added",            colour_added),
-    types.REMOVE:             TypeProps(":performing_arts:",    "Removed",          colour_removed)
+    types.ADD:                TypeProps(":performing_arts:",         "Added",            colour_added),
+    types.REMOVE:             TypeProps(":performing_arts:",         "Removed",          colour_removed)
 }
 
 def format_link(event: Event) -> str:
