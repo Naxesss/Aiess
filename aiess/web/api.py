@@ -31,7 +31,7 @@ GENRES = {
 }
 LANGUAGES = {
     "0": "Any",
-    "1": "Other",
+    "1": "Unspecified",  # API docs claim this is "Other", but it is actually "Unspecified", "Other" is id 14 instead.
     "2": "English",
     "3": "Japanese",
     "4": "Chinese",
@@ -44,7 +44,7 @@ LANGUAGES = {
     "11": "Italian",
     "12": "Russian",
     "13": "Polish",
-    "14": "Other"  # Seems 14 is also "Other".
+    "14": "Other"
 }
 
 cache = {}
