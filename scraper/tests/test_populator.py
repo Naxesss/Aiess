@@ -19,6 +19,8 @@ from scraper.populator import __complete_discussion_context
 from scraper.populator import __populate_additional_details
 from scraper.populator import populate_from_bnsite
 from scraper.populator import get_group_bnsite_comment
+from scraper.populator import get_group_bnsite_mode
+from scraper.populator import eval_likely_outdated
 
 from scraper.tests.mocks.discussion_jsons.additional_details import JSON as mock_discussion_json
 from scraper.tests.mocks.discussion_jsons.nomination_comment import JSON1 as mock_discussion_json_nom_comment_1
@@ -199,20 +201,62 @@ def group_event():
     return Event("remove", from_string("2020-01-01 00:00:00"), user=User(2, "sometwo"), group=Usergroup(32))
 
 @pytest.mark.asyncio
-async def test_populate_from_bnsite(group_event):
+async def test_populate_from_bnsite_content(group_event):
     with mock.patch("scraper.populator.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-01-01 00:01:00")
+        mock_datetime.utcnow.return_value = from_string("2020-01-02 06:00:00")
         mock_datetime.side_effect = datetime
 
         with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {
-                "action": "Resigned",
-                "timestamp": "2020-01-01 00:00:00"
+            mock_bnsite_api.request_last_eval.return_value = {
+                "active": True,
+                "kind": "resignation",
+                "updatedAt": "2020-01-01T00:00:00.000Z",
+                "mode": "taiko"
             }
             
             await populate_from_bnsite(group_event)
-
             assert group_event.content == "Resigned"
+        
+        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
+            mock_bnsite_api.request_last_eval.return_value = {
+                "active": False,
+                "kind": "currentBn",
+                "updatedAt": "2020-01-01T00:00:00.000Z",
+                "consensus": "probationBn",
+                "mode": "taiko"
+            }
+            
+            await populate_from_bnsite(group_event)
+            assert group_event.content is None
+        
+        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
+            mock_bnsite_api.request_last_eval.return_value = {
+                "active": False,
+                "kind": "currentBn",
+                "updatedAt": "2020-01-01T00:00:00.000Z",
+                "consensus": "removeFromBn",
+                "mode": "taiko"
+            }
+            
+            await populate_from_bnsite(group_event)
+            assert group_event.content == "Kicked"
+
+@pytest.mark.asyncio
+async def test_populate_from_bnsite_mode(group_event):
+    with mock.patch("scraper.populator.datetime") as mock_datetime:
+        mock_datetime.utcnow.return_value = from_string("2020-01-02 06:00:00")
+        mock_datetime.side_effect = datetime
+
+        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
+            mock_bnsite_api.request_last_eval.return_value = {
+                "active": True,
+                "kind": "resignation",
+                "updatedAt": "2020-01-01T00:00:00.000Z",
+                "mode": "taiko"
+            }
+            
+            await populate_from_bnsite(group_event)
+            assert group_event.group.mode == "taiko"
 
 def test_get_group_nat_comment(group_event):
     with mock.patch("scraper.populator.datetime") as mock_datetime:
@@ -220,9 +264,10 @@ def test_get_group_nat_comment(group_event):
         mock_datetime.side_effect = datetime
 
         with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {
-                "action": "Resigned",
-                "timestamp": "2020-01-01 00:00:00"
+            mock_bnsite_api.request_last_eval.return_value = {
+                "active": True,
+                "kind": "resignation",
+                "updatedAt": "2020-01-01T00:00:00.000Z"
             }
 
             assert get_group_bnsite_comment(group_event) == "Resigned"
@@ -234,9 +279,10 @@ def test_get_group_nat_comment_wrong_group(group_event):
         mock_datetime.side_effect = datetime
 
         with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {
-                "action": "Resigned",
-                "timestamp": "2020-01-01 00:00:00"
+            mock_bnsite_api.request_last_eval.return_value = {
+                "active": True,
+                "kind": "resignation",
+                "updatedAt": "2020-01-01T00:00:00.000Z"
             }
 
             assert get_group_bnsite_comment(group_event) == None
@@ -248,9 +294,10 @@ def test_get_group_nat_comment_added(group_event):
         mock_datetime.side_effect = datetime
 
         with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {
-                "action": "Resigned",
-                "timestamp": "2020-01-01 00:00:00"
+            mock_bnsite_api.request_last_eval.return_value = {
+                "active": True,
+                "kind": "resignation",
+                "updatedAt": "2020-01-01T00:00:00.000Z"
             }
 
             assert get_group_bnsite_comment(group_event) == None
@@ -261,24 +308,12 @@ def test_get_group_nat_comment_old(group_event):
         mock_datetime.side_effect = datetime
 
         with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {
-                "action": "Resigned",
-                "timestamp": "2020-01-01 00:00:00"
+            mock_bnsite_api.request_last_eval.return_value = {
+                "active": False,
+                "kind": "resignation",
+                "updatedAt": "2020-01-01T00:00:00.000Z"
             }
 
-            assert get_group_bnsite_comment(group_event) == None
-
-def test_get_group_nat_comment_missing_timestamp(group_event):
-    with mock.patch("scraper.populator.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-01-01 00:01:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {
-                "action": "Resigned"
-            }
-
-            # Make the assumption that it's too old.
             assert get_group_bnsite_comment(group_event) == None
 
 def test_get_group_nat_comment_empty_json(group_event):
@@ -287,6 +322,58 @@ def test_get_group_nat_comment_empty_json(group_event):
         mock_datetime.side_effect = datetime
 
         with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_removal_reason.return_value = {}
+            mock_bnsite_api.request_last_eval.return_value = {}
 
             assert get_group_bnsite_comment(group_event) == None
+
+def test_get_group_mode(group_event):
+    with mock.patch("scraper.populator.datetime") as mock_datetime:
+        mock_datetime.utcnow.return_value = from_string("2020-01-01 00:01:00")
+        mock_datetime.side_effect = datetime
+
+        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
+            mock_bnsite_api.request_last_eval.return_value = {
+                "active": False,
+                "kind": "resignation",
+                "updatedAt": "2020-01-01T00:00:00.000Z",
+                "mode": "taiko"
+            }
+
+            assert get_group_bnsite_mode(group_event) == "taiko"
+
+def test_get_group_mode_outdated(group_event):
+    with mock.patch("scraper.populator.datetime") as mock_datetime:
+        mock_datetime.utcnow.return_value = from_string("2020-03-01 00:01:00")
+        mock_datetime.side_effect = datetime
+
+        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
+            mock_bnsite_api.request_last_eval.return_value = {
+                "active": False,
+                "kind": "resignation",
+                "updatedAt": "2020-01-01T00:00:00.000Z",
+                "mode": "taiko"
+            }
+
+            assert get_group_bnsite_mode(group_event) is None
+
+def test_eval_likely_outdated():
+    old_archived_json = {
+        "active": False,
+        "updatedAt": "2020-01-01T00:00:00.000Z"
+    }
+    old_unarchived_json = {
+        "active": True,
+        "updatedAt": "2020-01-01T00:00:00.000Z"
+    }
+    new_archived_json = {
+        "active": False,
+        "updatedAt": "2020-03-06T00:00:00.000Z"
+    }
+
+    with mock.patch("scraper.populator.datetime") as mock_datetime:
+        mock_datetime.utcnow.return_value = from_string("2020-03-08 00:00:00")
+        mock_datetime.side_effect = datetime
+
+        assert eval_likely_outdated(old_archived_json)
+        assert not eval_likely_outdated(old_unarchived_json)
+        assert not eval_likely_outdated(new_archived_json)
