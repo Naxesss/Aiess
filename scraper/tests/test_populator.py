@@ -285,7 +285,7 @@ def test_get_group_nat_comment_wrong_group(group_event):
                 "updatedAt": "2020-01-01T00:00:00.000Z"
             }
 
-            assert get_group_bnsite_comment(group_event) == None
+            assert get_group_bnsite_comment(group_event) is None
 
 def test_get_group_nat_comment_added(group_event):
     group_event.type = "add"
@@ -300,7 +300,7 @@ def test_get_group_nat_comment_added(group_event):
                 "updatedAt": "2020-01-01T00:00:00.000Z"
             }
 
-            assert get_group_bnsite_comment(group_event) == None
+            assert get_group_bnsite_comment(group_event) is None
 
 def test_get_group_nat_comment_old(group_event):
     with mock.patch("scraper.populator.datetime") as mock_datetime:
@@ -314,7 +314,7 @@ def test_get_group_nat_comment_old(group_event):
                 "updatedAt": "2020-01-01T00:00:00.000Z"
             }
 
-            assert get_group_bnsite_comment(group_event) == None
+            assert get_group_bnsite_comment(group_event) is None
 
 def test_get_group_nat_comment_empty_json(group_event):
     with mock.patch("scraper.populator.datetime") as mock_datetime:
@@ -324,7 +324,7 @@ def test_get_group_nat_comment_empty_json(group_event):
         with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
             mock_bnsite_api.request_last_eval.return_value = {}
 
-            assert get_group_bnsite_comment(group_event) == None
+            assert get_group_bnsite_comment(group_event) is None
 
 def test_get_group_mode(group_event):
     with mock.patch("scraper.populator.datetime") as mock_datetime:
