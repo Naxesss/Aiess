@@ -240,19 +240,6 @@ def test_insert_retrieve_delete_group_user(test_database):
     retrieved_group_user_relation = test_database.retrieve_group_user(where="group_id=%s AND user_id=%s", where_values=(4, 1))
     assert retrieved_group_user_relation is None
 
-def test_insert_retrieve_group_user_with_mode(test_database):
-    user = User(1, name="test")
-    test_database.insert_group_user(group=Usergroup(28), user=user, mode="taiko")
-
-    retrieved_group, retrieved_user = test_database.retrieve_group_user(
-        where        = "group_id=%s AND user_id=%s AND mode=%s",
-        where_values = (28, 1, "taiko")
-    )
-    assert retrieved_group.id == 28
-    assert retrieved_group.mode == "taiko"
-    assert retrieved_user.id == 1
-    assert retrieved_user.name == "test"
-
 def test_insert_retrieve_multiple_users(test_database):
     user1 = User(1, name="test")
     user2 = User(2, name="test")
