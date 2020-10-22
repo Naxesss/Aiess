@@ -171,7 +171,7 @@ def get_group_bnsite_comment(event: Event) -> str:
         raise ValueError("Event lacks a group.")
 
     # Only comments removals of BNs.
-    if event.type != "remove" or event.group.id not in [32, 28]:
+    if event.type != types.REMOVE or event.group.id not in [32, 28]:
         return None
 
     json = bnsite_api.request_last_eval(event.user.id)
