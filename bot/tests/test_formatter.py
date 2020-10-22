@@ -69,7 +69,7 @@ def newspost_event():
 
 @pytest.fixture
 def group_event():
-    return Event("add", from_string("2020-07-24 20:00:00"), user=User(2, "sometwo"), group=Usergroup(32))
+    return Event("add", from_string("2020-07-24 20:00:00"), user=User(2, "sometwo"), group=Usergroup(32, mode="taiko"))
 
 @pytest.fixture
 def test_database():
@@ -189,7 +189,17 @@ async def test_format_field_value_newspost(newspost_event):
 async def test_format_field_value_group_change(group_event):
     assert (
         await format_field_value(group_event) ==
-        "[sometwo](https://osu.ppy.sh/users/2) to the\n" +
+        "[sometwo](https://osu.ppy.sh/users/2) to the\n"
+        "[**Beatmap Nominators (Probationary)**](https://osu.ppy.sh/groups/32)\n"
+        "for [**taiko**]"
+    )
+
+@pytest.mark.asyncio
+async def test_format_field_value_group_change_no_mode(group_event):
+    group_event.group.mode = None
+    assert (
+        await format_field_value(group_event) ==
+        "[sometwo](https://osu.ppy.sh/users/2) to the\n"
         "[**Beatmap Nominators (Probationary)**](https://osu.ppy.sh/groups/32)"
     )
 
