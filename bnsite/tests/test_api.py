@@ -46,6 +46,17 @@ def test_request_last_eval_missing():
     json = api.request_last_eval(user_id=4)
     assert not json
 
+def test_request_user_info():
+    # https://osu.ppy.sh/users/8129817
+    json = api.request_user_info(user_id=8129817)
+    assert json
+    assert json["username"] == "Naxess"
+    assert json["modes"] == ["osu"]
+
+def test_request_user_info_missing():
+    json = api.request_user_info(user_id=4)
+    assert not json
+
 def test_request_dq_info():
     # https://osu.ppy.sh/beatmapsets/1179039/discussion#/1755074
     json = api.request_dq_info(discussion_id=1755074)
