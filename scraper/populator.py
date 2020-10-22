@@ -173,13 +173,27 @@ def get_group_bnsite_comment(event: Event) -> str:
     if event.type != "remove" or event.group.id not in [32, 28]:
         return None
 
-    json = bnsite_api.request_removal_reason(event.user.id)
-    if not json:
+    json = bnsite_api.request_last_eval(event.user.id)
+    if not json or eval_likely_outdated(eval_json=json):
         return None
 
-    time = from_string(json["timestamp"]) if "timestamp" in json and json["timestamp"] else None
-    if not time or (datetime.utcnow() - time) > timedelta(days=1):
-        # In case the BN website for some reason doesn't update the removal entry, we should avoid using an old one.
-        return None
+    kind = json["kind"]
+    if   kind == "resignation": comment = "Resigned"
+    elif kind == "currentBn":
+        consensus = json["consensus"] if "consensus" in json else None
+        if   consensus is None:           comment = None
+        # Movement within the Beatmap Nominators is self-explanatory given both the added+removed events.
+        elif consensus == "fullBn":       comment = None
+        elif consensus == "probationBn":  comment = None
+        elif consensus == "removeFromBn": comment = "Kicked"
+        else:                             raise ValueError(f"Unrecognized evaluation consensus \"{consensus}\".")
+    else: raise ValueError(f"Unrecognized evaluation kind \"{kind}\".")
 
-    return json['action']
+    return comment
+
+def eval_likely_outdated(eval_json: object) -> bool:
+    archived = not eval_json["active"]
+    time     = from_string(eval_json["updatedAt"]) if "updatedAt" in eval_json and eval_json["updatedAt"] else None
+    old      = not time or (datetime.utcnow() - time) > timedelta(days=3)
+    # Chances are high that no evaluation exists for this, if all we can find is old archived evals.
+    return archived and old
