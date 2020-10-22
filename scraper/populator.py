@@ -31,7 +31,7 @@ async def populate_from_discussion(event: Event) -> None:
 
 async def populate_from_bnsite(event: Event) -> None:
     """Populates the given event using the bnsite API if possible."""
-    if event.type in [types.REMOVE]:
+    if event.type in [types.REMOVE, types.ADDED]:
         # Group removal content should reflect the bnsite removal reason (e.g. Kicked/Resigned)
         event.content = get_group_bnsite_comment(event)
         event.group.mode = get_group_bnsite_mode(event)
