@@ -275,7 +275,7 @@ class Database:
             )
         )
     
-    def insert_group_user(self, group: Usergroup, user: User, mode: str=None) -> None:
+    def insert_group_user(self, group: Usergroup, user: User) -> None:
         """Inserts/updates the given user to group relation into the group_users table.
         Also inserts/updates the associated user (i.e. whoever got added/removed)."""
         self.insert_user(user)
@@ -283,8 +283,7 @@ class Database:
             "group_users",
             dict(
                 group_id = group.id,
-                user_id  = user.id,
-                mode     = mode if mode else "-"
+                user_id  = user.id
             )
         )
 
@@ -308,6 +307,7 @@ class Database:
                 discussion_id = event.discussion.id if event.discussion is not None else None,
                 user_id       = event.user.id if event.user is not None else None,
                 group_id      = event.group.id if event.group is not None else None,
+                group_mode    = event.group.mode if event.group is not None else None,
                 news_id       = event.newspost.id if event.newspost is not None else None,
                 content       = event.content if event.content is not None else None
             )
@@ -425,11 +425,10 @@ class Database:
             table        = "group_users",
             where        = where,
             where_values = where_values,
-            selection    = "group_id, user_id, mode"
+            selection    = "group_id, user_id"
         )
         for row in (fetched_rows or []):
-            mode  = row[2] if row[2] != "-" else None
-            group = Usergroup(row[0], mode=mode)
+            group = Usergroup(row[0])
             user  = self.retrieve_user("id=%s", (row[1],))
             yield (group, user)
 
@@ -459,9 +458,9 @@ class Database:
             beatmapset = self.retrieve_beatmapset("id=%s", (row[2],)) if row[2] else None
             discussion = self.retrieve_discussion("id=%s", (row[3],)) if row[3] else None
             user       = self.retrieve_user("id=%s", (row[4],)) if row[4] else None
-            group      = Usergroup(row[5]) if row[5] else None
-            newspost   = self.retrieve_newspost("id=%s", (row[6],)) if row[6] else None
-            content    = row[7]
+            group      = Usergroup(row[5], mode=row[6] if row[6] else None) if row[5] else None
+            newspost   = self.retrieve_newspost("id=%s", (row[7],)) if row[7] else None
+            content    = row[8]
             yield Event(_type, time, beatmapset, discussion, user, group, newspost, content=content)
     
     def __fetch_events(self, where: str, where_values: tuple=None):
@@ -469,7 +468,7 @@ class Database:
             table        = "events",
             where        = where,
             where_values = where_values,
-            selection    = "type, time, beatmapset_id, discussion_id, user_id, group_id, news_id, content"
+            selection    = "type, time, beatmapset_id, discussion_id, user_id, group_id, group_mode, news_id, content"
         )
 
     def __fetch_events_extensive(self, where: str, where_values: tuple=None):
