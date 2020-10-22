@@ -49,6 +49,7 @@ DROP TABLE IF EXISTS `group_users`;
 CREATE TABLE `group_users` (
   `group_id` bigint(20) unsigned NOT NULL,
   `user_id` bigint(20) unsigned NOT NULL,
+  `mode` varchar(20) NOT NULL DEFAULT '-',
   PRIMARY KEY (`group_id`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
