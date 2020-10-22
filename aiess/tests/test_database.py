@@ -5,6 +5,7 @@ from datetime import datetime
 from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost, Usergroup
 from aiess.database import Database, CachedDatabase, SCRAPER_TEST_DB_NAME
 from aiess.common import anext
+from aiess.timestamp import from_string
 
 @pytest.fixture
 def test_database():
@@ -91,6 +92,22 @@ async def test_insert_retrieve_event_group_change(test_database):
     test_database.insert_event(event)
 
     retrieved_event = await test_database.retrieve_event("type=%s", ("add",))
+    assert retrieved_event.type == event.type
+    assert retrieved_event.time == event.time
+    assert retrieved_event.group == event.group
+    assert retrieved_event.group.mode == event.group.mode
+    assert retrieved_event.user == event.user
+    assert retrieved_event == event
+
+@pytest.mark.asyncio
+async def test_insert_retrieve_event_group_change_hybrid(test_database):
+    event_old = Event(_type="add", time=from_string("2020-01-01 00:00:00"), user=User(2, name="sometwo"), group=Usergroup(7, mode="osu"))
+    event = Event(_type="add", time=datetime.utcnow(), user=User(2, name="sometwo"), group=Usergroup(7, mode="taiko"))
+
+    test_database.insert_event(event_old)
+    test_database.insert_event(event)
+
+    retrieved_event = await test_database.retrieve_event("type=%s ORDER BY time DESC", ("add",))
     assert retrieved_event.type == event.type
     assert retrieved_event.time == event.time
     assert retrieved_event.group == event.group
