@@ -178,7 +178,8 @@ async def format_field_value(event: Event) -> str:
         to_or_from = "to" if event.type == types.ADD else "from"
         return (
             f"[{escape_markdown(event.user)}](https://osu.ppy.sh/users/{event.user.id}) {to_or_from} the\n" +
-            f"[**{event.group.name}**](https://osu.ppy.sh/groups/{event.group.id})"
+            f"[**{event.group.name}**](https://osu.ppy.sh/groups/{event.group.id})" +
+            (f"\nfor [**{event.group.mode}**]" if event.group.mode else "")
         )
     
     raise ValueError("Cannot format a field value of an event missing a beatmapset, newspost, and group.")
