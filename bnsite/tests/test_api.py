@@ -35,15 +35,15 @@ def test_request_cached():
     assert json1 == json1_cached
     assert json2 == json2_cached
 
-def test_request_removal_reason():
+def test_request_last_eval():
     # https://osu.ppy.sh/users/5999631
-    json = api.request_removal_reason(user_id=5999631)
+    json = api.request_last_eval(user_id=5999631)
     assert json
-    assert json["action"] == "Kicked"
-    assert from_string(json["timestamp"])
+    assert json["consensus"] == "removeFromBn"
+    assert from_string(json["updatedAt"])
 
-def test_request_removal_reason_missing():
-    json = api.request_removal_reason(user_id=4)
+def test_request_last_eval_missing():
+    json = api.request_last_eval(user_id=4)
     assert not json
 
 def test_request_dq_info():
