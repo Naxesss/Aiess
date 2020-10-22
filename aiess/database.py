@@ -275,7 +275,7 @@ class Database:
             )
         )
     
-    def insert_group_user(self, group: Usergroup, user: User) -> None:
+    def insert_group_user(self, group: Usergroup, user: User, mode: str=None) -> None:
         """Inserts/updates the given user to group relation into the group_users table.
         Also inserts/updates the associated user (i.e. whoever got added/removed)."""
         self.insert_user(user)
@@ -283,7 +283,8 @@ class Database:
             "group_users",
             dict(
                 group_id = group.id,
-                user_id  = user.id
+                user_id  = user.id,
+                mode     = mode if mode else "-"
             )
         )
 
@@ -424,11 +425,12 @@ class Database:
             table        = "group_users",
             where        = where,
             where_values = where_values,
-            selection    = "group_id, user_id"
+            selection    = "group_id, user_id, mode"
         )
         for row in (fetched_rows or []):
-            group     = Usergroup(row[0])
-            user      = self.retrieve_user("id=%s", (row[1],))
+            mode  = row[2] if row[2] != "-" else None
+            group = Usergroup(row[0], mode=mode)
+            user  = self.retrieve_user("id=%s", (row[1],))
             yield (group, user)
 
     async def retrieve_event(self, where: str, where_values: tuple=None, extensive: bool=False) -> Event:

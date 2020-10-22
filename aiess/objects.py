@@ -159,9 +159,10 @@ class Usergroup:
         32: "Beatmap Nominators (Probationary)"
     }
 
-    def __init__(self, _id: int, name: str=None):
+    def __init__(self, _id: int, name: str=None, mode: str=None):
         self.id = int(_id)
         self.name = str(name) if name is not None else self.__get_name(int(_id))
+        self.mode = mode
 
     def __get_name(self, _id: int) -> str:
         """Returns the name of the given group id, or None if unrecognized."""
@@ -170,7 +171,8 @@ class Usergroup:
     def __key(self) -> tuple:
         return (
             self.id,
-            self.name
+            self.name,
+            self.mode
         )
 
     def __eq__(self, other) -> bool:
