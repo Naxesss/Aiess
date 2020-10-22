@@ -483,7 +483,7 @@ class Database:
                 LEFT JOIN {self.db_name}.beatmapset_modes AS modes ON beatmapset.id=modes.beatmapset_id""",
             where        = where,
             where_values = where_values,
-            selection    = "events.type, events.time, events.beatmapset_id, events.discussion_id, events.user_id, events.group_id, events.news_id, events.content"
+            selection    = "events.type, events.time, events.beatmapset_id, events.discussion_id, events.user_id, events.group_id, events.group_mode, events.news_id, events.content"
         )
 
 class CachedDatabase(Database):
