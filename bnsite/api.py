@@ -34,6 +34,10 @@ def request_last_eval(user_id: int) -> object:
     """Returns the last updated evaluation associated with a user given their user id. Caches results."""
     return request("latestEvaluation", query=user_id)
 
+def request_user_info(user_id: int) -> str:
+    """Returns the data associated with a user given their user id. Caches results."""
+    return request("users", query=user_id)
+
 def request_dq_info(discussion_id: int) -> object:
     """Returns the disqualification info (SEV, QAH checkers, etc) associated with the given
     discussion id. Caches results."""
