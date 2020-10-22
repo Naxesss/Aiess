@@ -34,6 +34,7 @@ async def populate_from_bnsite(event: Event) -> None:
     if event.type in [types.REMOVE]:
         # Group removal content should reflect the bnsite removal reason (e.g. Kicked/Resigned)
         event.content = get_group_bnsite_comment(event)
+        event.group.mode = get_group_bnsite_mode(event)
 
 def get_discussions_json(beatmapset: Beatmapset) -> object:
     """Returns the beatmapset discussions json, containing all of the discussion information for the mapset,
@@ -190,6 +191,22 @@ def get_group_bnsite_comment(event: Event) -> str:
     else: raise ValueError(f"Unrecognized evaluation kind \"{kind}\".")
 
     return comment
+
+def get_group_bnsite_mode(event: Event) -> str:
+    """Returns the mode of the bn according to the bnsite
+    (e.g. "taiko"), if any, otherwise None."""
+    if not event.group:
+        raise ValueError("Event lacks a group.")
+
+    # Can only get mode of groups the bnsite keeps track of.
+    if event.group.id not in [7, 32, 28]:
+        return None
+    
+    json = bnsite_api.request_last_eval(event.user.id)
+    if not json or eval_likely_outdated(eval_json=json):
+        return None
+    
+    return json["mode"]
 
 def eval_likely_outdated(eval_json: object) -> bool:
     archived = not eval_json["active"]
