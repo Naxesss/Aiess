@@ -35,13 +35,19 @@ def test_request_cached():
     assert json1 == json1_cached
     assert json2 == json2_cached
 
-def test_request_last_eval():
+def test_request_last_eval_kick():
     # https://osu.ppy.sh/users/5999631
     json = api.request_last_eval(user_id=5999631)
     assert json
     assert json["consensus"] == "removeFromBn"
     assert from_string(json["updatedAt"])
 
+def test_request_last_eval_resign():
+    # https://osu.ppy.sh/users/1263669
+    json = api.request_last_eval(user_id=1263669)
+    assert json
+    assert json["kind"] == "resignation"
+    assert from_string(json["updatedAt"])
 def test_request_last_eval_missing():
     json = api.request_last_eval(user_id=4)
     assert not json
