@@ -17,7 +17,7 @@ async def loop(client: Client, reader: Reader) -> None:
         while True:
             await client.change_presence(
                 activity = get_activity(client),
-                status   = get_status(reader)
+                status   = get_status(client, reader)
             )
             # Presence updates are ratelimited at 1 update / 15s.
             await asyncio.sleep(60)
@@ -26,14 +26,20 @@ async def loop(client: Client, reader: Reader) -> None:
 
 def get_activity(client: Client) -> Activity:
     """Returns the "Playing +help | x servers" indicator for the bot."""
+    if not client.is_ready():
+        return Game(f"{DEFAULT_PREFIX}help | Starting...")
+
     guild_n = len(client.guilds)
     return Game(
         f"{DEFAULT_PREFIX}help | " +
         f"{guild_n} server" + ("s" if guild_n != 1 else "")
     )
 
-def get_status(reader: Reader) -> Status:
+def get_status(client: Client, reader: Reader) -> Status:
     """Returs online / idle / do not disturb, depending on how long ago the last event batch was."""
+    if not client.is_ready():
+        return Status.do_not_disturb
+
     time_since_heartbeat = datetime.utcnow() - reader.last_heartbeat
     if   time_since_heartbeat > timedelta(hours=1):    return Status.do_not_disturb
     elif time_since_heartbeat > timedelta(minutes=30): return Status.idle

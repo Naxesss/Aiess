@@ -16,12 +16,20 @@ from bot.activity import get_status
 def test_activity():
     mock_client = mock.MagicMock()
     mock_client.guilds = [object()] * 3
+    mock_client.is_ready = lambda: True
     assert get_activity(mock_client) == Game("+help | 3 servers")
 
 def test_activity_singular():
     mock_client = mock.MagicMock()
     mock_client.guilds = [object()] * 1
+    mock_client.is_ready = lambda: True
     assert get_activity(mock_client) == Game("+help | 1 server")
+
+def test_activity_not_ready():
+    mock_client = mock.MagicMock()
+    mock_client.guilds = [object()] * 3
+    mock_client.is_ready = lambda: False
+    assert get_activity(mock_client) == Game("+help | Starting...")
 
 
 @pytest.fixture
@@ -31,23 +39,42 @@ def mock_reader():
     return reader
 
 def test_status_online(mock_reader):
+    mock_client = mock.MagicMock()
+    mock_client.is_ready = lambda: True
+
     with mock.patch("bot.activity.datetime") as mock_datetime:
         # Mock `datetime.utcnow`, but retain the original datetime class functionality through the `side_effect` attribute.
         mock_datetime.utcnow.return_value = timestamp.from_string("2020-01-01 00:00:31")
         mock_datetime.side_effect = datetime
 
-        assert get_status(mock_reader) == Status.online
+        assert get_status(mock_client, mock_reader) == Status.online
 
 def test_status_idle(mock_reader):
+    mock_client = mock.MagicMock()
+    mock_client.is_ready = lambda: True
+
     with mock.patch("bot.activity.datetime") as mock_datetime:
         mock_datetime.utcnow.return_value = timestamp.from_string("2020-01-01 00:30:01")
         mock_datetime.side_effect = datetime
 
-        assert get_status(mock_reader) == Status.idle
+        assert get_status(mock_client, mock_reader) == Status.idle
 
 def test_status_do_not_disturb(mock_reader):
+    mock_client = mock.MagicMock()
+    mock_client.is_ready = lambda: True
+
     with mock.patch("bot.activity.datetime") as mock_datetime:
         mock_datetime.utcnow.return_value = timestamp.from_string("2020-01-01 01:00:01")
         mock_datetime.side_effect = datetime
 
-        assert get_status(mock_reader) == Status.do_not_disturb
+        assert get_status(mock_client, mock_reader) == Status.do_not_disturb
+
+def test_status_not_ready(mock_reader):
+    mock_client = mock.MagicMock()
+    mock_client.is_ready = lambda: False
+
+    with mock.patch("bot.activity.datetime") as mock_datetime:
+        mock_datetime.utcnow.return_value = timestamp.from_string("2020-01-01 00:00:00")
+        mock_datetime.side_effect = datetime
+
+        assert get_status(mock_client, mock_reader) == Status.do_not_disturb
