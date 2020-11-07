@@ -5,8 +5,8 @@ import asyncio
 from aiohttp.client_exceptions import ClientOSError
 
 import discord
-from discord import Message, Game
 from discord.errors import Forbidden
+from discord import Message, Game, Status
 
 import aiess
 from aiess import Event
@@ -30,7 +30,7 @@ permissions.load()
 
 class Client(discord.Client):
     def __init__(self, reader):
-        super().__init__()
+        super().__init__(status=Status.do_not_disturb)
         self.reader = reader
         self.reader.client = self
 
