@@ -101,6 +101,7 @@ def merge_concurrent(events: Iterable[Event]) -> List[Event]:
     # `dict.fromkeys` removes duplicates in the db, as keys in a dictonary are unique. We essentially merge same events.
     # This is copied such that any modification we make to this list won't affect the original references.
     new_events = list(dict.fromkeys(copy.deepcopy(list(events))))
+    new_events = list(sorted(new_events, key=lambda event: event.time))
     merged_events = []
 
     # `reversed(new_events)` is to go through events closer to each other first.
