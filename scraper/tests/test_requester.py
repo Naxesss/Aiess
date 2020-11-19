@@ -35,6 +35,11 @@ def test_get_news_events():
     for event in events:
         assert event.type == types.NEWS
         assert event.newspost
+        assert event.newspost.title
+        assert event.newspost.preview
+        assert event.newspost.image_url
+        assert event.newspost.author
+        assert event.newspost.slug
         event_n += 1
     
     assert event_n == 20
