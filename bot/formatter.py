@@ -172,7 +172,7 @@ async def format_field_value(event: Event) -> str:
         return result
 
     if event.newspost:
-        return event.newspost.preview
+        return event.newspost.preview if event.newspost.preview else "(Missing preview)"
     
     if event.group:
         to_or_from = "to" if event.type == types.ADD else "from"
