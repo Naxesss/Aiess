@@ -78,7 +78,7 @@ def test_request_qa_checks():
     json = api.request_qa_checks(user_id=10974170)
     assert json
     assert json[0]
-    assert int(json[0]["beatmapsetId"])
+    assert int(json[0]["event"]["beatmapsetId"])
     assert from_string(json[0]["timestamp"])
 
 def test_request_qa_checks_none():
