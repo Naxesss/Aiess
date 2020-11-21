@@ -1,17 +1,15 @@
 import sys
 sys.path.append('..')
 
-from typing import Union, Dict, List, Tuple
+from typing import Dict, List, Tuple
 from collections import OrderedDict
 
-from aiess import Event, User, Beatmapset, Discussion, NewsPost, Usergroup
 from aiess import event_types as types
 
 from bot.logic import expand, split_unescaped
 from bot.logic import AND_GATES, OR_GATES, NOT_GATES
 from bot.filterer import is_int, escape, is_valid, get_key_value_pairs
 from bot.filterer import FilterContext, Tag
-from bot.filterer import KEY_VALUE_PATTERN
 
 ANY_ALIASES = ["any", "all"]
 
