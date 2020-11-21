@@ -17,5 +17,9 @@
     "bnsite-headers":
     {
         "Qat-Key": "${BNSITE_HEADER_VALUE}"
+    },
+    "bnstats-headers":
+    {
+        "Authorization": "${BNSTATS_HEADER_VALUE}"
     }
 }
