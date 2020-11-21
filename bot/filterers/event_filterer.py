@@ -20,7 +20,7 @@ ANY_ALIASES = ["any", "all"]
 TYPE_ALIASES: Dict[str, List[str]] = {
     types.RANK:         ANY_ALIASES + ["ranked"],
     types.LOVE:         ANY_ALIASES + ["loved"],
-    types.UNLOVE:       ANY_ALIASES + ["unloved"],
+    types.UNLOVE:       ANY_ALIASES + ["unloved",          "unlove"],
     types.QUALIFY:      ANY_ALIASES + ["qualified",        "qualification",    "qual"],
     types.DISQUALIFY:   ANY_ALIASES + ["disqualified",     "disqualification", "dq"],
     types.NOMINATE:     ANY_ALIASES + ["nominated",        "nomination",       "nom",   "bubble", "bubbled"],
