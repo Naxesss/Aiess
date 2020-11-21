@@ -21,7 +21,7 @@ All commands are admin-only by default. This can be changed using `+enable` and 
 Gathers event data from the [osu! website](https://osu.ppy.sh) into a MySQL database. Rate limited at 1 page / 60 s, and 1 osu!api request / 1 s.
 | Page(s) scraped | Event type(s) yielded |
 |-----------------|-----------------------|
-|**[/beatmapsets/events](https://osu.ppy.sh/beatmapsets/events)**|`Nominated` `Qualified` `Nomination Reset` `Disqualified` `Ranked` `Loved` `Resolved` `Reopened` `Kudosu Given` `Kudosu Removed` `Kudosu Allowed` `Kudosu Denied` `Genre Edit` `Language Edit`|
+|**[/beatmapsets/events](https://osu.ppy.sh/beatmapsets/events)**|`Nominated` `Qualified` `Nomination Reset` `Disqualified` `Ranked` `Loved` `Unloved` `Resolved` `Reopened` `Kudosu Given` `Kudosu Removed` `Kudosu Allowed` `Kudosu Denied` `Genre Edit` `Language Edit`|
 |**[/beatmapsets/beatmap-discussions](https://osu.ppy.sh/beatmapsets/beatmap-discussions)**|`Suggestion` `Problem` `Note` `Praise` `Hype`|
 |**[/beatmapsets/beatmap-discussion-posts](https://osu.ppy.sh/beatmapsets/beatmap-discussion-posts)**|`Reply`|
 |**[/home/news](https://osu.ppy.sh/home/news)**|`News`|
