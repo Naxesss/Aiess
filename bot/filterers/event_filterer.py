@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from typing import Union, Dict, List
+from typing import Union, Dict, List, Tuple
 from collections import OrderedDict
 
 from aiess import Event, User, Beatmapset, Discussion, NewsPost, Usergroup
@@ -328,7 +328,7 @@ TAG_TO_SQL = {
     filter_context.get_tag("discussion-difficulty") : "discussion.difficulty LIKE %s"
 }
 
-def filter_to_sql(_filter: str) -> (str, tuple):
+def filter_to_sql(_filter: str) -> Tuple[str, tuple]:
     """Returns a tuple of the filter converted to an SQL WHERE clause and the inputs to the
     WHERE clause (e.g. ("type=%s", ("nominate",)) ), for use with the scraper database."""
     if not _filter:
