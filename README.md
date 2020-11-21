@@ -27,5 +27,8 @@ Gathers event data from the [osu! website](https://osu.ppy.sh) into a MySQL data
 |**[/home/news](https://osu.ppy.sh/home/news)**|`News`|
 |**[/groups/28](https://osu.ppy.sh/groups/28)** (full bns), **[/groups/32](https://osu.ppy.sh/groups/32)** (probo bns), **[/groups/7](https://osu.ppy.sh/groups/7)** (nat), **[/groups/4](https://osu.ppy.sh/groups/4)** (gmt), **[/groups/16](https://osu.ppy.sh/groups/16)** (alumni), **[/groups/11](https://osu.ppy.sh/groups/11)** (devs), **[/groups/22](https://osu.ppy.sh/groups/22)** (support)|`Added` `Removed`|
 
-## BN Website MongoDB Interface `/bnsite` | [Website](https://bn.mappersguild.com/) | [Github](https://github.com/pishifat/qat)
+## BN Website MongoDB Interface `/bnsite` | [bn.mappersguild.com](https://bn.mappersguild.com/) | [github.com/pishifat/qat](https://github.com/pishifat/qat)
 Reads `Nominated`, `Qualified`, `Nomination Reset`, `Disqualified` and `Ranked` events from the local database, and inserts them into a 3rd-party mongodb database used by the website. This enables the [Nomination Assessment Team](https://osu.ppy.sh/help/wiki/People/The_Team/Nomination_Assessment_Team) to conduct activity and performance evaluations of [Beatmap Nominators](https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators). Evaluation data is then requested to populate group events with additional information.
+
+## BN Stats Interface `/bnstats` | [bnstats.rorre.xyz](https://bnstats.rorre.xyz/) | [github.com/rorre/BNStats/](https://github.com/rorre/BNStats/)
+Reads `Nominated`, `Qualified`, `Nomination Reset`, and `Disqualified` events from the local database, and sends POST requests with the event data in json format to the website. This enables statistical analysis of [Beatmap Nominator](https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators) activity, including individual performance metrics.
