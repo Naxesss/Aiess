@@ -3,6 +3,7 @@
 
 RANK = "rank"
 LOVE = "love"
+UNLOVE = "remove_from_loved"
 QUALIFY = "qualify"
 DISQUALIFY = "disqualify"
 NOMINATE = "nominate"

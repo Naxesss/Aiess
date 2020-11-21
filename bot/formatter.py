@@ -40,6 +40,7 @@ colour_removed    = Colour.from_rgb(200, 160, 230)
 type_props = {
     types.RANK:               TypeProps(":sparkling_heart:",         "Ranked",           colour_ranked,      show_history=True),
     types.LOVE:               TypeProps(":gift_heart:",              "Loved",            colour_ranked,      show_history=True),
+    types.UNLOVE:             TypeProps(":broken_heart:",            "Unloved",          colour_qualified,   show_history=True),
 
     types.QUALIFY:            TypeProps(":heart:",                   "Qualified",        colour_qualified,   show_in_history=True),
     types.DISQUALIFY:         TypeProps(":broken_heart:",            "Disqualified",     colour_qualified,   show_in_history=True),

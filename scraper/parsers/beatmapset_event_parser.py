@@ -104,6 +104,10 @@ class BeatmapsetEventParser(EventParser):
                 old = event_json["comment"]["old"]
                 new = event_json["comment"]["new"]
                 content = f"{old} -> {new}"
+            
+            if _type in [types.UNLOVE]:
+                # E.g. "Mapper has asked for it to be removed from Loved".
+                content = event_json["comment"]["reason"]
 
             # Reconstruct objects
             beatmapset = Beatmapset(beatmapset_id)

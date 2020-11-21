@@ -42,7 +42,7 @@ def request_beatmapset_events(page: int=1, limit: int=50) -> BeautifulSoup:
     """Requests the beatmapset events page as a BeautifulSoup object. Only certain events are queried."""
     # This way if events are added we ignore them until we've properly supported them.
     event_types = [
-        types.NOMINATE, types.QUALIFY, types.RANK, types.LOVE, types.RESET, types.DISQUALIFY,  # Beatmap Status Events
+        types.NOMINATE, types.QUALIFY, types.RANK, types.LOVE, types.UNLOVE, types.RESET, types.DISQUALIFY,  # Beatmap Status Events
         types.KUDOSU_GAIN, types.KUDOSU_LOSS, types.KUDOSU_ALLOW, types.KUDOSU_DENY,  # Kudosu Events
         types.RESOLVE, types.REOPEN,  # Discussion Status Events
         types.GENRE_EDIT, types.LANGUAGE_EDIT,  # Genre/Language Events
