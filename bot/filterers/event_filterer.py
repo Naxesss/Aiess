@@ -24,7 +24,7 @@ TYPE_ALIASES: Dict[str, List[str]] = {
     types.QUALIFY:      ANY_ALIASES + ["qualified",        "qualification",    "qual"],
     types.DISQUALIFY:   ANY_ALIASES + ["disqualified",     "disqualification", "dq"],
     types.NOMINATE:     ANY_ALIASES + ["nominated",        "nomination",       "nom",   "bubble", "bubbled"],
-    types.RESET:        ANY_ALIASES + ["nomination reset",                     "reset", "pop",    "popped"],
+    types.RESET:        ANY_ALIASES + ["reset",                                         "pop",    "popped"],
 
     types.SUGGESTION:   ANY_ALIASES + [],
     types.PROBLEM:      ANY_ALIASES + [],
