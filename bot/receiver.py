@@ -42,7 +42,7 @@ def parse_command(content: str, context: Message=None, client: Client=None) -> C
         args = match.group(2)
 
         if args:
-            args_respecting_quotes = [unescape(arg) for arg, _ in split_unescaped(args, [" "])]
+            args_respecting_quotes = [unescape(arg) for arg, _ in split_unescaped(args, (" ",))]
             return Command(name, *args_respecting_quotes, context=context, client=client)
         return Command(name, context=context, client=client)
     return None
