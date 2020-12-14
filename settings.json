@@ -16,7 +16,8 @@
     "bnsite-mongodb-uri": "${BNSITE_MONGODB_URI}",
     "bnsite-headers":
     {
-        "Qat-Key": "${BNSITE_HEADER_VALUE}"
+        "username": "${BNSITE_HEADER_USERNAME}",
+        "secret": "${BNSITE_HEADER_SECRET}"
     },
     "bnstats-headers":
     {
