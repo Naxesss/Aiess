@@ -2,6 +2,7 @@ import sys
 sys.path.append('..')
 
 import pytest
+from datetime import datetime
 
 from bot.logic import expand
 from bot.logic import distribute
@@ -102,22 +103,44 @@ def test_forwards_leveled():
     assert forwards_leveled("a(ab(c)de)fg"[6+1:]) == "de"
 
 def test_split_unescaped():
-    generator = split_unescaped("type:\"One & two \"x | y\"\"&user:\"some two or three\"", ["&", "|", " or "])
+    generator = split_unescaped("type:\"One & two \"x | y\"\"&user:\"some two or three\"", ("&", "|", " or "))
     assert next(generator, None) == ("type:\"One & two \"x | y\"\"", "&")
     assert next(generator, None) == ("user:\"some two or three\"", None)
     assert next(generator, None) is None
 
 def test_split_unescaped_special_quotes():
-    generator = split_unescaped("type:“One & two “x | y””&user:“some two or three”", ["&", "|", " or "])
+    generator = split_unescaped("type:“One & two “x | y””&user:“some two or three”", ("&", "|", " or "))
     assert next(generator, None) == ("type:“One & two “x | y””", "&")
     assert next(generator, None) == ("user:“some two or three”", None)
     assert next(generator, None) is None
 
 def test_split_unescaped_long_delimiter():
-    generator = split_unescaped("type:\"one and two\" and user:three", [" and "])
+    generator = split_unescaped("type:\"one and two\" and user:three", (" and ",))
     assert next(generator, None) == ("type:\"one and two\"", " and ")
     assert next(generator, None) == ("user:three", None)
     assert next(generator, None) is None
+
+def test_split_unescaped_cache_timing():
+    iterations = 10000
+
+    time = datetime.utcnow()
+    generator = split_unescaped("type:\"one and two\" and user:three and " * iterations, (" and ",))
+    for i in range(iterations - 1):
+        assert next(generator, None) == ("type:\"one and two\"", " and ")
+        assert next(generator, None) == ("user:three", " and ")
+    delta_time_uncached = datetime.utcnow() - time
+    
+    assert delta_time_uncached.total_seconds() > 0.4
+    
+    time = datetime.utcnow()
+    generator = split_unescaped("type:\"one and two\" and user:three and " * iterations, (" and ",))
+    for i in range(iterations - 1):
+        assert next(generator, None) == ("type:\"one and two\"", " and ")
+        assert next(generator, None) == ("user:three", " and ")
+    delta_time_cached = datetime.utcnow() - time
+
+    # Retrieving from cache should be approximately 10 times faster.
+    assert delta_time_cached.total_seconds() < 0.04
 
 def test_de_morgans_law():
     assert de_morgans_law("not (A or B and C)") == "(not A and (not B or not C))"

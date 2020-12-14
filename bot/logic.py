@@ -4,9 +4,11 @@ sys.path.append('..')
 from typing import Union, List, Generator, Tuple, Match
 import re
 
-AND_GATES = [" and "]
-OR_GATES  = [" or "]
-NOT_GATES = ["not "]
+from aiess.common import memoized
+
+AND_GATES = (" and ",)
+OR_GATES  = (" or ",)
+NOT_GATES = ("not ",)
 
 # Regular expression for cases like "not A and (not B or not C)"
 # Any group captured may be removed.
@@ -163,7 +165,8 @@ def forwards_leveled(string: str) -> str:
         read += char
     return read
 
-def split_unescaped(string: str, delimiters: List[str]) -> Generator[Tuple[str, str], None, None]:
+@memoized
+def split_unescaped(string: str, delimiters: Tuple[str]) -> Generator[Tuple[str, str], None, None]:
     """Returns a generator of tuples consisting of splits and their respective following
     unescaped delimiters (or None if at the end) from the given string. Escaped delimiters are ones
     inside quotes or parentheses.
@@ -287,7 +290,7 @@ def double_negation_elimination(string: str) -> str:
                 continue
 
             substring = string[match.start(0):next_match.end(1)].lower()
-            if not any(gate in substring for gate in (AND_GATES + OR_GATES + ["(", ")"])):
+            if not any(gate in substring for gate in (AND_GATES + OR_GATES + ("(", ")"))):
                 matches.append(match)
                 matches.append(next_match)
 

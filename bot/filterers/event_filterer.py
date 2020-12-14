@@ -338,7 +338,7 @@ def filter_to_sql(_filter: str) -> Tuple[str, tuple]:
 
     converted_words = []
     converted_values = []
-    for word, _ in split_unescaped(expand(_filter), delimiters=[" "]):
+    for word, _ in split_unescaped(expand(_filter), (" ",)):
         # Convert gate symbols in the filter (e.g. "&", "!", "and", "|") to "AND", "OR", and "NOT".
         if any(map(lambda gate: word.lower() == gate.strip().lower(), AND_GATES)): word = "AND"
         if any(map(lambda gate: word.lower() == gate.strip().lower(), OR_GATES)):  word = "OR"
