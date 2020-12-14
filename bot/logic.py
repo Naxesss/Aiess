@@ -112,7 +112,7 @@ def deepest_parentheses(string: str) -> str:
     start, end = deepest_parentheses_range(string)
     return string[start:end].strip("()")
 
-def deepest_parentheses_range(string: str) -> [Union[int, None], Union[int, None]]:
+def deepest_parentheses_range(string: str) -> Tuple[Union[int, None], Union[int, None]]:
     """Returns a tuple of the indexes of the first deepest level of opening and closing parenthesis.
     Raises ValueError on parenthesis inequality."""
     if not parenthesis_equal(string):
@@ -318,7 +318,7 @@ def normalize_not(string: str) -> str:
     
     return reconstruction
 
-def extract_not(expr: str) -> (str, str):
+def extract_not(expr: str) -> Tuple[str, str]:
     """Returns a tuple of the given expression without the first NOT gate found and
     the NOT gate that was found, if any, otherwise None."""
     for index, pattern in enumerate(NOT_GATE_PATTERNS):
@@ -347,7 +347,7 @@ def surround_nonspace(string: str, pre: str, post: str) -> str:
     string = string.strip(" ")
     return pre_spaces + pre + string + post + post_spaces
 
-def combined_captured_span(match: Match) -> (int, int):
+def combined_captured_span(match: Match) -> Tuple[int, int]:
     """Returns the span of all capture groups in the match. That is, from the first start to the last end."""
     first_start = None
     last_end = None
