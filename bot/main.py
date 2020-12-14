@@ -5,8 +5,8 @@ import asyncio
 from aiohttp.client_exceptions import ClientOSError
 
 import discord
-from discord.errors import Forbidden
 from discord import Message, Game, Status
+from discord.errors import Forbidden, HTTPException
 
 import aiess
 from aiess import Event
@@ -64,6 +64,11 @@ class Client(discord.Client):
                 break  # In case we're subscribed to a channel we don't have access to.
             except ClientOSError as ex:
                 log_err(f"WARNING | Encountered ClientOSError \"{ex}\" when sending to channel \"{channel}\", retrying...")
+            except HTTPException as ex:
+                if ex.text.startswith("5"):
+                    # 500-type codes are server-related (i.e. on Discord's end) and can be safely ignored.
+                    # Commonly "503: Service Unavailable" and "504: Gateway Time-out".
+                    log_err(f"WARNING | Encountered HTTPException \"{ex}\" when sending to channel \"{channel}\", retrying...")
 
 class Reader(aiess.Reader):
     client: Client = None
