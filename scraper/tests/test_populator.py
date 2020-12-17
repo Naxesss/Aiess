@@ -145,6 +145,19 @@ async def test_additional_details_kudosu():
     assert kudosu_event.user == User(7342798, "_Epreus")
 
 @pytest.mark.asyncio
+async def test_additional_details_legacy_thread():
+    # E.g. beatmapset 296817.
+    beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
+    discussion = None
+
+    kudosu_event = Event(types.KUDOSU_GAIN, from_string("2019-10-04T11:50:40+00:00"), beatmapset, discussion)
+    
+    discussion_json = None
+    await __populate_additional_details(kudosu_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
+
+    assert kudosu_event.user == None
+
+@pytest.mark.asyncio
 async def test_nom_comment_from_hype():
     beatmapset = Beatmapset(1112303, artist="Fox Stevenson", title="Take You Down", creator=User(5745865, "Altai"), modes=["osu"], genre="g", language="l")
     nominate_event = Event(types.NOMINATE, from_string("2020-07-01T20:48:57+00:00"), beatmapset, user=User(2204515, "Mao"))
