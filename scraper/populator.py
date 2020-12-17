@@ -95,6 +95,10 @@ async def __populate_additional_details(event: Event, discussions_json: object, 
         if event.discussion:  # Discussion may have been deleted.
             event.content = event.discussion.content
 
+    if not discussions_json:
+        # Mapset has no discussion, probably associated with some legacy thread (e.g. ranked before modding v2).
+        return
+    
     beatmapset_json = discussions_json["beatmapset"]
     for page_event in get_map_page_event_jsons(event.beatmapset, discussions_json):
         # Likelihood that two same type of events happen in the same second is very unlikely,
