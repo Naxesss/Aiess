@@ -63,11 +63,11 @@ def request_discussion_events(page: int=1, limit: int=50) -> BeautifulSoup:
     for _type in map(lambda _type: _type.replace("-", "_"), event_types):
         type_query += f"&message_types[]={_type}"
     
-    return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussions?page={page}&limit={limit}{type_query}")
+    return request_soup(f"https://osu.ppy.sh/beatmapsets/discussions?page={page}&limit={limit}{type_query}")
 
 def request_reply_events(page: int=1, limit: int=50) -> BeautifulSoup:
     """Requests the discussion reply events page as a BeautifulSoup object."""
-    return request_soup(f"https://osu.ppy.sh/beatmapsets/beatmap-discussion-posts?page={page}&limit={limit}")
+    return request_soup(f"https://osu.ppy.sh/beatmapsets/discussions/posts?page={page}&limit={limit}")
 
 def request_news(_from: datetime, limit: int=20) -> BeautifulSoup:
     """Requests the news home page as a BeautifulSoup object with the newest post being from the given datetime."""
