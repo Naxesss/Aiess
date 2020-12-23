@@ -22,8 +22,8 @@ Gathers event data from the [osu! website](https://osu.ppy.sh) into a MySQL data
 | Page(s) scraped | Event type(s) yielded |
 |-----------------|-----------------------|
 |**[/beatmapsets/events](https://osu.ppy.sh/beatmapsets/events)**|`Nominated` `Qualified` `Nomination Reset` `Disqualified` `Ranked` `Loved` `Unloved` `Resolved` `Reopened` `Kudosu Given` `Kudosu Removed` `Kudosu Allowed` `Kudosu Denied` `Genre Edit` `Language Edit`|
-|**[/beatmapsets/discussions](https://osu.ppy.sh/beatmapsets/beatmap-discussions)**|`Suggestion` `Problem` `Note` `Praise` `Hype`|
-|**[/beatmapsets/discussions/posts](https://osu.ppy.sh/beatmapsets/beatmap-discussion-posts)**|`Reply`|
+|**[/beatmapsets/discussions](https://osu.ppy.sh/beatmapsets/discussions)**|`Suggestion` `Problem` `Note` `Praise` `Hype`|
+|**[/beatmapsets/discussions/posts](https://osu.ppy.sh/beatmapsets/discussions/posts)**|`Reply`|
 |**[/home/news](https://osu.ppy.sh/home/news)**|`News`|
 |**[/groups/28](https://osu.ppy.sh/groups/28)** (full bns), **[/groups/32](https://osu.ppy.sh/groups/32)** (probo bns), **[/groups/7](https://osu.ppy.sh/groups/7)** (nat), **[/groups/4](https://osu.ppy.sh/groups/4)** (gmt), **[/groups/16](https://osu.ppy.sh/groups/16)** (alumni), **[/groups/11](https://osu.ppy.sh/groups/11)** (devs), **[/groups/22](https://osu.ppy.sh/groups/22)** (support)|`Added` `Removed`|
 
