@@ -130,7 +130,7 @@ def test_split_unescaped_cache_timing():
         assert next(generator, None) == ("user:three", " and ")
     delta_time_uncached = datetime.utcnow() - time
     
-    assert delta_time_uncached.total_seconds() > 0.4
+    assert delta_time_uncached.total_seconds() > 0.25
     
     time = datetime.utcnow()
     generator = split_unescaped("type:\"one and two\" and user:three and " * iterations, (" and ",))
