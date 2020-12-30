@@ -46,7 +46,7 @@ def expand(string: str) -> str:
     if string == dist_string:
         return string
 
-    if (len(dist_string) > 10000):
+    if (len(dist_string) > 100000):
         raise ValueError("Logical expression expanded infinitely, try writing it differently. Could be caused by a missing gate.")
 
     return expand(dist_string)
