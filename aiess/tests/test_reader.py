@@ -137,6 +137,7 @@ async def test_on_event(reader):
     await reader._Reader__push_events_between(_from, to, scope)
 
     assert received_events == [event1, event2]
+    assert reader.latest_event_time == timestamp.from_string("2020-01-01 07:00:00")
 
 @pytest.mark.asyncio
 async def test_on_event_scope(reader):
@@ -153,6 +154,7 @@ async def test_on_event_scope(reader):
 
     assert received_events == [event1]
     assert timestamp.get_last(reader._Reader__time_id(scope)) == timestamp.from_string("2020-01-01 05:00:00")
+    assert reader.latest_event_time == timestamp.from_string("2020-01-01 05:00:00")
 
 def test_merge_concurrent():
     event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 05:00:00"), user=User(1, "someone"))
