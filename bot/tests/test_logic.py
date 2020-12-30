@@ -58,6 +58,22 @@ def test_expand_complex_capital():
 def test_expand_nested_leading_or():
     assert expand("type:(not B or (not C and D))") == "not type:B or not type:C and type:D"
 
+def test_expand_inf():
+    with pytest.raises(ValueError) as err:
+        expand(
+            "type:(rank and love and qualify and disqualify and remove_from_loved) mode:(osu and taiko and catch and mania)"
+        )
+    
+    assert "expanded infinitely" in str(err)
+
+def test_expand_inf_2():
+    with pytest.raises(ValueError) as err:
+        expand(
+            "content:(\"% 1/7,%\" or \"1/7,%\") and not content:(\"% 1/7\" or \"% 1/7 %\" or \"1/7 %\" or \"1/7\") "
+            "and not type:(qualify or nominate)"
+        )
+    
+    assert "expanded infinitely" in str(err)
 
 
 def test_distribute():
