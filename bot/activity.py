@@ -33,9 +33,11 @@ def get_activity(client: Client, reader: Reader) -> Activity:
     time_since_event = (datetime.utcnow() - reader.latest_event_time) if reader.latest_event_time else None
     guild_n = len(client.guilds)
     return Game(
-        f"{DEFAULT_PREFIX}help | " +
-        f"{guild_n} server" + ("s" if guild_n != 1 else "") +
-        (f"\r\n{format_time(time_since_event, max_units=1, long=True)} delay" if time_since_event else "")
+        f"{DEFAULT_PREFIX}help" +
+        f" | {guild_n} server" + ("s" if guild_n != 1 else "") +
+        (f" | {format_time(time_since_event, max_units=1, long=True)} delay"
+            if time_since_event and time_since_event > timedelta(minutes=30)
+            else "")
     )
 
 def get_status(client: Client, reader: Reader) -> Status:
