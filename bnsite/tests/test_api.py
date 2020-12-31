@@ -36,8 +36,8 @@ def test_request_cached():
     assert json2 == json2_cached
 
 def test_request_last_eval_kick():
-    # https://osu.ppy.sh/users/5999631
-    json = api.request_last_eval(user_id=5999631)
+    # https://osu.ppy.sh/users/5875419
+    json = api.request_last_eval(user_id=5875419)
     assert json
     assert json["consensus"] == "removeFromBn"
     assert from_string(json["updatedAt"])
