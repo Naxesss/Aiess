@@ -48,6 +48,7 @@ def test_request_last_eval_resign():
     assert json
     assert json["kind"] == "resignation"
     assert from_string(json["updatedAt"])
+
 def test_request_last_eval_missing():
     json = api.request_last_eval(user_id=4)
     assert not json
