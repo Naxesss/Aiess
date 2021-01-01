@@ -44,7 +44,8 @@ def test_activity_delay_small(mock_client, mock_reader):
         mock_datetime.utcnow.return_value = timestamp.from_string("2020-01-01 00:03:30")
         mock_datetime.side_effect = datetime
 
-        assert get_activity(mock_client, mock_reader) == Game("+help | 3 servers | 3 minutes delay")
+        # Delay is too small to be worth displaying here.
+        assert get_activity(mock_client, mock_reader) == Game("+help | 3 servers")
 
 def test_activity_delay_large(mock_client, mock_reader):
     mock_reader.latest_event_time = timestamp.from_string("2020-01-01 00:00:00")
