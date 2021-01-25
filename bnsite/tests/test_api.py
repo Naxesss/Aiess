@@ -44,7 +44,7 @@ def test_request_last_eval_kick():
 
 def test_request_last_eval_resign():
     # https://osu.ppy.sh/users/1263669
-    json = api.request_last_eval(user_id=1263669)
+    json = api.request_last_eval(user_id=8140944)
     assert json
     assert json["kind"] == "resignation"
     assert from_string(json["updatedAt"])
