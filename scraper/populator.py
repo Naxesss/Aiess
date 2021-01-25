@@ -25,6 +25,7 @@ async def populate_from_discussion(event: Event) -> None:
     if discussions_json is None:
         # This happens if the beatmapset was deleted in between us scraping it and populating it.
         event.marked_for_deletion = True
+        return
 
     event.discussion = get_complete_discussion_info(event.discussion, event.beatmapset, discussions_json)
     await __populate_additional_details(event, discussions_json)
