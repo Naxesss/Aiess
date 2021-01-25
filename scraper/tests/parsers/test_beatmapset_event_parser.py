@@ -10,6 +10,7 @@ from scraper.requester import soupify
 from scraper.tests.mocks.events import nominate as mock_nominate
 from scraper.tests.mocks.events.faulty import beatmapset_events as mock_beatmapset_events
 from scraper.tests.mocks import events_json as mock_events_json
+from scraper.tests.mocks import events_json_nominate as mock_events_nominate_json
 from scraper.tests.mocks import events_json_deleted_mapset as mock_events_json_deleted_mapset
 from scraper.tests.mocks import events_json_lang_genre as mock_events_lang_genre_json
 
@@ -41,6 +42,17 @@ def test_parse_json_deleted_beatmapset():
         generated_events.append(event)
     
     assert not generated_events
+
+def test_parse_nominate_json():
+    generated_events = []
+    for event in beatmapset_event_parser.parse(mock_events_nominate_json.soup):
+        generated_events.append(event)
+    
+    assert len(generated_events) == 1
+    assert generated_events[0].type == "nominate"
+    assert generated_events[0].user.id == 33599
+    assert generated_events[0].beatmapset.id == 1164305
+    assert generated_events[0].beatmapset.creator.name == "kunka"
 
 def test_parse_lang_genre_json():
     generated_events = []
