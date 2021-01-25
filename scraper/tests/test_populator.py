@@ -271,6 +271,19 @@ async def test_populate_from_bnsite_mode(group_event):
             await populate_from_bnsite(group_event)
             assert group_event.group.mode == "taiko"
 
+@pytest.mark.asyncio
+async def test_populate_from_bnsite_mode_integration():
+    # Mock datetime such that the eval won't be outdated.
+    with mock.patch("scraper.populator.datetime") as mock_datetime:
+        mock_datetime.utcnow.return_value = from_string("2020-10-24 02:00:00")
+        mock_datetime.side_effect = datetime
+
+        event = Event("add", from_string("2020-10-22 00:00:00"), user=User(12402453), group=Usergroup(28))
+
+        await populate_from_bnsite(event)
+        assert event.content is None
+        assert event.group.mode == "osu"
+
 def test_get_group_nat_comment(group_event):
     with mock.patch("scraper.populator.datetime") as mock_datetime:
         mock_datetime.utcnow.return_value = from_string("2020-01-01 00:01:00")
