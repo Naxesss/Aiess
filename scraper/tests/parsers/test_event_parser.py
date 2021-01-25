@@ -6,22 +6,60 @@ import pytest
 from aiess.errors import ParsingError, DeletedContextError
 from aiess.timestamp import from_string
 
-from scraper.tests.mocks.events import issue_resolve, nominate, problem
+from scraper.tests.mocks.events import issue_resolve, problem
 from scraper.tests.mocks.events.faulty import no_events, resolve_deleted_beatmap, kudosu_deleted_beatmap
-from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
-from scraper.parsers.discussion_event_parser import discussion_event_parser
+from scraper.parsers.event_parser import EventParser
 
-def test_parse_event_type():
+@pytest.fixture
+def event_parser():
+    return EventParser()
+
+def test_parse_event_type(event_parser):
     tests = [
-        [beatmapset_event_parser.parse_event_type(issue_resolve.tag), "issue_resolve"],
-        [beatmapset_event_parser.parse_event_type(nominate.tag), "nominate"],
-        [discussion_event_parser.parse_event_type(problem.tag), "problem"]
+        [
+            event_parser.parse_event_type(
+                issue_resolve.tag,
+                "beatmapset-event__icon",
+                "beatmapset-event__icon--"
+            ), "issue_resolve"
+        ],
+        [
+            event_parser.parse_event_type(
+                problem.tag,
+                "beatmap-discussion-message-type",
+                "beatmap-discussion-message-type--"
+            ), "problem"
+        ]
     ]
 
     for actual, expected in tests:
         assert actual == expected
 
-def test_parse_event_type_faulty():
+def test_parse_event_type_faulty(event_parser):
+    faulty_values = [
+        no_events.tag,
+        issue_resolve.tag,  # Wrong event type and class prefix.
+        None
+    ]
+
+    for value in faulty_values:
+        with pytest.raises(ParsingError):
+            event_parser.parse_event_type(
+                value,
+                "beatmap-discussion-message-type",
+                "beatmap-discussion-message-type--"
+            )
+
+def test_parse_event_time(event_parser):
+    tests = [
+        [event_parser.parse_event_time(issue_resolve.tag), from_string("2019-12-05T10:26:54+00:00")],
+        [event_parser.parse_event_time(problem.tag), from_string("2019-12-05T16:50:10+00:00")]
+    ]
+
+    for actual, expected in tests:
+        assert actual == expected
+
+def test_parse_event_time_faulty(event_parser):
     faulty_values = [
         no_events.tag,
         None
@@ -29,47 +67,18 @@ def test_parse_event_type_faulty():
 
     for value in faulty_values:
         with pytest.raises(ParsingError):
-            beatmapset_event_parser.parse_event_type(value)
-    
-    for value in faulty_values:
-        with pytest.raises(ParsingError):
-            discussion_event_parser.parse_event_type(value)
+            event_parser.parse_event_time(value)
 
-def test_parse_event_time():
+def test_parse_event_link(event_parser):
     tests = [
-        [beatmapset_event_parser.parse_event_time(issue_resolve.tag), from_string("2019-12-05T10:26:54+00:00")],
-        [beatmapset_event_parser.parse_event_time(nominate.tag), from_string("2019-12-05T12:39:39+00:00")],
-        [discussion_event_parser.parse_event_time(problem.tag), from_string("2019-12-05T16:50:10+00:00")]
+        [event_parser.parse_event_link(issue_resolve.tag), "https://osu.ppy.sh/beatmapsets/1011055/discussion#/1294675"],
+        [event_parser.parse_event_link(problem.tag), "https://osu.ppy.sh/beatmapsets/1074596/discussion#/1295203"]
     ]
 
     for actual, expected in tests:
         assert actual == expected
 
-def test_parse_event_time_faulty():
-    faulty_values = [
-        no_events.tag,
-        None
-    ]
-
-    for value in faulty_values:
-        with pytest.raises(ParsingError):
-            beatmapset_event_parser.parse_event_time(value)
-    
-    for value in faulty_values:
-        with pytest.raises(ParsingError):
-            discussion_event_parser.parse_event_time(value)
-
-def test_parse_event_link():
-    tests = [
-        [beatmapset_event_parser.parse_event_link(issue_resolve.tag), "https://osu.ppy.sh/beatmapsets/1011055/discussion#/1294675"],
-        [beatmapset_event_parser.parse_event_link(nominate.tag), "https://osu.ppy.sh/beatmapsets/1013400/discussion"],
-        [discussion_event_parser.parse_event_link(problem.tag), "https://osu.ppy.sh/beatmapsets/1074596/discussion#/1295203"]
-    ]
-
-    for actual, expected in tests:
-        assert actual == expected
-
-def test_parse_event_link_faulty():
+def test_parse_event_link_faulty(event_parser):
     faulty_values = [
         [no_events.tag, ParsingError],
         [resolve_deleted_beatmap.tag, DeletedContextError],
@@ -79,23 +88,18 @@ def test_parse_event_link_faulty():
 
     for value, expected_exception in faulty_values:
         with pytest.raises(expected_exception):
-            beatmapset_event_parser.parse_event_link(value)
-    
-    for value, expected_exception in faulty_values:
-        with pytest.raises(expected_exception):
-            discussion_event_parser.parse_event_link(value)
+            event_parser.parse_event_link(value)
 
-def test_parse_author_id():
+def test_parse_author_id(event_parser):
     tests = [
-        [beatmapset_event_parser.parse_event_author_id(issue_resolve.tag), None],
-        [beatmapset_event_parser.parse_event_author_id(nominate.tag), "1653229"],
-        [discussion_event_parser.parse_event_author_id(problem.tag), "197805"]
+        [event_parser.parse_event_author_id(issue_resolve.tag, "user-name"), None],
+        [event_parser.parse_event_author_id(problem.tag,       "beatmap-discussion-user-card__user-link"), "197805"]
     ]
 
     for actual, expected in tests:
         assert actual == expected
 
-def test_parse_event_author_id_faulty():
+def test_parse_event_author_id_faulty(event_parser):
     faulty_values = [
         [no_events.tag, ParsingError],
         [resolve_deleted_beatmap.tag, DeletedContextError],
@@ -103,23 +107,22 @@ def test_parse_event_author_id_faulty():
     ]
 
     for value, expected_exception in faulty_values:
-        assert beatmapset_event_parser.parse_event_author_id(value) is None
+        assert event_parser.parse_event_author_id(value, "beatmap-discussion-user-card__user-link") is None
     
     for value, expected_exception in faulty_values:
         with pytest.raises(expected_exception):
-            discussion_event_parser.parse_event_author_id(value)
+            event_parser.parse_event_author_id(value, "beatmap-discussion-user-card__user-link", must_find=True)
 
-def test_parse_author_name():
+def test_parse_author_name(event_parser):
     tests = [
-        [beatmapset_event_parser.parse_event_author_name(issue_resolve.tag), None],
-        [beatmapset_event_parser.parse_event_author_name(nominate.tag), "_Stan"],
-        [discussion_event_parser.parse_event_author_name(problem.tag), "Niva"]
+        [event_parser.parse_event_author_name(issue_resolve.tag, "user-name"), None],
+        [event_parser.parse_event_author_name(problem.tag,       "beatmap-discussion-user-card__user-text"), "Niva"]
     ]
 
     for actual, expected in tests:
         assert actual == expected
 
-def test_parse_event_author_name_faulty():
+def test_parse_event_author_name_faulty(event_parser):
     faulty_values = [
         [no_events.tag, ParsingError],
         [resolve_deleted_beatmap.tag, DeletedContextError],
@@ -127,40 +130,40 @@ def test_parse_event_author_name_faulty():
     ]
 
     for value, expected_exception in faulty_values:
-        assert beatmapset_event_parser.parse_event_author_name(value) is None
+        assert event_parser.parse_event_author_name(value, "beatmap-discussion-user-card__user-text") is None
     
     for value, expected_exception in faulty_values:
         with pytest.raises(expected_exception):
-            discussion_event_parser.parse_event_link(value)
+            event_parser.parse_event_link(value)
 
-def test_parse_id_from_user_link():
+def test_parse_id_from_user_link(event_parser):
     tests = [
-        [beatmapset_event_parser.parse_id_from_user_link(None), None],
-        [discussion_event_parser.parse_id_from_user_link("https://osu.ppy.sh/beatmapsets/1074596"), None],
-        [beatmapset_event_parser.parse_id_from_user_link("https://osu.ppy.sh/users/1653229"), "1653229"],
-        [discussion_event_parser.parse_id_from_user_link("https://osu.ppy.sh/users/197805/modding"), "197805"]
+        [event_parser.parse_id_from_user_link(None), None],
+        [event_parser.parse_id_from_user_link("https://osu.ppy.sh/beatmapsets/1074596"), None],
+        [event_parser.parse_id_from_user_link("https://osu.ppy.sh/users/1653229"), "1653229"],
+        [event_parser.parse_id_from_user_link("https://osu.ppy.sh/users/197805/modding"), "197805"]
     ]
 
     for actual, expected in tests:
         assert actual == expected
 
-def test_parse_id_from_discussion_link():
+def test_parse_id_from_discussion_link(event_parser):
     tests = [
-        [beatmapset_event_parser.parse_id_from_discussion_link(None), None],
-        [discussion_event_parser.parse_id_from_discussion_link("https://osu.ppy.sh/beatmapsets/1074596"), None],
-        [beatmapset_event_parser.parse_id_from_discussion_link("https://osu.ppy.sh/beatmapsets/1013400/discussion"), None],
-        [discussion_event_parser.parse_id_from_discussion_link("https://osu.ppy.sh/beatmapsets/1011055/discussion#/1294675"), "1294675"]
+        [event_parser.parse_id_from_discussion_link(None), None],
+        [event_parser.parse_id_from_discussion_link("https://osu.ppy.sh/beatmapsets/1074596"), None],
+        [event_parser.parse_id_from_discussion_link("https://osu.ppy.sh/beatmapsets/1013400/discussion"), None],
+        [event_parser.parse_id_from_discussion_link("https://osu.ppy.sh/beatmapsets/1011055/discussion#/1294675"), "1294675"]
     ]
 
     for actual, expected in tests:
         assert actual == expected
 
-def test_parse_id_from_beatmapset_link():
+def test_parse_id_from_beatmapset_link(event_parser):
     tests = [
-        [beatmapset_event_parser.parse_id_from_beatmapset_link(None), None],
-        [beatmapset_event_parser.parse_id_from_beatmapset_link("https://osu.ppy.sh/users/1653229"), None],
-        [discussion_event_parser.parse_id_from_beatmapset_link("https://osu.ppy.sh/beatmapsets/1074596"), "1074596"],
-        [discussion_event_parser.parse_id_from_beatmapset_link("https://osu.ppy.sh/beatmapsets/1011055/discussion#/1294675"), "1011055"]
+        [event_parser.parse_id_from_beatmapset_link(None), None],
+        [event_parser.parse_id_from_beatmapset_link("https://osu.ppy.sh/users/1653229"), None],
+        [event_parser.parse_id_from_beatmapset_link("https://osu.ppy.sh/beatmapsets/1074596"), "1074596"],
+        [event_parser.parse_id_from_beatmapset_link("https://osu.ppy.sh/beatmapsets/1011055/discussion#/1294675"), "1011055"]
     ]
 
     for actual, expected in tests:
