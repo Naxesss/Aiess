@@ -15,35 +15,14 @@ from scraper.tests.mocks import events_json_lang_genre as mock_events_lang_genre
 
 from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
 
-def test_parse():
-    generated_events = []
-    for event in beatmapset_event_parser.parse(mock_beatmapset_events.soup):
-        generated_events.append(event)
-    
-    assert len(generated_events) == 1  # 1 of 2 events is of a beatmapset that no longer exists.
-    assert generated_events[0].type == "nominate"
-
-def test_parse_no_json_or_tags():
+def test_parse_no_json():
     generated_events = []
     with pytest.raises(ValueError) as err:
         for event in beatmapset_event_parser.parse(soupify("")):
             generated_events.append(event)
     
     assert len(generated_events) == 0
-    assert "json" in str(err) and "HTML" in str(err)
-
-def test_parse_prefer_json():
-    combined_soup = soupify(f"""
-        {mock_nominate.HTML}
-        {mock_events_json.HTML}
-    """)
-
-    generated_events = []
-    for event in beatmapset_event_parser.parse(combined_soup):
-        generated_events.append(event)
-    
-    # For this test, the json has 5 events and the HTML has 1.
-    assert len(generated_events) == 5
+    assert "Missing either json-events or json-users" in str(err)
 
 def test_parse_json():
     generated_events = []
@@ -74,27 +53,3 @@ def test_parse_lang_genre_json():
     assert generated_events[0].content == "Unspecified -> Instrumental"
     assert generated_events[1].type == "genre_edit"
     assert generated_events[1].content == "Unspecified -> Electronic"
-
-@pytest.fixture(scope="module")
-def beatmapset_event():
-    return beatmapset_event_parser.parse_event(mock_nominate.tag)
-
-def test_event_attr(beatmapset_event):
-    assert beatmapset_event.time == timestamp.from_string("2019-12-05T12:39:39+00:00")
-    assert beatmapset_event.type == "nominate"
-    assert beatmapset_event.content is None
-
-def test_user_attr(beatmapset_event):
-    assert beatmapset_event.user.id == 1653229
-    assert beatmapset_event.user.name == "_Stan"
-
-def test_beatmapset_attr(beatmapset_event):
-    assert beatmapset_event.beatmapset.id == 1013400
-    assert beatmapset_event.beatmapset.artist == "Nekomata Gekidan"
-    assert beatmapset_event.beatmapset.title == "AsiaN distractive"
-    assert beatmapset_event.beatmapset.creator.id == 6089608
-    assert beatmapset_event.beatmapset.creator.name == "Tofu1222"
-    assert beatmapset_event.beatmapset.modes == ["mania"]
-
-def test_discussion_attr(beatmapset_event):
-    assert beatmapset_event.discussion is None
