@@ -7,7 +7,6 @@ from aiess import timestamp
 
 from scraper.requester import soupify
 
-from scraper.tests.mocks.events import nominate as mock_nominate
 from scraper.tests.mocks.events.faulty import beatmapset_events as mock_beatmapset_events
 from scraper.tests.mocks import events_json as mock_events_json
 from scraper.tests.mocks import events_json_nominate as mock_events_nominate_json
