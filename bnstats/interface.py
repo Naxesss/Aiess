@@ -23,6 +23,9 @@ def insert_event(event: Event) -> None:
     this event as a json, outlined in `Document`."""
     response = requests.post(url="https://bnstats.rorre.xyz/qat/aiess", json=vars(Document(event)), headers=BNSTATS_HEADERS)
     # See https://github.com/rorre/BNStats/blob/naxess_score/bnstats/routes/qat.py#L81.
-    if not str(response.status_code).startswith("2"):
-        # 2XX indicates success, if we don't succeed, we should raise an error.
+    code = str(response.status_code)
+    if not code.startswith("2") and not code.startswith("5"):
+        # 2XX indicates success. If we don't succeed, we should raise an error.
+        # 5XX indicates failure on part of the server (e.g. osu!api being down). We can safely
+        # ignore these, as bnstats runs a routine check for missing data, which is then recovered.
         raise ValueError(f"Received {response.text}")
