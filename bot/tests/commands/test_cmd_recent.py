@@ -140,3 +140,17 @@ async def test_recent_invalid_word():
     assert await receive_command(mock_command)
     assert mock_command.response.startswith("✗")
     assert "invalid word" in mock_command.response.lower()
+
+async def mock_retrieve_event(self, where, where_values, extensive):
+    raise TimeoutError
+
+@pytest.mark.asyncio
+@mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
+@mock.patch.object(Database, 'retrieve_event', mock_retrieve_event)
+async def test_recent_timeout():
+    mock_message = MockMessage(channel=MockChannel(_id=6, guild=MockGuild(_id=2)))
+    mock_command = MockCommand("recent", "type:nominate", context=mock_message)
+
+    assert await receive_command(mock_command)
+    assert mock_command.response.startswith("✗")
+    assert "took too long" in mock_command.response.lower()
