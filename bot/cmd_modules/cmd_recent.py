@@ -48,6 +48,6 @@ async def cmd_recent(command: Command, _filter: str=None):
         return
     
     await command.respond(
-        response = f"✓ Most recent event{matching_filter_str}\r\n{format_link(event)}",
+        response = f"✓ Most recent event{matching_filter_str}:\r\n{format_link(event)}",
         embed = await format_embed(event)
     )
