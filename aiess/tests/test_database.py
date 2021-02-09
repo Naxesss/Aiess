@@ -1,6 +1,6 @@
 import pytest
 from mysql.connector.errors import ProgrammingError
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost, Usergroup
 from aiess.database import Database, CachedDatabase, SCRAPER_TEST_DB_NAME
@@ -47,6 +47,17 @@ def test_missing_table(test_database):
     with pytest.raises(ProgrammingError) as error:
         test_database.insert_table_data("missing_table", dict(id=1, name="test"))
     assert "Table 'aiess_test.missing_table' doesn't exist" in str(error.value)
+
+def test_maximum_execution_time(test_database):
+    too_long_ms = test_database.timeout_ms + 1000
+
+    time = datetime.utcnow()
+    with pytest.raises(TimeoutError):
+        test_database._execute(f"SELECT SLEEP({too_long_ms/1000});")
+    delta_time = datetime.utcnow() - time
+
+    assert delta_time >= timedelta(milliseconds=test_database.timeout_ms)
+    assert delta_time <  timedelta(milliseconds=too_long_ms)
 
 @pytest.mark.asyncio
 async def test_insert_retrieve_event(test_database):
