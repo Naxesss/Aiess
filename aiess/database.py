@@ -507,8 +507,8 @@ class Database:
 class CachedDatabase(Database):
     """Creates an aiess database connection. Stores any query results in a cache and retrieves from it whenever available."""
     def __init__(self, _db_name: str):
-        super().__init__(_db_name=_db_name)
         self.cache = {}
+        super().__init__(_db_name=_db_name)
     
     def _execute(self, query: str, values: tuple=None) -> List[tuple]:
         """Executes the given SQL query with the given argument values, if any. Use like "%s" in query
