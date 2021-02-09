@@ -1,9 +1,9 @@
 import asyncio
 import mysql.connector
 from mysql.connector.errors import Error, OperationalError
-from typing import List, Generator, Tuple
+from typing import List, Generator, Tuple, Callable
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost, Usergroup
 from aiess.settings import DB_CONFIG
@@ -29,8 +29,9 @@ class Database:
         DISCUSSION_REPLIES = "discussion_replies"
         USERS              = "users"
 
-    def __init__(self, _db_name: str):
-        self.db_name = _db_name
+    def __init__(self, _db_name: str, timeout_ms: float=10000):
+        self.db_name    = _db_name
+        self.timeout_ms = timeout_ms
         db_config = {
             "host":     DB_CONFIG["host"],
             "port":     int(DB_CONFIG["port"]),
@@ -43,6 +44,10 @@ class Database:
             self.connection = mysql.connector.connect(**db_config)
         except Error as error:
             raise ValueError(f"Could not connect to MySQL; {error}")
+
+        # Prevents DoS from complex SELECT queries.
+        # See https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_max_execution_time.
+        self._execute(f"SET SESSION MAX_EXECUTION_TIME={timeout_ms}")
     
     def __get_cursor(self):
         attempts = 0
@@ -71,12 +76,25 @@ class Database:
                 return None  # Reached end of result set, not an issue.
             raise
 
+    def _check_for_timeout(self, func: Callable, args: List[object], timeout: float) -> None:
+        """Runs function `func` with arguments `args` until it ends. If this took more than `timeout`
+        milliseconds, `TimeoutError` is raised."""
+        start_time = datetime.utcnow()
+        func(*args)
+        delta_time = datetime.utcnow() - start_time
+        if delta_time > timedelta(milliseconds=self.timeout_ms):
+            raise TimeoutError("database execution time exceeded")
+
     def _execute(self, query: str, values: tuple=None) -> List[tuple]:
         """Executes the given SQL query with the given argument values, if any. Use like "%s" in query
         and ("name",) in values. Returns the fetched result sets as a list of tuples, or None if no result."""
         cursor = self.__get_cursor()
         cursor.nextset()
-        cursor.execute(query, values)
+        self._check_for_timeout(
+            func    = cursor.execute,
+            args    = [query, values],
+            timeout = self.timeout_ms
+        )
 
         fetch = self.__fetch(cursor)
         cursor.close()
