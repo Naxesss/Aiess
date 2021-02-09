@@ -30,18 +30,22 @@ async def cmd_recent(command: Command, _filter: str=None):
     if _filter and not await validate_filter(command, _filter, filter_context):
         return  # `validate_filter` will respond for us.
 
+    matching_filter_str = f" matching `{_filter}`" if _filter else ""
+
     filter_query, filter_values = filter_to_sql(_filter)
     database = Database(SCRAPER_DB_NAME)
-    event = await database.retrieve_event(
-        where        = f"""
-            {filter_query}
-            ORDER BY time DESC
-            """,
-        where_values = filter_values,
-        extensive    = True
-    )
-    
-    matching_filter_str = f" matching `{_filter}`" if _filter else ""
+    try:
+        event = await database.retrieve_event(
+            where        = f"""
+                {filter_query}
+                ORDER BY time DESC
+                """,
+            where_values = filter_values,
+            extensive    = True
+        )
+    except TimeoutError:
+        await command.respond_err(f"Took too long to find an event{matching_filter_str}.")
+        return
 
     if not event:
         await command.respond_err(f"No event{matching_filter_str} could be found.")
