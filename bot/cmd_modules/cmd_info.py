@@ -47,7 +47,8 @@ def retrieve_event_count():
     return retrieve_with_timeout(
         db_name      = SCRAPER_DB_NAME,
         table        = "events",
-        selection    = "COUNT(*)"
+        where        = "TRUE ORDER BY id DESC LIMIT 1",
+        selection    = "id"
     )
 
 def retrieve_event_count_today():
