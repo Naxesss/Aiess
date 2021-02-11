@@ -44,27 +44,41 @@ async def cmd_info(command: Command, key: str=None):
     )
 
 def retrieve_event_count():
-    return Database(SCRAPER_DB_NAME).retrieve_table_data(
+    return retrieve_with_timeout(
+        db_name      = SCRAPER_DB_NAME,
         table        = "events",
         selection    = "COUNT(*)"
-    )[0][0]
+    )
 
 def retrieve_event_count_today():
-    return Database(SCRAPER_DB_NAME).retrieve_table_data(
+    return retrieve_with_timeout(
+        db_name      = SCRAPER_DB_NAME,
         table        = "events",
         where        = "time >= NOW() - INTERVAL 24 HOUR",
         selection    = "COUNT(*)"
-    )[0][0]
+    )
 
 def retrieve_subscription_count():
-    return Database(BOT_DB_NAME).retrieve_table_data(
+    return retrieve_with_timeout(
+        db_name      = BOT_DB_NAME,
         table        = "subscriptions",
         selection    = "COUNT(*)"
-    )[0][0]
+    )
 
 def retrieve_first_event_at():
-    return Database(SCRAPER_DB_NAME).retrieve_table_data(
+    return retrieve_with_timeout(
+        db_name      = SCRAPER_DB_NAME,
         table        = "events",
         where        = "TRUE ORDER BY time ASC LIMIT 1",
         selection    = "time"
-    )[0][0]
+    )
+
+def retrieve_with_timeout(db_name, table, where="TRUE", selection="*"):
+    try:
+        return Database(db_name).retrieve_table_data(
+            table        = table,
+            where        = where,
+            selection    = selection
+        )[0][0]
+    except TimeoutError:
+        return "(timed out)"
