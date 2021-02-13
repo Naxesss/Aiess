@@ -83,10 +83,10 @@ class Beatmapset:
                 raise DeletedContextError(f"No beatmapset with id {_id} exists.")
             beatmap_json = beatmapset_json[0]  # Assumes metadata is the same across the entire set.
 
-        self.id = int(_id)
-        self.artist = str(artist) if artist is not None else beatmap_json["artist"]
-        self.title = str(title) if title is not None else beatmap_json["title"]
-        self.creator = creator if creator is not None else User(
+        self.id      = int(_id)
+        self.artist  = str(artist) if artist  is not None else beatmap_json["artist"]
+        self.title   = str(title)  if title   is not None else beatmap_json["title"]
+        self.creator = creator     if creator is not None else User(
             beatmap_json["creator_id"],
             beatmap_json["creator"])
         
@@ -132,7 +132,10 @@ class Beatmapset:
 
 class Discussion:
     """Contains the discussion data either supplied or further scraped (latter in case of e.g. disqualify or nomination_reset events)."""
-    def __init__(self, _id: int, beatmapset: Beatmapset, user: User=None, content: str=None, tab: str=None, difficulty: str=None):
+    def __init__(
+            self, _id: int, beatmapset: Beatmapset, user: User=None, content: str=None,
+            tab: str=None, difficulty: str=None
+        ):
         self.id = int(_id)
         self.beatmapset = beatmapset
         self.user = user if user is not None else None
