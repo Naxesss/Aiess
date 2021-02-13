@@ -6,9 +6,13 @@ from aiess.errors import DeletedContextError
 
 class User:
     """Contains the user data either requested from the api or directly supplied (i.e. id, name)."""
-    def __init__(self, _id: int=None, name: str=None):
+    def __init__(self, _id: int=None, name: str=None, allow_api: bool=True):
         if _id is None and name is None:
             raise ValueError("Cannot create a User object with neither id nor name provided.")
+
+        if not allow_api:
+            if _id  is None: _id  = 1
+            if name is None: name = "name"
 
         self.id = int(_id) if _id is not None else None
         self.name = str(name) if name is not None else None
@@ -50,12 +54,27 @@ class Beatmapset:
     """Contains the beatmapset data requested from the api or supplied as a json object (e.g. artist, title, creator)."""
     def __init__(
             self, _id: int, artist: str=None, title: str=None, creator: User=None,
-            modes: List[str]=None, genre: str=None, language: str=None, beatmapset_json: object=None):
+            modes: List[str]=None, genre: str=None, language: str=None, beatmapset_json: object=None,
+            allow_api: bool=True):
         if _id is None:
             raise ValueError("Beatmapset id should not be None.")
 
-        # No need to get the beatmap json if we already have all the data.
-        if artist is None or title is None or creator is None or modes is None or language is None or genre is None:
+        if not allow_api:
+            if artist   is None: artist   = "artist"
+            if title    is None: title    = "title"
+            if creator  is None: creator  = User(_id=1, name="creator")
+            if modes    is None: modes    = ["osu"]
+            if language is None: language = "language"
+            if genre    is None: genre    = "genre"
+        # If some data is missing, we should populate it.
+        if (
+            artist   is None or
+            title    is None or
+            creator  is None or
+            modes    is None or
+            language is None or
+            genre    is None
+        ):
             if not beatmapset_json:
                 beatmapset_json = api.request_beatmapset(_id)
                 if not beatmapset_json:
