@@ -53,7 +53,7 @@ def test_dissect_user():
 @mock.patch("aiess.objects.api.request_api", no_api_allowed)  # If we get this, simply add the new properties to the test!
 def test_dissect_beatmapset():
     user = User(2, "some two")
-    beatmapset = Beatmapset(4, artist="yes", title="no", creator=user, modes=["osu", "catch"], genre="g", language="l")
+    beatmapset = Beatmapset(4, artist="yes", title="no", creator=user, modes=["osu", "catch"], genre="g", language="l", tags=["tag1", "tag2"])
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset)
     assert filter_context.dissect(event) == [
         "set-id:4",
@@ -67,6 +67,10 @@ def test_dissect_beatmapset():
         "mode:catch",
         "genre:g",
         "language:l",
+        "tag:tag1",
+        "tags:tag1",
+        "tag:tag2",
+        "tags:tag2",
         "type:test"
     ]
 
