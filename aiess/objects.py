@@ -90,9 +90,9 @@ class Beatmapset:
             beatmap_json["creator_id"],
             beatmap_json["creator"])
         
-        self.modes = modes if modes is not None else self.__get_modes(beatmapset_json)
-        self.genre = genre if genre is not None else self.__get_genre(beatmapset_json)
-        self.language = language if language is not None else self.__get_language(beatmapset_json)
+        self.modes    = modes    if modes    is not None else self.__get_modes(beatmapset_json)
+        self.genre    = genre    if genre    is not None else api.GENRES[beatmap_json["genre_id"]]
+        self.language = language if language is not None else api.LANGUAGES[beatmap_json["language_id"]]
     
     def __str__(self) -> str:
         return f"{self.artist} - {self.title} (mapped by {self.creator}) {self.mode_str()}"
@@ -112,14 +112,6 @@ class Beatmapset:
             if mode_name not in mode_names:
                 mode_names.append(mode_name)
         return mode_names
-    
-    def __get_genre(self, beatmapset_json: object) -> str:
-        """Returns the genre by name included in the given beatmapset json (e.g. "Electronic")."""
-        return api.GENRES[beatmapset_json[0]["genre_id"]]
-
-    def __get_language(self, beatmapset_json: object) -> str:
-        """Returns the language by name included in the given beatmapset json (e.g. "Instrumental")."""
-        return api.LANGUAGES[beatmapset_json[0]["language_id"]]
     
     def __key(self) -> tuple:
         return (
