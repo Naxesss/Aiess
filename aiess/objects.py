@@ -128,7 +128,7 @@ class Beatmapset:
             tuple(self.modes),  # Cannot hash mutable types; list is mutable, tuple is immutable.
             self.language,
             self.genre,
-            self.tags
+            tuple(self.tags)
         )
     
     def __eq__(self, other) -> bool:
