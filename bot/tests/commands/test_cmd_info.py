@@ -6,7 +6,7 @@ import mock
 from datetime import datetime
 
 from aiess.timestamp import from_string
-from aiess.database import Database
+from aiess.database import Database, SCRAPER_TEST_DB_NAME
 
 from bot.tests.commands.mock_command import MockCommand, MockMessage, MockChannel
 from bot.cmd_modules import cmd_info
@@ -65,6 +65,7 @@ async def test_info():
 def mock_retrieve_table_data(self, table, where, selection):
     raise TimeoutError
 
+@mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
 @mock.patch.object(Database, 'retrieve_table_data', mock_retrieve_table_data)
 def test_retrieve_event_count_timeout():
     assert cmd_info.retrieve_event_count() == "(timed out)"
