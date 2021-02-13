@@ -98,6 +98,7 @@ class Beatmapset:
         return f"{self.artist} - {self.title} (mapped by {self.creator}) {self.mode_str()}"
 
     def mode_str(self) -> str:
+        """Returns a string representation of the modes in this beatmapset (e.g. "[osu][taiko]")."""
         string = ""
         for mode in self.modes:
             string += f"[{mode}]"
