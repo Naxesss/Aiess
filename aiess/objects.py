@@ -54,8 +54,8 @@ class Beatmapset:
     """Contains the beatmapset data requested from the api or supplied as a json object (e.g. artist, title, creator)."""
     def __init__(
             self, _id: int, artist: str=None, title: str=None, creator: User=None,
-            modes: List[str]=None, genre: str=None, language: str=None, beatmapset_json: object=None,
-            allow_api: bool=True):
+            modes: List[str]=None, genre: str=None, language: str=None, tags: List[str]=None,
+            beatmapset_json: object=None, allow_api: bool=True):
         if _id is None:
             raise ValueError("Beatmapset id should not be None.")
 
@@ -66,6 +66,8 @@ class Beatmapset:
             if modes    is None: modes    = ["osu"]
             if language is None: language = "language"
             if genre    is None: genre    = "genre"
+            if tags     is None: tags     = ["tags"]
+
         # If some data is missing, we should populate it.
         if (
             artist   is None or
@@ -73,7 +75,8 @@ class Beatmapset:
             creator  is None or
             modes    is None or
             language is None or
-            genre    is None
+            genre    is None or
+            tags     is None
         ):
             if not beatmapset_json:
                 beatmapset_json = api.request_beatmapset(_id)
@@ -93,6 +96,7 @@ class Beatmapset:
         self.modes    = modes    if modes    is not None else self.__get_modes(beatmapset_json)
         self.genre    = genre    if genre    is not None else api.GENRES[beatmap_json["genre_id"]]
         self.language = language if language is not None else api.LANGUAGES[beatmap_json["language_id"]]
+        self.tags     = tags     if tags     is not None else beatmap_json["tags"].split(" ")
     
     def __str__(self) -> str:
         return f"{self.artist} - {self.title} (mapped by {self.creator}) {self.mode_str()}"
@@ -120,7 +124,10 @@ class Beatmapset:
             self.artist,
             self.title,
             self.creator,
-            tuple(self.modes)  # Cannot hash mutable types; list is mutable, tuple is immutable.
+            tuple(self.modes),  # Cannot hash mutable types; list is mutable, tuple is immutable.
+            self.language,
+            self.genre,
+            self.tags
         )
     
     def __eq__(self, other) -> bool:
