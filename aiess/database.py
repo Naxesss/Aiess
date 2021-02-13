@@ -247,7 +247,8 @@ class Database:
                 artist     = beatmapset.artist,
                 creator_id = beatmapset.creator.id,
                 genre      = beatmapset.genre,
-                language   = beatmapset.language
+                language   = beatmapset.language,
+                tags       = str.join(" ", beatmapset.tags)
             )
         )
     
@@ -372,7 +373,7 @@ class Database:
             table        = "beatmapsets",
             where        = where,
             where_values = where_values,
-            selection    = "id, title, artist, creator_id, genre, language"
+            selection    = "id, title, artist, creator_id, genre, language, tags"
         )
         for row in (fetched_rows or []):
             _id      = row[0]
@@ -382,7 +383,8 @@ class Database:
             modes    = self.retrieve_beatmapset_modes(_id)
             genre    = row[4]
             language = row[5]
-            yield Beatmapset(_id, artist, title, creator, modes, genre, language)
+            tags     = row[6].split(" ")
+            yield Beatmapset(_id, artist, title, creator, modes, genre, language, tags)
 
     def retrieve_discussion(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Discussion:
         """Returns the first discussion from the database matching the given WHERE clause, or None if no such discussion is stored.

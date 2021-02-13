@@ -60,6 +60,7 @@ CREATE TABLE `beatmapsets` (
   `creator_id` bigint(20) unsigned NOT NULL,
   `genre` mediumtext,
   `language` mediumtext,
+  `tags` mediumtext,
   PRIMARY KEY (`id`),
   KEY `beatmapsetsfk_creator_id_idx` (`creator_id`),
   CONSTRAINT `beatmapsetsfk_creator_id` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`)
