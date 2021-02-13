@@ -91,7 +91,8 @@ class Beatmapset:
         self.title   = str(title)  if title   is not None else beatmap_json["title"]
         self.creator = creator     if creator is not None else User(
             beatmap_json["creator_id"],
-            beatmap_json["creator"])
+            beatmap_json["creator"]
+        )
         
         self.modes    = modes    if modes    is not None else self.__get_modes(beatmapset_json)
         self.genre    = genre    if genre    is not None else api.GENRES[beatmap_json["genre_id"]]
