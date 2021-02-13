@@ -65,6 +65,8 @@ def test_dissect_beatmapset():
         "creator-id:2",
         "mode:osu",
         "mode:catch",
+        "genre:g",
+        "language:l",
         "type:test"
     ]
 
