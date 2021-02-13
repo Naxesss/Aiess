@@ -76,6 +76,7 @@ def test_beatmapset():
     assert beatmapset.modes == ["osu", "taiko"]
     assert beatmapset.genre == "Electronic"
     assert beatmapset.language == "English"
+    assert beatmapset.tags == ["onosakihito", "speedcore", "renard", "lapfox"]
 
     assert beatmapset.mode_str() == "[osu][taiko]"
     assert str(beatmapset) == "The Quick Brown Fox - The Big Black (mapped by Blue Dragon) [osu][taiko]"
@@ -89,6 +90,7 @@ def test_beatmapset_without_api():
     assert beatmapset.modes    is not None
     assert beatmapset.language is not None
     assert beatmapset.genre    is not None
+    assert beatmapset.tags     is not None
 
 def test_beatmapset_int_artist_title():
     beatmapset = Beatmapset(41823, 5, 6, allow_api=False)
