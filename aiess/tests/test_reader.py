@@ -186,8 +186,8 @@ def test_merge_concurrent_1_second_off():
     assert merged_events[0].user == event1.user
 
 def test_merge_concurrent_different_beatmapsets():
-    beatmapset1 = Beatmapset(1, "artist", "title", User(1, "someone"), modes=["osu"], genre="g", language="l")
-    beatmapset2 = Beatmapset(2, "artist", "title", User(2, "sometwo"), modes=["osu"], genre="g", language="l")
+    beatmapset1 = Beatmapset(1, User(1, "someone"), allow_api=False)
+    beatmapset2 = Beatmapset(2, User(2, "sometwo"), allow_api=False)
     event1 = Event(_type="nominate", time=timestamp.from_string("2020-01-01 13:00:00"), beatmapset=beatmapset1, user=User(1, "someone"))
     event2 = Event(_type="qualify", time=timestamp.from_string("2020-01-01 13:00:01"), beatmapset=beatmapset2)
 

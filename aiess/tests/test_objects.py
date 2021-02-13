@@ -68,7 +68,7 @@ def test_beatmapset():
     assert str(beatmapset) == "The Quick Brown Fox - The Big Black (mapped by Blue Dragon) [osu][taiko]"
 
 def test_beatmapset_int_artist_title():
-    beatmapset = Beatmapset(41823, 5, 6, User(2, 222), ["osu"], genre="g", language="l")
+    beatmapset = Beatmapset(41823, 5, 6, allow_api=False)
 
     assert beatmapset.artist == "5"
     assert beatmapset.title == "6"

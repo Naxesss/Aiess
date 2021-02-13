@@ -159,7 +159,7 @@ async def test_additional_details_legacy_thread():
 
 @pytest.mark.asyncio
 async def test_nom_comment_from_hype():
-    beatmapset = Beatmapset(1112303, artist="Fox Stevenson", title="Take You Down", creator=User(5745865, "Altai"), modes=["osu"], genre="g", language="l")
+    beatmapset = Beatmapset(1112303, artist="Fox Stevenson", title="Take You Down", creator=User(5745865, "Altai"), allow_api=False)
     nominate_event = Event(types.NOMINATE, from_string("2020-07-01T20:48:57+00:00"), beatmapset, user=User(2204515, "Mao"))
     
     discussion_json = json.loads(mock_discussion_json_nom_comment_1)
@@ -169,7 +169,7 @@ async def test_nom_comment_from_hype():
 
 @pytest.mark.asyncio
 async def test_nom_comment_none():
-    beatmapset = Beatmapset(1112303, artist="Fox Stevenson", title="Take You Down", creator=User(5745865, "Altai"), modes=["osu"], genre="g", language="l")
+    beatmapset = Beatmapset(1112303, artist="Fox Stevenson", title="Take You Down", creator=User(5745865, "Altai"), allow_api=False)
     nominate_event = Event(types.NOMINATE, from_string("2020-07-01T20:48:47+00:00"), beatmapset, user=User(8623835, "Peter"))
     
     discussion_json = json.loads(mock_discussion_json_nom_comment_1)
@@ -179,7 +179,7 @@ async def test_nom_comment_none():
 
 @pytest.mark.asyncio
 async def test_nom_comment_from_note():
-    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), modes=["osu"], genre="g", language="l")
+    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), allow_api=False)
     nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(5312547, "Lafayla"))
     
     discussion_json = json.loads(mock_discussion_json_nom_comment_2)
@@ -189,7 +189,7 @@ async def test_nom_comment_from_note():
 
 @pytest.mark.asyncio
 async def test_nom_comment_praise_then_suggestions():
-    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), modes=["osu"], genre="g", language="l")
+    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), allow_api=False)
     nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(896613, "Lasse"))
     
     discussion_json = json.loads(mock_discussion_json_nom_comment_2)
@@ -199,7 +199,7 @@ async def test_nom_comment_praise_then_suggestions():
 
 @pytest.mark.asyncio
 async def test_nom_comment_from_praise():
-    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), modes=["osu"], genre="g", language="l")
+    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), allow_api=False)
     nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(4, "mock user"))
     
     discussion_json = json.loads(mock_discussion_json_nom_comment_2)

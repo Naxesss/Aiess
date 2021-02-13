@@ -35,7 +35,7 @@ def test_correct_setup():
 @pytest.mark.asyncio
 @mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
 async def test_recent():
-    beatmapset = Beatmapset(1, "artist", "title", creator=User(2, "sometwo"), modes=["osu"])
+    beatmapset = Beatmapset(1, "artist", "title", creator=User(2, "sometwo"), modes=["osu"], allow_api=False)
     event1 = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     event2 = Event("qualify", from_string("2020-01-01 01:00:00"), beatmapset, user=User(4, "somefour"), content="nicely done")
 
@@ -74,7 +74,7 @@ async def test_recent_not_found():
 @pytest.mark.asyncio
 @mock.patch("bot.cmd_modules.cmd_recent.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
 async def test_recent_no_args():
-    beatmapset = Beatmapset(1, "artist", "title", creator=User(2, "sometwo"), modes=["osu"])
+    beatmapset = Beatmapset(1, "artist", "title", creator=User(2, "sometwo"), modes=["osu"], allow_api=False)
     event1 = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     event2 = Event("qualify", from_string("2020-01-01 01:00:00"), beatmapset, user=User(4, "somefour"), content="nicely done")
 
