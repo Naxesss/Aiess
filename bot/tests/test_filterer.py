@@ -2,6 +2,7 @@ import sys
 sys.path.append('..')
 
 import pytest
+import mock
 from datetime import datetime
 
 from aiess import Event, User, Beatmapset, Discussion, NewsPost
@@ -16,6 +17,9 @@ from bot.filterer import get_invalid_keys
 from bot.filterer import get_invalid_filters
 from bot.filterer import get_invalid_words
 from bot.filterer import is_valid
+
+def no_api_allowed(*args):
+    raise ValueError("The api should not be used here!")
 
 def test_escape():
     assert escape("withoutspace") == "withoutspace"
@@ -46,6 +50,7 @@ def test_dissect_user():
         "type:test"
     ]
 
+@mock.patch("aiess.objects.api.request_api", no_api_allowed)  # If we get this, simply add the new properties to the test!
 def test_dissect_beatmapset():
     user = User(2, "some two")
     beatmapset = Beatmapset(4, artist="yes", title="no", creator=user, modes=["osu", "catch"], genre="g", language="l")

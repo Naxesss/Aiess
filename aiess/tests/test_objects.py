@@ -1,4 +1,5 @@
 import pytest
+import mock
 from datetime import datetime
 
 from aiess.objects import User, Beatmapset, Discussion, Usergroup, NewsPost, Event
@@ -7,12 +8,23 @@ from aiess.errors import DeletedContextError
 from aiess.tests.mocks.api import beatmap as mock_beatmap
 from aiess.tests.mocks.api import old_beatmap as mock_old_beatmap
 
+def no_api_allowed(*args):
+    raise ValueError("The api should not be used here!")
+
+@mock.patch("aiess.objects.api.request_api", no_api_allowed)
 def test_user():
     user = User(101, "Generic Name")
 
     assert user.id == 101
     assert user.name == "Generic Name"
     assert str(user) == "Generic Name"
+
+@mock.patch("aiess.objects.api.request_api", no_api_allowed)
+def test_user_without_api():
+    user = User(14, allow_api=False)
+
+    assert user.id == 14
+    assert user.name is not None
 
 def test_user_get_name_from_api():
     user = User(2)
@@ -52,6 +64,7 @@ def test_user_str_id():
     user = User("101", "someone")
     assert user.id == 101
 
+@mock.patch("aiess.objects.api.request_api", no_api_allowed)
 def test_beatmapset():
     beatmapset = Beatmapset(41823, beatmapset_json=mock_old_beatmap.JSON)
 
@@ -66,6 +79,16 @@ def test_beatmapset():
 
     assert beatmapset.mode_str() == "[osu][taiko]"
     assert str(beatmapset) == "The Quick Brown Fox - The Big Black (mapped by Blue Dragon) [osu][taiko]"
+
+@mock.patch("aiess.objects.api.request_api", no_api_allowed)
+def test_beatmapset_without_api():
+    beatmapset = Beatmapset(4, allow_api=False)
+
+    assert beatmapset.artist   is not None
+    assert beatmapset.title    is not None
+    assert beatmapset.modes    is not None
+    assert beatmapset.language is not None
+    assert beatmapset.genre    is not None
 
 def test_beatmapset_int_artist_title():
     beatmapset = Beatmapset(41823, 5, 6, allow_api=False)
