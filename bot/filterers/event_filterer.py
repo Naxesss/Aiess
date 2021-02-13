@@ -175,6 +175,22 @@ filter_context = FilterContext(
             value_predicate = lambda value: value in ["osu", "taiko", "catch", "mania"],
             value_func      = lambda event: [escape(mode) for mode in event.beatmapset.modes] if event.beatmapset else None
         ),
+        Tag(
+            names           = ["genre"],
+            description     = "The genre of a beatmapset an event occurred on (e.g. \"rock\" for rock songs).",
+            example_values  = ["rock", "pop", "jazz"],
+            value_hint      = HINT_ANY,
+            value_predicate = lambda value: True,
+            value_func      = lambda event: [escape(event.beatmapset.genre)] if event.beatmapset else None
+        ),
+        Tag(
+            names           = ["language"],
+            description     = "The language of a beatmapset an event occurred on (e.g. \"english\" for songs in english).",
+            example_values  = ["english", "instrumental", "spanish"],
+            value_hint      = HINT_ANY,
+            value_predicate = lambda value: True,
+            value_func      = lambda event: [escape(event.beatmapset.language)] if event.beatmapset else None
+        ),
         # Discussion
         Tag(
             names           = ["discussion-id"],
