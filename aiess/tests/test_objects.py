@@ -38,6 +38,12 @@ def test_user_get_id_from_api():
     assert user.id == 2
     assert user.name == "peppy"
 
+def test_user_get_id_from_api_name_case():
+    user = User(name="PEPPY")
+
+    assert user.id == 2
+    assert user.name == "peppy"
+
 def test_user_no_args():
     with pytest.raises(ValueError) as err:
         User()
