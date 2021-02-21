@@ -198,8 +198,12 @@ filter_context = FilterContext(
             value_hint      = HINT_ANY,
             value_predicate = lambda value: True,
             value_func      = lambda event: [escape(tag) for tag in event.beatmapset.tags] if event.beatmapset else None,
-            # E.g. tags:"mappers' guild" -> tags:(mappers' and guild).
-            value_convert   = lambda value: ("(" + str.join(" and ", value.split(" ")) + ")") if " " in value else None
+            # E.g. tags:"mappers' guild" -> tags:(%mappers'% and %guild%).
+            value_convert   = lambda value: (
+                    ("(%" + str.join("% and %", value.split(" ")) + "%)")
+                    if (" " in value or not value.startswith("%") or not value.endswith("%"))
+                    else None
+                )
         ),
         # Discussion
         Tag(
