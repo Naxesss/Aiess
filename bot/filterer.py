@@ -23,16 +23,21 @@ class Tag():
     - `value_predicate` :
         A function given a string returning True if the string is a valid value for this tag.
     - `value_func` :
-        A function given an object returning a list of key:value pairs representing that object."""
+        A function given an object returning a list of key:value pairs representing that object.
+    - `value_convert` :
+        A function given a string value returning a either a new string value or None if no conversion is needed."""
     def __init__(
             self, names: List[str], description: str, example_values: List[str], value_hint: str,
-            value_predicate: Callable[[str], bool], value_func: Callable[[object], List[str]]):
+            value_predicate: Callable[[str], bool], value_func: Callable[[object], List[str]],
+            value_convert: Callable[[str], str]=None
+        ):
         self.names           = names
         self.description     = description
         self.example_values  = example_values
         self.value_hint      = value_hint
         self.value_predicate = value_predicate
         self.value_func      = value_func
+        self.value_convert   = value_convert
 
 class FilterContext():
     """Determines how any filter passed into this class should behave
@@ -80,11 +85,11 @@ class FilterContext():
             for and_split, _ in split_unescaped(or_split, AND_GATES):
                 without_not_gate, not_gate = extract_not(and_split)
                 if not_gate:
-                    if any(wildcard_sensitive_in(without_not_gate, kvpair) for kvpair in dissection):
+                    if self.test_kvpair(without_not_gate, dissection):
                         passes_and = False
                         break
                 else:
-                    if not any(wildcard_sensitive_in(and_split, kvpair) for kvpair in dissection):
+                    if not self.test_kvpair(and_split, dissection):
                         passes_and = False
                         break
             
@@ -92,6 +97,17 @@ class FilterContext():
                 return True
 
         return False
+
+    def test_kvpair(self, kvpair, dissections) -> bool:
+        """Returns true if this key-value pair filter (e.g. "type:nominate") exists within given dissections (e.g.
+        ["type:nominate", "creator:xyz", ...]). If the tag has a conversion function for the key-value pair, it
+        is ran first and its result used instead (e.g. tags:"abc efg" -> tags:abc and tags:efg)."""
+        for key, value in get_key_value_pairs(kvpair):
+            tag = self.get_tag(key)
+            if tag.value_convert is not None and tag.value_convert(value) is not None:
+                return self.test(f"{key}:{tag.value_convert(value)}", dissections)
+        
+        return any(wildcard_sensitive_in(kvpair, dissection) for dissection in dissections)
 
 def wildcard_sensitive_in(substring: str, full_string: str) -> bool:
     """Returns whether the given substring exists in the given full string,
