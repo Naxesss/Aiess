@@ -194,10 +194,12 @@ filter_context = FilterContext(
         Tag(
             names           = ["tag", "tags"],
             description     = "The tags of a beatmapset an event occurred on (e.g. \"featured\" and \"artist\" if \"featured artist\" is in the tags).",
-            example_values  = ["fa", "gder", "touhou"],
-            value_hint      = "Accepts any value, apart from whitespaces. To find e.g. \"mappers' guild\", do `tag:mappers' and tag:guild`.",
-            value_predicate = lambda value: " " not in value,
-            value_func      = lambda event: [escape(tag) for tag in event.beatmapset.tags] if event.beatmapset else None
+            example_values  = ["gder", "(mappers' and guild)", "(rock and instrumental)"],
+            value_hint      = HINT_ANY,
+            value_predicate = lambda value: True,
+            value_func      = lambda event: [escape(tag) for tag in event.beatmapset.tags] if event.beatmapset else None,
+            # E.g. tags:"mappers' guild" -> tags:(mappers' and guild).
+            value_convert   = lambda value: ("(" + str.join(" and ", value.split(" ")) + ")") if " " in value else None
         ),
         # Discussion
         Tag(
