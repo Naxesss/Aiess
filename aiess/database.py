@@ -434,7 +434,7 @@ class Database:
             image_url   = row[6]
             yield NewsPost(_id, title, preview, author, slug, image_url)
 
-    def retrieve_group_user(self, where: str, where_values: tuple=None) -> NewsPost:
+    def retrieve_group_user(self, where: str, where_values: tuple=None) -> Tuple[Usergroup, User]:
         """Returns the first group user relation from the database matching the given WHERE clause,
         or None if no such group user relation is stored."""
         return next(self.retrieve_group_users(where + " LIMIT 1", where_values), None)
