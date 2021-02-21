@@ -383,7 +383,7 @@ class Database:
             modes    = self.retrieve_beatmapset_modes(_id)
             genre    = row[4]
             language = row[5]
-            tags     = row[6].split(" ")
+            tags     = row[6].split(" ") if row[6] else ""
             yield Beatmapset(_id, artist, title, creator, modes, genre, language, tags)
 
     def retrieve_discussion(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Discussion:
