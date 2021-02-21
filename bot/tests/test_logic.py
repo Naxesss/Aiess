@@ -146,8 +146,6 @@ def test_split_unescaped_cache_timing():
         assert next(generator, None) == ("user:three", " and ")
     delta_time_uncached = datetime.utcnow() - time
     
-    assert delta_time_uncached.total_seconds() > 0.25
-    
     time = datetime.utcnow()
     generator = split_unescaped("type:\"one and two\" and user:three and " * iterations, (" and ",))
     for i in range(iterations - 1):
@@ -156,7 +154,7 @@ def test_split_unescaped_cache_timing():
     delta_time_cached = datetime.utcnow() - time
 
     # Retrieving from cache should be approximately 10 times faster.
-    assert delta_time_cached.total_seconds() < 0.04
+    assert delta_time_uncached.total_seconds() / delta_time_cached.total_seconds() > 10
 
 def test_de_morgans_law():
     assert de_morgans_law("not (A or B and C)") == "(not A and (not B or not C))"
