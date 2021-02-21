@@ -58,7 +58,7 @@ async def receive_command(command: Command) -> bool:
     # Let the user know the command was recognized, and that a response should follow.
     await command.trigger_typing()
 
-    if not permissions.can_execute(command):
+    if not await permissions.can_execute(command):
         await command.respond(
             response = f"✗ Lacking permission.",
             embed = permissions_embed(

@@ -261,3 +261,15 @@ def test_general_help_embed_custom_prefix():
 
     assert "**`&test/&alias <one> <two> [three]`**" in embed.fields[0].value
     assert "**`&test2`**" in embed.fields[1].value
+
+def test_general_help_embed_wip():
+    registered_commands.clear()
+    registered_categories.clear()
+
+    register(category="A Test Category", names=["a", "b"])(None)
+    register(category="A Test Category", names=["c", "d"], wip=True)(None)
+    
+    embed = general_help_embed()
+
+    assert "**`+a/+b`**" in embed.fields[0].value
+    assert "**`+c/+d`**" not in embed.fields[0].value

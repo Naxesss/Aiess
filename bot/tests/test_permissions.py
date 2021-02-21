@@ -1,9 +1,10 @@
 import sys
 sys.path.append('..')
 
+import pytest
 import mock
 
-from bot.tests.commands.mock_command import MockMessage, MockChannel, MockDMChannel, MockGuild, MockUser, MockRole
+from bot.tests.commands.mock_command import MockMessage, MockChannel, MockDMChannel, MockGuild, MockUser, MockRole, MockCommand
 from bot.objects import CommandPermission
 from bot.commands import register, get_wrapper
 from bot.commands import FunctionWrapper, Command
@@ -13,7 +14,13 @@ from bot.permissions import set_permission_filter, get_permission_filter
 
 def setup_module():
     register(
-        category = None, names = ["test1", "test2", "test3"]
+        category = None,
+        names    = ["test1", "test2", "test3"]
+    )(None)
+    register(
+        category = None,
+        names    = ["wip1", "wip2"],
+        wip      = True
     )(None)
 
 def setup_function():
@@ -81,7 +88,8 @@ def test_load():
     assert permissions.cache
     assert permissions.cache[3]["test1"] == "filter"
 
-def test_can_execute_channel_perm():
+@pytest.mark.asyncio
+async def test_can_execute_channel_perm():
     command_wrapper = get_wrapper(name="test1")
     mock_message = MockMessage(
         channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
@@ -91,9 +99,10 @@ def test_can_execute_channel_perm():
 
     set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="channel:<#44>")
     
-    assert permissions.can_execute(command)
+    assert await permissions.can_execute(command)
 
-def test_can_execute_channel_perm_fail():
+@pytest.mark.asyncio
+async def test_can_execute_channel_perm_fail():
     command_wrapper = get_wrapper(name="test1")
     mock_message = MockMessage(
         channel = MockChannel(_id=9, guild=MockGuild(_id=3)),
@@ -103,9 +112,10 @@ def test_can_execute_channel_perm_fail():
 
     set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="channel:<#44>")
     
-    assert not permissions.can_execute(command)
+    assert not await permissions.can_execute(command)
 
-def test_can_execute_role_perm():
+@pytest.mark.asyncio
+async def test_can_execute_role_perm():
     command_wrapper = get_wrapper(name="test1")
     mock_message = MockMessage(
         channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
@@ -115,9 +125,10 @@ def test_can_execute_role_perm():
 
     set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="role:<@&66>")
     
-    assert permissions.can_execute(command)
+    assert await permissions.can_execute(command)
 
-def test_can_execute_role_perm_fail():
+@pytest.mark.asyncio
+async def test_can_execute_role_perm_fail():
     command_wrapper = get_wrapper(name="test1")
     mock_message = MockMessage(
         channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
@@ -127,9 +138,10 @@ def test_can_execute_role_perm_fail():
 
     set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="role:<@&66>")
     
-    assert not permissions.can_execute(command)
+    assert not await permissions.can_execute(command)
 
-def test_can_execute_user_perm():
+@pytest.mark.asyncio
+async def test_can_execute_user_perm():
     command_wrapper = get_wrapper(name="test1")
     mock_message = MockMessage(
         channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
@@ -139,9 +151,10 @@ def test_can_execute_user_perm():
 
     set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="user:<@88>")
     
-    assert permissions.can_execute(command)
+    assert await permissions.can_execute(command)
 
-def test_can_execute_user_perm_fail():
+@pytest.mark.asyncio
+async def test_can_execute_user_perm_fail():
     command_wrapper = get_wrapper(name="test1")
     mock_message = MockMessage(
         channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
@@ -151,31 +164,96 @@ def test_can_execute_user_perm_fail():
 
     set_permission_filter(guild_id=3, command_wrapper=command_wrapper, permission_filter="user:<@88>")
     
-    assert not permissions.can_execute(command)
+    assert not await permissions.can_execute(command)
 
-def test_can_execute_default():
+@pytest.mark.asyncio
+async def test_can_execute_default():
     mock_message = MockMessage(
         channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
         author  = MockUser(_id=2, is_admin=False)
     )
     command = Command(name="test2", context=mock_message)
     
-    assert not permissions.can_execute(command)
+    assert not await permissions.can_execute(command)
 
-def test_can_execute_admin():
+@pytest.mark.asyncio
+async def test_can_execute_admin():
     mock_message = MockMessage(
         channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
         author  = MockUser(_id=2, is_admin=True)
     )
     command = Command(name="test2", context=mock_message)
     
-    assert permissions.can_execute(command)
+    assert await permissions.can_execute(command)
 
-def test_can_execute_dm():
+@pytest.mark.asyncio
+async def test_can_execute_dm():
     mock_message = MockMessage(
         channel = MockDMChannel(_id=44),
         author  = MockUser(_id=2, is_dm=True)
     )
     command = Command(name="test2", context=mock_message)
     
-    assert permissions.can_execute(command)
+    assert await permissions.can_execute(command)
+
+
+
+async def application_info():
+    app_info_mock = mock.MagicMock()
+    app_info_mock.owner = mock.MagicMock()
+    app_info_mock.owner.id = 4
+    return app_info_mock
+
+async def application_info_owner():
+    app_info_mock = mock.MagicMock()
+    app_info_mock.owner = mock.MagicMock()
+    app_info_mock.owner.id = 2
+    return app_info_mock
+
+@pytest.mark.asyncio
+async def test_can_execute_wip():
+    mock_message = MockMessage(
+        channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=2, is_admin=False)
+    )
+    mock_client = mock.MagicMock()
+    mock_client.application_info = application_info
+    command = MockCommand(name="wip2", context=mock_message, client=mock_client)
+    
+    assert not await permissions.can_execute(command)
+
+@pytest.mark.asyncio
+async def test_can_execute_wip_admin():
+    mock_message = MockMessage(
+        channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=2, is_admin=True)
+    )
+    mock_client = mock.MagicMock()
+    mock_client.application_info = application_info
+    command = MockCommand(name="wip2", context=mock_message, client=mock_client)
+    
+    assert not await permissions.can_execute(command)
+
+@pytest.mark.asyncio
+async def test_can_execute_wip_dm():
+    mock_message = MockMessage(
+        channel = MockDMChannel(_id=44),
+        author  = MockUser(_id=2, is_dm=True)
+    )
+    mock_client = mock.MagicMock()
+    mock_client.application_info = application_info
+    command = MockCommand(name="wip2", context=mock_message, client=mock_client)
+    
+    assert not await permissions.can_execute(command)
+
+@pytest.mark.asyncio
+async def test_can_execute_wip_dev():
+    mock_message = MockMessage(
+        channel = MockChannel(_id=44, guild=MockGuild(_id=3)),
+        author  = MockUser(_id=2, is_admin=False)
+    )
+    mock_client = mock.MagicMock()
+    mock_client.application_info = application_info_owner
+    command = MockCommand(name="wip2", context=mock_message, client=mock_client)
+    
+    assert await permissions.can_execute(command)

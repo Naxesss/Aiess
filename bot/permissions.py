@@ -36,7 +36,7 @@ def set_permission_filter(guild_id: int, command_wrapper: FunctionWrapper, permi
         Database(DEFAULT_DB_NAME).insert_permission(CommandPermission(guild_id, command_wrapper.names[0], permission_filter))
     load()
 
-def can_execute(command: Command) -> bool:
+async def can_execute(command: Command) -> bool:
     """Returns whether the given command has permissions to execute within its current context
     (channel/author/roles of that guild). Administrators bypass any permission."""
     command_wrapper = commands.get_wrapper(command.name)
@@ -47,4 +47,9 @@ def can_execute(command: Command) -> bool:
     # The `guild_permissions` attribute is only available in guilds, for DM channels we skip this.
     is_admin_or_dm = not hasattr(caller, "guild_permissions") or caller.guild_permissions.administrator
 
-    return has_permission or is_admin_or_dm
+    if not command_wrapper.wip:
+        return has_permission or is_admin_or_dm
+    else:
+        # Only the owner of the bot should be able to use WIP commands.
+        app_info = await command.client.application_info()
+        return caller.id == app_info.owner.id

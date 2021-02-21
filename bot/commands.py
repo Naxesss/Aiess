@@ -89,7 +89,9 @@ class FunctionWrapper():
     def __init__(
             self, category: str, names: str, execute: Callable,
             required_args: List[str]=[], optional_args: List[str]=[],
-            description: str=None, example_args: List[str]=[]):
+            description: str=None, example_args: List[str]=[],
+            wip: bool=False
+        ):
         self.category = category
         self.names = names
         self.execute = execute
@@ -97,6 +99,7 @@ class FunctionWrapper():
         self.optional_args = optional_args
         self.description = description
         self.example_args = example_args
+        self.wip = wip
     
     def __str__(self):
         names = "/".join(f"{{0}}{name}" for name in self.names)
@@ -115,7 +118,8 @@ EVENTS_CATEGORY = "Events"
 T = TypeVar("T")
 def register(
         category: str, names: str, required_args: List[str]=[], optional_args: List[str]=[],
-        description: str=None, example_args: List[str]=[]) -> Callable[[Callable[..., T]], T]:
+        description: str=None, example_args: List[str]=[], wip: bool=False
+    ) -> Callable[[Callable[..., T]], T]:
     """A decorator which registers the respective function as a command
     able to be executed by the given names (e.g. "ping" in "+ping"), optionally
     with required and/or optional arguments as well."""
@@ -125,7 +129,7 @@ def register(
             registered_aliases[name] = names[0]
         registered_categories[category].append(names[0])
         registered_commands[names[0]] = FunctionWrapper(
-            category, names, execute, required_args, optional_args, description, example_args
+            category, names, execute, required_args, optional_args, description, example_args, wip
         )
         return execute
     
@@ -171,7 +175,9 @@ def general_help_embed(prefix: str=DEFAULT_PREFIX) -> Embed:
         embed.add_field(
             name   = category,
             value  = format_dotted_list(
-                f"**{registered_commands[name]}**".replace("{0}", prefix) for name in registered_categories[category]
+                f"**{registered_commands[name]}**".replace("{0}", prefix)
+                for name in registered_categories[category]
+                if not get_wrapper(name).wip  # WIP commands can't be used by regular users, hence skip.
             ),
             inline = False
         )
