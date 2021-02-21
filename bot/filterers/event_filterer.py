@@ -349,7 +349,8 @@ TAG_TO_SQL = {
     filter_context.get_tag("type")                  : "type=%s",
     filter_context.get_tag("content")               : "events.content LIKE %s",
     filter_context.get_tag("discussion-tab")        : "discussion.tab LIKE %s",
-    filter_context.get_tag("discussion-difficulty") : "discussion.difficulty LIKE %s"
+    filter_context.get_tag("discussion-difficulty") : "discussion.difficulty LIKE %s",
+    filter_context.get_tag("tags")                  : "beatmapset.tags LIKE %s"
 }
 
 def filter_to_sql(_filter: str) -> Tuple[str, tuple]:
@@ -379,6 +380,7 @@ def filter_to_sql(_filter: str) -> Tuple[str, tuple]:
             continue
 
         values = []
+        use_and = False
 
         # Support type aliases (e.g. "resolve" should be converted to "issue-resolve").
         if key.lower() == "type":
@@ -392,12 +394,19 @@ def filter_to_sql(_filter: str) -> Tuple[str, tuple]:
                 if value.lower() in GROUP_ALIASES[group]:
                     values.append(group)
 
+        # Ease tag search (e.g. "tags:"featured artist"" should be converted to "tags:%featured% and tags:%artist%").
+        if key.lower() in ["tag", "tags"]:
+            for split in value.split(" "):
+                values.append("%" + split + "%")
+            use_and = True
+
         if not values:
             # Our value is not an alias, so we can use it directly.
             values.append(value)
 
-        if len(values) > 1: converted_words.append("(" + " OR ".join([TAG_TO_SQL[tag]] * len(values)) + ")")
-        else:               converted_words.append(TAG_TO_SQL[tag])
+        if   len(values) > 1 and use_and: converted_words.append("(" + " AND ".join([TAG_TO_SQL[tag]] * len(values)) + ")")
+        elif len(values) > 1:             converted_words.append("(" + " OR ".join([TAG_TO_SQL[tag]] * len(values)) + ")")
+        else:                             converted_words.append(TAG_TO_SQL[tag])
         converted_values.extend(values)
     
     return (" ".join(converted_words), tuple(converted_values))
