@@ -193,9 +193,10 @@ def test_passes_filter_event_object():
     assert not filter_context.test("type:reply", event)
 
 def test_passes_filter_conversion():
-    assert filter_context.test("tags:\"mappers' guild\"",   ["tags:mappers'", "tags:guild"])
-    assert filter_context.test("tag:\"mappers' guild\"",    ["tag:mappers'",  "tag:guild" ])
-    assert filter_context.test("tags:(mappers' and guild)", ["tags:mappers'", "tags:guild"])
+    assert filter_context.test("tags:guild", ["tags:abcguild123"])
+    assert filter_context.test("tags:(mappers' and guild)", ["tags:abcmappers'123", "tags:abcguild123"])
+    assert filter_context.test("tags:\"mappers' guild\"",   ["tags:abcmappers'123", "tags:abcguild123"])
+    assert filter_context.test("tag:\"mappers' guild\"",    ["tag:abcmappers'123",  "tag:abcguild123" ])
 
 
 
