@@ -192,6 +192,11 @@ def test_passes_filter_event_object():
     assert filter_context.test("type:nominate and user:sometwo", event)
     assert not filter_context.test("type:reply", event)
 
+def test_passes_filter_conversion():
+    assert filter_context.test("tags:\"mappers' guild\"",   ["tags:mappers'", "tags:guild"])
+    assert filter_context.test("tag:\"mappers' guild\"",    ["tag:mappers'",  "tag:guild" ])
+    assert filter_context.test("tags:(mappers' and guild)", ["tags:mappers'", "tags:guild"])
+
 
 
 def test_get_tag():
