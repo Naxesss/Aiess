@@ -104,8 +104,8 @@ def test_format_link_group_event(group_event):
 async def test_format_embed(suggestion_event):
     embed: Embed = await format_embed(suggestion_event)
     
-    assert embed.fields[0].name.startswith(":yellow_circle:\u2000Suggestion (**")
-    assert embed.fields[0].name.endswith("** ago)")
+    assert embed.fields[0].name.startswith(":yellow_circle:\u2000Suggestion (<t:")
+    assert embed.fields[0].name.endswith(":R>)")
     assert (
         embed.fields[0].value ==
         "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]"
@@ -134,8 +134,8 @@ async def test_format_embed_no_timeago(suggestion_event):
 async def test_format_embed_newspost(newspost_event):
     embed: Embed = await format_embed(newspost_event)
     
-    assert embed.fields[0].name.startswith("title (**")
-    assert embed.fields[0].name.endswith("** ago)")
+    assert embed.fields[0].name.startswith("title (<t:")
+    assert embed.fields[0].name.endswith(":R>)")
     assert embed.fields[0].value == "quite long preview" * 10
     assert embed.footer.text == "sometwo"
     assert embed.footer.icon_url == "https://a.ppy.sh/2"
@@ -151,20 +151,20 @@ async def test_format_embed_context(kudosu_gain_event):
     assert embed.fields[1].value == format_context_field_value(kudosu_gain_event)
 
 def test_format_field_name(suggestion_event):
-    assert format_field_name(suggestion_event).startswith(":yellow_circle:\u2000Suggestion (**")
-    assert format_field_name(suggestion_event).endswith("** ago)")
+    assert format_field_name(suggestion_event).startswith(":yellow_circle:\u2000Suggestion (<t:")
+    assert format_field_name(suggestion_event).endswith(":R>)")
 
 def test_format_field_name_qualify(qualify_event):
-    assert format_field_name(qualify_event).startswith(":heart:\u2000Qualified (**")
-    assert format_field_name(qualify_event).endswith("** ago)")
+    assert format_field_name(qualify_event).startswith(":heart:\u2000Qualified (<t:")
+    assert format_field_name(qualify_event).endswith(":R>)")
 
 def test_format_field_name_newspost(newspost_event):
-    assert format_field_name(newspost_event).startswith("title (**")
-    assert format_field_name(newspost_event).endswith("** ago)")
+    assert format_field_name(newspost_event).startswith("title (<t:")
+    assert format_field_name(newspost_event).endswith(":R>)")
 
 def test_format_field_name_group_event(group_event):
-    assert format_field_name(group_event).startswith(":performing_arts:\u2000Added (< **")
-    assert format_field_name(group_event).endswith("** ago)")
+    assert format_field_name(group_event).startswith(":performing_arts:\u2000Added (< <t:")
+    assert format_field_name(group_event).endswith(":R>)")
 
 def test_format_field_name_skip_timeago(suggestion_event):
     suggestion_event.time = datetime.utcnow() - timedelta(minutes=5)
@@ -172,7 +172,9 @@ def test_format_field_name_skip_timeago(suggestion_event):
 
 def test_format_field_name_dont_skip_timeago(suggestion_event):
     suggestion_event.time = datetime.utcnow() - timedelta(minutes=20)
-    assert format_field_name(suggestion_event, skip_timeago_if_recent=True) == ":yellow_circle:\u2000Suggestion (**20 minutes** ago)"
+    formatted = format_field_name(suggestion_event, skip_timeago_if_recent=True)
+    assert formatted.startswith(":yellow_circle:\u2000Suggestion (<t:")
+    assert formatted.endswith(":R>)")
 
 @pytest.mark.asyncio
 async def test_format_field_value(suggestion_event):
@@ -428,19 +430,8 @@ def test_format_time_numeric_deltatime():
     assert format_time(10956, min_unit=None, max_units=None) == "3 h 2 min 36 s"
 
 def test_format_timeago():
-    with mock.patch("bot.formatter.datetime") as mock_datetime:
-        # Mock `datetime.utcnow`, but retain the original datetime class functionality through the `side_effect` attribute.
-        mock_datetime.utcnow.return_value = from_string("2020-01-01 05:30:06")
-        mock_datetime.side_effect = datetime
-
-        assert format_timeago(from_string("2020-01-01 00:00:00")) == "**5 hours** ago"
-
-def test_format_timeago_not_bold():
-    with mock.patch("bot.formatter.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-01-01 05:30:06")
-        mock_datetime.side_effect = datetime
-
-        assert format_timeago(from_string("2020-01-01 00:00:00"), bold=False) == "5 hours ago"
+    # 1577833200 is the unix timestamp for 2020-01-01 00:00:00.
+    assert format_timeago(from_string("2020-01-01 00:00:00")) == "<t:1577833200:R>"
 
 def test_format_dotted_list():
     assert format_dotted_list(["abc", "def", "ghi"]) == "∙\u00a0abc\n∙\u00a0def\n∙\u00a0ghi"
