@@ -239,6 +239,8 @@ class Database:
         Also inserts/updates the creator into the users table."""
         self.insert_user(beatmapset.creator)
         self.insert_beatmapset_modes(beatmapset)
+        for beatmap in beatmapset.beatmaps:
+            self.insert_beatmap(beatmap)
         self.insert_table_data(
             "beatmapsets",
             dict(
@@ -249,6 +251,28 @@ class Database:
                 genre      = beatmapset.genre,
                 language   = beatmapset.language,
                 tags       = str.join(" ", beatmapset.tags)
+            )
+        )
+    
+    def insert_beatmap(self, beatmap: Beatmap) -> None:
+        """Inserts/updates the given beatmap object into the beatmaps table."""
+        if beatmap is None:
+            # Can happen in cases where a beatmap is removed and can no longer have properties be retrieved.
+            return
+        
+        self.insert_table_data(
+            "beatmaps",
+            dict(
+                id            = beatmap.id,
+                beatmapset_id = beatmap.beatmapset_id,
+                version       = beatmap.version,
+                draintime     = beatmap.draintime,
+                sr_total      = beatmap.sr_total,
+                favourites    = beatmap.favourites,
+                userrating    = beatmap.userrating,
+                playcount     = beatmap.playcount,
+                passcount     = beatmap.passcount,
+                updated_at    = datetime.utcnow()
             )
         )
     
