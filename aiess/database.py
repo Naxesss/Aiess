@@ -5,7 +5,7 @@ from typing import List, Generator, Tuple, Callable
 from enum import Enum
 from datetime import datetime, timedelta
 
-from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost, Usergroup
+from aiess.objects import User, Beatmapset, BeatmapsetStatus, Beatmap, Discussion, Event, NewsPost, Usergroup
 from aiess.settings import DB_CONFIG
 from aiess.logger import log
 from aiess.common import anext
@@ -148,9 +148,19 @@ class Database:
 
         return self.__execute_dict(query, **new_column_dict)
 
-    def retrieve_table_data(self, table: str, where: str=None, where_values: tuple=None, selection: str="*") -> List[tuple]:
+    def retrieve_table_data(
+            self, table: str, where: str=None, where_values: tuple=None, selection: str="*",
+            group_by: str=None, order_by: str=None, limit: int=None
+        ) -> List[tuple]:
         """Returns all rows from the table where the WHERE clause applies (e.g. `where` as "type=%s AND id=%s" and 
         `where_values` as ("nominate", 5)), if specified, otherwise any data present in the table."""
+        group_by = f"\nGROUP BY {group_by}" if group_by else ""
+        order_by = f"\nORDER BY {order_by}" if order_by else ""
+        limit    = f"\nLIMIT {limit}" if limit else ""
+
+        if where and ("ORDER BY" in where or "LIMIT" in where):
+            log("WARNING | Found special in `where` variable. This should probably be in `order_by`/`limit` variables.")
+
         return self._execute("""
             SELECT %(selection)s FROM %(db_name)s.%(table)s
             WHERE %(where)s
@@ -159,6 +169,11 @@ class Database:
                 db_name   = self.db_name,
                 table     = table,
                 where     = where if where else "TRUE"
+            ) +
+            (
+                group_by +
+                order_by +
+                limit
             ),
             where_values
         )
@@ -371,7 +386,7 @@ class Database:
                 image_url   = newspost.image_url
             )
         )
-    
+
     def insert_group_user(self, group: Usergroup, user: User) -> None:
         """Inserts/updates the given user to group relation into the group_users table.
         Also inserts/updates the associated user (i.e. whoever got added/removed)."""
@@ -411,17 +426,32 @@ class Database:
             )
         )
     
-    def retrieve_user(self, where: str, where_values: tuple=None) -> User:
+    def retrieve_user(self, where: str, where_values: tuple=None, group_by: str=None, order_by: str=None) -> User:
         """Returns the first user from the database matching the given WHERE clause, or None if no such user is stored."""
-        return next(self.retrieve_users(where + " LIMIT 1", where_values), None)
+        return next(
+            self.retrieve_users(
+                where        = where,
+                where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1
+            ),
+            None
+        )
     
-    def retrieve_users(self, where: str, where_values: tuple=None) -> Generator[User, None, None]:
+    def retrieve_users(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None
+        ) -> Generator[User, None, None]:
         """Returns a generator of all users from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
             table        = "users",
             where        = where,
             where_values = where_values,
-            selection    = "id, name"
+            selection    = "id, name",
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
         )
         for row in (fetched_rows or []):
             _id  = row[0]
@@ -442,17 +472,32 @@ class Database:
             modes.append(row[0])
         return modes
     
-    def retrieve_beatmapset(self, where: str, where_values: tuple=None) -> Beatmapset:
+    def retrieve_beatmapset(self, where: str, where_values: tuple=None, group_by: str=None, order_by: str=None) -> Beatmapset:
         """Returns the first beatmapset from the database matching the given WHERE clause, or None if no such beatmapset is stored."""
-        return next(self.retrieve_beatmapsets(where + " LIMIT 1", where_values), None)
+        return next(
+            self.retrieve_beatmapsets(
+                where        = where,
+                where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1
+            ),
+            None
+        )
     
-    def retrieve_beatmapsets(self, where: str, where_values: tuple=None) -> Generator[Beatmapset, None, None]:
+    def retrieve_beatmapsets(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None
+        ) -> Generator[Beatmapset, None, None]:
         """Returns a generator of all beatmapsets from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
             table        = "beatmapsets",
             where        = where,
             where_values = where_values,
-            selection    = "id, title, artist, creator_id, genre, language, tags"
+            selection    = "id, title, artist, creator_id, genre, language, tags",
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
         )
         for row in (fetched_rows or []):
             _id      = row[0]
@@ -474,19 +519,38 @@ class Database:
             
             yield beatmapset
 
-    def retrieve_discussion(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Discussion:
+    def retrieve_discussion(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, beatmapset: Beatmapset=None
+        ) -> Discussion:
         """Returns the first discussion from the database matching the given WHERE clause, or None if no such discussion is stored.
         Also retrieves the associated beatmapset from the database if not supplied."""
-        return next(self.retrieve_discussions(where + " LIMIT 1", where_values), None)
+        return next(
+            self.retrieve_discussions(
+                where        = where,
+                where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1,
+                beatmapset   = beatmapset
+            ),
+            None
+        )
     
-    def retrieve_discussions(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Generator[Discussion, None, None]:
+    def retrieve_discussions(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None, beatmapset: Beatmapset=None
+        ) -> Generator[Discussion, None, None]:
         """Returns a generator of all discussions from the database matching the given WHERE clause.
         Also retrieves the associated beatmapset from the database if not supplied."""
         fetched_rows = self.retrieve_table_data(
             table        = "discussions", 
             where        = where,
             where_values = where_values,
-            selection    = "id, beatmapset_id, user_id, content, tab, difficulty"
+            selection    = "id, beatmapset_id, user_id, content, tab, difficulty",
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
         )
         for row in (fetched_rows or []):
             _id     = row[0]
@@ -497,18 +561,49 @@ class Database:
             tab        = row[4]
             difficulty = row[5]
             yield Discussion(_id, beatmapset, user, content, tab, difficulty)
-    
-    def retrieve_newspost(self, where: str, where_values: tuple=None) -> NewsPost:
+
+    def retrieve_beatmapset_status(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, beatmapset: Beatmapset=None
+        ) -> BeatmapsetStatus:
+        """Returns the first status from the database matching the given WHERE clause, or None if no such status is stored.
+        Also retrieves the associated beatmapset from the database if not supplied."""
+        return next(
+            self.retrieve_beatmapset_statuses(
+                where        = where,
+                where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1,
+                beatmapset   = beatmapset
+            ),
+            None
+        )
         """Returns the first newspost from the database matching the given WHERE clause, or None if no such newspost is stored."""
-        return next(self.retrieve_newsposts(where + " LIMIT 1", where_values), None)
+        return next(
+            self.retrieve_newsposts(
+                where        = where,
+                where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1
+            ),
+            None
+        )
     
-    def retrieve_newsposts(self, where: str, where_values: tuple=None) -> Generator[NewsPost, None, None]:
+    def retrieve_newsposts(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None
+        ) -> Generator[NewsPost, None, None]:
         """Returns a generator of all newsposts from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
             table        = "newsposts",
             where        = where,
             where_values = where_values,
-            selection    = "id, title, preview, author_id, author_name, slug, image_url"
+            selection    = "id, title, preview, author_id, author_name, slug, image_url",
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
         )
         for row in (fetched_rows or []):
             _id         = row[0]
@@ -522,42 +617,66 @@ class Database:
             image_url   = row[6]
             yield NewsPost(_id, title, preview, author, slug, image_url)
 
-    def retrieve_group_user(self, where: str, where_values: tuple=None) -> Tuple[Usergroup, User]:
+    def retrieve_group_user(self, where: str, where_values: tuple=None, group_by: str=None, order_by: str=None) -> Tuple[Usergroup, User]:
         """Returns the first group user relation from the database matching the given WHERE clause,
         or None if no such group user relation is stored."""
-        return next(self.retrieve_group_users(where + " LIMIT 1", where_values), None)
+        return next(
+            self.retrieve_group_users(
+                where        = where,
+                where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1
+            ),
+            None
+        )
 
-    def retrieve_group_users(self, where: str, where_values: tuple=None) -> Generator[Tuple[Usergroup, User], None, None]:
+    def retrieve_group_users(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None
+        ) -> Generator[Tuple[Usergroup, User], None, None]:
         """Returns a generator of all group user relations from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
             table        = "group_users",
             where        = where,
             where_values = where_values,
-            selection    = "group_id, user_id"
+            selection    = "group_id, user_id",
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
         )
         for row in (fetched_rows or []):
             group = Usergroup(row[0])
             user  = self.retrieve_user("id=%s", (row[1],))
             yield (group, user)
 
-    async def retrieve_event(self, where: str, where_values: tuple=None, extensive: bool=False) -> Event:
+    async def retrieve_event(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, extensive: bool=False
+        ) -> Event:
         """Returns the first event from the database matching the given WHERE clause, or None if no such event is stored."""
         return await anext(
             self.retrieve_events(
-                where        = where + " LIMIT 1",
+                where        = where,
                 where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1,
                 extensive    = extensive
             ),
             default_value = None
         )
     
-    async def retrieve_events(self, where: str, where_values: tuple=None, extensive: bool=False) -> Generator[Event, None, None]:
+    async def retrieve_events(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None, extensive: bool=False
+        ) -> Generator[Event, None, None]:
         """Returns an asynchronous generator of all events from the database matching the given WHERE clause.
         Optionally retrieve extensively so that more can be queried (e.g. user name, beatmap creator/artist/title)."""
         if not extensive:
-            fetched_rows = self.__fetch_events(where, where_values)
+            fetched_rows = self.__fetch_events(where, where_values, order_by, limit)
         else:
-            fetched_rows = self.__fetch_events_extensive(where, where_values)
+            fetched_rows = self.__fetch_events_extensive(where, where_values, order_by, limit)
         
         for row in (fetched_rows or []):
             await asyncio.sleep(0)  # Return control back to the event loop, granting other tasks a window to start/resume.
@@ -571,15 +690,18 @@ class Database:
             content    = row[8]
             yield Event(_type, time, beatmapset, discussion, user, group, newspost, content=content)
     
-    def __fetch_events(self, where: str, where_values: tuple=None):
+    def __fetch_events(self, where: str, where_values: tuple=None, order_by: str=None, limit: int=None):
         return self.retrieve_table_data(
             table        = "events",
             where        = where,
             where_values = where_values,
-            selection    = "type, time, beatmapset_id, discussion_id, user_id, group_id, group_mode, news_id, content"
+            selection    = "type, time, beatmapset_id, discussion_id, user_id, group_id, group_mode, news_id, content",
+            group_by     = "events.id",
+            order_by     = order_by,
+            limit        = limit
         )
 
-    def __fetch_events_extensive(self, where: str, where_values: tuple=None):
+    def __fetch_events_extensive(self, where: str, where_values: tuple=None, order_by: str=None, limit: int=None):
         return self.retrieve_table_data(
             table        = f"""events
                 LEFT JOIN {self.db_name}.discussions AS discussion ON events.discussion_id=discussion.id
@@ -591,7 +713,29 @@ class Database:
                 LEFT JOIN {self.db_name}.beatmapset_modes AS modes ON beatmapset.id=modes.beatmapset_id""",
             where        = where,
             where_values = where_values,
-            selection    = "events.type, events.time, events.beatmapset_id, events.discussion_id, events.user_id, events.group_id, events.group_mode, events.news_id, events.content"
+            selection    = "events.type, events.time, events.beatmapset_id, events.discussion_id, events.user_id, events.group_id, events.group_mode, events.news_id, events.content",
+            group_by     = "events.id",  # Ensures we don't return the same event more than once.
+            order_by     = order_by,
+            limit        = limit
+        )
+    
+    def __fetch_events_extensive_count(self, where: str, where_values: tuple=None):
+        return self.retrieve_table_data(
+            table        = f"""events
+                LEFT JOIN {self.db_name}.discussions AS discussion ON events.discussion_id=discussion.id
+                LEFT JOIN {self.db_name}.beatmapsets AS beatmapset ON events.beatmapset_id=beatmapset.id
+                LEFT JOIN {self.db_name}.newsposts AS newspost ON events.news_id=newspost.id
+                LEFT JOIN {self.db_name}.users AS author ON discussion.user_id=author.id
+                LEFT JOIN {self.db_name}.users AS creator ON beatmapset.creator_id=creator.id
+                LEFT JOIN {self.db_name}.users AS user ON events.user_id=user.id
+                LEFT JOIN {self.db_name}.beatmapset_modes AS modes ON beatmapset.id=modes.beatmapset_id
+                    LEFT JOIN {self.db_name}.beatmapset_status AS status ON events.beatmapset_id=status.beatmapset_id
+                LEFT JOIN {self.db_name}.status_nominators AS status_nominator ON status.id=status_nominator.status_id
+                LEFT JOIN {self.db_name}.users AS nominator ON status_nominator.nominator_id=nominator.id""",
+            where        = where,
+            where_values = where_values,
+            selection    = "COUNT(events.id)",
+            group_by     = "events.id"
         )
 
 class CachedDatabase(Database):
