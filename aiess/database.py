@@ -331,6 +331,29 @@ class Database:
             )
         )
     
+    def insert_obv_sev_event(self, event: Event) -> None:
+        """Inserts/updates the given SEV type event data into the SEV table.
+        Parses the obv/sev from the content of the event (e.g. "2/1")."""
+        if event.type != types.SEV:
+            raise ValueError("Cannot insert an event as obv/sev without being of SEV type.")
+        
+        splits = event.content.split("/")
+        obv = int(splits[0]) if splits[0] != "?" else None
+        sev = int(splits[1]) if splits[1] != "?" else None
+        self.insert_obv_sev(event.discussion, obv, sev)
+
+    def insert_obv_sev(self, discussion: Discussion, obv: int, sev: int) -> None:
+        """Inserts/updates the given obv/sev and associates it to the given
+        discussion in the SEV table."""
+        self.insert_table_data(
+            "discussion_obv_sev",
+            dict(
+                discussion_id = discussion.id,
+                obv           = obv,
+                sev           = sev
+            )
+        )
+    
     def insert_newspost(self, newspost: NewsPost) -> None:
         """Inserts/updates the given newspost object into the newsposts table.
         Also inserts/updates the associated user (i.e. author of the newspost)."""
