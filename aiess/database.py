@@ -462,8 +462,8 @@ class Database:
             modes    = self.retrieve_beatmapset_modes(_id)
             genre    = row[4]
             language = row[5]
-            tags     = row[6].split(" ") if row[6] else ""
             yield Beatmapset(_id, artist, title, creator, modes, genre, language, tags)
+            tags     = row[6].split(" ") if row[6] else None
 
     def retrieve_discussion(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Discussion:
         """Returns the first discussion from the database matching the given WHERE clause, or None if no such discussion is stored.
