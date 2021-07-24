@@ -302,6 +302,33 @@ class Beatmapset:
     def __hash__(self) -> str:
         return hash(self.__key())
 
+class BeatmapsetStatus():
+    """Contains information about the ranked status of a beatmapset at some point in time
+    (e.g. pending/qualified/ranked and nominators)."""
+    def __init__(self, _id: int, beatmapset: Beatmapset, status: str, time: datetime, nominators: List[User]=[]):
+        self.id         = _id
+        self.beatmapset = beatmapset
+        self.status     = status
+        self.time       = time
+        self.nominators = nominators
+    
+    def __key(self) -> tuple:
+        return (
+            self.id,
+            self.beatmapset,
+            self.status,
+            self.time,
+            tuple(self.nominators)
+        )
+    
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, BeatmapsetStatus):
+            return False
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())
+
 class Discussion:
     """Contains the discussion data either supplied or further scraped (latter in case of e.g. disqualify or nomination_reset events)."""
     def __init__(
