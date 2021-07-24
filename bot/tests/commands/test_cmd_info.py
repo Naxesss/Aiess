@@ -62,7 +62,7 @@ async def test_info():
     assert mock_command.response_embed.fields[5].value.startswith("**2020-01-01**\n(<t:")
     assert mock_command.response_embed.fields[5].value.endswith(":R>)")
 
-def mock_retrieve_table_data(self, table, where, selection):
+def mock_retrieve_table_data(self, **kwargs):
     raise TimeoutError
 
 @mock.patch("bot.cmd_modules.cmd_info.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)
