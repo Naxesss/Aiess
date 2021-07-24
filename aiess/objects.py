@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 
+from aiess import timestamp
 from aiess.web import api
 from aiess.errors import DeletedContextError
 
@@ -42,74 +43,243 @@ class User:
     def __hash__(self) -> str:
         return hash(self.__key())
 
+class Beatmap:
+    """Contains the beatmap data given a json representation (e.g. diff name, star rating, and draintime)."""
+    def __init__(self):
+        # Default initialize all values to None. This faciliates __eq__,
+        # __hash__, etc. to function even if not all values are specified.
+        self.id            = None
+        self.beatmapset_id = None
+        self.version       = None
+        self.totaltime     = None
+        self.draintime     = None
+        self.cs            = None
+        self.od            = None
+        self.ar            = None
+        self.hp            = None
+        self.mode          = None
+        self.circles       = None
+        self.sliders       = None
+        self.spinners      = None
+        self.submit_date   = None
+        self.approved_date = None
+        self.artist        = None
+        self.title         = None
+        self.creator_name  = None
+        self.bpm           = None
+        self.source        = None
+        self.tags          = None
+        self.genre         = None
+        self.language      = None
+        self.favourites    = None
+        self.userrating    = None
+        self.playcount     = None
+        self.passcount     = None
+        self.max_combo     = None
+        self.sr_aim        = None
+        self.sr_speed      = None
+        self.sr_total      = None
+    
+    @classmethod
+    def from_json(self, beatmap_json: str):
+        beatmap = self()
+        beatmap.id            = int(beatmap_json["beatmap_id"])
+        beatmap.beatmapset_id = int(beatmap_json["beatmapset_id"])
+        beatmap.version       = str(beatmap_json["version"])
+        beatmap.totaltime     = float(beatmap_json["total_length"])
+        beatmap.draintime     = float(beatmap_json["hit_length"])
+        beatmap.cs            = float(beatmap_json["diff_size"])
+        beatmap.od            = float(beatmap_json["diff_overall"])
+        beatmap.ar            = float(beatmap_json["diff_approach"])
+        beatmap.hp            = float(beatmap_json["diff_drain"])
+        beatmap.mode          = api.MODES[beatmap_json["mode"]]
+        beatmap.circles       = int(beatmap_json["count_normal"])
+        beatmap.sliders       = int(beatmap_json["count_slider"])
+        beatmap.spinners      = int(beatmap_json["count_spinner"])
+        beatmap.submit_date   = timestamp.from_string(beatmap_json["submit_date"])
+        beatmap.approved_date = timestamp.from_string(beatmap_json["approved_date"]) if beatmap_json["approved_date"] else None  # None if not ranked.
+        beatmap.artist        = str(beatmap_json["artist"])
+        beatmap.title         = str(beatmap_json["title"])
+        beatmap.creator_name  = str(beatmap_json["creator"])
+        beatmap.bpm           = float(beatmap_json["bpm"]) if beatmap_json["bpm"] else None  # None if no timing lines.
+        beatmap.source        = str(beatmap_json["source"])
+        beatmap.tags          = str(beatmap_json["tags"])
+        beatmap.genre         = api.GENRES[beatmap_json["genre_id"]]
+        beatmap.language      = api.LANGUAGES[beatmap_json["language_id"]]
+        beatmap.favourites    = int(beatmap_json["favourite_count"])
+        beatmap.userrating    = float(beatmap_json["rating"])
+        beatmap.playcount     = int(beatmap_json["playcount"])
+        beatmap.passcount     = int(beatmap_json["passcount"])
+        beatmap.max_combo     = int(beatmap_json["max_combo"])    if beatmap_json["max_combo"]  else None  # None for taiko maps.
+        beatmap.sr_aim        = float(beatmap_json["diff_aim"])   if beatmap_json["diff_aim"]   else None
+        beatmap.sr_speed      = float(beatmap_json["diff_speed"]) if beatmap_json["diff_speed"] else None
+        beatmap.sr_total      = float(beatmap_json["difficultyrating"])
+
+        return beatmap
+
+    @classmethod
+    def from_raw(
+            self, _id: int, beatmapset_id: int, version: str, draintime: float, sr_total: float,
+            favourites: int, userrating: float, playcount: int, passcount: int
+        ):
+        """Returns the beatmap object with the given attributes. This is
+        used by the database to reconstruct beatmaps when retrieved."""
+        beatmap = self()
+        beatmap.id            = int(_id)
+        beatmap.beatmapset_id = int(beatmapset_id)
+        beatmap.version       = str(version)
+        beatmap.draintime     = float(draintime)
+        beatmap.sr_total      = float(sr_total)
+        beatmap.favourites    = int(favourites)   if favourites is not None else None  # Following were added later, so old entries have these as None.
+        beatmap.userrating    = float(userrating) if userrating is not None else None 
+        beatmap.playcount     = int(playcount)    if playcount  is not None else None
+        beatmap.passcount     = int(passcount)    if passcount  is not None else None
+
+        return beatmap
+
+    @classmethod
+    def from_api(self, _id: int, beatmapset_id: int):
+        """Returns the beatmap with the given id and beatmapset id from the osu!api, if any, else None."""
+        beatmapset_json = api.request_beatmapset(beatmapset_id=beatmapset_id)
+        beatmapset = Beatmapset(beatmapset_json=beatmapset_json)
+        for beatmap in beatmapset.beatmaps:
+            if beatmap.id == _id:
+                return beatmap
+        
+        return None
+
+    def is_incomplete(self):
+        return (
+            self.id            is None or
+            self.beatmapset_id is None or
+            self.version       is None or
+            self.draintime     is None or
+            self.sr_total      is None or
+            self.favourites    is None or
+            self.userrating    is None or
+            self.playcount     is None or
+            self.passcount     is None
+        )
+
+    def __str__(self) -> str:
+        return f"{self.artist} - {self.title} (mapped by {self.creator_name}) [{self.mode}] \"{self.version}\""
+    
+    def __key(self) -> tuple:
+        # Only checks the most distinctive attributes, as these are the only ones we store in the database.
+        return (
+            self.beatmapset_id,
+            self.id,
+            self.version,
+            self.draintime,
+            self.sr_total,
+            self.favourites,
+            self.userrating,
+            self.playcount,
+            self.passcount
+        )
+    
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Beatmap):
+            return False
+        return self.__key() == other.__key()
+    
+    def __hash__(self) -> str:
+        return hash(self.__key())
+
 class Beatmapset:
     """Contains the beatmapset data requested from the api or supplied as a json object (e.g. artist, title, creator)."""
     def __init__(
-            self, _id: int, artist: str=None, title: str=None, creator: User=None,
+            self, _id: int=None, artist: str=None, title: str=None, creator: User=None,
             modes: List[str]=None, genre: str=None, language: str=None, tags: List[str]=None,
-            beatmapset_json: object=None, allow_api: bool=True):
-        if _id is None:
-            raise ValueError("Beatmapset id should not be None.")
+            beatmaps: List[Beatmap]=None, beatmapset_json: object=None, allow_api: bool=True):
 
-        if not allow_api:
-            if artist   is None: artist   = "artist"
-            if title    is None: title    = "title"
-            if creator  is None: creator  = User(_id=1, name="creator")
-            if modes    is None: modes    = ["osu"]
-            if language is None: language = "language"
-            if genre    is None: genre    = "genre"
-            if tags     is None: tags     = ["tags"]
+        self.incomplete = False
+        
+        self.id       = _id
+        self.artist   = artist
+        self.title    = title
+        self.creator  = creator
+        self.modes    = modes
+        self.genre    = genre
+        self.language = language
+        self.tags     = tags
+        self.beatmaps = beatmaps
+        self.status   = None
 
-        # If some data is missing, we should populate it.
-        if (
-            artist   is None or
-            title    is None or
-            creator  is None or
-            modes    is None or
-            language is None or
-            genre    is None or
-            tags     is None
-        ):
-            if not beatmapset_json:
+        if self.is_incomplete():
+            # Not all information was provided in the constructor.
+            # We need this information populated.
+            if beatmapset_json:
+                self.from_json(beatmapset_json)
+                self.incomplete = False
+            elif allow_api and _id is not None:
                 beatmapset_json = api.request_beatmapset(_id)
                 if not beatmapset_json:
                     raise DeletedContextError(f"Could not retrieve any api response for a beatmapset with id {_id}.")
-            if str(beatmapset_json) == "[]":
-                raise DeletedContextError(f"No beatmapset with id {_id} exists.")
-            beatmap_json = beatmapset_json[0]  # Assumes metadata is the same across the entire set.
+                self.from_json(beatmapset_json)
+                self.incomplete = False
+            else:
+                # With no access to the API, we can only mock the attributes.
+                self.id       = int(_id)      if _id      else 1
+                self.artist   = str(artist)   if artist   else "artist"
+                self.title    = str(title)    if title    else "title"
+                self.creator  = creator       if creator  else User(_id=1, name="creator")
+                self.modes    = modes         if modes    else ["osu"]
+                self.genre    = str(genre)    if genre    else "genre"
+                self.language = str(language) if language else "language"
+                self.tags     = tags          if tags     else ["tags"]
+                self.beatmaps = beatmaps      if beatmaps else []
 
-        self.id      = int(_id)
-        self.artist  = str(artist) if artist  is not None else beatmap_json["artist"]
-        self.title   = str(title)  if title   is not None else beatmap_json["title"]
-        self.creator = creator     if creator is not None else User(
+                # Show that the beatmapset is not truly complete, as we have simply mocked some attributes.
+                self.incomplete = True
+    
+    def from_json(self, beatmapset_json: str):
+        if str(beatmapset_json) == "[]":
+            raise DeletedContextError(f"A beatmapset did not exist.")
+        beatmap_json = beatmapset_json[0]
+
+        self.beatmaps = [Beatmap.from_json(json) for json in beatmapset_json]
+        ref_beatmap = self.beatmaps[0]  # Assumes metadata is the same across the entire set.
+
+        self.id       = int(beatmap_json["beatmapset_id"])
+        self.artist   = ref_beatmap.artist
+        self.title    = ref_beatmap.title
+        self.creator  = User(
             beatmap_json["creator_id"],
             beatmap_json["creator"]
         )
-        
-        self.modes    = modes    if modes    is not None else self.__get_modes(beatmapset_json)
-        self.genre    = genre    if genre    is not None else api.GENRES[beatmap_json["genre_id"]]
-        self.language = language if language is not None else api.LANGUAGES[beatmap_json["language_id"]]
-        self.tags     = tags     if tags     is not None else beatmap_json["tags"].split(" ")
-    
+        self.modes    = self.__get_modes()
+        self.genre    = ref_beatmap.genre
+        self.language = ref_beatmap.language
+        self.tags     = ref_beatmap.tags.split(" ")
+
+    def is_incomplete(self):
+        return self.incomplete or (
+            self.artist   is None or
+            self.title    is None or
+            self.creator  is None or
+            self.modes    is None or
+            self.language is None or
+            self.genre    is None or
+            self.tags     is None or
+            self.beatmaps is None or
+            any(beatmap.is_incomplete() for beatmap in self.beatmaps if beatmap is not None)
+        )
+
     def __str__(self) -> str:
         return f"{self.artist} - {self.title} (mapped by {self.creator}) {self.mode_str()}"
 
     def mode_str(self) -> str:
         """Returns a string representation of the modes in this beatmapset (e.g. "[osu][taiko]")."""
-        string = ""
-        for mode in self.modes:
-            string += f"[{mode}]"
-        return string
+        return "".join(f"[{mode}]" for mode in self.modes)
 
-    def __get_modes(self, beatmapset_json: object) -> List[str]:
-        """Returns a list of the game modes by name included in the given beatmapset json (e.g. ["osu", "taiko", "mania"])."""
-        mode_names = []
-        for beatmap_json in beatmapset_json:
-            mode_id = beatmap_json["mode"]
-            mode_name = api.MODES[mode_id]
-            if mode_name not in mode_names:
-                mode_names.append(mode_name)
-        return mode_names
+    def __get_modes(self) -> List[str]:
+        """Returns a list of the game modes by name (e.g. ["osu", "taiko", "mania"])."""
+        modes = []
+        for beatmap in self.beatmaps:
+            if beatmap.mode not in modes:
+                modes.append(beatmap.mode)
+        return modes
     
     def __key(self) -> tuple:
         return (
@@ -120,7 +290,8 @@ class Beatmapset:
             tuple(self.modes),  # Cannot hash mutable types; list is mutable, tuple is immutable.
             self.language,
             self.genre,
-            tuple(self.tags)
+            tuple(self.tags),
+            tuple(self.beatmaps)
         )
     
     def __eq__(self, other) -> bool:
