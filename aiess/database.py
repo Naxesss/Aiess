@@ -387,10 +387,11 @@ class Database:
     def insert_event(self, event: Event) -> None:
         """Inserts/updates the given event into the events table, along with any other values
         (e.g. beatmapset, discussion, user) into their respective tables."""
-        if event.beatmapset: self.insert_beatmapset(event.beatmapset)
-        if event.user:       self.insert_user(event.user)
-        if event.discussion: self.insert_discussion(event.discussion)
-        if event.newspost:   self.insert_newspost(event.newspost)
+        if event.beatmapset:        self.insert_beatmapset(event.beatmapset)
+        if event.user:              self.insert_user(event.user)
+        if event.type == types.SEV: self.insert_obv_sev_event(event)
+        if event.discussion:        self.insert_discussion(event.discussion)
+        if event.newspost:          self.insert_newspost(event.newspost)
         if event.group:
             if event.type == types.ADD:    self.insert_group_user(event.group, event.user)
             if event.type == types.REMOVE: self.delete_group_user(event.group, event.user)
