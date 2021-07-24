@@ -300,6 +300,37 @@ class Database:
             )
         )
     
+    def insert_beatmapset_status(self, status: BeatmapsetStatus) -> None:
+        """Inserts/updates the given status object into the beatmapset status table.
+        Also inserts/updates the associated nominators and beatmapset."""
+        if status.beatmapset: self.insert_beatmapset(status.beatmapset)
+        self.insert_table_data(
+            "beatmapset_status",
+            dict(
+                beatmapset_id = status.beatmapset.id,
+                status        = status.status,
+                time          = status.time
+            )
+        )
+        # Reason we're retrieving the event here is because we need the `status_id` field.
+        retrieved_status = self.retrieve_beatmapset_status(
+            "beatmapset_id=%s AND status=%s AND time=%s",
+            (status.beatmapset.id, status.status, status.time)
+        )
+        for nominator in status.nominators: self.insert_beatmapset_status_nominator(retrieved_status.id, nominator)
+    
+    def insert_beatmapset_status_nominator(self, status_id: int, nominator: User) -> None:
+        """Inserts/updates the given status object into the beatmapset status table.
+        Also inserts/updates the associated nominators and beatmapset."""
+        self.insert_user(nominator)
+        self.insert_table_data(
+            "status_nominators",
+            dict(
+                status_id    = status_id,
+                nominator_id = nominator.id
+            )
+        )
+    
     def insert_newspost(self, newspost: NewsPost) -> None:
         """Inserts/updates the given newspost object into the newsposts table.
         Also inserts/updates the associated user (i.e. author of the newspost)."""
