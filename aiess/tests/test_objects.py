@@ -2,7 +2,7 @@ import pytest
 import mock
 from datetime import datetime
 
-from aiess.objects import User, Beatmapset, Discussion, Usergroup, NewsPost, Event
+from aiess.objects import User, Beatmapset, Beatmap, Discussion, Usergroup, NewsPost, Event
 from aiess.errors import DeletedContextError
 
 from aiess.tests.mocks.api import beatmap as mock_beatmap
@@ -87,6 +87,17 @@ def test_beatmapset():
     assert beatmapset.mode_str() == "[osu][taiko]"
     assert str(beatmapset) == "The Quick Brown Fox - The Big Black (mapped by Blue Dragon) [osu][taiko]"
 
+    assert beatmapset.beatmaps[0].id == 131891
+    assert beatmapset.beatmaps[0].mode == "osu"
+    assert beatmapset.beatmaps[0].bpm == 360.3
+    assert beatmapset.beatmaps[0].submit_date.month == 12
+    assert beatmapset.beatmaps[0].submit_date.day == 24
+    assert beatmapset.beatmaps[0].version == "WHO'S AFRAID OF THE BIG BLACK"
+    assert beatmapset.beatmaps[1].mode == "taiko"
+    assert beatmapset.beatmaps[1].version == "Ono's Taiko Oni"
+    assert beatmapset.beatmaps[1].max_combo == None
+    assert str(beatmapset.beatmaps[1]) == "The Quick Brown Fox - The Big Black (mapped by Blue Dragon) [taiko] \"Ono's Taiko Oni\""
+
 @mock.patch("aiess.objects.api.request_api", no_api_allowed)
 def test_beatmapset_without_api():
     beatmapset = Beatmapset(4, allow_api=False)
@@ -107,6 +118,78 @@ def test_beatmapset_int_artist_title():
 def test_beatmapset_non_existent():
     with pytest.raises(DeletedContextError):
         Beatmapset(2, beatmapset_json="[]")
+
+@mock.patch("aiess.objects.api.request_api", no_api_allowed)
+def test_beatmap_from_raw():
+    beatmap = Beatmap.from_raw(
+        _id           = 1,
+        beatmapset_id = 3,
+        version       = "test",
+        draintime     = 93.4,
+        sr_total      = 3.428924,
+        favourites    = 13,
+        userrating    = 9.23,
+        playcount     = 52893,
+        passcount     = 4712
+    )
+    assert beatmap.id == 1
+    assert beatmap.beatmapset_id == 3
+    assert beatmap.version == "test"
+    assert beatmap.draintime == 93.4
+    assert beatmap.sr_total == 3.428924
+    assert beatmap.favourites == 13
+    assert beatmap.userrating == 9.23
+    assert beatmap.playcount == 52893
+    assert beatmap.passcount == 4712
+
+@mock.patch("aiess.objects.api.request_api", no_api_allowed)
+def test_beatmap_from_raw_eq():
+    beatmap1 = Beatmap.from_raw(
+        _id           = 1,
+        beatmapset_id = 3,
+        version       = "test",
+        draintime     = 93.4,
+        sr_total      = 3.428924,
+        favourites    = 13,
+        userrating    = 9.23,
+        playcount     = 52893,
+        passcount     = 4712
+    )
+    beatmap2 = Beatmap.from_raw(
+        _id           = 1,
+        beatmapset_id = 3,
+        version       = "test",
+        draintime     = 93.4,
+        sr_total      = 3.428924,
+        favourites    = 13,
+        userrating    = 9.23,
+        playcount     = 52893,
+        passcount     = 4712
+    )
+    beatmap3 = Beatmap.from_raw(
+        _id           = 1,
+        beatmapset_id = 3,
+        version       = "test2",
+        draintime     = 93.4,
+        sr_total      = 3.428924,
+        favourites    = 13,
+        userrating    = 9.23,
+        playcount     = 52893,
+        passcount     = 4712
+    )
+    assert beatmap1 == beatmap2
+    assert beatmap1.version != beatmap3.version
+    assert beatmap1 != beatmap3
+
+def test_beatmap_from_api():
+    beatmap = Beatmap.from_api(_id=131891, beatmapset_id=41823)
+
+    assert beatmap.id == 131891
+    assert beatmap.mode == "osu"
+    assert beatmap.bpm == 360.3
+    assert beatmap.submit_date.month == 12
+    assert beatmap.submit_date.day == 24
+    assert beatmap.version == "WHO'S AFRAID OF THE BIG BLACK"
 
 def test_old_discussion():
     beatmapset = Beatmapset(41823, beatmapset_json=mock_old_beatmap.JSON)
