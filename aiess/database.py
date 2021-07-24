@@ -562,6 +562,60 @@ class Database:
             
             yield beatmapset
 
+    def retrieve_beatmap(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None
+        ) -> Beatmap:
+        """Returns the first beatmap from the database matching the given WHERE clause, or None if no such beatmap is stored."""
+        return next(
+            self.retrieve_beatmaps(
+                where        = where,
+                where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1
+            ),
+            None
+        )
+    
+    def retrieve_beatmaps(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None
+        ) -> Generator[Beatmap, None, None]:
+        """Returns a generator of all beatmaps from the database matching the given WHERE clause."""
+        fetched_rows = self.retrieve_table_data(
+            table        = "beatmaps",
+            where        = where,
+            where_values = where_values,
+            selection    = "id, beatmapset_id, version, draintime, sr_total, favourites, userrating, playcount, passcount, updated_at",
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
+        )
+        for row in (fetched_rows or []):
+            beatmap = Beatmap.from_raw(
+                _id           = row[0],
+                beatmapset_id = row[1],
+                version       = row[2],
+                draintime     = row[3],
+                sr_total      = row[4],
+                favourites    = row[5],
+                userrating    = row[6],
+                playcount     = row[7],
+                passcount     = row[8]
+            )
+
+            updated_at     = row[9]
+            needs_updating = updated_at is None or (updated_at - datetime.utcnow()) > timedelta(days=30)
+
+            if not beatmap or beatmap.is_incomplete() or needs_updating:
+                # The retrieved beatmap is incomplete, and should be updated.
+                beatmap = Beatmap.from_api(_id=row[0], beatmapset_id=row[1])
+                self.insert_beatmap(beatmap)
+            
+            if beatmap:
+                yield beatmap
+
     def retrieve_discussion(
             self, where: str, where_values: tuple=None, group_by: str=None,
             order_by: str=None, beatmapset: Beatmapset=None
