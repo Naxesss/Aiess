@@ -75,7 +75,9 @@ type_props = {
     types.NEWS:               TypeProps(None,                        None,               colour_news),
 
     types.ADD:                TypeProps(":performing_arts:",         "Added",            colour_added),
-    types.REMOVE:             TypeProps(":performing_arts:",         "Removed",          colour_removed)
+    types.REMOVE:             TypeProps(":performing_arts:",         "Removed",          colour_removed),
+    
+    types.SEV:                TypeProps(":scales:",                  "SEV Updated",      colour_ranked,      show_context=True)
 }
 
 def format_link(event: Event) -> str:
@@ -198,6 +200,9 @@ def format_footer_text(event: Event, database: Database=None) -> str:
         else:
             return f"NAT {format_preview(event.content)}"
 
+    if event.type == types.SEV:
+        return f"NAT {format_preview(event.content)}"
+
     if not event.user:
         return Embed.Empty
 
@@ -250,6 +255,9 @@ def format_footer_icon_url(event: Event) -> str:
         else:
             # `6616586` is the user id for the QAT bot, which I'm just going to use to represent the NAT/BNSite.
             return "https://a.ppy.sh/6616586"
+
+    if event.type == types.SEV:
+        return "https://a.ppy.sh/6616586"
 
     if event.user and not event.group:
         if event.user.id:
