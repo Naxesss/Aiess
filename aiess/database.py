@@ -711,6 +711,23 @@ class Database:
         )
         for row in (fetched_rows or []):
             yield self.retrieve_user("id=%s", (row[0],))
+
+    def retrieve_obv_sev(self, discussion_id: int) -> Tuple[int, int]:
+        """Returns a tuple of the obviousness and severity from the database associated
+        with the given discussion id, or `(None, None)` if no such obv/sev is stored."""
+        fetched_rows = self.retrieve_table_data(
+            table        = "discussion_obv_sev", 
+            where        = "discussion_id=%s",
+            where_values = (discussion_id,),
+            selection    = "obv, sev"
+        )
+        for row in (fetched_rows or []):
+            obv = row[0]
+            sev = row[1]
+            return (obv, sev)
+        return (None, None)
+
+    def retrieve_newspost(self, where: str, where_values: tuple=None, group_by: str=None, order_by: str=None) -> NewsPost:
         """Returns the first newspost from the database matching the given WHERE clause, or None if no such newspost is stored."""
         return next(
             self.retrieve_newsposts(
