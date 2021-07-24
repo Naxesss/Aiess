@@ -499,7 +499,7 @@ class Database:
         for row in (fetched_rows or []):
             _id  = row[0]
             name = row[1]
-            yield User(_id, name)
+            yield User(_id, name, allow_api=False)
     
     def retrieve_beatmapset_modes(self, beatmapset_id: int) -> List[str]:
         """Returns an array of modes corresponding to the given beatmapset id.
