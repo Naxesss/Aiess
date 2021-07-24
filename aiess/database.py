@@ -410,6 +410,10 @@ class Database:
         if event.group:
             if event.type == types.ADD:    self.insert_group_user(event.group, event.user)
             if event.type == types.REMOVE: self.delete_group_user(event.group, event.user)
+        
+        if event.type in [types.NOMINATE, types.QUALIFY, types.RESET, types.DISQUALIFY, types.RANK, types.LOVE] and event.beatmapset:
+            self.update_beatmapset_status(event)
+
         self.insert_table_data(
             "events",
             dict(
@@ -426,6 +430,45 @@ class Database:
             )
         )
     
+    def update_beatmapset_status(self, event: Event) -> None:
+        """Inserts/updates the given status object into the beatmapset status table.
+        Also inserts/updates the associated nominators and beatmapset."""
+        if event.type not in [types.NOMINATE, types.QUALIFY, types.RESET, types.DISQUALIFY, types.RANK, types.LOVE]:
+            raise ValueError("Cannot update status from an event not being of nom/reset/rank type.")
+
+        status = self.retrieve_beatmapset_status(
+            where        = "beatmapset_id=%s",
+            where_values = (event.beatmapset.id,),
+            order_by     = "time DESC",
+            beatmapset   = event.beatmapset
+        )
+        is_reset = event.type in [types.RESET, types.DISQUALIFY]
+
+        new_status = status.status if status else "pending"
+        if is_reset:                     new_status = "pending"
+        if event.type == types.NOMINATE: new_status = "nominated" if new_status == "pending" else new_status
+        if event.type == types.QUALIFY:  new_status = "qualified" if new_status in ["pending", "nominated"] else new_status
+        if event.type == types.RANK:     new_status = "ranked"
+        if event.type == types.LOVE:     new_status = "loved"
+
+        new_nominators = status.nominators if status else []
+        valid_user = event.user and event.user not in new_nominators
+        if is_reset or event.type == types.LOVE: new_nominators = []
+        if event.type in [types.NOMINATE, types.QUALIFY]:
+            if valid_user: new_nominators.append(event.user)
+            else:          return  # Earliest qualify events are system qualifies (no user associated), we skip those.
+                                   # They'd be ranked by now anyway if they weren't dqed.
+
+        self.insert_beatmapset_status(
+            BeatmapsetStatus(
+                _id        = 0,  # Will be auto-generated, so doesn't matter.
+                beatmapset = event.beatmapset,
+                status     = new_status,
+                time       = event.time,
+                nominators = new_nominators
+            )
+        )
+
     def retrieve_user(self, where: str, where_values: tuple=None, group_by: str=None, order_by: str=None) -> User:
         """Returns the first user from the database matching the given WHERE clause, or None if no such user is stored."""
         return next(
