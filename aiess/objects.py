@@ -171,6 +171,7 @@ class Usergroup:
         16: "Alumni",
         22: "Support Team",
         28: "Beatmap Nominators",
+        31: "Project Loved",
         32: "Beatmap Nominators (Probationary)"
     }
 
