@@ -435,16 +435,10 @@ def format_time(
 
     return " ".join(formatted_units) if formatted_units else f"< 1 {unit_str(min_unit, long=long, size=1)}"
 
-def format_timeago(time: datetime, min_unit: TimeUnit=TimeUnit.SECONDS, max_units: int=1, bold=True):
-    """Returns the string representation of the time since the given datetime, using `format_time`, in
-    the format "{time} ago". Always uses long units (e.g. "seconds", not "s"). Surrounds {time}
-    in bold markup (**) if `bold`."""
-    delta_time = datetime.utcnow() - time
-    formatted_time = format_time(delta_time, min_unit=min_unit, max_units=max_units, long=True)
-    if bold:
-        formatted_time = f"**{formatted_time}**"
-
-    return f"{formatted_time} ago"
+def format_timeago(time: datetime):
+    """Returns the dynamic markdown representation of the time since the given datetime in
+    the format "{time} ago" e.g. "a minute ago" / "2 minutes ago" / "3 months ago"."""
+    return f"<t:{int(time.timestamp())}:R>"
 
 def format_dotted_list(elements: list) -> str:
     """Returns a dotted list representing the given elements."""
