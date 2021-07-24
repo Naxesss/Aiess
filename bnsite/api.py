@@ -55,3 +55,45 @@ def request_obv_sev(discussion_id: int) -> Tuple[int, int]:
 def request_qa_checks(user_id: int) -> object:
     """Returns all quality assurance checks done by the user with the given user id. Caches results."""
     return request("qaEventsByUser", query=user_id)
+
+def request_qa_check_logs(user_id: int) -> object:
+    """Returns a list of tuples representing the SEV for a reset `(discussion_id, obv, sev, time)`, since
+    the given time. If either the severity or obviousness was unchanged, they will be returned as None.
+    If the severity or obviousness was unset, they will be returned as -1."""
+    sev_logs = request("eventsByDate", query=since)
+    discussion_ids = []
+    discussion_obv = {}
+    discussion_sev = {}
+    discussion_time = {}
+    for sev_log in sev_logs:
+        if "severity" not in sev_log["action"] and "obviousness" not in sev_log["action"]:
+            # May find, e.g. "DQ reason updated to \"xyz\"", which isn't what we're looking for.
+            continue
+
+        discussion_id = sev_log["relatedId"]["discussionId"]
+        if discussion_id not in discussion_ids:
+            discussion_ids.append(discussion_id)
+
+        # E.g. "Updated severity of s/1207984 to "0""
+        amount_str = sev_log["action"].split(" ")[-1].strip("\"")
+        if amount_str == "null":
+            amount = -1
+        else:
+            try:
+                amount = int(amount_str)
+            except ValueError:
+                raise ValueError(f"Could not parse \"{amount_str}\" as int. The entire action is \"{sev_log['action']}\".")
+
+        if "obviousness" in sev_log["action"]: discussion_obv[discussion_id] = amount
+        else:                                  discussion_sev[discussion_id] = amount
+
+        time = timestamp.from_string(sev_log["updatedAt"])
+        if discussion_id not in discussion_time or time < discussion_time[discussion_id]:
+            discussion_time[discussion_id] = time
+
+    # Much more intuitive to receive these in bulk rather than obv/sev separately.
+    for discussion_id in discussion_ids:
+        obv = discussion_obv[discussion_id] if discussion_id in discussion_obv else None
+        sev = discussion_sev[discussion_id] if discussion_id in discussion_sev else None
+        time = discussion_time[discussion_id]
+        yield (discussion_id, obv, sev, time)
