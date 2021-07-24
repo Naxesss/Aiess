@@ -462,8 +462,17 @@ class Database:
             modes    = self.retrieve_beatmapset_modes(_id)
             genre    = row[4]
             language = row[5]
-            yield Beatmapset(_id, artist, title, creator, modes, genre, language, tags)
             tags     = row[6].split(" ") if row[6] else None
+            beatmaps = list(self.retrieve_beatmaps("beatmapset_id=%s", (_id,)))
+
+            beatmapset = Beatmapset(_id, artist, title, creator, modes, genre, language, tags, beatmaps, allow_api=False)
+            if beatmapset.is_incomplete():
+                # The retrieved beatmapset is incomplete, and should be updated.
+                api_beatmapset = Beatmapset(_id, allow_api=True)
+                self.insert_beatmapset(api_beatmapset)
+                beatmapset = api_beatmapset
+            
+            yield beatmapset
 
     def retrieve_discussion(self, where: str, where_values: tuple=None, beatmapset: Beatmapset=None) -> Discussion:
         """Returns the first discussion from the database matching the given WHERE clause, or None if no such discussion is stored.
