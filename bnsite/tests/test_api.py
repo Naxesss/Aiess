@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from aiess.timestamp import from_string
 from bnsite import api
@@ -89,3 +89,15 @@ def test_request_qa_checks_none():
 def test_request_qa_checks_missing():
     json = api.request_qa_checks(user_id=4)
     assert not json
+
+#def test_request_qa_check_logs():
+    tuples = api.request_discussion_sev(datetime.utcnow() - timedelta(days=7))
+    assert tuples
+    amount = 0
+    for discussion_id, obv, sev, time in tuples:
+        assert discussion_id is not None
+        assert obv is not None or sev is not None
+        assert time is not None
+        amount += 1
+    
+    assert amount > 10
