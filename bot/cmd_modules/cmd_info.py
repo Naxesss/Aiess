@@ -47,8 +47,10 @@ def retrieve_event_count():
     return retrieve_with_timeout(
         db_name      = SCRAPER_DB_NAME,
         table        = "events",
-        where        = "TRUE ORDER BY id DESC LIMIT 1",
-        selection    = "id"
+        where        = "TRUE",
+        selection    = "id",
+        order_by     = "id DESC",
+        limit        = 1
     )
 
 def retrieve_event_count_today():
@@ -70,16 +72,25 @@ def retrieve_first_event_at():
     return retrieve_with_timeout(
         db_name      = SCRAPER_DB_NAME,
         table        = "events",
-        where        = "TRUE ORDER BY time ASC LIMIT 1",
-        selection    = "time"
+        where        = "TRUE",
+        selection    = "time",
+        order_by     = "time ASC",
+        limit        = 1
     )
 
-def retrieve_with_timeout(db_name, table, where="TRUE", selection="*"):
+def retrieve_with_timeout(
+        db_name, table, where="TRUE", selection="*",
+        group_by: str=None, order_by: str=None, limit: int=None
+    ):
     try:
-        return Database(db_name).retrieve_table_data(
+        db = Database(db_name)
+        return db.retrieve_table_data(
             table        = table,
             where        = where,
-            selection    = selection
+            selection    = selection,
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
         )[0][0]
     except TimeoutError:
         return "(timed out)"

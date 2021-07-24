@@ -31,17 +31,32 @@ class Database(aiess.Database):
                 channel_id=subscription.channel_id,
                 filter=subscription.filter))
     
-    def retrieve_subscription(self, where: str=None, where_values: tuple=None) -> Subscription:
+    def retrieve_subscription(self, where: str=None, where_values: tuple=None, group_by: str=None, order_by: str=None) -> Subscription:
         """Returns the first subscription matching the given WHERE clause, if any, otherwise None."""
-        return next(self.retrieve_subscriptions(where + " LIMIT 1", where_values), None)
+        return next(
+            self.retrieve_subscriptions(
+                where        = where,
+                where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1
+            ),
+            None
+        )
 
-    def retrieve_subscriptions(self, where: str=None, where_values: tuple=None) -> Generator[Subscription, None, None]:
+    def retrieve_subscriptions(
+            self, where: str=None, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None
+        ) -> Generator[Subscription, None, None]:
         """Returns a generator of all subscriptions from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
             table        = "subscriptions",
             where        = where,
             where_values = where_values,
-            selection    = "guild_id, channel_id, filter"
+            selection    = "guild_id, channel_id, filter",
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
         )
         for row in (fetched_rows or []):
             guild_id = row[0]
@@ -67,17 +82,32 @@ class Database(aiess.Database):
                 guild_id=prefix.guild_id,
                 prefix=prefix.prefix))
     
-    def retrieve_prefix(self, where: str=None, where_values: tuple=None) -> Prefix:
+    def retrieve_prefix(self, where: str=None, where_values: tuple=None, group_by: str=None, order_by: str=None) -> Prefix:
         """Returns the first command prefix matching the given WHERE clause, if any, otherwise None."""
-        return next(self.retrieve_prefixes(where + " LIMIT 1", where_values), None)
+        return next(
+            self.retrieve_prefixes(
+                where        = where,
+                where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1
+            ),
+            None
+        )
 
-    def retrieve_prefixes(self, where: str=None, where_values: tuple=None) -> Generator[Prefix, None, None]:
+    def retrieve_prefixes(
+            self, where: str=None, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None
+        ) -> Generator[Prefix, None, None]:
         """Returns a generator of all command prefixes from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
             table        = "prefixes",
             where        = where,
             where_values = where_values,
-            selection    = "guild_id, prefix"
+            selection    = "guild_id, prefix",
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
         )
         for row in (fetched_rows or []):
             guild_id = row[0]
@@ -101,17 +131,32 @@ class Database(aiess.Database):
                 command_name=permission.command_name,
                 permission_filter=permission.permission_filter))
     
-    def retrieve_permission(self, where: str=None, where_values: tuple=None) -> CommandPermission:
+    def retrieve_permission(self, where: str=None, where_values: tuple=None, group_by: str=None, order_by: str=None) -> CommandPermission:
         """Returns the first command permission matching the given WHERE clause, if any, otherwise None."""
-        return next(self.retrieve_permissions(where + " LIMIT 1", where_values), None)
+        return next(
+            self.retrieve_permissions(
+                where        = where,
+                where_values = where_values,
+                group_by     = group_by,
+                order_by     = order_by,
+                limit        = 1
+            ),
+            None
+        )
 
-    def retrieve_permissions(self, where: str=None, where_values: tuple=None) -> Generator[CommandPermission, None, None]:
+    def retrieve_permissions(
+            self, where: str=None, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None
+        ) -> Generator[CommandPermission, None, None]:
         """Returns a generator of all command permissions from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
             table        = "permissions",
             where        = where,
             where_values = where_values,
-            selection    = "guild_id, command_name, permission_filter"
+            selection    = "guild_id, command_name, permission_filter",
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
         )
         for row in (fetched_rows or []):
             guild_id = row[0]
@@ -134,7 +179,11 @@ class Database(aiess.Database):
         
         The cache must be cleared before new information can be obtained, see `clear_cache`."""
         if beatmapset.id not in beatmapset_event_cache[self.db_name]:
-            raw_event_generator = self.retrieve_events(where="beatmapset_id=%s ORDER BY time DESC", where_values=(beatmapset.id,))
+            raw_event_generator = self.retrieve_events(
+                where        = "beatmapset_id=%s",
+                where_values = (beatmapset.id,),
+                order_by     = "time DESC"
+            )
             beatmapset_event_cache[self.db_name][beatmapset.id] = [event async for event in raw_event_generator]
 
         return beatmapset_event_cache[self.db_name][beatmapset.id]

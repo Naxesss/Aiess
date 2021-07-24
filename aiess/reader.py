@@ -87,7 +87,11 @@ class Reader():
     async def events_between(self, _from: datetime, to: datetime, sql_target: str="TRUE") -> Generator[Event, None, None]:
         """Yields each event found in the database, from (excluding) the later time to (including) the earlier time.
         Optionally only retrieves events matching the `sql_target` WHERE clause."""
-        return self.database.retrieve_events(where=f"({sql_target}) AND time > %s AND time <= %s ORDER BY time ASC", where_values=(_from, to))
+        return self.database.retrieve_events(
+            where        = f"({sql_target}) AND time > %s AND time <= %s",
+            where_values = (_from, to),
+            order_by     = "time ASC"
+        )
 
     async def on_event_batch(self) -> None:
         """Called for each new event batch found in the running loop of the reader.
