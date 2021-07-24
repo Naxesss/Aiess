@@ -676,6 +676,41 @@ class Database:
             ),
             None
         )
+
+    def retrieve_beatmapset_statuses(
+            self, where: str, where_values: tuple=None, group_by: str=None,
+            order_by: str=None, limit: int=None, beatmapset: Beatmapset=None
+        ) -> Generator[BeatmapsetStatus, None, None]:
+        """Returns a generator of all statuses from the database matching the given WHERE clause.
+        Also retrieves the associated beatmapset from the database if not supplied."""
+        fetched_rows = self.retrieve_table_data(
+            table        = "beatmapset_status", 
+            where        = where,
+            where_values = where_values,
+            selection    = "id, beatmapset_id, status, time",
+            group_by     = group_by,
+            order_by     = order_by,
+            limit        = limit
+        )
+        for row in (fetched_rows or []):
+            _id        = row[0]
+            if not beatmapset:
+                beatmapset = self.retrieve_beatmapset("id=%s", (row[1],))
+            status     = row[2]
+            time       = row[3]
+            nominators = list(self.retrieve_beatmapset_status_nominators(status_id=_id))
+            yield BeatmapsetStatus(_id, beatmapset, status, time, nominators)
+
+    def retrieve_beatmapset_status_nominators(self, status_id: int) -> Generator[User, None, None]:
+        """Returns a generator of all users who are nominators on the given beatmapset status instance."""
+        fetched_rows = self.retrieve_table_data(
+            table        = "status_nominators",
+            where        = "status_id=%s",
+            where_values = (status_id,),
+            selection    = "nominator_id"
+        )
+        for row in (fetched_rows or []):
+            yield self.retrieve_user("id=%s", (row[0],))
         """Returns the first newspost from the database matching the given WHERE clause, or None if no such newspost is stored."""
         return next(
             self.retrieve_newsposts(
