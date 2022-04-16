@@ -4,11 +4,13 @@ from mysql.connector.errors import Error, OperationalError
 from typing import List, Generator, Tuple, Callable
 from enum import Enum
 from datetime import datetime, timedelta
+from contextlib import suppress
 
 from aiess.objects import User, Beatmapset, BeatmapsetStatus, Beatmap, Discussion, Event, NewsPost, Usergroup
 from aiess.settings import DB_CONFIG
 from aiess.logger import log
 from aiess.common import anext
+from aiess.errors import DeletedContextError
 from aiess import event_types as types
 
 SCRAPER_DB_NAME      = "aiess"
@@ -213,6 +215,14 @@ class Database:
             table        = "group_users",
             where        = "group_id=%s AND user_id=%s",
             where_values = (group.id, user.id)
+        )
+    
+    def delete_beatmap(self, beatmap: Beatmap) -> None:
+        """Deletes the given beatmap from the beatmaps table."""
+        self.delete_table_data(
+            table        = "beatmaps",
+            where        = "id=%s",
+            where_values = (beatmap.id,)
         )
 
     def insert_user(self, user: User) -> None:
@@ -551,13 +561,18 @@ class Database:
             genre    = row[4]
             language = row[5]
             tags     = row[6].split(" ") if row[6] else None
-            beatmaps = list(self.retrieve_beatmaps("beatmapset_id=%s", (_id,)))
+            beatmaps = list(self.retrieve_beatmaps("beatmapset_id=%s", (_id,), allow_api=False))
 
             beatmapset = Beatmapset(_id, artist, title, creator, modes, genre, language, tags, beatmaps, allow_api=False)
             if beatmapset.is_incomplete():
                 # The retrieved beatmapset is incomplete, and should be updated.
                 api_beatmapset = Beatmapset(_id, allow_api=True)
                 self.insert_beatmapset(api_beatmapset)
+                for beatmap in beatmaps:
+                    # Ensure any deleted beatmap gets cleared out before we repopulate it.
+                    self.delete_beatmap(beatmap)
+                for api_beatmap in api_beatmapset.beatmaps:
+                    self.insert_beatmap(api_beatmap)
                 beatmapset = api_beatmapset
             
             yield beatmapset
@@ -580,7 +595,7 @@ class Database:
     
     def retrieve_beatmaps(
             self, where: str, where_values: tuple=None, group_by: str=None,
-            order_by: str=None, limit: int=None
+            order_by: str=None, limit: int=None, allow_api: bool=True
         ) -> Generator[Beatmap, None, None]:
         """Returns a generator of all beatmaps from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
@@ -602,16 +617,23 @@ class Database:
                 favourites    = row[5],
                 userrating    = row[6],
                 playcount     = row[7],
-                passcount     = row[8]
+                passcount     = row[8],
+                updated_at    = row[9]
             )
 
-            updated_at     = row[9]
-            needs_updating = updated_at is None or (updated_at - datetime.utcnow()) > timedelta(days=30)
+            if allow_api:
+                updated_at     = row[9]
+                needs_updating = updated_at is None or (updated_at - datetime.utcnow()) > timedelta(days=30)
 
-            if not beatmap or beatmap.is_incomplete() or needs_updating:
-                # The retrieved beatmap is incomplete, and should be updated.
-                beatmap = Beatmap.from_api(_id=row[0], beatmapset_id=row[1])
-                self.insert_beatmap(beatmap)
+                if not beatmap or beatmap.is_incomplete() or needs_updating:
+                    # The retrieved beatmap is incomplete, and should be updated.
+                    retrieved_beatmap = Beatmap.from_api(_id=row[0], beatmapset_id=row[1])
+                    #if retrieved_beatmap is None:
+                        # Beatmap was likely deleted.
+                        #self.delete_beatmap(beatmap)
+                    
+                    beatmap = retrieved_beatmap
+                    self.insert_beatmap(beatmap)
             
             if beatmap:
                 yield beatmap
@@ -829,15 +851,36 @@ class Database:
         
         for row in (fetched_rows or []):
             await asyncio.sleep(0)  # Return control back to the event loop, granting other tasks a window to start/resume.
-            _type      = row[0]
-            time       = row[1]
-            beatmapset = self.retrieve_beatmapset("id=%s", (row[2],)) if row[2] else None
-            discussion = self.retrieve_discussion("id=%s", (row[3],)) if row[3] else None
-            user       = self.retrieve_user("id=%s", (row[4],)) if row[4] else None
-            group      = Usergroup(row[5], mode=row[6] if row[6] else None) if row[5] else None
-            newspost   = self.retrieve_newspost("id=%s", (row[7],)) if row[7] else None
-            content    = row[8]
-            yield Event(_type, time, beatmapset, discussion, user, group, newspost, content=content)
+            
+            # Treat deleted beatmapsets/discussions as if not stored.
+            with suppress(DeletedContextError):
+                _type      = row[0]
+                time       = row[1]
+                beatmapset = self.retrieve_beatmapset("id=%s", (row[2],)) if row[2] else None
+                discussion = self.retrieve_discussion("id=%s", (row[3],), beatmapset=beatmapset) if row[3] else None
+                user       = self.retrieve_user("id=%s", (row[4],)) if row[4] else None
+                group      = Usergroup(row[5], mode=row[6] if row[6] else None) if row[5] else None
+                newspost   = self.retrieve_newspost("id=%s", (row[7],)) if row[7] else None
+                content    = row[8]
+
+                if beatmapset:
+                    status_time = time
+                    if _type == types.SEV:
+                        reset_event = await self.retrieve_event(
+                            where        = "(type=%s OR type=%s) AND discussion_id=%s",
+                            where_values = ("disqualify", "nomination_reset", discussion.id)
+                        )
+                        if reset_event:
+                            status_time = reset_event.time
+
+                    # Dependent on when the event happened, hence why this is here and not in `retrieve_beatmapset`.
+                    beatmapset.status = self.retrieve_beatmapset_status(
+                        where        = "beatmapset_id=%s AND time < %s",
+                        where_values = (beatmapset.id, status_time),
+                        order_by     = "time DESC"
+                    )
+
+                yield Event(_type, time, beatmapset, discussion, user, group, newspost, content=content)
     
     def __fetch_events(self, where: str, where_values: tuple=None, order_by: str=None, limit: int=None):
         return self.retrieve_table_data(
