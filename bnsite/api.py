@@ -2,24 +2,27 @@ import sys
 sys.path.append('..')
 
 import json
-from typing import Tuple
+from typing import Tuple, Generator
+from datetime import datetime
 
 from aiess.web.ratelimiter import request_with_rate_limit
 from aiess.settings import BNSITE_RATE_LIMIT, BNSITE_HEADERS
+from aiess import timestamp
 
 cache = {}
 def request(route: str, query: str) -> object:
     """Requests the page from the given route and query.
     Caches any response such that requesting the same discussion id yields the same result."""
     request_url = f"https://bn.mappersguild.com/interOp/{route}/{query}"
-    if request_url in cache:
+    if request_url in cache and cache[request_url]:
         return cache[request_url]
 
     response = request_with_rate_limit(
         request_url   = request_url,
         rate_limit    = BNSITE_RATE_LIMIT,
         rate_limit_id = "bnsite",
-        headers       = BNSITE_HEADERS
+        headers       = BNSITE_HEADERS,
+        timeout       = 10
     )
     try:
         result = json.loads(response.text)
@@ -57,17 +60,35 @@ def request_qa_checks(user_id: int) -> object:
     return request("qaEventsByUser", query=user_id)
 
 def request_qa_check_logs(user_id: int) -> object:
+    """Returns the logs of all quality assurance checks done by the user with the given user id. Caches results.
+    This route, unlike `request_qa_checks`, includes timestamps of the checks. Note that logs may contain checks
+    which were later removed."""
+    return request("logs", query=f"{user_id}/qualityAssurance")
+
+def request_qa_check_timestamp(user_id: int, beatmapset_id: int) -> datetime:
+    """Returns when the last qa check on the given map by the given user happened, if any, otherwise None.
+    Makes a request to `request_qa_check_logs`."""
+    logs_json = request("logs", query=f"{user_id}/qualityAssurance")
+    if not logs_json:
+        return
+    
+    for log_json in logs_json:  # Sorted by time ascending; we'll go through newer events first.
+        action = log_json["action"]
+        if action.startswith("Added") and action.endswith(f"s/{beatmapset_id}"):
+            return timestamp.from_string(log_json["createdAt"])
+
+def request_discussion_sev(since: datetime) -> Generator[Tuple[int, int, int, datetime], None, None]:
     """Returns a list of tuples representing the SEV for a reset `(discussion_id, obv, sev, time)`, since
     the given time. If either the severity or obviousness was unchanged, they will be returned as None.
-    If the severity or obviousness was unset, they will be returned as -1."""
-    sev_logs = request("eventsByDate", query=since)
+    If the severity or obviousness were unset, they will be returned as -1."""
+    sev_logs = request("eventsByDate", query=timestamp.to_string(since))
     discussion_ids = []
     discussion_obv = {}
     discussion_sev = {}
     discussion_time = {}
     for sev_log in sev_logs:
-        if "severity" not in sev_log["action"] and "obviousness" not in sev_log["action"]:
-            # May find, e.g. "DQ reason updated to \"xyz\"", which isn't what we're looking for.
+        if "Updated DQ reason" in sev_log["action"] or "Toggled review status" in sev_log["action"]:
+            # May find, e.g. "DQ reason updated to \"xyz\"" or "Toggled review status of s/1457453 to false", which isn't what we're looking for.
             continue
 
         discussion_id = sev_log["relatedId"]["discussionId"]
