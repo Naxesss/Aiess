@@ -881,7 +881,7 @@ class Database:
                     )
 
                 yield Event(_type, time, beatmapset, discussion, user, group, newspost, content=content)
-    
+
     def __fetch_events(self, where: str, where_values: tuple=None, order_by: str=None, limit: int=None):
         return self.retrieve_table_data(
             table        = "events",
@@ -912,25 +912,6 @@ class Database:
             group_by     = "events.id",  # Ensures we don't return the same event more than once.
             order_by     = order_by,
             limit        = limit
-        )
-    
-    def __fetch_events_extensive_count(self, where: str, where_values: tuple=None):
-        return self.retrieve_table_data(
-            table        = f"""events
-                LEFT JOIN {self.db_name}.discussions AS discussion ON events.discussion_id=discussion.id
-                LEFT JOIN {self.db_name}.beatmapsets AS beatmapset ON events.beatmapset_id=beatmapset.id
-                LEFT JOIN {self.db_name}.newsposts AS newspost ON events.news_id=newspost.id
-                LEFT JOIN {self.db_name}.users AS author ON discussion.user_id=author.id
-                LEFT JOIN {self.db_name}.users AS creator ON beatmapset.creator_id=creator.id
-                LEFT JOIN {self.db_name}.users AS user ON events.user_id=user.id
-                LEFT JOIN {self.db_name}.beatmapset_modes AS modes ON beatmapset.id=modes.beatmapset_id
-                    LEFT JOIN {self.db_name}.beatmapset_status AS status ON events.beatmapset_id=status.beatmapset_id
-                LEFT JOIN {self.db_name}.status_nominators AS status_nominator ON status.id=status_nominator.status_id
-                LEFT JOIN {self.db_name}.users AS nominator ON status_nominator.nominator_id=nominator.id""",
-            where        = where,
-            where_values = where_values,
-            selection    = "COUNT(events.id)",
-            group_by     = "events.id"
         )
 
 class CachedDatabase(Database):
