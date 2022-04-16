@@ -19,6 +19,8 @@ class Document():
         self.userId       = event.user.id if event.user else None
         self.artistTitle  = f"{event.beatmapset.artist} - {event.beatmapset.title}"
         self.content      = event.content
+        self.genre        = event.beatmapset.genre
+        self.language     = event.beatmapset.language
 
 def insert_event(event: Event) -> None:
     """Creates a connection to the MongoDB server, inserts the event as a
