@@ -8,6 +8,7 @@ import json
 from aiess.objects import Event, User, NewsPost
 from aiess.timestamp import from_string
 
+# deprecated since https://github.com/ppy/osu-web/pull/8070
 def parse(events: BeautifulSoup) -> Generator[Event, None, None]:
     """Returns a generator of news events from the given /news BeautifulSoup response, parsed top-down."""
     json_index = events.find("script", {"id": "json-index"})
@@ -16,6 +17,10 @@ def parse(events: BeautifulSoup) -> Generator[Event, None, None]:
 
     post_jsons = json.loads(json_index.string)["news_posts"]
     return parse_post_jsons(post_jsons)
+
+def parse_json(news_posts_json: object) -> Generator[Event, None, None]:
+    """Returns a generator of news events from the given /news BeautifulSoup response, parsed top-down."""
+    return parse_post_jsons(news_posts_json)
 
 def parse_post_jsons(post_jsons: Iterator[object]) -> Generator[Event, None, None]:
     """Returns a generator of news events representing the given news post json objects."""
