@@ -237,7 +237,8 @@ def test_insert_retrieve_beatmap(test_database):
         favourites    = 13,
         userrating    = 9.23,
         playcount     = 42938,
-        passcount     = 1202
+        passcount     = 1202,
+        updated_at    = datetime.utcnow()
     )
     test_database.insert_beatmap(beatmap)
 
