@@ -208,6 +208,30 @@ filter_context = FilterContext(
                     else None
                 )
         ),
+        Tag(
+            names           = ["nominator"],
+            description     = "The user that had nominated a beatmapset an event occurred on (e.g. \"lasse\" for any event on sets they nominated).",
+            example_values  = ["lasse", "\"seto kousuke\""],
+            value_hint      = HINT_ANY,
+            value_predicate = lambda value: True,
+            value_func      = lambda event: [escape(nominator) for nominator in event.beatmapset.status.nominators] if event.beatmapset and event.beatmapset.status else None
+        ),
+        Tag(
+            names           = ["nominator-id"],
+            description     = "The id of the user that had nominated a beatmapset an event occurred on (e.g. \"896613\" for any event on sets lasse nominated).",
+            example_values  = ["lasse", "\"seto kousuke\""],
+            value_hint      = HINT_ANY,
+            value_predicate = lambda value: True,
+            value_func      = lambda event: [escape(nominator.id) for nominator in event.beatmapset.status.nominators] if event.beatmapset and event.beatmapset.status else None
+        ),
+        Tag(
+            names           = ["status"],
+            description     = "The ranked status of a beatmapset an event occurred on (e.g. \"nominated\" for any set nominated but not yet qualified).",
+            example_values  = ["nominated", "qualified", "ranked"],
+            value_hint      = "\u2000".join(f"`{mode}`" for mode in ["pending", "nominated", "qualified", "ranked", "loved"]),
+            value_predicate = lambda value: value in ["pending", "nominated", "qualified", "ranked", "loved"],
+            value_func      = lambda event: [escape(event.beatmapset.status.status)] if event.beatmapset and event.beatmapset.status else None
+        ),
         # Discussion
         Tag(
             names           = ["discussion-id"],
@@ -357,7 +381,10 @@ TAG_TO_SQL = {
     filter_context.get_tag("content")               : "events.content LIKE %s",
     filter_context.get_tag("discussion-tab")        : "discussion.tab LIKE %s",
     filter_context.get_tag("discussion-difficulty") : "discussion.difficulty LIKE %s",
-    filter_context.get_tag("tags")                  : "beatmapset.tags LIKE %s"
+    filter_context.get_tag("tags")                  : "beatmapset.tags LIKE %s",
+    filter_context.get_tag("nominator")             : "nominator.name LIKE %s",
+    filter_context.get_tag("nominator-id")          : "nominator.id=%s",
+    filter_context.get_tag("status")                : "status.status LIKE %s"
 }
 
 def filter_to_sql(_filter: str) -> Tuple[str, tuple]:
