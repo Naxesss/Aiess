@@ -79,6 +79,7 @@ class Beatmap:
         self.sr_aim        = None
         self.sr_speed      = None
         self.sr_total      = None
+        self.updated_at    = None
     
     @classmethod
     def from_json(self, beatmap_json: str):
@@ -114,13 +115,14 @@ class Beatmap:
         beatmap.sr_aim        = float(beatmap_json["diff_aim"])   if beatmap_json["diff_aim"]   else None
         beatmap.sr_speed      = float(beatmap_json["diff_speed"]) if beatmap_json["diff_speed"] else None
         beatmap.sr_total      = float(beatmap_json["difficultyrating"])
+        beatmap.updated_at    = datetime.utcnow()
 
         return beatmap
 
     @classmethod
     def from_raw(
             self, _id: int, beatmapset_id: int, version: str, draintime: float, sr_total: float,
-            favourites: int, userrating: float, playcount: int, passcount: int
+            favourites: int, userrating: float, playcount: int, passcount: int, updated_at: object
         ):
         """Returns the beatmap object with the given attributes. This is
         used by the database to reconstruct beatmaps when retrieved."""
@@ -134,6 +136,7 @@ class Beatmap:
         beatmap.userrating    = float(userrating) if userrating is not None else None 
         beatmap.playcount     = int(playcount)    if playcount  is not None else None
         beatmap.passcount     = int(passcount)    if passcount  is not None else None
+        beatmap.updated_at    = updated_at
 
         return beatmap
 
@@ -158,7 +161,8 @@ class Beatmap:
             self.favourites    is None or
             self.userrating    is None or
             self.playcount     is None or
-            self.passcount     is None
+            self.passcount     is None or
+            self.updated_at    is None
         )
 
     def __str__(self) -> str:
