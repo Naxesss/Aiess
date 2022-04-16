@@ -50,6 +50,7 @@ def write(_obj, newline: bool=True, postfix: str="") -> None:
     with a given postfix, if specified."""
     global time_str
     if not time_str:
+        print("WARNING | Logger.write() called before Logger.init(), no logs created!")
         return  # Tests do not initalize the time string.
 
     message = timestamped_str(_obj) if newline else str(_obj)
