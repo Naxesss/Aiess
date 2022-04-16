@@ -45,7 +45,9 @@ TYPE_ALIASES: Dict[str, List[str]] = {
     types.NEWS:         ANY_ALIASES + ["newspost", "newsposts", "news post", "news posts"],
 
     types.ADD:          ANY_ALIASES + ["added", "promote", "promoted"],
-    types.REMOVE:       ANY_ALIASES + ["removed", "demote", "demoted"]
+    types.REMOVE:       ANY_ALIASES + ["removed", "demote", "demoted"],
+
+    types.SEV:          ANY_ALIASES + ["sev/obv", "severity", "sev updated"]
 }
 
 # Includes both full and probationary bns.
