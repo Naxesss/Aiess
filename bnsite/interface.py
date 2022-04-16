@@ -1,4 +1,6 @@
 import sys
+
+from pymongo.common import SERVER_SELECTION_TIMEOUT
 sys.path.append('..')
 
 from aiess import Event
@@ -25,6 +27,6 @@ class Document():
 def insert_event(event: Event) -> None:
     """Creates a connection to the MongoDB server, inserts the event as a
     custom document, then immediately closes the connection."""
-    client = MongoClient(BNSITE_MONGODB_URI, retryWrites=False)
+    client = MongoClient(BNSITE_MONGODB_URI, retryWrites=False, serverSelectionTimeoutMS=120000)
     client.qat_db.aiess.insert_one(vars(Document(event)))
     client.close()
