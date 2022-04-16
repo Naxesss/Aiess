@@ -305,6 +305,15 @@ class Beatmapset:
     
     def __hash__(self) -> str:
         return hash(self.__key())
+    
+    @classmethod
+    def from_api(self, beatmapset_id: int):
+        """Returns the beatmapset with the given id from the osu!api, if any, else None."""
+        beatmapset_json = api.request_beatmapset(beatmapset_id=beatmapset_id)
+        if beatmapset_json:
+            return Beatmapset(beatmapset_json=beatmapset_json)
+        else:
+            return None
 
 class BeatmapsetStatus():
     """Contains information about the ranked status of a beatmapset at some point in time
