@@ -903,6 +903,9 @@ class Database:
                 LEFT JOIN {self.db_name}.users AS creator ON beatmapset.creator_id=creator.id
                 LEFT JOIN {self.db_name}.users AS user ON events.user_id=user.id
                 LEFT JOIN {self.db_name}.beatmapset_modes AS modes ON beatmapset.id=modes.beatmapset_id""",
+                #LEFT JOIN {self.db_name}.beatmapset_status AS status ON events.beatmapset_id=status.beatmapset_id
+                #LEFT JOIN {self.db_name}.status_nominators AS status_nominator ON status.id=status_nominator.status_id
+                #LEFT JOIN {self.db_name}.users AS nominator ON status_nominator.nominator_id=nominator.id""",
             where        = where,
             where_values = where_values,
             selection    = "events.type, events.time, events.beatmapset_id, events.discussion_id, events.user_id, events.group_id, events.group_mode, events.news_id, events.content",
