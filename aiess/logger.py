@@ -7,16 +7,19 @@ PATH_PREFIX = ROOT_PATH + "logs/"
 
 time_str = None
 
+ESC = "\033"
+
 # These are ANSI escape sequences, see http://ascii-table.com/ansi-escape-sequences.php
 class colors:
-    CLEAR = "\033[0m"
+    CLEAR = f"{ESC}[0m"
 
-    LOADING_FILLED = "\033[47m"
-    LOADING_EMPTY  = "\033[44m"
+    LOADING_FILLED = f"{ESC}[47m"
+    LOADING_EMPTY  = f"{ESC}[44m"
 
-    EVENT   = "\033[33m"
-    AUTHOR  = "\033[32m"
-    CONTEXT = "\033[34m"
+    EVENT   = f"{ESC}[33m"
+    AUTHOR  = f"{ESC}[32m"
+    CONTEXT = f"{ESC}[34m"
+
 
 def fmt(string: str, esc_seq: str):
     return f"{esc_seq}{string}{colors.CLEAR}"
