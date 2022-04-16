@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 from enum import Enum
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import total_ordering
 from typing import Union, Tuple
 
@@ -434,7 +434,7 @@ def format_time(
 def format_timeago(time: datetime):
     """Returns the dynamic markdown representation of the time since the given datetime in
     the format "{time} ago" e.g. "a minute ago" / "2 minutes ago" / "3 months ago"."""
-    return f"<t:{int(time.timestamp())}:R>"
+    return f"<t:{int(time.replace(tzinfo=timezone.utc).timestamp())}:R>"
 
 def format_dotted_list(elements: list) -> str:
     """Returns a dotted list representing the given elements."""
