@@ -53,7 +53,17 @@ def test_dissect_user():
 @mock.patch("aiess.objects.api.request_api", no_api_allowed)  # If we get this, simply add the new properties to the test!
 def test_dissect_beatmapset():
     user = User(2, "some two")
-    beatmapset = Beatmapset(4, artist="yes", title="no", creator=user, modes=["osu", "catch"], genre="g", language="l", tags=["tag1", "tag2"])
+    beatmapset = Beatmapset(
+        _id      = 4,
+        artist   = "yes",
+        title    = "no",
+        creator  = user,
+        modes    = ["osu", "catch"],
+        genre    = "g",
+        language = "l",
+        tags     = ["tag1", "tag2"],
+        beatmaps = []
+    )
     event = Event(_type="test", time=datetime.utcnow(), beatmapset=beatmapset)
     assert filter_context.dissect(event) == [
         "set-id:4",
@@ -268,7 +278,7 @@ def test_valid_words():
 
 
 def test_filter_to_sql():
-    assert filter_to_sql("type:nominate and not user:someone") == ("type=%s AND NOT user.name LIKE %s", ("nominate", "someone"))
+    assert filter_to_sql("type:nominate and not user:someone") == ("events.type=%s AND NOT user.name LIKE %s", ("nominate", "someone"))
 
 def test_filter_to_sql_quotations():
     assert filter_to_sql("user:\"space in name\"") == ("user.name LIKE %s", ("space in name",))
