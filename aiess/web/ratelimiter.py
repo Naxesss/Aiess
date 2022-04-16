@@ -5,7 +5,7 @@ from time import sleep
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-from aiess.logger import log_err
+from aiess.logger import log_err, log
 
 next_request_time: Dict[str, datetime] = defaultdict(datetime.utcnow)
 failed_attempts: Dict[str, datetime] = defaultdict(int)
@@ -54,6 +54,8 @@ def try_request(request_url: str, method: str="GET", **kwargs) -> Response:
         log_err("WARNING | CloudFlare IUAM is active")
         return None
     
+    log(f"RECEIVED {response.status_code}: {response.reason}", postfix="requests")
+
     return response
 
 def back_off(rate_limit_id: str=None) -> None:
