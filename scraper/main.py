@@ -10,7 +10,7 @@ from aiess.logger import log, colors, fmt
 from aiess.database import Database, SCRAPER_DB_NAME
 from aiess.reader import merge_concurrent
 
-from scraper.crawler import get_all_events_between, get_news_between, get_group_events_between
+from scraper.crawler import get_all_events_between, get_news_between, get_group_events_between, get_sev_events_between
 
 LAST_CHECKED_POSTFIX = "-last-checked"
 
@@ -36,6 +36,10 @@ async def gather_news() -> None:
 async def gather_group_changes() -> None:
     """Gathers any new newsposts."""
     await gather(get_group_events_between, "groups")
+
+async def gather_sev_changes() -> None:
+    """Gathers any sev changes."""
+    await gather(get_sev_events_between, "sev")
 
 async def gather(async_event_generator, _id: str) -> None:
     """Iterates over new events since the last time, inserts them into the database,
