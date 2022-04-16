@@ -13,6 +13,7 @@ from bot.filterers.event_filterer import filter_to_sql
 from bot.filterer import escape
 from bot.filterer import unescape
 from bot.filterer import get_key_value_pairs
+from bot.filterer import get_invalid_gates
 from bot.filterer import get_invalid_keys
 from bot.filterer import get_invalid_filters
 from bot.filterer import get_invalid_words
@@ -220,6 +221,15 @@ def test_get_tag_undefined():
 
 def test_get_key_value_pairs():
     assert list(get_key_value_pairs("user:someone and content:test")) == [("user", "someone"), ("content", "test")]
+
+def test_invalid_gates_start():
+    assert list(get_invalid_gates("and content:test")) == ["and"]
+
+def test_invalid_gates_start_with_space():
+    assert list(get_invalid_gates(" and content:test")) == ["and"]
+
+def test_invalid_gates_end():
+    assert list(get_invalid_gates("content:test or")) == ["or"]
 
 def test_invalid_keys():
     assert list(get_invalid_keys("content:test or undefined:test and mpaset-id:12389", filter_context)) == ["undefined", "mpaset-id"]
