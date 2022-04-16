@@ -3,6 +3,7 @@ sys.path.append('..')
 
 import asyncio
 from aiohttp.client_exceptions import ClientOSError
+from aiohttp.client_exceptions import ServerDisconnectedError
 
 import discord
 from discord import Message, Game, Status
@@ -60,15 +61,19 @@ class Client(discord.Client):
                     embed   = pre_generated_embed
                 )
                 break
-            except Forbidden:
+            except Forbidden as ex:
                 break  # In case we're subscribed to a channel we don't have access to.
             except ClientOSError as ex:
                 log_err(f"WARNING | Encountered ClientOSError \"{ex}\" when sending to channel \"{channel}\", retrying...")
+            except ServerDisconnectedError as ex:
+                log_err(f"WARNING | Encountered ServerDisconnectedError \"{ex}\" when sending to channel \"{channel}\", retrying...")
             except HTTPException as ex:
                 if ex.text.startswith("5"):
                     # 500-type codes are server-related (i.e. on Discord's end) and can be safely ignored.
                     # Commonly "503: Service Unavailable" and "504: Gateway Time-out".
                     log_err(f"WARNING | Encountered HTTPException \"{ex}\" when sending to channel \"{channel}\", retrying...")
+            except asyncio.TimeoutError as ex:
+                log_err(f"WARNING | Encountered asyncio.TimeoutError \"{ex}\" when sending to channel \"{channel}\", retrying...")
 
 class Reader(aiess.Reader):
     client: Client = None
