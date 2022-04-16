@@ -120,7 +120,8 @@ async def test_format_embed_no_timeago(suggestion_event):
     suggestion_event.time = datetime.utcnow() - timedelta(minutes=5)
     embed: Embed = await format_embed(suggestion_event, skip_timeago_if_recent=True)
     
-    assert embed.fields[0].name == ":yellow_circle:\u2000Suggestion"
+    assert embed.fields[0].name.startswith(":yellow_circle:\u2000Suggestion (<t:")
+    assert embed.fields[0].name.endswith(":R>)")
     assert (
         embed.fields[0].value ==
         "[**artist - title**](https://osu.ppy.sh/beatmapsets/3)\nMapped by [sometwo](https://osu.ppy.sh/users/2) [**osu**]"
@@ -430,8 +431,8 @@ def test_format_time_numeric_deltatime():
     assert format_time(10956, min_unit=None, max_units=None) == "3 h 2 min 36 s"
 
 def test_format_timeago():
-    # 1577833200 is the unix timestamp for 2020-01-01 00:00:00.
-    assert format_timeago(from_string("2020-01-01 00:00:00")) == "<t:1577833200:R>"
+    # 1577836800 is the unix timestamp for 2020-01-01 00:00:00.
+    assert format_timeago(from_string("2020-01-01 00:00:00")) == "<t:1577836800:R>"
 
 def test_format_dotted_list():
     assert format_dotted_list(["abc", "def", "ghi"]) == "∙\u00a0abc\n∙\u00a0def\n∙\u00a0ghi"
