@@ -377,7 +377,7 @@ TAG_TO_SQL = {
     filter_context.get_tag("news-content")          : "newspost.preview LIKE %s",
     filter_context.get_tag("news-author")           : "newspost.author_name LIKE %s",
     filter_context.get_tag("news-author-id")        : "newspost.author_id=%s",
-    filter_context.get_tag("type")                  : "type=%s",
+    filter_context.get_tag("type")                  : "events.type=%s",
     filter_context.get_tag("content")               : "events.content LIKE %s",
     filter_context.get_tag("discussion-tab")        : "discussion.tab LIKE %s",
     filter_context.get_tag("discussion-difficulty") : "discussion.difficulty LIKE %s",
