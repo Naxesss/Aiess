@@ -9,7 +9,7 @@ from discord import Embed
 from bot import commands
 from bot.commands import Command, FunctionWrapper
 from bot.commands import registered_commands
-from bot.filterer import expand, get_invalid_keys, get_invalid_filters, get_invalid_words, get_missing_gate
+from bot.filterer import expand, get_invalid_gates, get_invalid_keys, get_invalid_filters, get_invalid_words, get_missing_gate
 from bot.logic import AND_GATES, OR_GATES, NOT_GATES
 from bot.filterer import FilterContext
 from bot.formatter import format_dotted_list
@@ -24,6 +24,15 @@ async def validate_filter(command: Command, _filter: str, filter_context: Filter
     except ValueError as err:
         # E.g. parenthesis inequality.
         await command.respond_err(f"{str(err)}")
+        return False
+
+    invalid_gates = set(get_invalid_gates(_filter))
+    if invalid_gates:
+        invalids_formatted = "`" + "`, `".join(invalid_gates) + "`"
+        await command.respond_err(
+            response = f"Invalid positioning of gate(s) {invalids_formatted} in expansion `{expansion}`.",
+            embed    = filters_embed(filter_context)
+        )
         return False
 
     invalid_keys = set(get_invalid_keys(_filter, filter_context))
