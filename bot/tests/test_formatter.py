@@ -167,16 +167,6 @@ def test_format_field_name_group_event(group_event):
     assert format_field_name(group_event).startswith(":performing_arts:\u2000Added (< <t:")
     assert format_field_name(group_event).endswith(":R>)")
 
-def test_format_field_name_skip_timeago(suggestion_event):
-    suggestion_event.time = datetime.utcnow() - timedelta(minutes=5)
-    assert format_field_name(suggestion_event, skip_timeago_if_recent=True) == ":yellow_circle:\u2000Suggestion"
-
-def test_format_field_name_dont_skip_timeago(suggestion_event):
-    suggestion_event.time = datetime.utcnow() - timedelta(minutes=20)
-    formatted = format_field_name(suggestion_event, skip_timeago_if_recent=True)
-    assert formatted.startswith(":yellow_circle:\u2000Suggestion (<t:")
-    assert formatted.endswith(":R>)")
-
 @pytest.mark.asyncio
 async def test_format_field_value(suggestion_event):
     assert (
