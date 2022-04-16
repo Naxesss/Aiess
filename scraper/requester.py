@@ -80,8 +80,6 @@ def request_news(_from: datetime, limit: int=20) -> BeautifulSoup:
     """Requests the news home page as a BeautifulSoup object with the newest post being from the given datetime."""
     json_response = apiv2.request_news(cursor_id=0, cursor_published_at=to_string(_from), limit=limit)
     return json_response["news_posts"]
-    # The `id` attribute doesn't seem to matter.
-    #return request_soup(f"https://osu.ppy.sh/home/news?cursor[id]=0&cursor[published_at]={to_string(_from)}&limit={limit}")
 
 def request_group_page(group_id: int) -> BeautifulSoup:
     """Requests the group page of the given group id as a BeautifulSoup object."""
