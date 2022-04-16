@@ -51,6 +51,9 @@ def try_request(request_url: str, method: str="GET", **kwargs) -> Response:
     except requests.exceptions.ConnectionError:
         log_err(f"WARNING | ConnectionError was raised on GET \"{request_url}\"")
         return None
+    except requests.exceptions.ReadTimeout:
+        log_err(f"WARNING | ReadTimeout was raised on GET \"{request_url}\"")
+        return None
     
     if "<title>Just a moment...</title>" in response.text:
         log_err("WARNING | CloudFlare IUAM is active")
