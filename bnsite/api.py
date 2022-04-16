@@ -55,28 +55,6 @@ def request_obv_sev(discussion_id: int) -> Tuple[int, int]:
     
     return (dq_info_json["obviousness"], dq_info_json["severity"])
 
-def request_qa_checks(user_id: int) -> object:
-    """Returns all quality assurance checks done by the user with the given user id. Caches results."""
-    return request("qaEventsByUser", query=user_id)
-
-def request_qa_check_logs(user_id: int) -> object:
-    """Returns the logs of all quality assurance checks done by the user with the given user id. Caches results.
-    This route, unlike `request_qa_checks`, includes timestamps of the checks. Note that logs may contain checks
-    which were later removed."""
-    return request("logs", query=f"{user_id}/qualityAssurance")
-
-def request_qa_check_timestamp(user_id: int, beatmapset_id: int) -> datetime:
-    """Returns when the last qa check on the given map by the given user happened, if any, otherwise None.
-    Makes a request to `request_qa_check_logs`."""
-    logs_json = request("logs", query=f"{user_id}/qualityAssurance")
-    if not logs_json:
-        return
-    
-    for log_json in logs_json:  # Sorted by time ascending; we'll go through newer events first.
-        action = log_json["action"]
-        if action.startswith("Added") and action.endswith(f"s/{beatmapset_id}"):
-            return timestamp.from_string(log_json["createdAt"])
-
 def request_discussion_sev(since: datetime) -> Generator[Tuple[int, int, int, datetime], None, None]:
     """Returns a list of tuples representing the SEV for a reset `(discussion_id, obv, sev, time)`, since
     the given time. If either the severity or obviousness was unchanged, they will be returned as None.
