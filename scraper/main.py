@@ -19,11 +19,14 @@ async def gather_loop() -> None:
     while(True):
         await gather_new_events()
         # We only need to check newsposts between exact hours, as this is when they're posted.
-        if timestamp.get_last(_id="news").hour != datetime.utcnow().hour:
+        if timestamp.get_last("news" + LAST_CHECKED_POSTFIX).hour != datetime.utcnow().hour:
             await gather_news()
         # Group changes happen very rarely compared to other events, but people tend to want these updates quickly.
-        if (datetime.utcnow() - timestamp.get_last(_id="groups")).total_seconds() > 300:
+        if (datetime.utcnow() - timestamp.get_last("groups" + LAST_CHECKED_POSTFIX)).total_seconds() > 300:
             await gather_group_changes()
+        # SEV changes happen more commonly, but people can wait for these updates more than for other events.
+        if (datetime.utcnow() - timestamp.get_last("sev" + LAST_CHECKED_POSTFIX)).total_seconds() > 300:
+            await gather_sev_changes()
 
 async def gather_new_events() -> None:
     """Gathers any new beatmapset/discussion/reply events."""
