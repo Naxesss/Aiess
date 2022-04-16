@@ -149,10 +149,6 @@ def format_field_name(event: Event, skip_timeago_if_recent: bool=False) -> str:
     if event.group:
         return f"{title} (< {format_timeago(event.time)})"
 
-    is_recent = (datetime.utcnow() - event.time).total_seconds() < 600
-    if skip_timeago_if_recent and is_recent:
-        return title
-
     return f"{title} ({format_timeago(event.time)})"
 
 async def format_field_value(event: Event) -> str:
