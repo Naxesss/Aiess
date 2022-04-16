@@ -113,6 +113,10 @@ def wildcard_sensitive_in(substring: str, full_string: str) -> bool:
     """Returns whether the given substring exists in the given full string,
     taking into account any wildcards in the substring. Acceptable wildcards are
     `%` and `_`."""
+    if "%" not in substring and "_" not in substring:
+        # No wildcards, so just check for equality.
+        return substring == full_string
+
     pattern = (
         "^" +
         re.escape(substring)
