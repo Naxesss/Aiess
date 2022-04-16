@@ -47,7 +47,7 @@ class Client(discord.Client):
     async def on_message(self, message: Message) -> None:
         await receiver.receive(message, client=self)
     
-    async def send_event(self, event: Event, subscription: Subscription):
+    async def send_event(self, event: Event, subscription: Subscription, pre_generated_embed: discord.Embed):
         channel = self.get_channel(subscription.channel_id)
         if not channel:
             # Ignore channels we no longer have access to (e.g. deleted / power outage).
@@ -57,7 +57,7 @@ class Client(discord.Client):
             try:
                 await channel.send(
                     content = format_link(event),
-                    embed   = await format_embed(event, skip_timeago_if_recent=True)
+                    embed   = pre_generated_embed
                 )
                 break
             except Forbidden:
