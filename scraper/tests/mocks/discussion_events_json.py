@@ -56,7 +56,7 @@ DISCUSSIONS_JSON = r"""
     },
     "starting_post": {
       "id": 4041540,
-      "beatmap_discussion_id": 1436266,
+      "beatmapset_discussion_id": 1436266,
       "user_id": 11939459,
       "last_editor_id": null,
       "deleted_by_id": null,
@@ -115,7 +115,7 @@ DISCUSSIONS_JSON = r"""
     },
     "starting_post": {
       "id": 4041535,
-      "beatmap_discussion_id": 1436265,
+      "beatmapset_discussion_id": 1436265,
       "user_id": 11939459,
       "last_editor_id": null,
       "deleted_by_id": null,
@@ -174,7 +174,7 @@ DISCUSSIONS_JSON = r"""
     },
     "starting_post": {
       "id": 4041531,
-      "beatmap_discussion_id": 1436264,
+      "beatmapset_discussion_id": 1436264,
       "user_id": 2597417,
       "last_editor_id": null,
       "deleted_by_id": null,
@@ -228,7 +228,7 @@ DISCUSSIONS_JSON = r"""
     },
     "starting_post": {
       "id": 3909724,
-      "beatmap_discussion_id": 1389788,
+      "beatmapset_discussion_id": 1389788,
       "user_id": 11746150,
       "last_editor_id": null,
       "deleted_by_id": null,
@@ -287,7 +287,7 @@ DISCUSSIONS_JSON = r"""
     },
     "starting_post": {
       "id": 4041530,
-      "beatmap_discussion_id": 1436263,
+      "beatmapset_discussion_id": 1436263,
       "user_id": 8050850,
       "last_editor_id": null,
       "deleted_by_id": null,
@@ -346,7 +346,7 @@ DISCUSSIONS_JSON = r"""
     },
     "starting_post": {
       "id": 4041529,
-      "beatmap_discussion_id": 1436262,
+      "beatmapset_discussion_id": 1436262,
       "user_id": 2597417,
       "last_editor_id": null,
       "deleted_by_id": null,
