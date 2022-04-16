@@ -183,7 +183,7 @@ async def format_field_value(event: Event) -> str:
     
     raise ValueError("Cannot format a field value of an event missing a beatmapset, newspost, and group.")
 
-def format_footer_text(event: Event, database: Database=None) -> str:
+def format_footer_text(event: Event) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
     if there's a user associated with the event, otherwise None."""
     if event.newspost:
