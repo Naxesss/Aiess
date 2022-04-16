@@ -2,6 +2,8 @@ import sys
 sys.path.append('..')
 
 import pytest
+import asyncio
+from mock import patch
 from datetime import datetime
 
 from aiess import Event
@@ -65,7 +67,7 @@ class MockClient():
     def __init__(self):
         self.event_sub_pairs = []
 
-    async def send_event(self, event: Event, sub: Subscription) -> None:
+    async def send_event(self, event: Event, sub: Subscription, _) -> None:
         self.event_sub_pairs.append((sub, event))
 
 @pytest.mark.asyncio
@@ -80,8 +82,11 @@ async def test_forward():
     event2 = Event(_type="test2", time=datetime.utcnow())
     client = MockClient()
 
-    await subscriber.forward(event1, client)
-    await subscriber.forward(event2, client)
+    with patch("bot.subscriber.format_embed", return_value=None):
+        await subscriber.forward(event1, client)
+        await subscriber.forward(event2, client)
+
+    await asyncio.sleep(2)
 
     assert (sub_both, event1) in client.event_sub_pairs
     assert (sub_both, event2) in client.event_sub_pairs
