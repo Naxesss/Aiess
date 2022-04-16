@@ -56,7 +56,7 @@ def request_api(request_type: str, query: str) -> object:
     if cache_line in cache:
         return cache[cache_line]
 
-    response = request_with_rate_limit(request, API_RATE_LIMIT, "api")
+    response = request_with_rate_limit(request, API_RATE_LIMIT, "api", timeout = 10)
     try:
         json_response = json.loads(response.text)
         if "error" in json_response:
