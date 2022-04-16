@@ -20,6 +20,9 @@ class colors:
     AUTHOR  = f"{ESC}[32m"
     CONTEXT = f"{ESC}[34m"
 
+    RED = f"{ESC}[31m"
+    GREEN = f"{ESC}[32m"
+    YELLOW = f"{ESC}[33m"
 
 def fmt(string: str, esc_seq: str):
     return f"{esc_seq}{string}{colors.CLEAR}"
