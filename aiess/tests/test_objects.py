@@ -130,7 +130,8 @@ def test_beatmap_from_raw():
         favourites    = 13,
         userrating    = 9.23,
         playcount     = 52893,
-        passcount     = 4712
+        passcount     = 4712,
+        updated_at    = datetime(2016, 1, 1, 12, 0, 0)
     )
     assert beatmap.id == 1
     assert beatmap.beatmapset_id == 3
@@ -153,7 +154,8 @@ def test_beatmap_from_raw_eq():
         favourites    = 13,
         userrating    = 9.23,
         playcount     = 52893,
-        passcount     = 4712
+        passcount     = 4712,
+        updated_at    = datetime(2016, 1, 1, 12, 0, 0)
     )
     beatmap2 = Beatmap.from_raw(
         _id           = 1,
@@ -164,7 +166,8 @@ def test_beatmap_from_raw_eq():
         favourites    = 13,
         userrating    = 9.23,
         playcount     = 52893,
-        passcount     = 4712
+        passcount     = 4712,
+        updated_at    = datetime(2016, 1, 1, 12, 0, 0)
     )
     beatmap3 = Beatmap.from_raw(
         _id           = 1,
@@ -175,7 +178,8 @@ def test_beatmap_from_raw_eq():
         favourites    = 13,
         userrating    = 9.23,
         playcount     = 52893,
-        passcount     = 4712
+        passcount     = 4712,
+        updated_at    = datetime(2016, 1, 1, 12, 0, 0)
     )
     assert beatmap1 == beatmap2
     assert beatmap1.version != beatmap3.version
