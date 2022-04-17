@@ -113,3 +113,13 @@ CREATE TABLE `newsposts` (
   KEY `newsposts_author_id_fk_idx` (`author_id`),
   CONSTRAINT `newsposts_author_id_fk` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DROP TABLE IF EXISTS `discussion_obv_sev`;
+CREATE TABLE `discussion_obv_sev` (
+  `id` bigint(20) unsigned NOT NULL,
+  `obv` INT unsigned NOT NULL,
+  `sev` INT unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  CONSTRAINT `discussion_obv_sev_id` FOREIGN KEY (`id`) REFERENCES `discussions` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
