@@ -52,6 +52,20 @@ CREATE TABLE `group_users` (
   PRIMARY KEY (`group_id`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+DROP TABLE IF EXISTS `beatmapsets`;
+CREATE TABLE `beatmapsets` (
+  `id` bigint(20) unsigned NOT NULL,
+  `title` mediumtext,
+  `artist` mediumtext,
+  `creator_id` bigint(20) unsigned NOT NULL,
+  `genre` mediumtext,
+  `language` mediumtext,
+  `tags` mediumtext,
+  PRIMARY KEY (`id`),
+  KEY `beatmapsetsfk_creator_id_idx` (`creator_id`),
+  CONSTRAINT `beatmapsetsfk_creator_id` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 DROP TABLE IF EXISTS `beatmaps`;
 CREATE TABLE `beatmaps` (
   `id` bigint(20) unsigned NOT NULL,
@@ -66,20 +80,6 @@ CREATE TABLE `beatmaps` (
   `updated_at` DATETIME,
   PRIMARY KEY (`id`),
   CONSTRAINT `beatmapsfk_beatmapset_id` FOREIGN KEY (`beatmapset_id`) REFERENCES `beatmapsets` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-DROP TABLE IF EXISTS `beatmapsets`;
-CREATE TABLE `beatmapsets` (
-  `id` bigint(20) unsigned NOT NULL,
-  `title` mediumtext,
-  `artist` mediumtext,
-  `creator_id` bigint(20) unsigned NOT NULL,
-  `genre` mediumtext,
-  `language` mediumtext,
-  `tags` mediumtext,
-  PRIMARY KEY (`id`),
-  KEY `beatmapsetsfk_creator_id_idx` (`creator_id`),
-  CONSTRAINT `beatmapsetsfk_creator_id` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 DROP TABLE IF EXISTS `beatmapset_status`;
