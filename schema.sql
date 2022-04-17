@@ -52,6 +52,22 @@ CREATE TABLE `group_users` (
   PRIMARY KEY (`group_id`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+DROP TABLE IF EXISTS `beatmaps`;
+CREATE TABLE `beatmaps` (
+  `id` bigint(20) unsigned NOT NULL,
+  `beatmapset_id` bigint(20) unsigned NOT NULL,
+  `version` TINYTEXT,
+  `draintime` DOUBLE unsigned NOT NULL,
+  `sr_total` DOUBLE unsigned NOT NULL,
+  `favourites` bigint(20) unsigned,
+  `userrating` FLOAT,
+  `playcount` bigint(20) unsigned,
+  `passcount` bigint(20) unsigned,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `beatmapsfk_beatmapset_id` FOREIGN KEY (`beatmapset_id`) REFERENCES `beatmapsets` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 DROP TABLE IF EXISTS `beatmapsets`;
 CREATE TABLE `beatmapsets` (
   `id` bigint(20) unsigned NOT NULL,
@@ -64,6 +80,25 @@ CREATE TABLE `beatmapsets` (
   PRIMARY KEY (`id`),
   KEY `beatmapsetsfk_creator_id_idx` (`creator_id`),
   CONSTRAINT `beatmapsetsfk_creator_id` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DROP TABLE IF EXISTS `beatmapset_status`;
+CREATE TABLE `beatmapset_status` (
+  `id` bigint(20) unsigned NOT NULL,
+  `beatmapset_id` bigint(20) unsigned NOT NULL,
+  `status` VARCHAR(32) NOT NULL,
+  `time` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `beatmapset_statusfk_beatmapset_id` FOREIGN KEY (`beatmapset_id`) REFERENCES `beatmapsets` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DROP TABLE IF EXISTS `status_nominators`;
+CREATE TABLE `status_nominators` (
+  `status_id` bigint(20) unsigned NOT NULL,
+  `nominator_id` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`status_id`, `nominator_id`),
+  CONSTRAINT `status_nominatorsfk_status_id` FOREIGN KEY (`status_id`) REFERENCES `beatmapset_status` (`id`),
+  CONSTRAINT `status_nominatorsfk_nominator_id` FOREIGN KEY (`nominator_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 DROP TABLE IF EXISTS `discussions`;
