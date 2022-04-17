@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 from enum import Enum
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import total_ordering
 from typing import Union, Tuple
 
@@ -75,7 +75,9 @@ type_props = {
     types.NEWS:               TypeProps(None,                        None,               colour_news),
 
     types.ADD:                TypeProps(":performing_arts:",         "Added",            colour_added),
-    types.REMOVE:             TypeProps(":performing_arts:",         "Removed",          colour_removed)
+    types.REMOVE:             TypeProps(":performing_arts:",         "Removed",          colour_removed),
+    
+    types.SEV:                TypeProps(":scales:",                  "SEV Updated",      colour_ranked,      show_context=True)
 }
 
 def format_link(event: Event) -> str:
@@ -147,10 +149,6 @@ def format_field_name(event: Event, skip_timeago_if_recent: bool=False) -> str:
     if event.group:
         return f"{title} (< {format_timeago(event.time)})"
 
-    is_recent = (datetime.utcnow() - event.time).total_seconds() < 600
-    if skip_timeago_if_recent and is_recent:
-        return title
-
     return f"{title} ({format_timeago(event.time)})"
 
 async def format_field_value(event: Event) -> str:
@@ -185,7 +183,7 @@ async def format_field_value(event: Event) -> str:
     
     raise ValueError("Cannot format a field value of an event missing a beatmapset, newspost, and group.")
 
-def format_footer_text(event: Event, database: Database=None) -> str:
+def format_footer_text(event: Event) -> str:
     """Returns the footer text of the event (e.g. modder \"00:01:318 - fix blanket\"),
     if there's a user associated with the event, otherwise None."""
     if event.newspost:
@@ -197,6 +195,9 @@ def format_footer_text(event: Event, database: Database=None) -> str:
             return Embed.Empty
         else:
             return f"NAT {format_preview(event.content)}"
+
+    if event.type == types.SEV:
+        return f"NAT {format_preview(event.content)}"
 
     if not event.user:
         return Embed.Empty
@@ -250,6 +251,9 @@ def format_footer_icon_url(event: Event) -> str:
         else:
             # `6616586` is the user id for the QAT bot, which I'm just going to use to represent the NAT/BNSite.
             return "https://a.ppy.sh/6616586"
+
+    if event.type == types.SEV:
+        return "https://a.ppy.sh/6616586"
 
     if event.user and not event.group:
         if event.user.id:
@@ -320,7 +324,7 @@ async def format_history(beatmapset: Beatmapset, length_limit: int=None, databas
             long_history
         )
 
-    if length_limit is None or len(long_history) <= length_limit:
+    if length_limit is None or len(long_history) < length_limit:
         return f"\n{long_history}"
     
     short_history = ""
@@ -427,16 +431,10 @@ def format_time(
 
     return " ".join(formatted_units) if formatted_units else f"< 1 {unit_str(min_unit, long=long, size=1)}"
 
-def format_timeago(time: datetime, min_unit: TimeUnit=TimeUnit.SECONDS, max_units: int=1, bold=True):
-    """Returns the string representation of the time since the given datetime, using `format_time`, in
-    the format "{time} ago". Always uses long units (e.g. "seconds", not "s"). Surrounds {time}
-    in bold markup (**) if `bold`."""
-    delta_time = datetime.utcnow() - time
-    formatted_time = format_time(delta_time, min_unit=min_unit, max_units=max_units, long=True)
-    if bold:
-        formatted_time = f"**{formatted_time}**"
-
-    return f"{formatted_time} ago"
+def format_timeago(time: datetime):
+    """Returns the dynamic markdown representation of the time since the given datetime in
+    the format "{time} ago" e.g. "a minute ago" / "2 minutes ago" / "3 months ago"."""
+    return f"<t:{int(time.replace(tzinfo=timezone.utc).timestamp())}:R>"
 
 def format_dotted_list(elements: list) -> str:
     """Returns a dotted list representing the given elements."""

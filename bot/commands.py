@@ -153,7 +153,8 @@ def help_embed(name: str, prefix: str=DEFAULT_PREFIX) -> Embed:
     embed = Embed()
     embed.add_field(
         name   = f"**{str(wrapper)}**".replace("{0}", prefix),
-        value  = wrapper.description.replace("{0}", prefix) if wrapper.description else "Description missing.",
+        value  = (wrapper.description.replace("{0}", prefix) if wrapper.description else "Description missing.") +
+            ("\n⚠️ This is work-in-progress, and cannot be used yet! ⚠️" if wrapper.wip else ""),
         inline = True
     )
     if wrapper.example_args:

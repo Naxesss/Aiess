@@ -22,5 +22,11 @@
     "bnstats-headers":
     {
         "Authorization": "${BNSTATS_HEADER_VALUE}"
-    }
+    },
+    "bnplanner-headers":
+    {
+        "Authorization": "${BNPLANNER_HEADER_VALUE}"
+    },
+    "apiv2-client-id": "${APIV2_CLIENT_ID}",
+    "apiv2-client-secret": "${APIV2_CLIENT_SECRET}"
 }

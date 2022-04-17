@@ -52,8 +52,8 @@ async def test_recent():
     assert "https://osu.ppy.sh/beatmapsets/1" in mock_command.response
     assert mock_command.response_embed
     assert mock_command.response_embed.fields
-    assert mock_command.response_embed.fields[0].name.startswith(":heart:\u2000Qualified (**")
-    assert mock_command.response_embed.fields[0].name.endswith("** ago)")
+    assert mock_command.response_embed.fields[0].name.startswith(":heart:\u2000Qualified (<t:")
+    assert mock_command.response_embed.fields[0].name.endswith(":R>)")
     assert "artist - title" in mock_command.response_embed.fields[0].value
     assert "sometwo" in mock_command.response_embed.fields[0].value
     assert mock_command.response_embed.footer.text == "somefour \"nicely done\""
@@ -91,8 +91,8 @@ async def test_recent_no_args():
     assert "https://osu.ppy.sh/beatmapsets/1" in mock_command.response
     assert mock_command.response_embed
     assert mock_command.response_embed.fields
-    assert mock_command.response_embed.fields[0].name.startswith(":heart:\u2000Qualified (**")
-    assert mock_command.response_embed.fields[0].name.endswith("** ago)")
+    assert mock_command.response_embed.fields[0].name.startswith(":heart:\u2000Qualified (<t:")
+    assert mock_command.response_embed.fields[0].name.endswith(":R>)")
     assert "artist - title" in mock_command.response_embed.fields[0].value
     assert "sometwo" in mock_command.response_embed.fields[0].value
     assert mock_command.response_embed.footer.text == "somefour \"nicely done\""
@@ -141,7 +141,7 @@ async def test_recent_invalid_word():
     assert mock_command.response.startswith("✗")
     assert "invalid word" in mock_command.response.lower()
 
-async def mock_retrieve_event(self, where, where_values, extensive):
+async def mock_retrieve_event(self, **kwargs):
     raise TimeoutError
 
 @pytest.mark.asyncio

@@ -2,6 +2,7 @@ import sys
 sys.path.append('..')
 
 import pytest
+import json
 
 from aiess import timestamp
 
@@ -36,20 +37,8 @@ def test_parse_discussion_diff():
 
     assert actual_content == expected_content
 
-def test_parse():
-    generator = discussion_event_parser.parse(discussion_events.soup)
-
-    generated_events = []
-    for event in generator:
-        generated_events.append(event)
-    
-    assert len(generated_events) == 1  # 1 of 2 events is of a beatmapset that no longer exists.
-    assert generated_events[0].type == "suggestion"
-    assert generated_events[0].discussion.tab == "timeline"
-    assert generated_events[0].discussion.difficulty == "Expert"
-
 def test_parse_json():
-    generator = discussion_event_parser.parse(discussion_events_json.soup)
+    generator = discussion_event_parser.parse(json.loads(discussion_events_json.DISCUSSIONS_JSON))
 
     generated_events = []
     for event in generator:

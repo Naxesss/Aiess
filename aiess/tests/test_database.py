@@ -2,10 +2,12 @@ import pytest
 from mysql.connector.errors import ProgrammingError
 from datetime import datetime, timedelta
 
-from aiess.objects import User, Beatmapset, Discussion, Event, NewsPost, Usergroup
+from aiess import event_types as types
+from aiess.objects import User, Beatmapset, BeatmapsetStatus, Beatmap, Discussion, Event, NewsPost, Usergroup
 from aiess.database import Database, CachedDatabase, SCRAPER_TEST_DB_NAME
 from aiess.common import anext
 from aiess.timestamp import from_string
+from aiess.tests.mocks.api import old_beatmap as mock_old_beatmap
 
 @pytest.fixture
 def test_database():
@@ -13,7 +15,10 @@ def test_database():
     # Reset database to state before any tests ran.
     database.clear_table_data("events")
     database.clear_table_data("discussions")
+    database.clear_table_data("discussion_obv_sev")
     database.clear_table_data("beatmapsets")
+    database.clear_table_data("beatmapset_status")
+    database.clear_table_data("status_nominators")
     database.clear_table_data("beatmapset_modes")
     database.clear_table_data("newsposts")
     database.clear_table_data("group_users")
@@ -24,7 +29,10 @@ def test_database():
 def test_correct_setup(test_database):
     assert not test_database.retrieve_table_data("events")
     assert not test_database.retrieve_table_data("discussions")
+    assert not test_database.retrieve_table_data("discussion_obv_sev")
     assert not test_database.retrieve_table_data("beatmapsets")
+    assert not test_database.retrieve_table_data("beatmapset_status")
+    assert not test_database.retrieve_table_data("status_nominators")
     assert not test_database.retrieve_table_data("beatmapset_modes")
     assert not test_database.retrieve_table_data("newsposts")
     assert not test_database.retrieve_table_data("group_users")
@@ -118,7 +126,7 @@ async def test_insert_retrieve_event_group_change_hybrid(test_database):
     test_database.insert_event(event_old)
     test_database.insert_event(event)
 
-    retrieved_event = await test_database.retrieve_event("type=%s ORDER BY time DESC", ("add",))
+    retrieved_event = await test_database.retrieve_event("type=%s", ("add",), order_by="time DESC")
     assert retrieved_event.type == event.type
     assert retrieved_event.time == event.time
     assert retrieved_event.group == event.group
@@ -198,7 +206,53 @@ def test_insert_retrieve_beatmapset(test_database):
     assert retrieved_beatmapset.modes == beatmapset.modes
     assert retrieved_beatmapset.genre == beatmapset.genre
     assert retrieved_beatmapset.language == beatmapset.language
+    assert retrieved_beatmapset.beatmaps == beatmapset.beatmaps
     assert retrieved_beatmapset == beatmapset
+
+def test_insert_retrieve_beatmapset_with_beatmaps(test_database):
+    # Major difference between `allow_api=False` and from json is
+    # that latter actually makes the `beatmaps` field populated, and
+    # so we test whether that's inserted and retrieved properly here.
+    beatmapset = Beatmapset(41823, beatmapset_json=mock_old_beatmap.JSON)
+    test_database.insert_beatmapset(beatmapset)
+
+    retrieved_beatmapset = test_database.retrieve_beatmapset(where="id=%s", where_values=(41823,))
+    assert retrieved_beatmapset.id == beatmapset.id
+    assert retrieved_beatmapset.artist == beatmapset.artist
+    assert retrieved_beatmapset.title == beatmapset.title
+    assert retrieved_beatmapset.creator == beatmapset.creator
+    assert retrieved_beatmapset.modes == beatmapset.modes
+    assert retrieved_beatmapset.genre == beatmapset.genre
+    assert retrieved_beatmapset.language == beatmapset.language
+    assert retrieved_beatmapset.beatmaps == beatmapset.beatmaps
+    assert retrieved_beatmapset == beatmapset
+
+def test_insert_retrieve_beatmap(test_database):
+    beatmap = Beatmap.from_raw(
+        _id           = 1,
+        beatmapset_id = 3,
+        version       = "test",
+        draintime     = 93.4,
+        sr_total      = 3.428924,
+        favourites    = 13,
+        userrating    = 9.23,
+        playcount     = 42938,
+        passcount     = 1202,
+        updated_at    = datetime.utcnow()
+    )
+    test_database.insert_beatmap(beatmap)
+
+    retrieved_beatmap = test_database.retrieve_beatmap(where="id=%s", where_values=(1,))
+    assert retrieved_beatmap.id == beatmap.id
+    assert retrieved_beatmap.beatmapset_id == beatmap.beatmapset_id
+    assert retrieved_beatmap.version == beatmap.version
+    assert retrieved_beatmap.draintime == beatmap.draintime
+    assert retrieved_beatmap.sr_total == beatmap.sr_total
+    assert retrieved_beatmap.favourites == beatmap.favourites
+    assert retrieved_beatmap.userrating == beatmap.userrating
+    assert retrieved_beatmap.playcount == beatmap.playcount
+    assert retrieved_beatmap.passcount == beatmap.passcount
+    assert retrieved_beatmap == beatmap
 
 def test_insert_retrieve_discussion(test_database):
     user = User(1, name="test")
@@ -248,6 +302,101 @@ def test_insert_retrieve_discussion_and_replies(test_database):
     assert retrieved_problem
     assert retrieved_reply1
     assert retrieved_reply2
+
+def test_insert_retrieve_beatmapset_status(test_database):
+    creator = User(3, name="test")
+    user1 = User(1, name="someone")
+    user2 = User(2, name="sometwo")
+    beatmapset = Beatmapset(1, creator=creator, allow_api=False)
+    status = BeatmapsetStatus(
+        _id        = 1,
+        beatmapset = beatmapset,
+        status     = "qualified",
+        time       = from_string("2020-01-01 00:00:00"),
+        nominators = [user1, user2]
+    )
+    test_database.insert_beatmapset_status(status)
+
+    retrieved_status = test_database.retrieve_beatmapset_status("beatmapset_id=%s", (beatmapset.id,))
+    assert retrieved_status.beatmapset == status.beatmapset
+    assert retrieved_status.status == status.status
+    assert retrieved_status.time == status.time
+    assert retrieved_status.nominators == status.nominators
+    assert retrieved_status == status
+
+def test_update_beatmapset_status_nom(test_database):
+    creator = User(3, name="test")
+    user = User(1, name="someone")
+    beatmapset = Beatmapset(1, creator=creator, allow_api=False)
+    event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=user)
+
+    test_database.insert_event(event)  # Should call `update_beatmapset_status`.
+
+    retrieved_status = test_database.retrieve_beatmapset_status("beatmapset_id=%s", (beatmapset.id,))
+    assert retrieved_status.status == "nominated"
+    assert retrieved_status.nominators == [user]
+
+def test_update_beatmapset_status_nom_qual(test_database):
+    creator = User(3, name="test")
+    user1 = User(1, name="someone")
+    user2 = User(2, name="sometwo")
+    beatmapset = Beatmapset(1, creator=creator, allow_api=False)
+    event1 = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=user1)
+    event2 = Event("qualify", from_string("2020-01-01 00:01:00"), beatmapset, user=user2)
+
+    test_database.insert_event(event1)
+    test_database.insert_event(event2)
+
+    retrieved_status = test_database.retrieve_beatmapset_status("beatmapset_id=%s ORDER BY time DESC", (beatmapset.id,))
+    assert retrieved_status.status == "qualified"
+    assert retrieved_status.nominators == [user1, user2]
+
+def test_update_beatmapset_status_nom_qual_dq(test_database):
+    creator = User(3, name="test")
+    user1 = User(1, name="someone")
+    user2 = User(2, name="sometwo")
+    beatmapset = Beatmapset(1, creator=creator, allow_api=False)
+    event1 = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=user1)
+    event2 = Event("qualify", from_string("2020-01-01 00:01:00"), beatmapset, user=user2)
+    event3 = Event("disqualify", from_string("2020-01-02 00:00:00"), beatmapset, user=user1)
+
+    test_database.insert_event(event1)
+    test_database.insert_event(event2)
+    test_database.insert_event(event3)
+
+    retrieved_status = test_database.retrieve_beatmapset_status("beatmapset_id=%s ORDER BY time DESC", (beatmapset.id,))
+    assert retrieved_status.status == "pending"
+    assert retrieved_status.nominators == []
+    
+    retrieved_status = test_database.retrieve_beatmapset_status("beatmapset_id=%s AND time=%s", (beatmapset.id, from_string("2020-01-01 00:01:00")))
+    assert retrieved_status.status == "qualified"
+    assert retrieved_status.nominators == [user1, user2]
+
+def test_insert_retrieve_obv_sev(test_database):
+    user = User(1, name="test")
+    beatmapset = Beatmapset(1, creator=user, allow_api=False)
+    discussion = Discussion(1, beatmapset=beatmapset, user=user, content="testing", tab="tab", difficulty="diff")
+    test_database.insert_obv_sev(discussion, obv=2, sev=0)
+
+    obv, sev = test_database.retrieve_obv_sev(discussion_id=1)
+    assert obv == 2
+    assert sev == 0
+
+def test_insert_retrieve_obv_sev_missing(test_database):
+    obv, sev = test_database.retrieve_obv_sev(discussion_id=3)
+    assert obv is None
+    assert sev is None
+
+def test_insert_retrieve_obv_sev_event(test_database):
+    user = User(1, name="test")
+    beatmapset = Beatmapset(1, creator=user, allow_api=False)
+    discussion = Discussion(1, beatmapset=beatmapset, user=user, content="testing", tab="tab", difficulty="diff")
+    event = Event(_type=types.SEV, time=from_string("2020-01-01 00:00:00"), beatmapset=beatmapset, discussion=discussion, content="2/0")
+    test_database.insert_obv_sev_event(event)
+
+    obv, sev = test_database.retrieve_obv_sev(discussion_id=1)
+    assert obv == 2
+    assert sev == 0
 
 def test_insert_retrieve_newspost(test_database):
     author = User(1, name="test")
@@ -370,7 +519,10 @@ def cached_database():
     # Reset database to state before any tests ran.
     database.clear_table_data("events")
     database.clear_table_data("discussions")
+    database.clear_table_data("discussion_obv_sev")
     database.clear_table_data("beatmapsets")
+    database.clear_table_data("beatmapset_status")
+    database.clear_table_data("status_nominators")
     database.clear_table_data("beatmapset_modes")
     database.clear_table_data("newsposts")
     database.clear_table_data("group_users")

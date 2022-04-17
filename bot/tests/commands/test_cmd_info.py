@@ -42,9 +42,9 @@ async def test_info():
     assert mock_command.response_embed.author.icon_url == "avatar url"
     assert mock_command.response_embed.description == "description"
 
-    assert mock_command.response_embed.fields[0].name == "Created at"
-    assert mock_command.response_embed.fields[0].value.startswith("**2020-01-01**\n(**")
-    assert mock_command.response_embed.fields[0].value.endswith("** ago)")
+    assert mock_command.response_embed.fields[0].name == "Created"
+    assert mock_command.response_embed.fields[0].value.startswith("**2020-01-01**\n(<t:")
+    assert mock_command.response_embed.fields[0].value.endswith(":R>)")
 
     assert mock_command.response_embed.fields[1].name == "Author"
     assert mock_command.response_embed.fields[1].value == "owner"
@@ -58,11 +58,11 @@ async def test_info():
     assert mock_command.response_embed.fields[4].name == "Subscriptions"
     assert mock_command.response_embed.fields[4].value == "**6** in total across **5** servers"
     
-    assert mock_command.response_embed.fields[5].name == "First event at"
-    assert mock_command.response_embed.fields[5].value.startswith("**2020-01-01**\n(**")
-    assert mock_command.response_embed.fields[5].value.endswith("** ago)")
+    assert mock_command.response_embed.fields[5].name == "First event"
+    assert mock_command.response_embed.fields[5].value.startswith("**2020-01-01**\n(<t:")
+    assert mock_command.response_embed.fields[5].value.endswith(":R>)")
 
-def mock_retrieve_table_data(self, table, where, selection):
+def mock_retrieve_table_data(self, **kwargs):
     raise TimeoutError
 
 @mock.patch("bot.cmd_modules.cmd_info.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME)

@@ -113,6 +113,10 @@ def wildcard_sensitive_in(substring: str, full_string: str) -> bool:
     """Returns whether the given substring exists in the given full string,
     taking into account any wildcards in the substring. Acceptable wildcards are
     `%` and `_`."""
+    if "%" not in substring and "_" not in substring:
+        # No wildcards, so just check for equality.
+        return substring == full_string
+
     pattern = (
         "^" +
         re.escape(substring)
@@ -150,6 +154,13 @@ def get_key_value_pairs(_filter: str) -> Generator[Tuple[str, str], None, None]:
     expansion = expand(_filter)
     for match in re.finditer(KEY_VALUE_PATTERN, expansion):
         yield (match.group(1), match.group(2).strip("\""))
+
+def get_invalid_gates(_filter: str) -> Generator[str, None, None]:
+    """Returns a generator of invalid gates from the given filter (i.e. starting or ending the filter with one)."""
+    expanded_filter = expand(_filter).strip()
+    for gate in map(lambda g: g.strip(), (AND_GATES + OR_GATES)):
+        if expanded_filter.startswith(gate) or expanded_filter.endswith(gate):
+            yield gate
 
 def get_invalid_keys(_filter: str, filter_context: FilterContext) -> Generator[str, None, None]:
     """Returns a generator of invalid keys from the given filter."""
@@ -189,6 +200,7 @@ def get_missing_gate(_filter: str) -> Generator[str, None, None]:
 
 def is_valid(_filter: str, filter_context: FilterContext) -> bool:
     if (
+        list(get_invalid_gates(_filter)) or
         list(get_invalid_keys(_filter, filter_context)) or
         list(get_invalid_filters(_filter, filter_context)) or
         list(get_invalid_words(_filter))

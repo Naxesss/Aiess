@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from aiess.timestamp import from_string
 from bnsite import api
@@ -75,17 +75,14 @@ def test_request_dq_info_missing():
     json = api.request_dq_info(discussion_id=4)
     assert not json
 
-def test_request_qa_checks():
-    json = api.request_qa_checks(user_id=10974170)
-    assert json
-    assert json[0]
-    assert int(json[0]["event"]["beatmapsetId"])
-    assert from_string(json[0]["timestamp"])
-
-def test_request_qa_checks_none():
-    json = api.request_qa_checks(user_id=5128277)
-    assert not json
-
-def test_request_qa_checks_missing():
-    json = api.request_qa_checks(user_id=4)
-    assert not json
+def test_request_sev_events():
+    tuples = api.request_discussion_sev(datetime.utcnow() - timedelta(days=7))
+    assert tuples
+    amount = 0
+    for discussion_id, obv, sev, time in tuples:
+        assert discussion_id is not None
+        assert obv is not None or sev is not None
+        assert time is not None
+        amount += 1
+    
+    assert amount > 10

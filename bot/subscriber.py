@@ -1,6 +1,7 @@
 import sys
 sys.path.append('..')
 
+import asyncio
 from typing import List, Union
 import discord
 from discord import TextChannel
@@ -9,6 +10,7 @@ from aiess import Event
 
 from bot.objects import Subscription
 from bot.database import Database, BOT_DB_NAME
+from bot.formatter import format_embed
 from bot.filterers.event_filterer import filter_context
 
 DEFAULT_DB_NAME = BOT_DB_NAME
@@ -62,6 +64,16 @@ def get_subscription(channel: TextChannel) -> Subscription:
 
 async def forward(event: Event, client: discord.Client) -> None:
     """Attempts to forward an event through all subscription filters."""
+    pre_generated_embed = await format_embed(event, skip_timeago_if_recent=True)
+
+    tasks = []
+
     for sub in cache:
-        if filter_context.test(sub.filter, event):
-            await client.send_event(event, sub)
+        tasks.append(asyncio.create_task(forward_sub(event, sub, client, pre_generated_embed)))
+    
+    await asyncio.gather(*tasks)
+
+async def forward_sub(event: Event, sub: Subscription, client: discord.Client, pre_generated_embed: discord.Embed) -> None:
+    """Attempts to forward an event through the filter of the given subscription."""
+    if filter_context.test(sub.filter, event):
+        await client.send_event(event, sub, pre_generated_embed)

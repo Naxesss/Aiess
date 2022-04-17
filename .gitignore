@@ -13,3 +13,11 @@ time/
 
 # VS Code config
 .vscode
+
+# Temporary scripts & caches
+stats/
+temp/
+*.pk
+
+# Assets
+assets/

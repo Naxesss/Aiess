@@ -36,12 +36,10 @@ async def cmd_recent(command: Command, _filter: str=None):
     database = Database(SCRAPER_DB_NAME)
     try:
         event = await database.retrieve_event(
-            where        = f"""
-                {filter_query}
-                ORDER BY time DESC
-                """,
+            where        = filter_query,
             where_values = filter_values,
-            extensive    = True
+            order_by     = "time DESC",
+            extensive    = True if _filter else False
         )
     except TimeoutError:
         await command.respond_err(f"Took too long to find an event{matching_filter_str}.")

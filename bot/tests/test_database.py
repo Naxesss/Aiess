@@ -115,7 +115,7 @@ def test_insert_retrieve_permissions(bot_test_database):
 
 @pytest.mark.asyncio
 async def test_retrieve_beatmapset_events(scraper_test_database):
-    beatmapset = Beatmapset(3, creator=User(4, "creator"), allow_api=False)
+    beatmapset = Beatmapset(1, creator=User(4, "creator"), allow_api=False)
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
     suggestion_event = Event("suggestion", from_string("2020-01-01 01:00:00"), beatmapset, user=User(3, "somethree"))
@@ -131,7 +131,7 @@ async def test_retrieve_beatmapset_events(scraper_test_database):
 
 @pytest.mark.asyncio
 async def test_retrieve_beatmapset_events_cache(scraper_test_database):
-    beatmapset = Beatmapset(3, creator=User(4, "creator"), allow_api=False)
+    beatmapset = Beatmapset(1, creator=User(4, "creator"), allow_api=False)
     nom_event = Event("nominate", from_string("2020-01-01 00:00:00"), beatmapset, user=User(1, "someone"))
     qual_event = Event("qualify", from_string("2020-01-01 05:00:00"), beatmapset, user=User(2, "sometwo"))
 
@@ -139,7 +139,7 @@ async def test_retrieve_beatmapset_events_cache(scraper_test_database):
     scraper_test_database.insert_event(qual_event)
     
     await scraper_test_database.retrieve_beatmapset_events(beatmapset)
-    assert db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME][3] == [qual_event, nom_event]
+    assert db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME][1] == [qual_event, nom_event]
 
     db_module.clear_cache(SCRAPER_TEST_DB_NAME)
     assert not db_module.beatmapset_event_cache[SCRAPER_TEST_DB_NAME]

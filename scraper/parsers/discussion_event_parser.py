@@ -10,32 +10,16 @@ from aiess.objects import Event, Beatmapset, User, Discussion
 from aiess.errors import ParsingError, DeletedContextError
 from aiess import timestamp
 from aiess.logger import log_err
+from aiess import event_types as types
 
 from scraper.parsers.event_parser import EventParser
 
 class DiscussionEventParser(EventParser):
 
-    def parse(self, events: BeautifulSoup) -> Generator[Event, None, None]:
-        """Returns a generator of BeatmapsetEvents, from the given /beatmapset-discussions BeautifulSoup response, parsed top-down."""
-        json_discussions = events.find("script", {"id": "json-discussions"})
-        json_users = events.find("script", {"id": "json-users"})
-
-        if not json_discussions or not json_users:
-            # Currently /beatmap-discussions uses json, but not /beatmap-discussion-posts,
-            # both of which are handled by this function, hence why we parse HTML tags here.
-            event_tags = events.findAll("div", {"class": "beatmapset-activities__discussion-post"})
-            if event_tags:
-                for event_tag in event_tags:
-                    event = self.parse_event(event_tag)
-                    if event:
-                        yield event
-            return
-
-        event_jsons = json.loads(json_discussions.string)
-        user_jsons = json.loads(json_users.string)
-
-        for event_json in event_jsons:
-            event = self.parse_event_json(event_json, user_jsons)
+    def parse(self, discussion_jsons: object, user_jsons: object=None, discussion_jsons_for_replies: object=None) -> Generator[Event, None, None]:
+        """Returns a generator of BeatmapsetEvents, from the given disussions and user jsons."""
+        for discussion_json in discussion_jsons:
+            event = self.parse_event_json(discussion_json, user_jsons, discussion_jsons_for_replies)
             if event:
                 yield event
     
@@ -80,7 +64,7 @@ class DiscussionEventParser(EventParser):
         
         return None
     
-    def parse_event_json(self, event_json: object, user_jsons: object=None) -> Event:
+    def parse_event_json(self, event_json: object, user_jsons: object=None, discussion_jsons_for_replies: object=None) -> Event:
         """Returns a BeatmapsetEvent reflecting the given event json object.
         Ignores any event with an incomplete context (e.g. deleted beatmaps).
 
@@ -93,24 +77,44 @@ class DiscussionEventParser(EventParser):
         
         try:
             # Scrape object data
-            _type = event_json["message_type"]
+            _type = event_json["message_type"] if "message_type" in event_json else types.REPLY
             time = timestamp.from_string(event_json["created_at"])
 
-            beatmapset_id = event_json["beatmapset_id"]
-            discussion_id = event_json["starting_post"]["beatmap_discussion_id"]
+            # This part only matters in case `event_json` is a post, as we would then be missing some context.
+            respective_discussion_json = None
+            if discussion_jsons_for_replies:
+                for discussion_json in discussion_jsons_for_replies:
+                    if discussion_json["id"] == event_json["beatmapset_discussion_id"]:
+                        respective_discussion_json = discussion_json
+                        break
+                
+                if respective_discussion_json is None:
+                    log_err("WARNING | The parent discussion for a reply is missing; it was probably deleted.")
+                    return None
+
+            beatmapset_id = event_json["beatmapset_id"] if "beatmapset_id" in event_json else respective_discussion_json["beatmapset_id"]
+            if discussion_jsons_for_replies:
+                discussion_id = event_json["beatmapset_discussion_id"]
+            else:
+                discussion_id = event_json["starting_post"]["beatmapset_discussion_id"] if "starting_post" in event_json else None
 
             user_id = event_json["user_id"]
             # The user name is either provided by a user json from the discussion page, or queried through the api.
             user_json = self.__lookup_user_json(user_id, user_jsons)
             user_name = user_json["username"] if user_json else None
             
-            content = event_json["starting_post"]["message"]
+            if discussion_jsons_for_replies:
+                content = event_json["message"]
+            else:
+                content = event_json["starting_post"]["message"] if discussion_id else None
+
 
             difficulty = event_json["beatmap"]["version"] if "beatmap" in event_json and "version" in event_json["beatmap"] else None
             tab = None
-            if event_json["timestamp"] is not None: tab = "timeline"
-            elif difficulty:                        tab = "general"
-            else:                                   tab = "generalAll"
+            if "timestamp" in event_json:
+                if event_json["timestamp"] is not None: tab = "timeline"
+                elif difficulty:                        tab = "general"
+                else:                                   tab = "generalAll"
 
             # Reconstruct objects
             beatmapset = Beatmapset(beatmapset_id)

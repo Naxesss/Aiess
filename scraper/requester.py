@@ -4,6 +4,7 @@ sys.path.append('..')
 from datetime import datetime
 from bs4 import BeautifulSoup
 from requests import Response
+from requests.exceptions import Timeout
 from typing import Generator
 import json
 
@@ -12,16 +13,20 @@ from aiess.objects import Event, Beatmapset, Discussion
 from aiess.settings import PAGE_RATE_LIMIT
 from aiess import event_types as types
 from aiess.timestamp import to_string
+from aiess.errors import DeletedContextError
+from aiess.web import apiv2
+
+from bnsite import api as bnsite_api
 
 from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
 from scraper.parsers.discussion_event_parser import discussion_event_parser
 from scraper.parsers.discussion_parser import discussion_parser
-from scraper.parsers import news_parser, group_parser
+from scraper.parsers import news_parser, group_parser, sev_parser
 
 def request_page(url: str) -> Response:
     """Requests a response object using the page rate limit.
     If cloudflare IUAM (https://blog.cloudflare.com/tag/iuam/) is active we simply wait until it's over."""
-    return request_with_rate_limit(url, PAGE_RATE_LIMIT, "page")
+    return request_with_rate_limit(url, PAGE_RATE_LIMIT, "page", timeout=10)  # `timeout` is in seconds.
 
 def request_json(url: str) -> object:
     """Requests the page from the url as a json object."""
@@ -63,16 +68,18 @@ def request_discussion_events(page: int=1, limit: int=50) -> BeautifulSoup:
     for _type in map(lambda _type: _type.replace("-", "_"), event_types):
         type_query += f"&message_types[]={_type}"
     
-    return request_soup(f"https://osu.ppy.sh/beatmapsets/discussions?page={page}&limit={limit}{type_query}")
+    json_response = apiv2.request_discussions(page=page, message_types=type_query, limit=limit)
+    return (json_response["discussions"], json_response["users"])
 
 def request_reply_events(page: int=1, limit: int=50) -> BeautifulSoup:
     """Requests the discussion reply events page as a BeautifulSoup object."""
-    return request_soup(f"https://osu.ppy.sh/beatmapsets/discussions/posts?page={page}&limit={limit}")
+    json_response = apiv2.request_discussion_posts(page=page, limit=limit)
+    return (json_response["posts"], json_response["users"], json_response["discussions"])
 
 def request_news(_from: datetime, limit: int=20) -> BeautifulSoup:
     """Requests the news home page as a BeautifulSoup object with the newest post being from the given datetime."""
-    # The `id` attribute doesn't seem to matter.
-    return request_soup(f"https://osu.ppy.sh/home/news?cursor[id]=0&cursor[published_at]={to_string(_from)}&limit={limit}")
+    json_response = apiv2.request_news(cursor_id=0, cursor_published_at=to_string(_from), limit=limit)
+    return json_response["news_posts"]
 
 def request_group_page(group_id: int) -> BeautifulSoup:
     """Requests the group page of the given group id as a BeautifulSoup object."""
@@ -86,20 +93,30 @@ def get_beatmapset_events(page: int=1, limit: int=50) -> Generator[Event, None, 
 
 def get_discussion_events(page: int=1, limit: int=50) -> Generator[Event, None, None]:
     """Returns a generator of Event objects from the discussion events page. Newer events are yielded first."""
-    return discussion_event_parser.parse(request_discussion_events(page, limit))
+    discussion_jsons, user_jsons = request_discussion_events(page=page, limit=limit)
+    return discussion_event_parser.parse(discussion_jsons, user_jsons)
 
 def get_reply_events(page: int=1, limit: int=50) -> Generator[Event, None, None]:
     """Returns a generator of Event objects from the discussion reply events page. Newer events are yielded first."""
-    return discussion_event_parser.parse(request_reply_events(page, limit))
+    post_jsons, user_jsons, discussion_jsons = request_reply_events(page=page, limit=limit)
+    return discussion_event_parser.parse(post_jsons, user_jsons, discussion_jsons_for_replies=discussion_jsons)
 
 def get_news_events(_from: datetime, limit: int=20) -> Generator[Event, None, None]:
     """Returns a generator of Event objects from the news home page. Newer events are yielded first."""
-    return news_parser.parse(request_news(_from, limit))
+    return news_parser.parse_json(request_news(_from, limit))
 
 def get_group_events(_from: datetime) -> Generator[Event, None, None]:
     """Returns a generator of group addition and removal Event objects from all group pages."""
-    for group_id in [4, 7, 11, 16, 22, 28, 32]:
+    for group_id in [4, 7, 11, 16, 22, 28, 31, 32]:
         yield from group_parser.parse(group_id=group_id, group_page=request_group_page(group_id), last_checked_at=_from)
+
+def get_sev_events(_from: datetime) -> Generator[Event, None, None]:
+    """Returns a generator of Event objects representing sev changes from the bnsite."""
+    for discussion_id, obv, sev, time in bnsite_api.request_discussion_sev(since=_from):
+        try:
+            yield sev_parser.parse(discussion_id, obv, sev, time)
+        except DeletedContextError:
+            pass
 
 
 

@@ -36,3 +36,5 @@ NEWS = "news"
 
 ADD = "add"
 REMOVE = "remove"
+
+SEV = "sev"

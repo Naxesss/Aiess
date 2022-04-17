@@ -5,7 +5,7 @@ from time import sleep
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-from aiess.logger import log_err
+from aiess.logger import log_err, log
 
 next_request_time: Dict[str, datetime] = defaultdict(datetime.utcnow)
 failed_attempts: Dict[str, datetime] = defaultdict(int)
@@ -13,7 +13,7 @@ failed_attempts: Dict[str, datetime] = defaultdict(int)
 def invalid_response(response: Response) -> bool:
     return response is None or str(response.status_code).startswith('5')
 
-def request_with_rate_limit(request_url: str, rate_limit: float, rate_limit_id: str=None, **kwargs) -> Response:
+def request_with_rate_limit(request_url: str, rate_limit: float, rate_limit_id: str=None, method: str="GET", sleep_if_ratelimited: bool=True, **kwargs) -> Response:
     """Requests a response object at most once every rate_limit seconds for the same rate_limit_id (default None).
     Additional keyword arguments are given to the request function (e.g. headers, timeout, etc)."""
     global next_request_time
@@ -22,9 +22,11 @@ def request_with_rate_limit(request_url: str, rate_limit: float, rate_limit_id: 
     while invalid_response(response):
         request_time = next_request_time[rate_limit_id]
         if request_time and request_time > datetime.now():
+            if not sleep_if_ratelimited:
+                return None
             sleep((request_time - datetime.now()).total_seconds())
 
-        response = try_request(request_url, **kwargs)
+        response = try_request(request_url, method=method, **kwargs)
         next_request_time[rate_limit_id] = datetime.now() + timedelta(seconds=rate_limit)
 
         # `try_request` will return None in case of ConnectionErrors or IUAM.
@@ -37,21 +39,28 @@ def request_with_rate_limit(request_url: str, rate_limit: float, rate_limit_id: 
 
     return response
 
-def try_request(request_url: str, **kwargs) -> Response:
+def try_request(request_url: str, method: str="GET", **kwargs) -> Response:
     """Requests a response object and returns it if successful, otherwise None is returned.
     If the website is in cloudflare IUAM mode, we also return None."""
     response = None
 
+    log(f"GET {request_url}", postfix="requests")
+
     try:
-        response = requests.get(request_url, **kwargs)
+        response = requests.request(method, request_url, **kwargs)
     except requests.exceptions.ConnectionError:
         log_err(f"WARNING | ConnectionError was raised on GET \"{request_url}\"")
+        return None
+    except requests.exceptions.ReadTimeout:
+        log_err(f"WARNING | ReadTimeout was raised on GET \"{request_url}\"")
         return None
     
     if "<title>Just a moment...</title>" in response.text:
         log_err("WARNING | CloudFlare IUAM is active")
         return None
     
+    log(f"RECEIVED {response.status_code}: {response.reason}", postfix="requests")
+
     return response
 
 def back_off(rate_limit_id: str=None) -> None:

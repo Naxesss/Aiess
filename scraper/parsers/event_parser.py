@@ -24,8 +24,8 @@ class EventParser():
         
         # Failure to parse event type should be met with an exception, as this is abnormal and will likely cause further issues if silent.
         if not event_type:
-            raise ParsingError(f"""
-                The type of an event could not be parsed. Expected some class starting with \"{class_prefix}\":\r\n{event}""")
+            raise ParsingError(""
+                f"The type of an event could not be parsed. Expected some class starting with \"{class_prefix}\":\r\n{event}")
 
         return event_type
 

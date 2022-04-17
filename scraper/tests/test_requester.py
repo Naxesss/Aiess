@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 import mock
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from aiess.database import Database, SCRAPER_TEST_DB_NAME
 from aiess import event_types as types
@@ -12,6 +12,7 @@ from scraper.requester import get_group_events
 from scraper.requester import get_beatmapset_events
 from scraper.requester import get_discussion_events
 from scraper.requester import get_reply_events
+from scraper.requester import get_sev_events
 
 def test_get_group_events():
     Database(SCRAPER_TEST_DB_NAME).clear_table_data("group_users")
@@ -27,6 +28,20 @@ def test_get_group_events():
             event_n += 1
     
     assert event_n > 100
+
+def test_get_sev_events():
+    since = datetime.utcnow() - timedelta(days=7)
+    events = get_sev_events(_from=since)
+
+    event_n = 0
+    for event in events:
+        assert event.type == types.SEV
+        assert event.beatmapset
+        assert event.discussion
+        assert event.time > since
+        event_n += 1
+    
+    assert event_n > 10
 
 def test_get_news_events():
     events = get_news_events(_from=datetime.utcnow(), limit=20)
