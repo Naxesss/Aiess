@@ -2,7 +2,7 @@
 # Aiess
 ![tests](https://github.com/Naxesss/Aiess/workflows/tests/badge.svg) [![codecov](https://codecov.io/gh/Naxesss/Aiess/branch/master/graph/badge.svg)](https://codecov.io/gh/Naxesss/Aiess) [![CodeFactor](https://www.codefactor.io/repository/github/naxesss/aiess/badge)](https://www.codefactor.io/repository/github/naxesss/aiess) [![Discord](https://img.shields.io/discord/420015424365789184.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/2XV5dcW)
 
-## Discord Bot `/bot` | [Invite](https://discord.com/api/oauth2/authorize?client_id=680467769573244928&permissions=0&scope=bot)
+## Discord Bot `/bot` | [Invite](https://discord.com/api/oauth2/authorize?client_id=680467769573244928&permissions=0&scope=bot%20applications.commands)
 Provides subscriptions for mapping-related events in osu! (e.g. ranks, qualifications, nominations, suggestions, newsposts, group changes, etc). Written in [discord.py](https://discordpy.readthedocs.io/). Example commands:
 - `+recent [filter]` Retrieves the latest event data, optionally matching a specific filter (e.g. `+recent type:nominate`).
 - `+sub [filter]` Show current subscription, or subscribe to new events matching the given filter (e.g. `+sub user:ephemeral`)
