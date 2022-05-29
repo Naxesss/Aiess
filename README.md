@@ -60,7 +60,7 @@ Gathers event data from [osu!apiv2](https://osu.ppy.sh/docs/index.html) and the 
 |**[/home/news](https://osu.ppy.sh/home/news)**|`News`|
 |**[/groups/28](https://osu.ppy.sh/groups/28)** (full bns), **[/groups/32](https://osu.ppy.sh/groups/32)** (probation bns), **[/groups/7](https://osu.ppy.sh/groups/7)** (nat), **[/groups/4](https://osu.ppy.sh/groups/4)** (gmt), **[/groups/16](https://osu.ppy.sh/groups/16)** (alumni), **[/groups/11](https://osu.ppy.sh/groups/11)** (devs), **[/groups/22](https://osu.ppy.sh/groups/22)** (support), **[/groups/31](https://osu.ppy.sh/groups/31)** (project loved)|`Added`, `Removed`|
 
-## [BN Website]((https://github.com/pishifat/qat/)) Interface (`./bnsite`) | [bn.mappersguild.com](https://bn.mappersguild.com/)
+## [BN Website](https://github.com/pishifat/qat/) Interface (`./bnsite`) | [bn.mappersguild.com](https://bn.mappersguild.com/)
 
 Handles activity, performance, and application evaluations of [Beatmap Nominators](https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators).
 
