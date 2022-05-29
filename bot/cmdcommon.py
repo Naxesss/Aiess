@@ -16,32 +16,26 @@ from bot.formatter import format_dotted_list
 from bot.permissions import get_permission_filter
 from bot.prefixes import get_prefix
 
-async def validate_filter(command: Command, _filter: str, filter_context: FilterContext) -> bool:
+async def validate_filter(ctx, _filter: str, filter_context: FilterContext) -> bool:
     """Returns whether the filter was considered valid. If invalid, an appropriate response is sent
     where the command was called. Requires a filter context to determine filter validity."""
     try:
         expansion = expand(_filter)
     except ValueError as err:
         # E.g. parenthesis inequality.
-        await command.respond_err(f"{str(err)}")
+        await ctx.respond(f"{str(err)}", embed=filters_embed(filter_context), ephemeral=True)
         return False
 
     invalid_gates = set(get_invalid_gates(_filter))
     if invalid_gates:
         invalids_formatted = "`" + "`, `".join(invalid_gates) + "`"
-        await command.respond_err(
-            response = f"Invalid positioning of gate(s) {invalids_formatted} in expansion `{expansion}`.",
-            embed    = filters_embed(filter_context)
-        )
+        await ctx.respond(f"✗ Invalid positioning of gate(s) {invalids_formatted} in expansion `{expansion}`.", embed=filters_embed(filter_context), ephemeral=True)
         return False
 
     invalid_keys = set(get_invalid_keys(_filter, filter_context))
     if invalid_keys:
         invalids_formatted = "`" + "`, `".join(invalid_keys) + "`"
-        await command.respond_err(
-            response = f"Invalid key(s) {invalids_formatted} in expansion `{expansion}`.",
-            embed    = filters_embed(filter_context)
-        )
+        await ctx.respond(f"✗ Invalid key(s) {invalids_formatted} in expansion `{expansion}`.", embed=filters_embed(filter_context), ephemeral=True)
         return False
 
     invalid_filters = set(get_invalid_filters(_filter, filter_context))
@@ -52,33 +46,25 @@ async def validate_filter(command: Command, _filter: str, filter_context: Filter
             invalids_strs.append(f"{key}:{value}")
             keys.append(key)
         invalids_formatted = "`" + "`, `".join(invalids_strs) + "`"
-        await command.respond_err(
-            response = f"Invalid value(s) for key(s) {invalids_formatted} in expansion `{expansion}`.",
-            embed    = filter_embed(keys[0], filter_context)  # `keys` will have at least one element, else `invalid_filters` would be falsy.
-        )
+        # `keys` will have at least one element, else `invalid_filters` would be falsy.
+        await ctx.respond(f"✗ Invalid value(s) for key(s) {invalids_formatted} in expansion `{expansion}`.", embed=filter_embed(keys[0], filter_context), ephemeral=True)
         return False
 
     invalid_words = set(get_invalid_words(_filter))
     if invalid_words:
         invalids_formatted = "`" + "`, `".join(invalid_words) + "`"
-        await command.respond_err(
-            response = f"Invalid word(s) {invalids_formatted} in expansion `{expansion}`.",
-            embed    = filters_embed(filter_context)
-        )
+        await ctx.respond(f"✗ Invalid word(s) {invalids_formatted} in expansion `{expansion}`.", embed=filters_embed(filter_context), ephemeral=True)
         return False
     
     parts = get_missing_gate(_filter)
     if parts:
         left_part, right_part = parts
-        await command.respond_err(
-            response = f"Missing gate between `{left_part}` and `{right_part}` in expansion `{expansion}`.",
-            embed    = filters_embed(filter_context)
-        )
+        await ctx.respond(f"✗ Missing gate between `{left_part}` and `{right_part}` in expansion `{expansion}`.", embed=filters_embed(filter_context), ephemeral=True)
         return False
 
-    if not hasattr(command.context.channel, "guild"):
+    if not hasattr(ctx.channel, "guild"):
         # Prevents excessive discord rate limiting (5 DMs per second globally).
-        await command.respond_err("Cannot subscribe in DM channels.")
+        await ctx.respond("✗ Cannot subscribe in DM channels.", ephemeral=True)
         return False
     
     return True

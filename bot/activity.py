@@ -28,12 +28,12 @@ async def loop(client: Client, reader: Reader) -> None:
 def get_activity(client: Client, reader: Reader) -> Activity:
     """Returns the "Playing +help | x servers" indicator for the bot."""
     if not client.is_ready():
-        return Game(f"{DEFAULT_PREFIX}help | Starting...")
+        return Game(f"/subscribe | Starting...")
 
     time_since_event = (datetime.utcnow() - reader.latest_event_time) if reader.latest_event_time else None
     guild_n = len(client.guilds)
     return Game(
-        f"{DEFAULT_PREFIX}help" +
+        f"/subscribe" +
         f" | {guild_n} server" + ("s" if guild_n != 1 else "") +
         (f" | {format_time(time_since_event, max_units=1, long=True)} delay"
             if time_since_event and time_since_event > timedelta(minutes=30)
