@@ -63,8 +63,10 @@ class Database:
 
     def __del__(self):
         """Clears up allocated resources such as memory upon destruction."""
-        if (hasattr(self, "connection") and self.connection.is_connected()):
-            self.connection.cursor().close()
+        if hasattr(self, "connection") and self.connection.is_connected():
+            cursor = self.connection.cursor()
+            self.__fetch(cursor)  # Ensure we have no unread results before closing the cursor.
+            cursor.close()
             self.connection.close()
     
     def __fetch(self, cursor: object) -> List[tuple]:
