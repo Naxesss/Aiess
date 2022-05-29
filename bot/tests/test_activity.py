@@ -27,15 +27,15 @@ def mock_reader():
     return reader
 
 def test_activity(mock_client, mock_reader):
-    assert get_activity(mock_client, mock_reader) == Game("+help | 3 servers")
+    assert get_activity(mock_client, mock_reader) == Game("/subscribe | 3 servers")
 
 def test_activity_singular(mock_client, mock_reader):
     mock_client.guilds = [object()] * 1
-    assert get_activity(mock_client, mock_reader) == Game("+help | 1 server")
+    assert get_activity(mock_client, mock_reader) == Game("/subscribe | 1 server")
 
 def test_activity_not_ready(mock_client, mock_reader):
     mock_client.is_ready = lambda: False
-    assert get_activity(mock_client, mock_reader) == Game("+help | Starting...")
+    assert get_activity(mock_client, mock_reader) == Game("/subscribe | Starting...")
 
 def test_activity_delay_small(mock_client, mock_reader):
     mock_reader.latest_event_time = timestamp.from_string("2020-01-01 00:00:00")
@@ -45,7 +45,7 @@ def test_activity_delay_small(mock_client, mock_reader):
         mock_datetime.side_effect = datetime
 
         # Delay is too small to be worth displaying here.
-        assert get_activity(mock_client, mock_reader) == Game("+help | 3 servers")
+        assert get_activity(mock_client, mock_reader) == Game("/subscribe | 3 servers")
 
 def test_activity_delay_large(mock_client, mock_reader):
     mock_reader.latest_event_time = timestamp.from_string("2020-01-01 00:00:00")
@@ -54,7 +54,7 @@ def test_activity_delay_large(mock_client, mock_reader):
         mock_datetime.utcnow.return_value = timestamp.from_string("2020-01-01 04:01:30")
         mock_datetime.side_effect = datetime
 
-        assert get_activity(mock_client, mock_reader) == Game("+help | 3 servers | 4 hours delay")
+        assert get_activity(mock_client, mock_reader) == Game("/subscribe | 3 servers | 4 hours delay")
 
 
 
