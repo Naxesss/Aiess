@@ -37,14 +37,6 @@ def test_correct_setup():
     assert not database.retrieve_table_data("events")
     assert not database.retrieve_table_data("discussions")
 
-def test_old_discussion():
-    beatmapset = Beatmapset(41823, beatmapset_json=mock_old_beatmap.JSON)
-    discussion = Discussion(1234956, beatmapset)
-    
-    # Can't obtain any discussion data from a beatmapset that doesn't have a discussion interface.
-    with pytest.raises(ParsingError):
-        get_complete_discussion_info(discussion, beatmapset, db_name=SCRAPER_TEST_DB_NAME)
-
 def test_discussion():
     beatmapset = Beatmapset(1001546, beatmapset_json=mock_beatmap.JSON)
     discussion = Discussion(1234956, beatmapset)

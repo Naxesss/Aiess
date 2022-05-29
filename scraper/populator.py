@@ -70,9 +70,7 @@ def get_complete_discussion_info(
         if __complete_discussion_context(discussion, db_name=db_name):
             return discussion
         
-        discussions_json = get_discussions_json(beatmapset)
-        if not discussions_json:
-            raise ParsingError("No discussions json exists to use for discussion context.")
+        discussions_json = get_discussions_json(beatmapset)  # This will always be available.
 
     for other_discussion in get_map_page_discussions(beatmapset, discussions_json):
         if other_discussion.id == discussion.id:
