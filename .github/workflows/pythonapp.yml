@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest mock pytest-cov pytest-asyncio requests BeautifulSoup4 discord.py py-cord mysql-connector-python pymongo
+        pip install flake8 pytest mock pytest-cov pytest-asyncio requests BeautifulSoup4 py-cord mysql-connector-python pymongo
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Setup database
       run: |
