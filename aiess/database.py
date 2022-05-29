@@ -56,7 +56,7 @@ class Database:
         while(attempts < 3):
             attempts += 1
             try:
-                return self.connection.cursor()
+                return self.connection.cursor(buffered=True)
             except OperationalError as error:
                 log(f"WARNING | {error}")
                 self.__init__(self.db_name)
@@ -64,9 +64,7 @@ class Database:
     def __del__(self):
         """Clears up allocated resources such as memory upon destruction."""
         if hasattr(self, "connection") and self.connection.is_connected():
-            cursor = self.connection.cursor()
-            self.__fetch(cursor)  # Ensure we have no unread results before closing the cursor.
-            cursor.close()
+            self.connection.cursor().close()
             self.connection.close()
     
     def __fetch(self, cursor: object) -> List[tuple]:
