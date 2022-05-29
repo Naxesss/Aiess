@@ -63,11 +63,14 @@ def test_remove_subscription():
     subscriber.remove_subscription(sub1)
     assert sub1 not in subscriber.cache
 
-class MockClient():
+class MockBot():
     def __init__(self):
         self.event_sub_pairs = []
+    
+    async def get_channel(self, _):
+        return True
 
-    async def send_event(self, event: Event, sub: Subscription, _) -> None:
+    async def send_event(self, event: Event, sub: Subscription, _, __) -> None:
         self.event_sub_pairs.append((sub, event))
 
 @pytest.mark.asyncio
@@ -80,16 +83,17 @@ async def test_forward():
 
     event1 = Event(_type="test1", time=datetime.utcnow())
     event2 = Event(_type="test2", time=datetime.utcnow())
-    client = MockClient()
+    bot = MockBot()
 
     with patch("bot.subscriber.format_embed", return_value=None):
-        await subscriber.forward(event1, client)
-        await subscriber.forward(event2, client)
+        with patch("bot.subscriber.send_event", new=bot.send_event):
+            await subscriber.forward(event1, bot)
+            await subscriber.forward(event2, bot)
 
     await asyncio.sleep(2)
 
-    assert (sub_both, event1) in client.event_sub_pairs
-    assert (sub_both, event2) in client.event_sub_pairs
+    assert (sub_both, event1) in bot.event_sub_pairs
+    assert (sub_both, event2) in bot.event_sub_pairs
 
-    assert (sub_one, event1) in client.event_sub_pairs
-    assert (sub_one, event2) not in client.event_sub_pairs, "A subscription was forwarded an event it was supposed to filter."
+    assert (sub_one, event1) in bot.event_sub_pairs
+    assert (sub_one, event2) not in bot.event_sub_pairs, "A subscription was forwarded an event it was supposed to filter."
