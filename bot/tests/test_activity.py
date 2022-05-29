@@ -9,7 +9,6 @@ from discord import Game, Status
 
 from aiess import timestamp
 
-from bot.prefixes import DEFAULT_PREFIX
 from bot.activity import get_activity
 from bot.activity import get_status
 

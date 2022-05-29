@@ -9,7 +9,6 @@ from discord import Client, Activity, Game, Status
 from aiess.logger import log_err
 from aiess import Reader
 
-from bot.prefixes import DEFAULT_PREFIX
 from bot.formatter import format_time
 
 async def loop(client: Client, reader: Reader) -> None:
