@@ -76,7 +76,7 @@ class Database:
             # Fetch entire result set so nothing carries over to the next query.
             return cursor.fetchall()
         except mysql.connector.errors.InterfaceError as error:
-            if error.msg == "No result set to fetch from.":
+            if "No result set to fetch from" in error.msg:
                 return None  # Reached end of result set, not an issue.
             raise
 
