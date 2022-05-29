@@ -185,6 +185,7 @@ def get_group_bnsite_comment(event: Event) -> str:
 
     kind = json["kind"]
     if   kind == "resignation": comment = "Resigned"
+    elif kind == "application": comment = None
     elif kind == "currentBn":
         consensus = json["consensus"] if "consensus" in json else None
         if   consensus is None:           comment = None
