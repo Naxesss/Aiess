@@ -9,14 +9,10 @@ from discord import Status
 from aiess import logger
 
 from bot import subscriber
-from bot import prefixes
-from bot import permissions
 from bot.settings import API_KEY
 
 logger.init()
 subscriber.load()
-prefixes.load()
-permissions.load()
 
 bot = discord.Bot(status=Status.do_not_disturb)
 
