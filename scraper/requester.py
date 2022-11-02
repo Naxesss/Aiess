@@ -107,7 +107,7 @@ def get_news_events(_from: datetime, limit: int=20) -> Generator[Event, None, No
 
 def get_group_events(_from: datetime) -> Generator[Event, None, None]:
     """Returns a generator of group addition and removal Event objects from all group pages."""
-    for group_id in [4, 7, 11, 16, 22, 28, 31, 32]:
+    for group_id in [4, 7, 11, 16, 22, 28, 31, 32, 48]:
         yield from group_parser.parse(group_id=group_id, group_page=request_group_page(group_id), last_checked_at=_from)
 
 def get_sev_events(_from: datetime) -> Generator[Event, None, None]:

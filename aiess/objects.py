@@ -383,7 +383,8 @@ class Usergroup:
         22: "Support Team",
         28: "Beatmap Nominators",
         31: "Project Loved",
-        32: "Beatmap Nominators (Probationary)"
+        32: "Beatmap Nominators (Probationary)",
+        48: "Beatmap Spotlight Curators"
     }
 
     def __init__(self, _id: int, name: str=None, mode: str=None):

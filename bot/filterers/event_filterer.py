@@ -61,7 +61,8 @@ GROUP_ALIASES: Dict[str, List[str]] = {
     "28": ANY_ALIASES + BN_ALIASES + ["full", "full bn", "full bns", "full beatmap nominators"],
     "31": ANY_ALIASES + ["lov", "loved", "project loved"],
     "32": (ANY_ALIASES + BN_ALIASES + ["probo", "probo bn", "probo bns", "probation", "probation bn",
-        "probation bns", "probationary beatmap nominators"])
+        "probation bns", "probationary beatmap nominators"]),
+    "48": (ANY_ALIASES + ["bsc", "beatmap spotlight curators", "spotlights", "curators"])
 }
 
 def get_all_type_aliases() -> List[str]:
