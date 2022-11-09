@@ -35,7 +35,6 @@ async def populate_from_bnsite(event: Event) -> None:
     if event.type in [types.REMOVE, types.ADD]:
         # Group removal content should reflect the bnsite removal reason (e.g. Kicked/Resigned)
         event.content = get_group_bnsite_comment(event)
-        event.group.mode = get_group_bnsite_mode(event)
 
 def get_discussions_json(beatmapset: Beatmapset) -> object:
     """Returns the beatmapset discussions json, containing all of the discussion information for the mapset,
@@ -194,7 +193,17 @@ def get_group_bnsite_comment(event: Event) -> str:
         else:                             raise ValueError(f"Unrecognized evaluation consensus \"{consensus}\".")
     else: raise ValueError(f"Unrecognized evaluation kind \"{kind}\".")
 
-    return comment
+    if comment is None:
+        return None
+
+    addition = (
+        " for low activity"            if json["addition"] == "lowActivityWarning"    else
+        " for poor behavior"           if json["addition"] == "behaviorWarning"       else
+        " for poor nomination quality" if json["addition"] == "mapQualityWarning"     else
+        " for poor modding quality"    if json["addition"] == "moddingQualityWarning" else ""
+    )
+
+    return comment + addition
 
 def get_group_bnsite_mode(event: Event) -> str:
     """Returns the mode of the bn according to the bnsite
