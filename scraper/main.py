@@ -84,6 +84,7 @@ def format_event_log(event: Event) -> str:
         f" ({fmt(event.user, colors.AUTHOR)})" if event.user else "",
         f" on {fmt(event.beatmapset, colors.CONTEXT)}" if event.beatmapset else "",
         f" to/from {fmt(event.group, colors.CONTEXT)}" if event.group else "",
+        f" for [{fmt(event.group.mode, colors.CONTEXT)}]" if event.group and event.group.mode else "",
         f" \"{event.content}\"" if event.content else ""
     ])
 

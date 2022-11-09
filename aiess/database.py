@@ -208,13 +208,20 @@ class Database:
         )
         self._execute("SET FOREIGN_KEY_CHECKS = 1")
     
-    def delete_group_user(self, group: Usergroup, user: User) -> None:
+    def delete_group_user(self, group: Usergroup, user: User, mode: str=None) -> None:
         """Deletes the given user to group relation from the group_users table."""
-        self.delete_table_data(
-            table        = "group_users",
-            where        = "group_id=%s AND user_id=%s",
-            where_values = (group.id, user.id)
-        )
+        if mode is None:
+            self.delete_table_data(
+                table        = "group_users",
+                where        = "group_id=%s AND user_id=%s",
+                where_values = (group.id, user.id)
+            )
+        else:
+            self.delete_table_data(
+                table        = "group_users",
+                where        = "group_id=%s AND user_id=%s AND mode=%s",
+                where_values = (group.id, user.id, mode)
+            )
     
     def delete_beatmap(self, beatmap: Beatmap) -> None:
         """Deletes the given beatmap from the beatmaps table."""
@@ -404,7 +411,8 @@ class Database:
             "group_users",
             dict(
                 group_id = group.id,
-                user_id  = user.id
+                user_id  = user.id,
+                mode     = group.mode or "N/A"
             )
         )
 
@@ -788,7 +796,7 @@ class Database:
             yield NewsPost(_id, title, preview, author, slug, image_url)
 
     def retrieve_group_user(self, where: str, where_values: tuple=None, group_by: str=None, order_by: str=None) -> Tuple[Usergroup, User]:
-        """Returns the first group user relation from the database matching the given WHERE clause,
+        """Returns the first `(group, user)` relation from the database matching the given WHERE clause,
         or None if no such group user relation is stored."""
         return next(
             self.retrieve_group_users(
@@ -805,18 +813,18 @@ class Database:
             self, where: str, where_values: tuple=None, group_by: str=None,
             order_by: str=None, limit: int=None
         ) -> Generator[Tuple[Usergroup, User], None, None]:
-        """Returns a generator of all group user relations from the database matching the given WHERE clause."""
+        """Returns a generator of all `(group, user)` relations from the database matching the given WHERE clause."""
         fetched_rows = self.retrieve_table_data(
             table        = "group_users",
             where        = where,
             where_values = where_values,
-            selection    = "group_id, user_id",
+            selection    = "group_id, user_id, mode",
             group_by     = group_by,
             order_by     = order_by,
             limit        = limit
         )
         for row in (fetched_rows or []):
-            group = Usergroup(row[0])
+            group = Usergroup(row[0], mode=row[2])
             user  = self.retrieve_user("id=%s", (row[1],))
             yield (group, user)
 

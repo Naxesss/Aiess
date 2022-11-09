@@ -39,32 +39,32 @@ def test_parse_additions():
         for event in group_parser.parse(group_id=7, group_page=mock_groups.soup, last_checked_at=from_string("2020-07-22T21:00:00+00:00")):
             events.append(event)
 
-    assert len(events) == 17
+    assert len(events) == 27
     assert events[0] == Event(
         _type = "add",
         time  = from_string("2020-07-22T21:00:00+00:00"),
-        group = Usergroup(7),
-        user  = User(_id=2202163)
+        group = Usergroup(7, mode="mania"),
+        user  = User(_id=1653229)
     )
     assert events[1] == Event(
         _type = "add",
         time  = from_string("2020-07-22T21:00:00+00:00"),
-        group = Usergroup(7),
-        user  = User(_id=3621552)
+        group = Usergroup(7, mode="osu"),
+        user  = User(_id=2202163)
     )
 
 def test_parse_removals():
-    Database(SCRAPER_TEST_DB_NAME).insert_group_user(group=Usergroup(7), user=User(1, "someone"))
+    Database(SCRAPER_TEST_DB_NAME).insert_group_user(group=Usergroup(7, mode="taiko"), user=User(1, "someone"))
 
     events = []
     with mock.patch("scraper.parsers.group_parser.SCRAPER_DB_NAME", SCRAPER_TEST_DB_NAME):
         for event in group_parser.parse(group_id=7, group_page=mock_groups.soup, last_checked_at=from_string("2020-07-22T21:00:00+00:00")):
             events.append(event)
 
-    assert len(events) == 18
+    assert len(events) == 28
     assert events[0] == Event(
         _type = "remove",
         time  = from_string("2020-07-22T21:00:00+00:00"),
-        group = Usergroup(7),
+        group = Usergroup(7, mode="taiko"),
         user  = User(_id=1, name="someone")
     )

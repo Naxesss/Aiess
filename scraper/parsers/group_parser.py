@@ -5,10 +5,17 @@ from typing import Generator, List
 from bs4 import BeautifulSoup
 from datetime import datetime
 import json
+from dataclasses import dataclass
 
 from aiess import Event, User, Usergroup
 from aiess import event_types as types
 from aiess.database import Database, SCRAPER_DB_NAME
+
+@dataclass
+class GroupUser:
+    group_id: int
+    user: User
+    mode: str
 
 def parse(group_id: int, group_page: BeautifulSoup, last_checked_at: datetime) -> Generator[Event, None, None]:
     """Returns a generator of group addition and removal events from the given BeautifulSoup group page and its id."""
@@ -21,40 +28,53 @@ def parse(group_id: int, group_page: BeautifulSoup, last_checked_at: datetime) -
 
 def parse_users_json(group_id: int, users_json: object, last_checked_at: datetime) -> Generator[Event, None, None]:
     """Returns a generator of group addition and removal events from the given users json and group id."""
-    missing_user_ids = get_group_user_ids(group_id)
-    new_users = []
+    missing_group_users = retrieve_group_users(group_id)
+    new_group_users: List[GroupUser] = []
     for user_json in users_json:
         user_id = user_json["id"]
-        if user_id in missing_user_ids:
-            missing_user_ids.remove(user_id)
-        else:
-            new_users.append(User(_id=user_id, name=user_json["username"]))
+        modes = [None]
+
+        for user_group_json in user_json["groups"]:
+            has_modes = "playmodes" in user_group_json and user_group_json["playmodes"] is not None
+            if user_group_json["id"] == group_id and has_modes:
+                modes = user_group_json["playmodes"]
+        
+        for mode in modes:
+            user = User(_id=user_id, name=user_json["username"])
+            group_user = GroupUser(group_id, user, mode)
+            if group_user in missing_group_users:
+                missing_group_users.remove(group_user)
+            else:
+                new_group_users.append(group_user)
     
     content = None
     time = last_checked_at
 
-    for missing_user_id in missing_user_ids:
+    for group_user in missing_group_users:
         yield Event(
             _type   = types.REMOVE,
             time    = time,
-            user    = get_group_user(group_id=group_id, user_id=missing_user_id),
-            group   = Usergroup(_id=group_id),
+            user    = retrieve_user_from_group(group_id=group_id, user_id=group_user.user.id, mode=group_user.mode),
+            group   = Usergroup(_id=group_id, mode=group_user.mode),
             content = content
         )
-    for new_user in new_users:
+    for group_user in new_group_users:
         yield Event(
             _type   = types.ADD,
             time    = time,
-            user    = new_user,
-            group   = Usergroup(_id=group_id),
+            user    = group_user.user,
+            group   = Usergroup(_id=group_id, mode=group_user.mode),
             content = content
         )
 
-def get_group_user_ids(group_id: int) -> List[int]:
+def retrieve_group_users(group_id: int) -> List[GroupUser]:
     """Returns the last remembered user ids beloning to the given group id."""
     group_user_relations = Database(SCRAPER_DB_NAME).retrieve_group_users("group_id=%s", (group_id,))
-    return [user.id for group, user in group_user_relations]
+    return [GroupUser(group.id, user, group.mode) for group, user in group_user_relations]
 
-def get_group_user(group_id: int, user_id: int) -> List[int]:
+def retrieve_user_from_group(group_id: int, user_id: int, mode: str=None) -> List[int]:
     """Returns the last remembered user beloning to the given group id with the given user id."""
-    return Database(SCRAPER_DB_NAME).retrieve_group_user("group_id=%s AND user_id=%s", (group_id, user_id))[1]
+    if mode is not None:
+        return Database(SCRAPER_DB_NAME).retrieve_group_user("group_id=%s AND user_id=%s AND mode=%s", (group_id, user_id, mode))[1]
+    else:
+        return Database(SCRAPER_DB_NAME).retrieve_group_user("group_id=%s AND user_id=%s", (group_id, user_id))[1]
