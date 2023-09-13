@@ -173,11 +173,12 @@ filter_context = FilterContext(
         ),
         Tag(
             names           = ["mode"],
-            description     = "The involved mode of a beatmapset an event occurred on (e.g. \"taiko\" for any set with a taiko map).",
+            description     = "The involved mode of a beatmapset or group move event (e.g. \"taiko\" for any set with a taiko map or taiko-specific group move).",
             example_values  = ["osu", "taiko", "catch", "mania"],
             value_hint      = "\u2000".join(f"`{mode}`" for mode in ["osu", "taiko", "catch", "mania"]),
             value_predicate = lambda value: value in ["osu", "taiko", "catch", "mania"],
-            value_func      = lambda event: [escape(mode) for mode in event.beatmapset.modes] if event.beatmapset else None
+            value_func      = lambda event: [escape(mode) for mode in event.beatmapset.modes] if event.beatmapset else
+                                            [escape(event.group.mode)]                        if event.group and event.group.mode else None
         ),
         Tag(
             names           = ["genre"],
