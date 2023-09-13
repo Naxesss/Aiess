@@ -9,6 +9,12 @@ from aiess import event_types as types
 
 from pymongo import MongoClient
 
+class DocumentBeatmap():
+    def __init__(self, beatmap: Beatmap):
+        self.drain      = beatmap.draintime
+        self.starRating = beatmap.sr_total
+        self.userRating = beatmap.userrating
+
 class Document():
     def __init__(self, event):
         self.type         = event.type
@@ -23,6 +29,7 @@ class Document():
         self.content      = event.content
         self.genre        = event.beatmapset.genre
         self.language     = event.beatmapset.language
+        self.beatmaps     = list(map(lambda beatmap: vars(DocumentBeatmap(beatmap)), event.beatmapset.beatmaps))
 
 def insert_event(event: Event) -> None:
     """Creates a connection to the MongoDB server, inserts the event as a
