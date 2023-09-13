@@ -3,7 +3,7 @@ import sys
 from pymongo.common import SERVER_SELECTION_TIMEOUT
 sys.path.append('..')
 
-from aiess import Event
+from aiess import Event, Beatmap
 from aiess.settings import BNSITE_MONGODB_URI
 from aiess import event_types as types
 
@@ -16,7 +16,7 @@ class DocumentBeatmap():
         self.userRating = beatmap.userrating
 
 class Document():
-    def __init__(self, event):
+    def __init__(self, event: Event):
         self.type         = event.type
         self.timestamp    = event.time
         self.beatmapsetId = event.beatmapset.id
