@@ -193,8 +193,8 @@ def get_group_bnsite_comment(event: Event) -> str:
         else:                             raise ValueError(f"Unrecognized evaluation consensus \"{consensus}\".")
     else: raise ValueError(f"Unrecognized evaluation kind \"{kind}\".")
 
-    if comment is None:
-        return None
+    if comment is None or "addition" not in json:
+        return comment
 
     addition = (
         " for low activity"            if json["addition"] == "lowActivityWarning"    else
