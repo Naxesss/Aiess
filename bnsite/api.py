@@ -10,11 +10,11 @@ from aiess.settings import BNSITE_RATE_LIMIT, BNSITE_HEADERS
 from aiess import timestamp
 
 cache = {}
-def request(route: str, query: str) -> object:
+def request(route: str, query: str, allow_cache: bool=True) -> object:
     """Requests the page from the given route and query.
     Caches any response such that requesting the same discussion id yields the same result."""
     request_url = f"https://bn.mappersguild.com/interOp/{route}/{query}"
-    if request_url in cache and cache[request_url]:
+    if request_url in cache and cache[request_url] and allow_cache:
         return cache[request_url]
 
     response = request_with_rate_limit(
@@ -59,7 +59,7 @@ def request_discussion_sev(since: datetime) -> Generator[Tuple[int, int, int, da
     """Returns a list of tuples representing the SEV for a reset `(discussion_id, obv, sev, time)`, since
     the given time. If either the severity or obviousness was unchanged, they will be returned as None.
     If the severity or obviousness were unset, they will be returned as -1."""
-    sev_logs = request("eventsByDate", query=timestamp.to_string(since))
+    sev_logs = request("eventsByDate", query=timestamp.to_string(since), allow_cache=False)
     discussion_ids = []
     discussion_obv = {}
     discussion_sev = {}
