@@ -26,7 +26,7 @@ from scraper.parsers import news_parser, group_parser, sev_parser
 def request_page(url: str) -> Response:
     """Requests a response object using the page rate limit.
     If cloudflare IUAM (https://blog.cloudflare.com/tag/iuam/) is active we simply wait until it's over."""
-    return request_with_rate_limit(url, PAGE_RATE_LIMIT, "page", timeout=10)  # `timeout` is in seconds.
+    return request_with_rate_limit(url, PAGE_RATE_LIMIT, "page", timeout=60)  # `timeout` is in seconds.
 
 def request_json(url: str) -> object:
     """Requests the page from the url as a json object."""
