@@ -4,6 +4,8 @@ sys.path.append('..')
 from typing import Union, List, Generator, Callable, Tuple
 import re
 
+from aiess import Event
+
 from bot.logic import expand, split_unescaped, extract_not
 from bot.logic import AND_GATES, OR_GATES, NOT_GATES, QUOTE_CHARS
 
@@ -28,7 +30,7 @@ class Tag():
         A function given a string value returning a either a new string value or None if no conversion is needed."""
     def __init__(
             self, names: List[str], description: str, example_values: List[str], value_hint: str,
-            value_predicate: Callable[[str], bool], value_func: Callable[[object], List[str]],
+            value_predicate: Callable[[str], bool], value_func: Callable[[Event], List[str]],
             value_convert: Callable[[str], str]=None
         ):
         self.names           = names
