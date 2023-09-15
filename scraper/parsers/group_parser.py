@@ -37,15 +37,22 @@ def parse_users_json(group_id: int, users_json: object, last_checked_at: datetim
         for user_group_json in user_json["groups"]:
             has_modes = "playmodes" in user_group_json and user_group_json["playmodes"] is not None
             if user_group_json["id"] == group_id and has_modes:
-                modes = user_group_json["playmodes"]
+                if len(user_group_json["playmodes"]):
+                    modes = user_group_json["playmodes"]
+                else:
+                    # A user part of the group, but with no modes (e.g. non-captins in Project Loved / managers in the BSC).
+                    modes = [None]
         
         for mode in modes:
             user = User(_id=user_id, name=user_json["username"])
-            group_user = GroupUser(group_id, user, mode)
-            if group_user in missing_group_users:
-                missing_group_users.remove(group_user)
-            else:
-                new_group_users.append(group_user)
+            was_in_group_with_mode = False
+            for group_user in missing_group_users:
+                if group_user.user.id == user.id and group_user.mode == mode:
+                    was_in_group_with_mode = True
+                    missing_group_users.remove(group_user)
+            
+            if not was_in_group_with_mode:
+                new_group_users.append(GroupUser(group_id, user, mode))
     
     content = None
     time = last_checked_at
