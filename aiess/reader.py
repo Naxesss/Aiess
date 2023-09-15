@@ -58,10 +58,12 @@ class Reader():
         """Triggers the on_event method for each new event since the last stored datetime for each scope."""
         news_target   = f"type=\"{types.NEWS}\""
         groups_target = f"type=\"{types.ADD}\" OR type=\"{types.REMOVE}\""
+        sev_target    = f"type=\"{types.SEV}\""
 
-        await self.__push_new_events(Scope("mapset", sql_target=f"NOT ({news_target}) AND NOT ({groups_target})"))
+        await self.__push_new_events(Scope("mapset", sql_target=f"NOT ({news_target}) AND NOT ({groups_target}) AND NOT ({sev_target})"))
         await self.__push_new_events(Scope("news",   sql_target=news_target))
         await self.__push_new_events(Scope("groups", sql_target=groups_target))
+        await self.__push_new_events(Scope("sev",    sql_target=sev_target))
 
     async def __push_new_events(self, scope: Scope) -> None:
         """Triggers the on_event method for each new event since the last stored datetime for the given scope."""
