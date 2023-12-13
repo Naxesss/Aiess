@@ -10,7 +10,7 @@ from aiess.logger import log, colors, fmt
 from aiess.database import Database, SCRAPER_DB_NAME
 from aiess.reader import merge_concurrent
 
-from scraper.crawler import get_all_events_between, get_news_between, get_group_events_between, get_sev_events_between
+from scraper.crawler import get_all_events_between, get_news_between, get_group_events_between
 
 LAST_CHECKED_POSTFIX = "-last-checked"
 
@@ -24,9 +24,6 @@ async def gather_loop() -> None:
         # Group changes happen very rarely compared to other events, but people tend to want these updates quickly.
         if (datetime.utcnow() - timestamp.get_last("groups" + LAST_CHECKED_POSTFIX)).total_seconds() > 300:
             await gather_group_changes()
-        # SEV changes happen more commonly, but people can wait for these updates more than for other events.
-        if (datetime.utcnow() - timestamp.get_last("sev" + LAST_CHECKED_POSTFIX)).total_seconds() > 300:
-            await gather_sev_changes()
 
 async def gather_new_events() -> None:
     """Gathers any new beatmapset/discussion/reply events."""
@@ -39,10 +36,6 @@ async def gather_news() -> None:
 async def gather_group_changes() -> None:
     """Gathers any new newsposts."""
     await gather(get_group_events_between, "groups")
-
-async def gather_sev_changes() -> None:
-    """Gathers any sev changes."""
-    await gather(get_sev_events_between, "sev")
 
 async def gather(async_event_generator, _id: str) -> None:
     """Iterates over new events since the last time, inserts them into the database,

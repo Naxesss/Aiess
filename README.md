@@ -67,7 +67,7 @@ Handles activity, performance, and application evaluations of [Beatmap Nominator
 | Events | Types |
 |:-|:-
 | Forwarded | `Nominated`, `Qualified`, `Nomination Reset`, `Disqualified`, `Ranked` |
-| Retrieved | `SEV`, `Added`, `Removed`
+| Retrieved | `Added`, `Removed`
 
 ## [BN Planner](https://github.com/Darius-Wattimena/bnplanner) Interface (`./bnplanner`)
 

@@ -21,7 +21,7 @@ from bnsite import api as bnsite_api
 from scraper.parsers.beatmapset_event_parser import beatmapset_event_parser
 from scraper.parsers.discussion_event_parser import discussion_event_parser
 from scraper.parsers.discussion_parser import discussion_parser
-from scraper.parsers import news_parser, group_parser, sev_parser
+from scraper.parsers import news_parser, group_parser
 
 def request_page(url: str) -> Response:
     """Requests a response object using the page rate limit.
@@ -109,14 +109,6 @@ def get_group_events(_from: datetime) -> Generator[Event, None, None]:
     """Returns a generator of group addition and removal Event objects from all group pages."""
     for group_id in [4, 7, 11, 16, 22, 28, 31, 32, 48]:
         yield from group_parser.parse(group_id=group_id, group_page=request_group_page(group_id), last_checked_at=_from)
-
-def get_sev_events(_from: datetime) -> Generator[Event, None, None]:
-    """Returns a generator of Event objects representing sev changes from the bnsite."""
-    for discussion_id, obv, sev, time in bnsite_api.request_discussion_sev(since=_from):
-        try:
-            yield sev_parser.parse(discussion_id, obv, sev, time)
-        except DeletedContextError:
-            pass
 
 
 
