@@ -18,6 +18,8 @@ from bot.database import Database, BOT_DB_NAME
 from bot.formatter import format_embed, format_link
 from bot.filterers.event_filterer import filter_context
 
+from aiess.web.ratelimiter import async_call_with_rate_limit
+
 DEFAULT_DB_NAME = BOT_DB_NAME
 
 cache: List[Subscription] = []
@@ -91,9 +93,14 @@ async def send_event(event: Event, subscription: Subscription, bot: discord.Bot,
 
     while True:
         try:
-            await channel.send(
-                content = format_link(event),
-                embed   = pre_generated_embed
+            await async_call_with_rate_limit(
+                awaited_result_func = lambda: channel.send(
+                    content = format_link(event),
+                    embed   = pre_generated_embed
+                ),
+                is_result_invalid   = lambda result: result is None,
+                rate_limit          = 0,
+                rate_limit_id       = "bot_channel_send"
             )
             break
         except Forbidden as ex:
