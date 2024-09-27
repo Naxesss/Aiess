@@ -31,7 +31,7 @@ class Database:
         DISCUSSION_REPLIES = "discussion_replies"
         USERS              = "users"
 
-    def __init__(self, _db_name: str, timeout_ms: float=20000):
+    def __init__(self, _db_name: str, timeout_ms: float=60000):
         self.db_name    = _db_name
         self.timeout_ms = timeout_ms
         db_config = {
