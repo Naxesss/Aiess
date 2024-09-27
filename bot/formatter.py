@@ -114,9 +114,8 @@ async def format_embed(event: Event, skip_timeago_if_recent: bool=False) -> str:
     )
     embed.colour = type_props[event.type].colour
     
-    # Unlike `set_footer`, providing `Embed.Empty` to thumbnail and image urls will cause a 400 Bad Request error.
-    if format_thumbnail_url(event) != Embed.Empty: embed.set_thumbnail(url=format_thumbnail_url(event))
-    if format_image_url(event) != Embed.Empty:     embed.set_image(url=format_image_url(event))
+    if format_thumbnail_url(event) is not None: embed.set_thumbnail(url=format_thumbnail_url(event))
+    if format_image_url(event) is not None:     embed.set_image(url=format_image_url(event))
 
     if type_props[event.type].show_context and event.discussion:
         embed.add_field(
@@ -192,7 +191,7 @@ def format_footer_text(event: Event) -> str:
     if event.group:
         if not event.content:
             # Group events already include `event.user` elsewhere in the embed, so shouldn't be here.
-            return Embed.Empty
+            return None
         else:
             return f"NAT {format_preview(event.content)}"
 
@@ -200,7 +199,7 @@ def format_footer_text(event: Event) -> str:
         return f"NAT {format_preview(event.content)}"
 
     if not event.user:
-        return Embed.Empty
+        return None
 
     if event.content:
         text = f"{event.user} {format_preview(event.content)}"
@@ -247,7 +246,7 @@ def format_footer_icon_url(event: Event) -> str:
     if there's a user associated with the event, otherwise None."""
     if event.group:
         if not event.content:
-            return Embed.Empty
+            return None
         else:
             # `6616586` is the user id for the QAT bot, which I'm just going to use to represent the NAT/BNSite.
             return "https://a.ppy.sh/6616586"
@@ -266,7 +265,7 @@ def format_footer_icon_url(event: Event) -> str:
         # In case the author field is free-text (e.g. "Noffy & -Mo-").
         return "https://osu.ppy.sh/images/layout/avatar-guest.png"
     
-    return Embed.Empty
+    return None
 
 def format_thumbnail_url(event: Event) -> str:
     """Returns the thumbnail url for the event (e.g. beatmapset thumbnail), if applicable, else None."""
@@ -276,13 +275,13 @@ def format_thumbnail_url(event: Event) -> str:
     if event.group:
         return f"https://a.ppy.sh/{event.user.id}"
     
-    return Embed.Empty
+    return None
 
 def format_image_url(event: Event) -> str:
     """Returns the image url for the event (e.g. newspost banner), if applicable, else None."""
     if event.newspost:
         return event.newspost.image_url
-    return Embed.Empty
+    return None
 
 def format_context_field_name(event: Event) -> str:
     """Returns the title for the discussion context; the name of the discussion author."""
