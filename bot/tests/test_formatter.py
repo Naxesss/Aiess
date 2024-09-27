@@ -247,7 +247,7 @@ def test_format_footer_text_newspost(newspost_event):
     assert format_footer_text(newspost_event) == "sometwo"
 
 def test_format_footer_text_no_user(qualify_event):
-    assert format_footer_text(qualify_event) == Embed.Empty
+    assert format_footer_text(qualify_event) == None
 
 def test_format_footer_text_preview(suggestion_event):
     suggestion_event.content = "04:25:218 (3,4) - the guitar is really strong here so mapping to the red beats only feels unfitting"
@@ -263,11 +263,11 @@ def test_format_footer_text_kudosu_given(kudosu_gain_event):
 def test_format_footer_text_kudosu_denied(kudosu_gain_event):
     kudosu_gain_event.type = "kudosu-deny"
     kudosu_gain_event.user = None
-    assert format_footer_text(kudosu_gain_event) == Embed.Empty
+    assert format_footer_text(kudosu_gain_event) == None
 
 def test_format_footer_text_group_event(group_event):
     # Group events already include the user in the field value.
-    assert format_footer_text(group_event) == Embed.Empty
+    assert format_footer_text(group_event) == None
 
 def test_format_footer_text_group_event_reason(group_event):
     group_event.type = "remove"
@@ -296,7 +296,7 @@ def test_format_footer_icon_url(suggestion_event):
     assert format_footer_icon_url(suggestion_event) == "https://a.ppy.sh/1"
 
 def test_format_footer_icon_url_no_user(qualify_event):
-    assert format_footer_icon_url(qualify_event) == Embed.Empty
+    assert format_footer_icon_url(qualify_event) == None
 
 def test_format_footer_icon_url_non_existing_user(suggestion_event):
     suggestion_event.user = User(_id=None, name="a")
@@ -319,13 +319,13 @@ def test_format_thumbnail_url_group_event(group_event):
     assert format_thumbnail_url(group_event) == "https://a.ppy.sh/2"
 
 def test_format_thumbnail_url_non_applicable(newspost_event):
-    assert format_thumbnail_url(newspost_event) == Embed.Empty
+    assert format_thumbnail_url(newspost_event) == None
 
 def test_format_image_url(newspost_event):
     assert format_image_url(newspost_event) == "https://osu.ppy.sh/image.jpg"
 
 def test_format_image_url_non_applicable(suggestion_event):
-    assert format_image_url(suggestion_event) == Embed.Empty
+    assert format_image_url(suggestion_event) == None
 
 def test_context_field_name(kudosu_gain_event):
     assert format_context_field_name(kudosu_gain_event) == "\\_someone\\_"
