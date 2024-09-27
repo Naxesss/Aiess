@@ -1,6 +1,7 @@
 from datetime import datetime
 from contextlib import suppress
 import os
+import tempfile
 
 from aiess.settings import ROOT_PATH
 
@@ -41,8 +42,12 @@ def set_last(new_datetime: datetime, _id: str=None) -> None:
     if not os.path.exists(get_dir_path(_id)):
         os.makedirs(get_dir_path(_id))
     
-    with open(get_path(_id), "w") as _file:
-        _file.write(to_string(new_datetime))
+    with tempfile.NamedTemporaryFile("w", dir=get_dir_path(_id), delete=False) as temp_file:
+        temp_file.write(to_string(new_datetime))
+        temp_file.flush()
+        os.fsync(temp_file.fileno())
+
+    os.replace(temp_file.name, get_path(_id))
 
 def exists(_id: str=None) -> bool:
     """Returns whether a datetime file for this id exists."""
