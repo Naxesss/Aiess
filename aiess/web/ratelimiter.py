@@ -22,7 +22,8 @@ async def async_call_with_rate_limit(awaited_result_func, is_result_invalid, rat
         if request_time and request_time > datetime.now():
             if not sleep_if_ratelimited:
                 return None
-            asyncio.sleep((request_time - datetime.now()).total_seconds())
+            sleep_seconds = (request_time - datetime.now()).total_seconds()
+            await asyncio.sleep(sleep_seconds)
 
         result = await awaited_result_func()
         next_request_time[rate_limit_id] = datetime.now() + timedelta(seconds=rate_limit)
