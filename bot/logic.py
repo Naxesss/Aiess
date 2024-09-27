@@ -12,7 +12,7 @@ NOT_GATES = ("not ",)
 
 # Regular expression for cases like "not A and (not B or not C)"
 # Any group captured may be removed.
-NOT_GATE_PATTERNS = [r"(?i)(?:(?:^|[^A-Za-z0-9_ ])|(?: ))(not)(?:(?:[^A-Za-z0-9_ ])|( ))"]
+NOT_GATE_PATTERNS = [r"(?:(?:^|[^A-Za-z0-9_ ])|(?: ))(not)(?:(?:[^A-Za-z0-9_ ])|( ))"]
 
 QUOTE_CHARS = ["\"", "“", "”"]
 
@@ -218,7 +218,7 @@ def de_morgans_law(string: str) -> str:
         if char == "(":
             for pattern_index, not_gate_pattern in enumerate(NOT_GATE_PATTERNS):
                 match = None
-                for temp_match in re.finditer(not_gate_pattern, read):
+                for temp_match in re.finditer(not_gate_pattern, read, re.IGNORECASE):
                     if not any(gate in read[temp_match.start(0):].lower() for gate in (AND_GATES + OR_GATES)):
                         match = temp_match
 
@@ -286,7 +286,7 @@ def double_negation_elimination(string: str) -> str:
     """Returns the same string, but where all double NOT gates are removed (e.g. "not type:not A" -> "type:A")."""
     matches = []
     for pattern in NOT_GATE_PATTERNS:
-        temp = list(re.finditer("(?=(?:" + pattern + "))", string))
+        temp = list(re.finditer("(?=(?:" + pattern + "))", string, re.IGNORECASE))
         for index, match in enumerate(temp):
             next_match = temp[index + 1] if len(temp) > index + 1 else None
             if not next_match:
@@ -325,7 +325,7 @@ def extract_not(expr: str) -> Tuple[str, str]:
     """Returns a tuple of the given expression without the first NOT gate found and
     the NOT gate that was found, if any, otherwise None."""
     for index, pattern in enumerate(NOT_GATE_PATTERNS):
-        match = re.search(pattern, expr)
+        match = re.search(pattern, expr, re.IGNORECASE)
         if match:
             not_gate = NOT_GATES[index]
             start, end = combined_captured_span(match)
