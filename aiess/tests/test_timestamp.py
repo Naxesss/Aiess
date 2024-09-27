@@ -59,6 +59,3 @@ def test_from_string_tz_different_timezone():
 
 def test_from_string_tz2():
     assert timestamp.from_string("2020-01-12T05:00:00.000Z") == timestamp.from_string("2020-01-12 05:00:00")
-
-def test_from_string_tz2_different_timezone():
-    assert timestamp.from_string("2020-01-12T05:00:00.000Z") == timestamp.from_string("2020-01-12 05:00:00")
