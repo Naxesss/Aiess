@@ -181,17 +181,13 @@ def get_group_bnsite_comment(event: Event) -> str:
         return None
 
     kind = json["kind"]
-    if   kind == "resignation": comment = "Resigned"
-    elif kind == "application": comment = None
-    elif kind == "currentBn":
-        consensus = json["consensus"] if "consensus" in json else None
-        if   consensus is None:           comment = None
-        # Movement within the Beatmap Nominators is self-explanatory given both the added+removed events.
-        elif consensus == "fullBn":       comment = None
-        elif consensus == "probationBn":  comment = None
-        elif consensus == "removeFromBn": comment = "Kicked"
-        else:                             raise ValueError(f"Unrecognized evaluation consensus \"{consensus}\".")
-    else: raise ValueError(f"Unrecognized evaluation kind \"{kind}\".")
+    comment = None
+    consensus = json["consensus"] if "consensus" in json else None
+
+    if kind == "resignation":
+        comment = "Resigned"
+    elif kind == "currentBn" and consensus == "removeFromBn":
+        comment = "Kicked"
 
     if comment is None or "addition" not in json:
         return comment
