@@ -106,9 +106,12 @@ async def send_event(event: Event, subscription: Subscription, bot: discord.Bot,
         except ServerDisconnectedError as ex:
             logger.log_err(f"WARNING | Encountered ServerDisconnectedError \"{ex}\" when sending to channel \"{channel}\", retrying...")
         except HTTPException as ex:
-            if ex.text.startswith("5"):
+            if str(ex.status).startswith("5"):
                 # 500-type codes are server-related (i.e. on Discord's end) and can be safely ignored.
                 # Commonly "503: Service Unavailable" and "504: Gateway Time-out".
                 logger.log_err(f"WARNING | Encountered HTTPException \"{ex}\" when sending to channel \"{channel}\", retrying...")
+            if ex.status == 429:
+                # We are being ratelimited by Discord and should back off our next attempt.
+                ratelimiter.back_off("bot_channel_send")
         except asyncio.TimeoutError as ex:
             logger.log_err(f"WARNING | Encountered asyncio.TimeoutError \"{ex}\" when sending to channel \"{channel}\", retrying...")
