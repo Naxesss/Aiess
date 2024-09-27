@@ -73,12 +73,8 @@ async def forward(event: Event, bot: discord.Bot) -> None:
     """Attempts to forward an event through all subscription filters."""
     pre_generated_embed = await format_embed(event, skip_timeago_if_recent=True)
 
-    tasks = []
-
     for sub in cache:
-        tasks.append(asyncio.create_task(forward_sub(event, sub, bot, pre_generated_embed)))
-    
-    await asyncio.gather(*tasks)
+        await forward_sub(event, sub, bot, pre_generated_embed)
 
 async def forward_sub(event: Event, sub: Subscription, bot: discord.Bot, pre_generated_embed: discord.Embed) -> None:
     """Attempts to forward an event through the filter of the given subscription."""
