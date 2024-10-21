@@ -191,13 +191,13 @@ async def test_nom_comment_praise_then_suggestions():
 
 @pytest.mark.asyncio
 async def test_nom_comment_from_praise():
-    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), allow_api=False)
-    nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(4, "mock user"))
+    beatmapset = Beatmapset(2237577, artist="Hashimoto Miyuki", title="Symphonic Love (Game Ver.)", creator=User(3181083, "AJT"), allow_api=False)
+    nominate_event = Event(types.NOMINATE, from_string("2024-10-09T23:50:20+00:00"), beatmapset, user=User(10447058, "dakiwii"))
     
     discussion_json = json.loads(mock_discussion_json_nom_comment_2)
     await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
 
-    assert nominate_event.content == "nice"
+    assert nominate_event.content == "happy new year 2012"
 
 
 

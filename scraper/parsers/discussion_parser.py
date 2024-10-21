@@ -9,10 +9,10 @@ class DiscussionParser():
 
     def parse(self, discussions_json: object, beatmapset: Beatmapset) -> Generator[Discussion, None, None]:
         """Returns a generator of discussions from the given beatmapset discussion page json, or None if no discussions exist."""
-        discussion_jsons = discussions_json["beatmapset"]["discussions"]
+        discussion_jsons = discussions_json["discussions"]
         for discussion_json in discussion_jsons:
             if not discussion_json: continue
-            yield self.parse_discussion(discussion_json, discussions_json["beatmapset"], beatmapset)
+            yield self.parse_discussion(discussion_json, discussions_json, beatmapset)
     
     def parse_discussion(self, discussion_json: object, beatmapset_json: object, beatmapset: Beatmapset) -> Discussion:
         """Returns a discussion from the given discussion json. The beatmapset json is also included for efficient username querying."""

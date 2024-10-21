@@ -36,13 +36,13 @@ def test_parse(discussions_json, beatmapset):
         assert discussion.tab is not None
 
 def test_parse_discussion(discussions_json, beatmapset):
-    discussion_jsons = discussions_json["beatmapset"]["discussions"]
+    discussion_jsons = discussions_json["discussions"]
     for discussion_json in discussion_jsons:
         if not discussion_json: continue
 
         discussion = discussion_parser.parse_discussion(
             discussion_json = discussion_json,
-            beatmapset_json = discussions_json["beatmapset"],
+            beatmapset_json = discussions_json,
             beatmapset      = beatmapset
         )
         assert discussion
@@ -53,32 +53,32 @@ def test_parse_discussion(discussions_json, beatmapset):
         assert discussion.tab is not None
 
 def test_parse_user(discussions_json):
-    discussion_jsons = discussions_json["beatmapset"]["discussions"]
+    discussion_jsons = discussions_json["discussions"]
     for discussion_json in discussion_jsons:
         if not discussion_json: continue
 
-        user = discussion_parser.parse_user(user_id=discussion_json["user_id"], beatmapset_json=discussions_json["beatmapset"])
+        user = discussion_parser.parse_user(user_id=discussion_json["user_id"], beatmapset_json=discussions_json)
         assert user
         assert user.id
         assert user.name
 
 def test_parse_discussion_post_author(discussions_json):
-    discussion_jsons = discussions_json["beatmapset"]["discussions"]
+    discussion_jsons = discussions_json["discussions"]
     for discussion_json in discussion_jsons:
         if not discussion_json: continue
 
-        user = discussion_parser.parse_discussion_post_author(post_id=3016640, beatmapset_json=discussions_json["beatmapset"])
+        user = discussion_parser.parse_discussion_post_author(post_id=3016640, beatmapset_json=discussions_json)
         assert user
         assert user.id
         assert user.name
 
 def test_parse_tab(discussions_json):
-    discussion_jsons = discussions_json["beatmapset"]["discussions"]
+    discussion_jsons = discussions_json["discussions"]
     tabs = set()
     for discussion_json in discussion_jsons:
         if not discussion_json: continue
 
-        tab = discussion_parser.parse_tab(discussion_json=discussion_json, beatmapset_json=discussions_json["beatmapset"])
+        tab = discussion_parser.parse_tab(discussion_json=discussion_json, beatmapset_json=discussions_json)
         tabs.add(tab)
         assert tab
     
@@ -87,13 +87,13 @@ def test_parse_tab(discussions_json):
     assert "generalAll" in tabs
 
 def test_parse_diff(discussions_json):
-    discussion_jsons = discussions_json["beatmapset"]["discussions"]
+    discussion_jsons = discussions_json["discussions"]
     difficulties = set()
     for discussion_json in discussion_jsons:
         if not discussion_json: continue
 
-        difficulty = discussion_parser.parse_diff(discussion_json=discussion_json, beatmapset_json=discussions_json["beatmapset"])
+        difficulty = discussion_parser.parse_diff(discussion_json=discussion_json, beatmapset_json=discussions_json)
         difficulties.add(difficulty)
     
-    for beatmap_json in discussions_json["beatmapset"]["beatmaps"]:
+    for beatmap_json in discussions_json["beatmaps"]:
         assert beatmap_json["version"] in difficulties

@@ -28,10 +28,6 @@ def request_page(url: str) -> Response:
     If cloudflare IUAM (https://blog.cloudflare.com/tag/iuam/) is active we simply wait until it's over."""
     return request_with_rate_limit(url, PAGE_RATE_LIMIT, "page", timeout=60)  # `timeout` is in seconds.
 
-def request_json(url: str) -> object:
-    """Requests the page from the url as a json object."""
-    return json.loads(request_page(url).text)
-
 def soupify(html: str) -> BeautifulSoup:
     """Returns the given html as a BeautifulSoup object."""
     return BeautifulSoup(html, features="html.parser")
@@ -59,6 +55,13 @@ def request_beatmapset_events(page: int=1, limit: int=50) -> BeautifulSoup:
         type_query += f"&types[]={_type}"
     
     return request_soup(f"https://osu.ppy.sh/beatmapsets/events?page={page}&limit={limit}{type_query}")
+
+def request_beatmapset_json(url: str) -> object:
+    """Requests the page from the url as a json object."""
+    beatmapset_soup = request_soup(url)
+    beatmapset_json_tag = beatmapset_soup.find("script", {"id": "json-beatmapset"})
+    beatmapset_json = beatmapset_json_tag.text
+    return json.loads(beatmapset_json)
 
 def request_discussion_events(page: int=1, limit: int=50) -> BeautifulSoup:
     """Requests the discussion events page as a BeautifulSoup object."""
@@ -116,7 +119,7 @@ def request_discussions_json(beatmapset_id: int) -> object:
     """Requests the beatmapset discussion page as a json object, if it exists, otherwise None.
     Older beatmapsets have no discussions, for example, so they will return None."""
     try:
-        return request_json(f"https://osu.ppy.sh/beatmapsets/{beatmapset_id}/discussion?format=json")
+        return request_beatmapset_json(f"https://osu.ppy.sh/beatmapsets/{beatmapset_id}/discussion")
     except json.decoder.JSONDecodeError:
         return None
 
@@ -128,9 +131,9 @@ def get_map_page_discussions(beatmapset: Beatmapset, discussions_json: object=No
 def get_map_page_event_jsons(beatmapset: Beatmapset, discussions_json: object=None) -> Generator[object, None, None]:
     """Returns a generator of event json objects from the beatmapset discussion page json. If not supplied it is scraped."""
     discussions_json = request_discussions_json(beatmapset.id) if discussions_json is None else discussions_json
-    return discussions_json["beatmapset"]["events"]
+    return discussions_json["events"]
 
 def get_map_page_discussion_jsons(beatmapset: Beatmapset, discussions_json: object=None) -> Generator[object, None, None]:
     """Returns a generator of event json objects from the beatmapset discussion page json. If not supplied it is scraped."""
     discussions_json = request_discussions_json(beatmapset.id) if discussions_json is None else discussions_json
-    return discussions_json["beatmapset"]["discussions"]
+    return discussions_json["discussions"]
