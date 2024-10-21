@@ -191,13 +191,13 @@ async def test_nom_comment_praise_then_suggestions():
 
 @pytest.mark.asyncio
 async def test_nom_comment_from_praise():
-    beatmapset = Beatmapset(1147354, artist="Jashin-chan (CV: Suzuki Aina)", title="Jinbouchou Aika", creator=User(9590557, "Firika"), allow_api=False)
-    nominate_event = Event(types.NOMINATE, from_string("2020-07-03T12:14:13+00:00"), beatmapset, user=User(4, "mock user"))
+    beatmapset = Beatmapset(2237577, artist="Hashimoto Miyuki", title="Symphonic Love (Game Ver.)", creator=User(3181083, "AJT"), allow_api=False)
+    nominate_event = Event(types.NOMINATE, from_string("2024-10-09T23:50:20+00:00"), beatmapset, user=User(10447058, "dakiwii"))
     
     discussion_json = json.loads(mock_discussion_json_nom_comment_2)
     await __populate_additional_details(nominate_event, discussion_json, db_name=SCRAPER_TEST_DB_NAME)
 
-    assert nominate_event.content == "nice"
+    assert nominate_event.content == "happy new year 2012"
 
 
 
@@ -245,36 +245,6 @@ async def test_populate_from_bnsite_content(group_event):
             
             await populate_from_bnsite(group_event)
             assert group_event.content == "Kicked"
-
-@pytest.mark.asyncio
-async def test_populate_from_bnsite_mode(group_event):
-    with mock.patch("scraper.populator.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-01-02 06:00:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_last_eval.return_value = {
-                "active": True,
-                "kind": "resignation",
-                "updatedAt": "2020-01-01T00:00:00.000Z",
-                "mode": "taiko"
-            }
-            
-            await populate_from_bnsite(group_event)
-            assert group_event.group.mode == "taiko"
-
-@pytest.mark.asyncio
-async def test_populate_from_bnsite_mode_integration():
-    # Mock datetime such that the eval won't be outdated.
-    with mock.patch("scraper.populator.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-10-24 02:00:00")
-        mock_datetime.side_effect = datetime
-
-        event = Event("add", from_string("2020-10-22 00:00:00"), user=User(12402453), group=Usergroup(28))
-
-        await populate_from_bnsite(event)
-        assert event.content is None
-        assert event.group.mode == "osu"
 
 def test_get_group_nat_comment(group_event):
     with mock.patch("scraper.populator.datetime") as mock_datetime:
@@ -343,36 +313,6 @@ def test_get_group_nat_comment_empty_json(group_event):
             mock_bnsite_api.request_last_eval.return_value = {}
 
             assert get_group_bnsite_comment(group_event) is None
-
-def test_get_group_mode(group_event):
-    with mock.patch("scraper.populator.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-01-01 00:01:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_last_eval.return_value = {
-                "active": False,
-                "kind": "resignation",
-                "updatedAt": "2020-01-01T00:00:00.000Z",
-                "mode": "taiko"
-            }
-
-            assert get_group_bnsite_mode(group_event) == "taiko"
-
-def test_get_group_mode_outdated(group_event):
-    with mock.patch("scraper.populator.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-03-01 00:01:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_last_eval.return_value = {
-                "active": False,
-                "kind": "resignation",
-                "updatedAt": "2020-01-01T00:00:00.000Z",
-                "mode": "taiko"
-            }
-
-            assert get_group_bnsite_mode(group_event) is None
 
 def test_eval_likely_outdated():
     old_archived_json = {

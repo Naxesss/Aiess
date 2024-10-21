@@ -23,47 +23,6 @@ class DiscussionEventParser(EventParser):
             if event:
                 yield event
     
-    def parse_event(self, event: Tag) -> Event:
-        """Returns a BeatmapsetEvent reflecting the given event html Tag object.
-        Ignores any event with an incomplete context (e.g. deleted beatmaps)."""
-        try:
-            # Scrape object data
-            _type = self.parse_event_type(event)
-            time = self.parse_event_time(event)
-
-            link = self.parse_event_link(event)
-            beatmapset_id = self.parse_id_from_beatmapset_link(link)
-            discussion_id = self.parse_id_from_discussion_link(link)
-
-            user_id = self.parse_event_author_id(event)
-            user_name = self.parse_event_author_name(event)
-
-            content = self.parse_discussion_message(event)
-
-            # Reconstruct objects
-            beatmapset = Beatmapset(beatmapset_id)
-            user = User(user_id, user_name) if user_id is not None else None
-            if _type == "reply":
-                # Replies should look up the discussion they are posted on.
-                discussion = Discussion(discussion_id, beatmapset) if discussion_id is not None else None
-            else:
-                tab = self.parse_discussion_tab(event)
-                difficulty = self.parse_discussion_diff(event)
-
-                discussion = Discussion(discussion_id, beatmapset, user, content, tab, difficulty) if discussion_id is not None else None
-        except DeletedContextError as err:
-            log_err(err)
-        else:
-            return Event(
-                _type = _type,
-                time = time,
-                beatmapset = beatmapset,
-                discussion = discussion,
-                user = user,
-                content = content)
-        
-        return None
-    
     def parse_event_json(self, event_json: object, user_jsons: object=None, discussion_jsons_for_replies: object=None) -> Event:
         """Returns a BeatmapsetEvent reflecting the given event json object.
         Ignores any event with an incomplete context (e.g. deleted beatmaps).
