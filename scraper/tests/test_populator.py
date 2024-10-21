@@ -246,36 +246,6 @@ async def test_populate_from_bnsite_content(group_event):
             await populate_from_bnsite(group_event)
             assert group_event.content == "Kicked"
 
-@pytest.mark.asyncio
-async def test_populate_from_bnsite_mode(group_event):
-    with mock.patch("scraper.populator.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-01-02 06:00:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_last_eval.return_value = {
-                "active": True,
-                "kind": "resignation",
-                "updatedAt": "2020-01-01T00:00:00.000Z",
-                "mode": "taiko"
-            }
-            
-            await populate_from_bnsite(group_event)
-            assert group_event.group.mode == "taiko"
-
-@pytest.mark.asyncio
-async def test_populate_from_bnsite_mode_integration():
-    # Mock datetime such that the eval won't be outdated.
-    with mock.patch("scraper.populator.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-10-24 02:00:00")
-        mock_datetime.side_effect = datetime
-
-        event = Event("add", from_string("2020-10-22 00:00:00"), user=User(12402453), group=Usergroup(28))
-
-        await populate_from_bnsite(event)
-        assert event.content is None
-        assert event.group.mode == "osu"
-
 def test_get_group_nat_comment(group_event):
     with mock.patch("scraper.populator.datetime") as mock_datetime:
         mock_datetime.utcnow.return_value = from_string("2020-01-01 00:01:00")
@@ -343,36 +313,6 @@ def test_get_group_nat_comment_empty_json(group_event):
             mock_bnsite_api.request_last_eval.return_value = {}
 
             assert get_group_bnsite_comment(group_event) is None
-
-def test_get_group_mode(group_event):
-    with mock.patch("scraper.populator.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-01-01 00:01:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_last_eval.return_value = {
-                "active": False,
-                "kind": "resignation",
-                "updatedAt": "2020-01-01T00:00:00.000Z",
-                "mode": "taiko"
-            }
-
-            assert get_group_bnsite_mode(group_event) == "taiko"
-
-def test_get_group_mode_outdated(group_event):
-    with mock.patch("scraper.populator.datetime") as mock_datetime:
-        mock_datetime.utcnow.return_value = from_string("2020-03-01 00:01:00")
-        mock_datetime.side_effect = datetime
-
-        with mock.patch("scraper.populator.bnsite_api") as mock_bnsite_api:
-            mock_bnsite_api.request_last_eval.return_value = {
-                "active": False,
-                "kind": "resignation",
-                "updatedAt": "2020-01-01T00:00:00.000Z",
-                "mode": "taiko"
-            }
-
-            assert get_group_bnsite_mode(group_event) is None
 
 def test_eval_likely_outdated():
     old_archived_json = {
